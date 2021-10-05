@@ -10,7 +10,7 @@ using namespace soulng::unicode;
 int RecentSolution::classId = -1;
 
 RecentSolution::RecentSolution()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), name(), filePath(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), name(), filePath(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -75,7 +75,7 @@ std::unique_ptr<sngxml::dom::Element> RecentSolution::ToXml(const std::string& f
 int BuildSettings::classId = -1;
 
 BuildSettings::BuildSettings()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), numberOfProjectBuildThreads(), singleThreadedCompile(), generateIntermediateCodeFiles(), generateOptimizedIntermediateCodeFiles(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), numberOfProjectBuildThreads(), singleThreadedCompile(), generateIntermediateCodeFiles(), generateOptimizedIntermediateCodeFiles(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -144,7 +144,7 @@ std::unique_ptr<sngxml::dom::Element> BuildSettings::ToXml(const std::string& fi
 int Options::classId = -1;
 
 Options::Options()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), defined(), codeCompletionDefined(), showStartupDialog(), numberOfRecentSolutions(), codeCompletion(), parsingFrequency(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), defined(), codeCompletionDefined(), showStartupDialog(), numberOfRecentSolutions(), codeCompletion(), parsingFrequency(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -217,7 +217,7 @@ std::unique_ptr<sngxml::dom::Element> Options::ToXml(const std::string& fieldNam
 int WindowLocation::classId = -1;
 
 WindowLocation::WindowLocation()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), x(), y(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), x(), y(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -282,7 +282,7 @@ std::unique_ptr<sngxml::dom::Element> WindowLocation::ToXml(const std::string& f
 int WindowSize::classId = -1;
 
 WindowSize::WindowSize()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), width(), height(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), width(), height(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -347,7 +347,7 @@ std::unique_ptr<sngxml::dom::Element> WindowSize::ToXml(const std::string& field
 int WindowSettings::classId = -1;
 
 WindowSettings::WindowSettings()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), defined(), windowState(), location(), size(), maximizedHorizontalSplitterDistance(), maximizedVerticalSplitterDistance(), normalHorizontalSplitterDistance(), normalVerticalSplitterDistance(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), defined(), windowState(), location(), size(), maximizedHorizontalSplitterDistance(), maximizedVerticalSplitterDistance(), normalHorizontalSplitterDistance(), normalVerticalSplitterDistance(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -424,7 +424,7 @@ std::unique_ptr<sngxml::dom::Element> WindowSettings::ToXml(const std::string& f
 int Configuration::classId = -1;
 
 Configuration::Configuration()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), recentSolutions(), options(), buildSettings(), windowSettings(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), recentSolutions(), options(), buildSettings(), windowSettings(), dataPtr(nullptr), isOwned(false)
 {
 }
 

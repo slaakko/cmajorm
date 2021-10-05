@@ -10,7 +10,7 @@ using namespace soulng::unicode;
 int SimpleClass::classId = -1;
 
 SimpleClass::SimpleClass()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), member(), ptr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), member(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -73,7 +73,7 @@ std::unique_ptr<sngxml::dom::Element> SimpleClass::ToXml(const std::string& fiel
 int BaseClass::classId = -1;
 
 BaseClass::BaseClass()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), member(), ptr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), member(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -169,7 +169,7 @@ void DerivedClass::FromXml(sngxml::dom::Element* element)
 
 std::vector<sngxml::xmlser::XmlPtrBase*> DerivedClass::GetPtrs() const
 {
-    std::vector<sngxml::xmlser::XmlPtrBase*> ptrs;
+    std::vector<sngxml::xmlser::XmlPtrBase*> ptrs = BaseClass::GetPtrs();
     return ptrs;
 }
 
@@ -194,7 +194,7 @@ std::unique_ptr<sngxml::dom::Element> DerivedClass::ToXml(const std::string& fie
 int XmlTestClass::classId = -1;
 
 XmlTestClass::XmlTestClass()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), f0(), f1(), f2(), f3(), f4(), f5(), f6(), f7(), f8(), f9(), f10(), f11(), f12(), f13(), f14(), f15(), ts(), time(), f16(), f17(), f18(), f19(), f20(), f21(), f22(), f23(), f24(), f25(), f26(), f27(), f28(), f29(), f30(), f31(), f32(), f33(), f34(), f35(), ptr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), f0(), f1(), f2(), f3(), f4(), f5(), f6(), f7(), f8(), f9(), f10(), f11(), f12(), f13(), f14(), f15(), ts(), time(), f16(), f17(), f18(), f19(), f20(), f21(), f22(), f23(), f24(), f25(), f26(), f27(), f28(), f29(), f30(), f31(), f32(), f33(), f34(), f35(), dataPtr(nullptr), isOwned(false)
 {
 }
 

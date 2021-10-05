@@ -19,6 +19,11 @@ XmlContainer::~XmlContainer()
 {
 }
 
+void XmlContainer::Clear()
+{
+    idMap.clear();
+}
+
 void XmlContainer::Add(XmlSerializable* serializable)
 {
     const boost::uuids::uuid& objectId = serializable->ObjectId();
@@ -74,6 +79,22 @@ void XmlContainer::AddToBundle(XmlBundle& bundle, XmlSerializable* object, std::
             if (targetObject)
             {
                 AddToBundle(bundle, targetObject, addedSet);
+            }
+            else
+            {
+                XmlSerializable* s = ptr->GetPtr();
+                if (s)
+                {
+                    XmlContainer* container = s->Container();
+                    if (container)
+                    {
+                        targetObject = container->Get(ptr->TargetObjectId());
+                        if (targetObject)
+                        {
+                            container->AddToBundle(bundle, targetObject, addedSet);
+                        }
+                    }
+                }
             }
         }
     }

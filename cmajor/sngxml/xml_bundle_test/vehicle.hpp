@@ -42,6 +42,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -65,6 +68,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 #endif // VEHICLE_HPP_87AA9A703BD3AEEFE2F3DDC4DF3BD1DE137171E6

@@ -4,6 +4,7 @@
 // =================================
 
 #include <sngxml/serialization/XmlSerializable.hpp>
+#include <sngxml/serialization/XmlContainer.hpp>
 #include <boost/uuid/random_generator.hpp>
 
 namespace sngxml { namespace xmlser {

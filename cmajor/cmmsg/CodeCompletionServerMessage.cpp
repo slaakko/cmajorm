@@ -10,7 +10,7 @@ using namespace soulng::unicode;
 int CodeCompletionRequest::classId = -1;
 
 CodeCompletionRequest::CodeCompletionRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), created(), received(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), created(), received(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -75,7 +75,7 @@ std::unique_ptr<sngxml::dom::Element> CodeCompletionRequest::ToXml(const std::st
 int CodeCompletionReply::classId = -1;
 
 CodeCompletionReply::CodeCompletionReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), requestCreated(), requestReceived(), created(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), requestCreated(), requestReceived(), created(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -908,7 +908,7 @@ std::unique_ptr<sngxml::dom::Element> StopCCReply::ToXml(const std::string& fiel
 int KeepAliveCCRequest::classId = -1;
 
 KeepAliveCCRequest::KeepAliveCCRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -969,7 +969,7 @@ std::unique_ptr<sngxml::dom::Element> KeepAliveCCRequest::ToXml(const std::strin
 int KeepAliveCCReply::classId = -1;
 
 KeepAliveCCReply::KeepAliveCCReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 

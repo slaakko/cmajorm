@@ -18,12 +18,14 @@ struct SNGXML_SERIALIZATION_API XmlSerParser
     static soulng::parser::Match FileTag(XmlSerLexer& lexer);
     static soulng::parser::Match NamespaceContent(XmlSerLexer& lexer, sngxml::xmlser::NamespaceNode* ownerNs);
     static soulng::parser::Match Declaration(XmlSerLexer& lexer);
+    static soulng::parser::Match QualifiedId(XmlSerLexer& lexer);
     static soulng::parser::Match Definition(XmlSerLexer& lexer);
     static soulng::parser::Match Namespace(XmlSerLexer& lexer);
     static soulng::parser::Match Class(XmlSerLexer& lexer);
     static soulng::parser::Match Api(XmlSerLexer& lexer);
     static soulng::parser::Match ClassKey(XmlSerLexer& lexer);
-    static soulng::parser::Match Inheritance(XmlSerLexer& lexer);
+    static soulng::parser::Match Inheritance(XmlSerLexer& lexer, sngxml::xmlser::ClassNode* classNode);
+    static soulng::parser::Match BaseClass(XmlSerLexer& lexer, sngxml::xmlser::ClassNode* classNode);
     static soulng::parser::Match ClassContent(XmlSerLexer& lexer, sngxml::xmlser::ClassNode* classNode);
     static soulng::parser::Match MemberVariable(XmlSerLexer& lexer);
     static soulng::parser::Match Enum(XmlSerLexer& lexer);

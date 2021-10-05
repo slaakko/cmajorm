@@ -11,6 +11,7 @@ namespace XmlSerTokens
     void InitTokenIdMap()
     {
         tokenIdMap[U"API"] = 1;
+        tokenIdMap[U"ASSIGN"] = 39;
         tokenIdMap[U"AST"] = 35;
         tokenIdMap[U"BASE"] = 5;
         tokenIdMap[U"BOOL"] = 6;
@@ -18,33 +19,34 @@ namespace XmlSerTokens
         tokenIdMap[U"CHAR"] = 17;
         tokenIdMap[U"CLASS"] = 3;
         tokenIdMap[U"COLON"] = 34;
+        tokenIdMap[U"COLONCOLON"] = 44;
         tokenIdMap[U"COMMA"] = 38;
         tokenIdMap[U"DATE"] = 24;
         tokenIdMap[U"DATETIME"] = 25;
         tokenIdMap[U"DOUBLE"] = 16;
         tokenIdMap[U"DURATION"] = 28;
-        tokenIdMap[U"ENDCPP"] = 40;
+        tokenIdMap[U"ENDCPP"] = 41;
         tokenIdMap[U"ENUM"] = 4;
-        tokenIdMap[U"FILEPATH"] = 45;
+        tokenIdMap[U"FILEPATH"] = 47;
         tokenIdMap[U"FLOAT"] = 15;
-        tokenIdMap[U"HASH"] = 43;
+        tokenIdMap[U"HASH"] = 45;
         tokenIdMap[U"ID"] = 2;
-        tokenIdMap[U"INCLUDE"] = 44;
+        tokenIdMap[U"INCLUDE"] = 46;
         tokenIdMap[U"INT"] = 11;
-        tokenIdMap[U"LANGLE"] = 41;
+        tokenIdMap[U"LANGLE"] = 42;
         tokenIdMap[U"LBRACE"] = 31;
         tokenIdMap[U"LBRACKET"] = 29;
         tokenIdMap[U"LONG"] = 13;
         tokenIdMap[U"LPAREN"] = 36;
-        tokenIdMap[U"NAMESPACE"] = 46;
-        tokenIdMap[U"RANGLE"] = 42;
+        tokenIdMap[U"NAMESPACE"] = 48;
+        tokenIdMap[U"RANGLE"] = 43;
         tokenIdMap[U"RBRACE"] = 32;
         tokenIdMap[U"RBRACKET"] = 30;
         tokenIdMap[U"RPAREN"] = 37;
         tokenIdMap[U"SBYTE"] = 7;
         tokenIdMap[U"SEMICOLON"] = 33;
         tokenIdMap[U"SHORT"] = 9;
-        tokenIdMap[U"STARTCPP"] = 39;
+        tokenIdMap[U"STARTCPP"] = 40;
         tokenIdMap[U"STRING"] = 21;
         tokenIdMap[U"TIMESTAMP"] = 26;
         tokenIdMap[U"TIME_POINT"] = 27;
@@ -52,6 +54,7 @@ namespace XmlSerTokens
         tokenIdMap[U"UINT"] = 12;
         tokenIdMap[U"ULONG"] = 14;
         tokenIdMap[U"USHORT"] = 10;
+        tokenIdMap[U"USING"] = 49;
         tokenIdMap[U"USTRING"] = 23;
         tokenIdMap[U"UUID"] = 20;
         tokenIdMap[U"WCHAR"] = 18;
@@ -112,14 +115,17 @@ namespace XmlSerTokens
         "LPAREN",
         "RPAREN",
         "COMMA",
+        "ASSIGN",
         "STARTCPP",
         "ENDCPP",
         "LANGLE",
         "RANGLE",
+        "COLONCOLON",
         "HASH",
         "INCLUDE",
         "FILEPATH",
-        "NAMESPACE"
+        "NAMESPACE",
+        "USING"
     };
 
     const char* GetTokenName(int tokenId)
@@ -168,14 +174,17 @@ namespace XmlSerTokens
         "'('",
         "')'",
         "','",
+        "'='",
         "'<%'",
         "'%>'",
         "'<'",
         "'>'",
+        "'::'",
         "'#'",
         "'include'",
         "'filepath'",
-        "'namespace'"
+        "'namespace'",
+        "'using'"
     };
 
     const char* GetTokenInfo(int tokenId)

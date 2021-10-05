@@ -41,8 +41,13 @@ parser api(SNGXML_SERIALIZATION_API) XmlSerParser
         ::= (Declaration:declaration{ ownerNs->AddNode(declaration); } | Definition:definition{ ownerNs->AddNode(definition); })*
         ;
 
-    Declaration(var std::string classId) : sngxml::xmlser::Node*
+    Declaration(var std::string classId , var std::string id) : sngxml::xmlser::Node*
         ::= (CLASS ID{ classId = ToUtf8(lexer.GetMatch(span)); } SEMICOLON){ return new sngxml::xmlser::ForwardClassDeclarationNode(classId); }
+        |   (USING ID{ id = ToUtf8(lexer.GetMatch(span)); } ASSIGN QualifiedId:subject SEMICOLON){ return new sngxml::xmlser::AliasDeclarationNode(id, subject); }
+        ;
+
+    QualifiedId(var std::string id) : std::string
+        ::= (ID{ id = ToUtf8(lexer.GetMatch(span)); } (COLONCOLON ID{ id.append("::").append(ToUtf8(lexer.GetMatch(span))); })*){ return id; }
         ;
         
     Definition(var std::unique_ptr<sngxml::xmlser::CppBlockNode> cppBlockNode) : sngxml::xmlser::Node*
@@ -60,9 +65,9 @@ parser api(SNGXML_SERIALIZATION_API) XmlSerParser
         ;
 
     Class(var std::unique_ptr<sngxml::xmlser::ClassNode> classNode, var std::string api_) : sngxml::xmlser::ClassNode*
-        ::= (ClassKey:clsKey (Api:a{ api_ = a; })? ID{ classNode.reset(new sngxml::xmlser::ClassNode(clsKey, api_, ToUtf8(lexer.GetMatch(span)))); } 
-            (Inheritance:inheritance{ classNode->SetBaseClassId(inheritance); })? 
-            LBRACE ClassContent(classNode.get()):classContent RBRACE)
+        ::= ClassKey:clsKey (Api:a{ api_ = a; })? ID{ classNode.reset(new sngxml::xmlser::ClassNode(clsKey, api_, ToUtf8(lexer.GetMatch(span)))); } 
+            (Inheritance(classNode.get()):inheritance)? 
+            LBRACE ClassContent(classNode.get()):classContent RBRACE
         {
             return classNode.release();
         }
@@ -77,8 +82,13 @@ parser api(SNGXML_SERIALIZATION_API) XmlSerParser
         |   CLASS{ return sngxml::xmlser::ClassNode::Key::class_; }
         ;
 
-    Inheritance : std::string
-        ::= COLON ID{ return ToUtf8(lexer.GetMatch(span)); }
+    Inheritance(sngxml::xmlser::ClassNode* classNode) 
+        ::= COLON BaseClass(classNode):first (COMMA BaseClass(classNode):next)*
+        ;
+
+    BaseClass(sngxml::xmlser::ClassNode* classNode, var std::string baseClassId)
+        ::= BASE LPAREN ID{ baseClassId = ToUtf8(lexer.GetMatch(span)); } RPAREN{ classNode->AddBaseClass(new sngxml::xmlser::ExternalBaseClassNode(baseClassId)); }
+        |   ID{ classNode->AddBaseClass(new sngxml::xmlser::InternalBaseClassNode(ToUtf8(lexer.GetMatch(span)))); }
         ;
 
     ClassContent(sngxml::xmlser::ClassNode* classNode)

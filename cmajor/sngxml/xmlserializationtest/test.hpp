@@ -1,5 +1,5 @@
-#ifndef TEST_HPP_4022209C1104C780FE295AA2C5E6439DA402B7EA
-#define TEST_HPP_4022209C1104C780FE295AA2C5E6439DA402B7EA
+#ifndef TEST_HPP_03908BDD6AE840D2388CF6A916D601CB77831F32
+#define TEST_HPP_03908BDD6AE840D2388CF6A916D601CB77831F32
 #include <sngxml/serialization/XmlPtr.hpp>
 #include <soulng/util/Time.hpp>
 #include <chrono>
@@ -27,6 +27,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -36,11 +39,12 @@ public:
     virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     std::string member;
-    void* ptr;
+    void* dataPtr;
 private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class BaseClass : public sngxml::xmlser::XmlSerializable
@@ -55,6 +59,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -64,11 +71,12 @@ public:
     virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     std::string member;
-    void* ptr;
+    void* dataPtr;
 private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class DerivedClass : public BaseClass
@@ -108,6 +116,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -154,11 +165,12 @@ public:
     unique_xml_ptr<BaseClass> f33;
     std::vector<xml_ptr<BaseClass>> f34;
     std::vector<unique_xml_ptr<BaseClass>> f35;
-    void* ptr;
+    void* dataPtr;
 private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
-#endif // TEST_HPP_4022209C1104C780FE295AA2C5E6439DA402B7EA
+#endif // TEST_HPP_03908BDD6AE840D2388CF6A916D601CB77831F32

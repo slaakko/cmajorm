@@ -10,7 +10,7 @@ using namespace soulng::unicode;
 int HelloPmsRequest::classId = -1;
 
 HelloPmsRequest::HelloPmsRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -71,7 +71,7 @@ std::unique_ptr<sngxml::dom::Element> HelloPmsRequest::ToXml(const std::string& 
 int HelloPmsReply::classId = -1;
 
 HelloPmsReply::HelloPmsReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), version(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), version(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -134,7 +134,7 @@ std::unique_ptr<sngxml::dom::Element> HelloPmsReply::ToXml(const std::string& fi
 int GetFreePortNumberRequest::classId = -1;
 
 GetFreePortNumberRequest::GetFreePortNumberRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), processName(), pid(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), processName(), pid(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -199,7 +199,7 @@ std::unique_ptr<sngxml::dom::Element> GetFreePortNumberRequest::ToXml(const std:
 int GetFreePortNumberReply::classId = -1;
 
 GetFreePortNumberReply::GetFreePortNumberReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), portNumber(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), portNumber(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -262,7 +262,7 @@ std::unique_ptr<sngxml::dom::Element> GetFreePortNumberReply::ToXml(const std::s
 int ExtendPortLeaseRequest::classId = -1;
 
 ExtendPortLeaseRequest::ExtendPortLeaseRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), processName(), pid(), portNumbers(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), processName(), pid(), portNumbers(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -329,7 +329,7 @@ std::unique_ptr<sngxml::dom::Element> ExtendPortLeaseRequest::ToXml(const std::s
 int ExtendPortLeaseReply::classId = -1;
 
 ExtendPortLeaseReply::ExtendPortLeaseReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -390,7 +390,7 @@ std::unique_ptr<sngxml::dom::Element> ExtendPortLeaseReply::ToXml(const std::str
 int StopPortMapServerRequest::classId = -1;
 
 StopPortMapServerRequest::StopPortMapServerRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -451,7 +451,7 @@ std::unique_ptr<sngxml::dom::Element> StopPortMapServerRequest::ToXml(const std:
 int StopPortMapServerReply::classId = -1;
 
 StopPortMapServerReply::StopPortMapServerReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -512,7 +512,7 @@ std::unique_ptr<sngxml::dom::Element> StopPortMapServerReply::ToXml(const std::s
 int PortLease::classId = -1;
 
 PortLease::PortLease()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), portNumber(), processName(), pid(), leaseStartTime(), leaseRenewalTime(), leaseState(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), portNumber(), processName(), pid(), leaseStartTime(), leaseRenewalTime(), leaseState(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -585,7 +585,7 @@ std::unique_ptr<sngxml::dom::Element> PortLease::ToXml(const std::string& fieldN
 int ViewPortLeaseRequest::classId = -1;
 
 ViewPortLeaseRequest::ViewPortLeaseRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -646,7 +646,7 @@ std::unique_ptr<sngxml::dom::Element> ViewPortLeaseRequest::ToXml(const std::str
 int ViewPortLeaseReply::classId = -1;
 
 ViewPortLeaseReply::ViewPortLeaseReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), portLeases(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), portLeases(), dataPtr(nullptr), isOwned(false)
 {
 }
 

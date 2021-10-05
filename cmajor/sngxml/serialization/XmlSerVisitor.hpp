@@ -43,8 +43,11 @@ class EnumTypeNode;
 class EnumConstantNode;
 class SourceFileNode;
 class ForwardClassDeclarationNode;
+class AliasDeclarationNode;
 class IncludeDirectiveNode;
 class CppBlockNode;
+class ExternalBaseClassNode;
+class InternalBaseClassNode;
 
 class Visitor
 {
@@ -84,8 +87,11 @@ public:
     virtual void Visit(EnumConstantNode& node) {}
     virtual void Visit(SourceFileNode& node) {}
     virtual void Visit(ForwardClassDeclarationNode& node) {}
+    virtual void Visit(AliasDeclarationNode& node) {}
     virtual void Visit(IncludeDirectiveNode& node) {}
     virtual void Visit(CppBlockNode& node) {}
+    virtual void Visit(ExternalBaseClassNode& node) {}
+    virtual void Visit(InternalBaseClassNode& node) {}
 };
 
 class DefaultVisitor : public Visitor

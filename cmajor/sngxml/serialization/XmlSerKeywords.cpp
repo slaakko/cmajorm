@@ -38,7 +38,8 @@ namespace XmlSerKeywords
         {U"time_point", TIME_POINT}, 
         {U"duration", DURATION}, 
         {U"include", INCLUDE}, 
-        {U"namespace", NAMESPACE},
+        {U"namespace", NAMESPACE}, 
+        {U"using", USING},
         {nullptr, -1}
     };
 

@@ -18,10 +18,12 @@ public:
     const boost::uuids::uuid& RootObjectId() const { return rootObjectId; }
     void SetRootObjectId(const boost::uuids::uuid& rootObjectId_) override;
     XmlSerializable* Root() const;
+    XmlSerializable* ReleaseRoot();
     std::unique_ptr<sngxml::dom::Document> ToXmlDocument() const;
     std::string ToXmlString() const;
     std::string ToXmlString(int indent) const;
     void ResolveXmlPtrs();
+    void DestroyNonownedObjects();
 private:
     boost::uuids::uuid rootObjectId;
 };

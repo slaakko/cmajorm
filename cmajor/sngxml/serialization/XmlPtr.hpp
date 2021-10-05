@@ -98,15 +98,15 @@ class UniqueXmlPtr : public XmlPtrBase
 {
 public:
     UniqueXmlPtr() : ptr() {}
-    explicit UniqueXmlPtr(T* ptr_) : ptr(ptr_) { SetId(); }
+    explicit UniqueXmlPtr(T* ptr_) : ptr(ptr_) { SetIdAndOwned(); }
     UniqueXmlPtr(const UniqueXmlPtr&) = delete;
     UniqueXmlPtr(UniqueXmlPtr&& that) : XmlPtrBase(std::move(that)), ptr(std::move(that.ptr)) { }
-    void operator=(T* ptr_) { ptr.reset(ptr_); SetId(); }
+    void operator=(T* ptr_) { ptr.reset(ptr_); SetIdAndOwned(); }
     UniqueXmlPtr& operator=(const UniqueXmlPtr& that) = delete;
-    void Reset() { ptr.reset(); SetId(); }
-    void Reset(T* ptr_) { ptr.reset(ptr_); SetId(); }
+    void Reset() { ptr.reset(); SetIdAndOwned(); }
+    void Reset(T* ptr_) { ptr.reset(ptr_); SetIdAndOwned(); }
     T* Get() const { return ptr.get(); }
-    T* Release() { T* p = ptr.release(); SetId(); return p; }
+    T* Release() { T* p = ptr.release(); SetIdAndOwned(); return p; }
     T* operator->() { return ptr.get(); }
     const T* operator->() const { return ptr.get(); }
     T& operator*() { return *ptr; }
@@ -114,13 +114,14 @@ public:
     XmlSerializable* GetPtr() const override;
     void SetPtr(XmlSerializable* p) override;
 private:
-    void SetId()
+    void SetIdAndOwned()
     {
         if (ptr)
         {
             if (XmlSerializable* intf = dynamic_cast<XmlSerializable*>(ptr.get()))
             {
                 SetTargetObjectId(intf->ObjectId());
+                intf->SetOwned();
             }
             else
             {
@@ -145,6 +146,10 @@ template<class T>
 void UniqueXmlPtr<T>::SetPtr(XmlSerializable* p)
 { 
     ptr.reset(dynamic_cast<T*>(p)); 
+    if (p)
+    {
+        p->SetOwned();
+    }
 }
 
 template<class T>

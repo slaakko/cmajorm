@@ -102,17 +102,7 @@ int XmlSerLexer::NextState(int state, char32_t c)
                 {
                     return 17;
                 }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 17:
-        {
-            switch (i)
-            {
-                case 1:
+                case 22:
                 {
                     return 18;
                 }
@@ -124,9 +114,23 @@ int XmlSerLexer::NextState(int state, char32_t c)
         }
         case 18:
         {
+            switch (i)
+            {
+                case 1:
+                {
+                    return 19;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 19:
+        {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
-            int tokenId = GetTokenId(14);
+            int tokenId = GetTokenId(16);
             if (tokenId == CONTINUE_TOKEN)
             {
                 token.id = tokenId;
@@ -142,7 +146,64 @@ int XmlSerLexer::NextState(int state, char32_t c)
             }
             return -1;
         }
-        case 16:
+        case 17:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(17);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 1:
+                {
+                    return 20;
+                }
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                {
+                    return 21;
+                }
+                case 22:
+                {
+                    return 22;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 22:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -164,7 +225,7 @@ int XmlSerLexer::NextState(int state, char32_t c)
             {
                 case 1:
                 {
-                    return 19;
+                    return 20;
                 }
                 case 2:
                 case 3:
@@ -185,10 +246,8 @@ int XmlSerLexer::NextState(int state, char32_t c)
                 case 18:
                 case 19:
                 case 20:
-                {
-                    return 20;
-                }
                 case 21:
+                case 22:
                 {
                     return 21;
                 }
@@ -200,9 +259,47 @@ int XmlSerLexer::NextState(int state, char32_t c)
         }
         case 21:
         {
+            switch (i)
+            {
+                case 1:
+                {
+                    return 20;
+                }
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                {
+                    return 21;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 20:
+        {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
-            int tokenId = GetTokenId(13);
+            int tokenId = GetTokenId(19);
             if (tokenId == CONTINUE_TOKEN)
             {
                 token.id = tokenId;
@@ -216,83 +313,13 @@ int XmlSerLexer::NextState(int state, char32_t c)
             {
                 token.match = prevMatch;
             }
-            switch (i)
-            {
-                case 1:
-                {
-                    return 19;
-                }
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                {
-                    return 20;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
+            return -1;
         }
-        case 20:
-        {
-            switch (i)
-            {
-                case 1:
-                {
-                    return 19;
-                }
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                {
-                    return 20;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 19:
+        case 16:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
-            int tokenId = GetTokenId(17);
+            int tokenId = GetTokenId(14);
             if (tokenId == CONTINUE_TOKEN)
             {
                 token.id = tokenId;
@@ -329,6 +356,36 @@ int XmlSerLexer::NextState(int state, char32_t c)
             return -1;
         }
         case 14:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(11);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 18:
+                {
+                    return 23;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 23:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -531,7 +588,7 @@ int XmlSerLexer::NextState(int state, char32_t c)
                 case 5:
                 case 6:
                 {
-                    return 22;
+                    return 24;
                 }
                 default:
                 {
@@ -539,7 +596,7 @@ int XmlSerLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 22:
+        case 24:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -562,7 +619,7 @@ int XmlSerLexer::NextState(int state, char32_t c)
                 case 5:
                 case 6:
                 {
-                    return 22;
+                    return 24;
                 }
                 default:
                 {
@@ -574,7 +631,7 @@ int XmlSerLexer::NextState(int state, char32_t c)
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
-            int tokenId = GetTokenId(11);
+            int tokenId = GetTokenId(13);
             if (tokenId == CONTINUE_TOKEN)
             {
                 token.id = tokenId;
@@ -596,44 +653,6 @@ int XmlSerLexer::NextState(int state, char32_t c)
             {
                 case 2:
                 {
-                    return 23;
-                }
-                case 3:
-                {
-                    return 24;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 24:
-        {
-            switch (i)
-            {
-                case 0:
-                case 1:
-                case 2:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                {
                     return 25;
                 }
                 case 3:
@@ -650,12 +669,9 @@ int XmlSerLexer::NextState(int state, char32_t c)
         {
             switch (i)
             {
-                case 3:
-                {
-                    return 26;
-                }
                 case 0:
                 case 1:
+                case 2:
                 case 4:
                 case 5:
                 case 6:
@@ -674,10 +690,11 @@ int XmlSerLexer::NextState(int state, char32_t c)
                 case 19:
                 case 20:
                 case 21:
+                case 22:
                 {
                     return 27;
                 }
-                case 2:
+                case 3:
                 {
                     return 28;
                 }
@@ -689,27 +706,19 @@ int XmlSerLexer::NextState(int state, char32_t c)
         }
         case 28:
         {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
             switch (i)
             {
+                case 3:
+                {
+                    return 28;
+                }
+                case 0:
                 case 1:
+                case 4:
                 case 5:
                 case 6:
+                case 7:
+                case 8:
                 case 9:
                 case 10:
                 case 11:
@@ -723,17 +732,7 @@ int XmlSerLexer::NextState(int state, char32_t c)
                 case 19:
                 case 20:
                 case 21:
-                {
-                    return 25;
-                }
-                case 3:
-                {
-                    return 26;
-                }
-                case 0:
-                case 4:
-                case 7:
-                case 8:
+                case 22:
                 {
                     return 29;
                 }
@@ -749,15 +748,27 @@ int XmlSerLexer::NextState(int state, char32_t c)
         }
         case 30:
         {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
             switch (i)
             {
-                case 0:
                 case 1:
-                case 4:
                 case 5:
                 case 6:
-                case 7:
-                case 8:
                 case 9:
                 case 10:
                 case 11:
@@ -771,14 +782,22 @@ int XmlSerLexer::NextState(int state, char32_t c)
                 case 19:
                 case 20:
                 case 21:
+                case 22:
                 {
-                    return 25;
+                    return 27;
                 }
-                case 2:
+                case 3:
+                {
+                    return 28;
+                }
+                case 0:
+                case 4:
+                case 7:
+                case 8:
                 {
                     return 31;
                 }
-                case 3:
+                case 2:
                 {
                     return 32;
                 }
@@ -792,10 +811,6 @@ int XmlSerLexer::NextState(int state, char32_t c)
         {
             switch (i)
             {
-                case 3:
-                {
-                    return 26;
-                }
                 case 0:
                 case 1:
                 case 4:
@@ -816,26 +831,73 @@ int XmlSerLexer::NextState(int state, char32_t c)
                 case 19:
                 case 20:
                 case 21:
+                case 22:
                 {
                     return 27;
                 }
                 case 2:
                 {
+                    return 33;
+                }
+                case 3:
+                {
+                    return 34;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 34:
+        {
+            switch (i)
+            {
+                case 3:
+                {
                     return 28;
                 }
+                case 0:
+                case 1:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                {
+                    return 29;
+                }
+                case 2:
+                {
+                    return 30;
+                }
                 default:
                 {
                     return -1;
                 }
             }
         }
-        case 31:
+        case 33:
         {
             switch (i)
             {
                 case 0:
                 {
-                    return 33;
+                    return 35;
                 }
                 case 1:
                 case 2:
@@ -856,642 +918,17 @@ int XmlSerLexer::NextState(int state, char32_t c)
                 case 19:
                 case 20:
                 case 21:
-                {
-                    return 34;
-                }
-                case 3:
-                {
-                    return 35;
-                }
-                case 4:
+                case 22:
                 {
                     return 36;
                 }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 36:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 1:
-                case 5:
-                case 6:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                {
-                    return 25;
-                }
                 case 3:
-                {
-                    return 26;
-                }
-                case 4:
-                case 7:
-                case 8:
-                {
-                    return 29;
-                }
-                case 2:
-                {
-                    return 30;
-                }
-                case 0:
                 {
                     return 37;
                 }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 37:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 1:
-                case 5:
-                case 6:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                {
-                    return 25;
-                }
-                case 3:
-                {
-                    return 26;
-                }
-                case 0:
                 case 4:
-                case 7:
-                case 8:
-                {
-                    return 29;
-                }
-                case 2:
-                {
-                    return 30;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 35:
-        {
-            switch (i)
-            {
-                case 3:
-                {
-                    return 35;
-                }
-                case 0:
                 {
                     return 38;
-                }
-                case 1:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                {
-                    return 39;
-                }
-                case 2:
-                {
-                    return 40;
-                }
-                case 4:
-                {
-                    return 41;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 41:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 1:
-                case 5:
-                case 6:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                {
-                    return 25;
-                }
-                case 3:
-                {
-                    return 26;
-                }
-                case 4:
-                case 7:
-                case 8:
-                {
-                    return 29;
-                }
-                case 2:
-                {
-                    return 30;
-                }
-                case 0:
-                {
-                    return 37;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 40:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 1:
-                case 5:
-                case 6:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                {
-                    return 34;
-                }
-                case 3:
-                {
-                    return 35;
-                }
-                case 0:
-                {
-                    return 42;
-                }
-                case 2:
-                {
-                    return 43;
-                }
-                case 4:
-                {
-                    return 44;
-                }
-                case 7:
-                case 8:
-                {
-                    return 45;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 45:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 1:
-                case 5:
-                case 6:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                {
-                    return 34;
-                }
-                case 3:
-                {
-                    return 35;
-                }
-                case 0:
-                {
-                    return 42;
-                }
-                case 2:
-                {
-                    return 43;
-                }
-                case 4:
-                {
-                    return 44;
-                }
-                case 7:
-                case 8:
-                {
-                    return 45;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 44:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 1:
-                case 5:
-                case 6:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                {
-                    return 25;
-                }
-                case 3:
-                {
-                    return 26;
-                }
-                case 4:
-                case 7:
-                case 8:
-                {
-                    return 29;
-                }
-                case 2:
-                {
-                    return 30;
-                }
-                case 0:
-                {
-                    return 37;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 43:
-        {
-            switch (i)
-            {
-                case 2:
-                {
-                    return 31;
-                }
-                case 0:
-                {
-                    return 33;
-                }
-                case 1:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                {
-                    return 34;
-                }
-                case 4:
-                {
-                    return 36;
-                }
-                case 3:
-                {
-                    return 46;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 46:
-        {
-            switch (i)
-            {
-                case 3:
-                {
-                    return 35;
-                }
-                case 0:
-                {
-                    return 38;
-                }
-                case 1:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                {
-                    return 39;
-                }
-                case 2:
-                {
-                    return 40;
-                }
-                case 4:
-                {
-                    return 41;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 42:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 1:
-                case 5:
-                case 6:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                {
-                    return 25;
-                }
-                case 3:
-                {
-                    return 26;
-                }
-                case 0:
-                case 4:
-                case 7:
-                case 8:
-                {
-                    return 29;
-                }
-                case 2:
-                {
-                    return 30;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 39:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 33;
-                }
-                case 1:
-                case 2:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                {
-                    return 34;
-                }
-                case 3:
-                {
-                    return 35;
-                }
-                case 4:
-                {
-                    return 36;
                 }
                 default:
                 {
@@ -1535,23 +972,27 @@ int XmlSerLexer::NextState(int state, char32_t c)
                 case 19:
                 case 20:
                 case 21:
+                case 22:
                 {
-                    return 25;
+                    return 27;
                 }
                 case 3:
                 {
-                    return 26;
+                    return 28;
                 }
-                case 0:
                 case 4:
                 case 7:
                 case 8:
                 {
-                    return 29;
+                    return 31;
                 }
                 case 2:
                 {
-                    return 30;
+                    return 32;
+                }
+                case 0:
+                {
+                    return 39;
                 }
                 default:
                 {
@@ -1559,51 +1000,7 @@ int XmlSerLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 34:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 33;
-                }
-                case 1:
-                case 2:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                {
-                    return 34;
-                }
-                case 3:
-                {
-                    return 35;
-                }
-                case 4:
-                {
-                    return 36;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 33:
+        case 39:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -1639,23 +1036,764 @@ int XmlSerLexer::NextState(int state, char32_t c)
                 case 19:
                 case 20:
                 case 21:
+                case 22:
                 {
-                    return 25;
+                    return 27;
                 }
                 case 3:
                 {
-                    return 26;
+                    return 28;
                 }
                 case 0:
                 case 4:
                 case 7:
                 case 8:
                 {
-                    return 29;
+                    return 31;
                 }
                 case 2:
                 {
-                    return 30;
+                    return 32;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 37:
+        {
+            switch (i)
+            {
+                case 3:
+                {
+                    return 37;
+                }
+                case 0:
+                {
+                    return 40;
+                }
+                case 1:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                {
+                    return 41;
+                }
+                case 2:
+                {
+                    return 42;
+                }
+                case 4:
+                {
+                    return 43;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 43:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 1:
+                case 5:
+                case 6:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                {
+                    return 27;
+                }
+                case 3:
+                {
+                    return 28;
+                }
+                case 4:
+                case 7:
+                case 8:
+                {
+                    return 31;
+                }
+                case 2:
+                {
+                    return 32;
+                }
+                case 0:
+                {
+                    return 39;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 42:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 1:
+                case 5:
+                case 6:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                {
+                    return 36;
+                }
+                case 3:
+                {
+                    return 37;
+                }
+                case 0:
+                {
+                    return 44;
+                }
+                case 2:
+                {
+                    return 45;
+                }
+                case 4:
+                {
+                    return 46;
+                }
+                case 7:
+                case 8:
+                {
+                    return 47;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 47:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 1:
+                case 5:
+                case 6:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                {
+                    return 36;
+                }
+                case 3:
+                {
+                    return 37;
+                }
+                case 0:
+                {
+                    return 44;
+                }
+                case 2:
+                {
+                    return 45;
+                }
+                case 4:
+                {
+                    return 46;
+                }
+                case 7:
+                case 8:
+                {
+                    return 47;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 46:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 1:
+                case 5:
+                case 6:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                {
+                    return 27;
+                }
+                case 3:
+                {
+                    return 28;
+                }
+                case 4:
+                case 7:
+                case 8:
+                {
+                    return 31;
+                }
+                case 2:
+                {
+                    return 32;
+                }
+                case 0:
+                {
+                    return 39;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 45:
+        {
+            switch (i)
+            {
+                case 2:
+                {
+                    return 33;
+                }
+                case 0:
+                {
+                    return 35;
+                }
+                case 1:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                {
+                    return 36;
+                }
+                case 4:
+                {
+                    return 38;
+                }
+                case 3:
+                {
+                    return 48;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 48:
+        {
+            switch (i)
+            {
+                case 3:
+                {
+                    return 37;
+                }
+                case 0:
+                {
+                    return 40;
+                }
+                case 1:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                {
+                    return 41;
+                }
+                case 2:
+                {
+                    return 42;
+                }
+                case 4:
+                {
+                    return 43;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 44:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 1:
+                case 5:
+                case 6:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                {
+                    return 27;
+                }
+                case 3:
+                {
+                    return 28;
+                }
+                case 0:
+                case 4:
+                case 7:
+                case 8:
+                {
+                    return 31;
+                }
+                case 2:
+                {
+                    return 32;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 41:
+        {
+            switch (i)
+            {
+                case 0:
+                {
+                    return 35;
+                }
+                case 1:
+                case 2:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                {
+                    return 36;
+                }
+                case 3:
+                {
+                    return 37;
+                }
+                case 4:
+                {
+                    return 38;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 40:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 1:
+                case 5:
+                case 6:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                {
+                    return 27;
+                }
+                case 3:
+                {
+                    return 28;
+                }
+                case 0:
+                case 4:
+                case 7:
+                case 8:
+                {
+                    return 31;
+                }
+                case 2:
+                {
+                    return 32;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 36:
+        {
+            switch (i)
+            {
+                case 0:
+                {
+                    return 35;
+                }
+                case 1:
+                case 2:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                {
+                    return 36;
+                }
+                case 3:
+                {
+                    return 37;
+                }
+                case 4:
+                {
+                    return 38;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 35:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 1:
+                case 5:
+                case 6:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                {
+                    return 27;
+                }
+                case 3:
+                {
+                    return 28;
+                }
+                case 0:
+                case 4:
+                case 7:
+                case 8:
+                {
+                    return 31;
+                }
+                case 2:
+                {
+                    return 32;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 31:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 1:
+                case 5:
+                case 6:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                {
+                    return 27;
+                }
+                case 3:
+                {
+                    return 28;
+                }
+                case 0:
+                case 4:
+                case 7:
+                case 8:
+                {
+                    return 31;
+                }
+                case 2:
+                {
+                    return 32;
                 }
                 default:
                 {
@@ -1665,27 +1803,16 @@ int XmlSerLexer::NextState(int state, char32_t c)
         }
         case 29:
         {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
             switch (i)
             {
+                case 0:
                 case 1:
+                case 2:
+                case 4:
                 case 5:
                 case 6:
+                case 7:
+                case 8:
                 case 9:
                 case 10:
                 case 11:
@@ -1699,23 +1826,13 @@ int XmlSerLexer::NextState(int state, char32_t c)
                 case 19:
                 case 20:
                 case 21:
+                case 22:
                 {
-                    return 25;
+                    return 27;
                 }
                 case 3:
                 {
-                    return 26;
-                }
-                case 0:
-                case 4:
-                case 7:
-                case 8:
-                {
-                    return 29;
-                }
-                case 2:
-                {
-                    return 30;
+                    return 28;
                 }
                 default:
                 {
@@ -1748,12 +1865,13 @@ int XmlSerLexer::NextState(int state, char32_t c)
                 case 19:
                 case 20:
                 case 21:
+                case 22:
                 {
-                    return 25;
+                    return 27;
                 }
                 case 3:
                 {
-                    return 26;
+                    return 28;
                 }
                 default:
                 {
@@ -1766,81 +1884,44 @@ int XmlSerLexer::NextState(int state, char32_t c)
             switch (i)
             {
                 case 0:
-                case 1:
-                case 2:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                {
-                    return 25;
-                }
-                case 3:
-                {
-                    return 26;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 23:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 47;
-                }
-                case 1:
-                case 2:
-                case 3:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                {
-                    return 48;
-                }
-                case 4:
                 {
                     return 49;
                 }
+                case 1:
+                case 2:
+                case 3:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                {
+                    return 50;
+                }
+                case 4:
+                {
+                    return 51;
+                }
                 default:
                 {
                     return -1;
                 }
             }
         }
-        case 49:
+        case 51:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -1872,7 +1953,44 @@ int XmlSerLexer::NextState(int state, char32_t c)
                 }
                 case 0:
                 {
-                    return 50;
+                    return 52;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 52:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 0:
+                case 4:
+                case 7:
+                case 8:
+                {
+                    return 1;
+                }
+                case 2:
+                {
+                    return 3;
                 }
                 default:
                 {
@@ -1882,48 +2000,11 @@ int XmlSerLexer::NextState(int state, char32_t c)
         }
         case 50:
         {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 0:
-                case 4:
-                case 7:
-                case 8:
-                {
-                    return 1;
-                }
-                case 2:
-                {
-                    return 3;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 48:
-        {
             switch (i)
             {
                 case 0:
                 {
-                    return 47;
+                    return 49;
                 }
                 case 1:
                 case 2:
@@ -1945,12 +2026,13 @@ int XmlSerLexer::NextState(int state, char32_t c)
                 case 19:
                 case 20:
                 case 21:
+                case 22:
                 {
-                    return 48;
+                    return 50;
                 }
                 case 4:
                 {
-                    return 49;
+                    return 51;
                 }
                 default:
                 {
@@ -1958,7 +2040,7 @@ int XmlSerLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 47:
+        case 49:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -1999,7 +2081,7 @@ int XmlSerLexer::NextState(int state, char32_t c)
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
-            int tokenId = GetTokenId(16);
+            int tokenId = GetTokenId(18);
             if (tokenId == CONTINUE_TOKEN)
             {
                 token.id = tokenId;
@@ -2112,58 +2194,70 @@ int XmlSerLexer::GetTokenId(int statementIndex)
         case 8:
         {
             Retract();
-            return SEMICOLON;
+            return ASSIGN;
             break;
         }
         case 9:
         {
             Retract();
-            return COLON;
+            return SEMICOLON;
             break;
         }
         case 10:
         {
             Retract();
-            return COMMA;
+            return COLONCOLON;
             break;
         }
         case 11:
         {
             Retract();
-            return AST;
+            return COLON;
             break;
         }
         case 12:
         {
             Retract();
-            return HASH;
+            return COMMA;
             break;
         }
         case 13:
         {
             Retract();
-            return STARTCPP;
+            return AST;
             break;
         }
         case 14:
         {
             Retract();
-            return ENDCPP;
+            return HASH;
             break;
         }
         case 15:
         {
             Retract();
-            return LANGLE;
+            return STARTCPP;
             break;
         }
         case 16:
         {
             Retract();
-            return RANGLE;
+            return ENDCPP;
             break;
         }
         case 17:
+        {
+            Retract();
+            return LANGLE;
+            break;
+        }
+        case 18:
+        {
+            Retract();
+            return RANGLE;
+            break;
+        }
+        case 19:
         {
             if (!parsingIncludeDeclaration) return INVALID_TOKEN;
             Retract();

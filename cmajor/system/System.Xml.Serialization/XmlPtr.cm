@@ -39,6 +39,7 @@ namespace System.Xml.Serialization
         {
              includeInBundle = includeInBundle_;
         }
+        public abstract nothrow XmlSerializable Interface() const;
         public nothrow void Resolve(XmlContainer* container)
         {
             XmlSerializableProxy* proxy = container->Get(targetObjectId);
@@ -120,6 +121,11 @@ namespace System.Xml.Serialization
         {
             ptr = cast<T*>(p);
         }
+        public override nothrow XmlSerializable Interface() const
+        {
+            XmlSerializable intf = *Get();
+            return intf;
+        }       
         private nothrow void SetId()
         {
             if (!IsNull())
@@ -219,6 +225,11 @@ namespace System.Xml.Serialization
         public override nothrow void SetPtr(void* p)
         {
             ptr.Reset(cast<T*>(p));
+        }
+        public override nothrow XmlSerializable Interface() const
+        {
+            XmlSerializable intf = *Get();
+            return intf;
         }
         private nothrow void SetId()
         {

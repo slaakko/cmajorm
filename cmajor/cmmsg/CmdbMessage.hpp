@@ -28,6 +28,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -47,6 +50,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API Type : public sngxml::xmlser::XmlSerializable
@@ -61,6 +65,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -76,6 +83,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API Result : public sngxml::xmlser::XmlSerializable
@@ -90,6 +98,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -107,6 +118,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API ChildResult : public sngxml::xmlser::XmlSerializable
@@ -121,6 +133,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -140,6 +155,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API TargetState : public sngxml::xmlser::XmlSerializable
@@ -154,6 +170,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -172,6 +191,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API SourceLoc : public sngxml::xmlser::XmlSerializable
@@ -186,6 +206,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -201,6 +224,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API BreakpointInfo : public sngxml::xmlser::XmlSerializable
@@ -215,6 +239,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -233,6 +260,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API StartDebugRequest : public sngxml::xmlser::XmlSerializable
@@ -247,6 +275,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -261,6 +292,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API StartDebugReply : public sngxml::xmlser::XmlSerializable
@@ -275,6 +307,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -293,6 +328,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API StopDebugRequest : public sngxml::xmlser::XmlSerializable
@@ -307,6 +343,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -320,6 +359,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API StopDebugReply : public sngxml::xmlser::XmlSerializable
@@ -334,6 +374,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -347,6 +390,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API GenericDebugErrorReply : public sngxml::xmlser::XmlSerializable
@@ -361,6 +405,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -375,6 +422,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API ContinueRequest : public sngxml::xmlser::XmlSerializable
@@ -389,6 +437,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -402,6 +453,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API ContinueReply : public sngxml::xmlser::XmlSerializable
@@ -416,6 +468,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -433,6 +488,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API NextRequest : public sngxml::xmlser::XmlSerializable
@@ -447,6 +503,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -460,6 +519,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API NextReply : public sngxml::xmlser::XmlSerializable
@@ -474,6 +534,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -491,6 +554,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API StepRequest : public sngxml::xmlser::XmlSerializable
@@ -505,6 +569,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -518,6 +585,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API StepReply : public sngxml::xmlser::XmlSerializable
@@ -532,6 +600,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -549,6 +620,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API FinishRequest : public sngxml::xmlser::XmlSerializable
@@ -563,6 +635,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -576,6 +651,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API FinishReply : public sngxml::xmlser::XmlSerializable
@@ -590,6 +666,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -607,6 +686,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API UntilRequest : public sngxml::xmlser::XmlSerializable
@@ -621,6 +701,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -635,6 +718,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API UntilReply : public sngxml::xmlser::XmlSerializable
@@ -649,6 +733,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -666,6 +753,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API BreakRequest : public sngxml::xmlser::XmlSerializable
@@ -680,6 +768,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -694,6 +785,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API BreakReply : public sngxml::xmlser::XmlSerializable
@@ -708,6 +800,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -722,6 +817,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API DeleteRequest : public sngxml::xmlser::XmlSerializable
@@ -736,6 +832,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -750,6 +849,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API DeleteReply : public sngxml::xmlser::XmlSerializable
@@ -764,6 +864,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -779,6 +882,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API DepthRequest : public sngxml::xmlser::XmlSerializable
@@ -793,6 +897,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -806,6 +913,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API DepthReply : public sngxml::xmlser::XmlSerializable
@@ -820,6 +928,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -836,6 +947,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API FramesRequest : public sngxml::xmlser::XmlSerializable
@@ -850,6 +962,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -865,6 +980,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API FramesReply : public sngxml::xmlser::XmlSerializable
@@ -879,6 +995,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -895,6 +1014,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API EvaluateRequest : public sngxml::xmlser::XmlSerializable
@@ -909,6 +1029,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -923,6 +1046,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API EvaluateReply : public sngxml::xmlser::XmlSerializable
@@ -937,6 +1061,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -953,6 +1080,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API CountRequest : public sngxml::xmlser::XmlSerializable
@@ -967,6 +1095,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -981,6 +1112,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API CountReply : public sngxml::xmlser::XmlSerializable
@@ -995,6 +1127,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -1011,6 +1146,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API EvaluateChildRequest : public sngxml::xmlser::XmlSerializable
@@ -1025,6 +1161,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -1041,6 +1180,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API EvaluateChildReply : public sngxml::xmlser::XmlSerializable
@@ -1055,6 +1195,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -1071,6 +1214,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API TargetRunningRequest : public sngxml::xmlser::XmlSerializable
@@ -1085,6 +1229,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -1098,6 +1245,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API TargetRunningReply : public sngxml::xmlser::XmlSerializable
@@ -1112,6 +1260,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -1125,6 +1276,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API TargetInputRequest : public sngxml::xmlser::XmlSerializable
@@ -1139,6 +1291,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -1152,6 +1307,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API TargetInputReply : public sngxml::xmlser::XmlSerializable
@@ -1166,6 +1322,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -1181,6 +1340,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API TargetOutputRequest : public sngxml::xmlser::XmlSerializable
@@ -1195,6 +1355,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -1210,6 +1373,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API TargetOutputReply : public sngxml::xmlser::XmlSerializable
@@ -1224,6 +1388,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -1237,6 +1404,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API LogDebugMessageRequest : public sngxml::xmlser::XmlSerializable
@@ -1251,6 +1419,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -1265,6 +1436,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API LogDebugMessageReply : public sngxml::xmlser::XmlSerializable
@@ -1279,6 +1451,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -1292,6 +1467,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API KillRequest : public sngxml::xmlser::XmlSerializable
@@ -1306,6 +1482,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -1319,6 +1498,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class MSG_API KillReply : public sngxml::xmlser::XmlSerializable
@@ -1333,6 +1513,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -1346,6 +1529,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 #endif // CMDBMESSAGE_HPP_9A6DA1BD20F12675B0E78EEAF8B950F3D0DDB92E

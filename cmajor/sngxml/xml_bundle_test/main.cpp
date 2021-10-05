@@ -81,10 +81,10 @@ int main()
         std::unique_ptr<sngxml::xmlser::XmlBundle> bundle = container.CreateBundle(p.Get());
         std::string xmlStr = bundle->ToXmlString();
         std::cout << xmlStr << std::endl;
-
+        
         std::unique_ptr<sngxml::xmlser::XmlBundle> readBundle = sngxml::xmlser::ToXmlBundle(xmlStr);
-        std::unique_ptr<Person> root(sngxml::xmlser::XmlCast<Person>(readBundle->Root()));
-        if (root)
+        unique_xml_ptr<Person> root(sngxml::xmlser::XmlCast<Person>(readBundle->ReleaseRoot()));
+        if (root.Get())
         {
             // use root
         }

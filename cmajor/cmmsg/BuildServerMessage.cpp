@@ -10,7 +10,7 @@ using namespace soulng::unicode;
 int StopBuildRequest::classId = -1;
 
 StopBuildRequest::StopBuildRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -71,7 +71,7 @@ std::unique_ptr<sngxml::dom::Element> StopBuildRequest::ToXml(const std::string&
 int StopBuildReply::classId = -1;
 
 StopBuildReply::StopBuildReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -132,7 +132,7 @@ std::unique_ptr<sngxml::dom::Element> StopBuildReply::ToXml(const std::string& f
 int KeepAliveBuildRequest::classId = -1;
 
 KeepAliveBuildRequest::KeepAliveBuildRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -193,7 +193,7 @@ std::unique_ptr<sngxml::dom::Element> KeepAliveBuildRequest::ToXml(const std::st
 int KeepAliveBuildReply::classId = -1;
 
 KeepAliveBuildReply::KeepAliveBuildReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -254,7 +254,7 @@ std::unique_ptr<sngxml::dom::Element> KeepAliveBuildReply::ToXml(const std::stri
 int BuildRequest::classId = -1;
 
 BuildRequest::BuildRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), messageKind(), backend(), config(), optimizationLevel(), filePath(), defines(), numBuildThreads(), toolChain(), verbose(), quiet(), clean(), strictNothrow(), emitIR(), emitOptIR(), linkWithDebugRuntime(), linkUsingMsLink(), rebuild(), buildAllDependencies(), forceDebugInfo(), forceNoDebugInfo(), disableModuleCache(), singleThreadedCompile(), disableCodeGen(), justMyCode(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), messageKind(), backend(), config(), optimizationLevel(), filePath(), defines(), numBuildThreads(), toolChain(), verbose(), quiet(), clean(), strictNothrow(), emitIR(), emitOptIR(), linkWithDebugRuntime(), linkUsingMsLink(), rebuild(), buildAllDependencies(), forceDebugInfo(), forceNoDebugInfo(), disableModuleCache(), singleThreadedCompile(), disableCodeGen(), justMyCode(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -363,7 +363,7 @@ std::unique_ptr<sngxml::dom::Element> BuildRequest::ToXml(const std::string& fie
 int CompileError::classId = -1;
 
 CompileError::CompileError()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), message(), project(), file(), line(), scol(), ecol(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), message(), project(), file(), line(), scol(), ecol(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -436,7 +436,7 @@ std::unique_ptr<sngxml::dom::Element> CompileError::ToXml(const std::string& fie
 int BuildReply::classId = -1;
 
 BuildReply::BuildReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), requestValid(), requestErrorMessage(), logException(), time(), success(), errors(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), requestValid(), requestErrorMessage(), logException(), time(), success(), errors(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -509,7 +509,7 @@ std::unique_ptr<sngxml::dom::Element> BuildReply::ToXml(const std::string& field
 int LogBuildMessageRequest::classId = -1;
 
 LogBuildMessageRequest::LogBuildMessageRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), message(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), message(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -572,7 +572,7 @@ std::unique_ptr<sngxml::dom::Element> LogBuildMessageRequest::ToXml(const std::s
 int LogBuildMessageReply::classId = -1;
 
 LogBuildMessageReply::LogBuildMessageReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), ok(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), ok(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -635,7 +635,7 @@ std::unique_ptr<sngxml::dom::Element> LogBuildMessageReply::ToXml(const std::str
 int BuildProgressMessage::classId = -1;
 
 BuildProgressMessage::BuildProgressMessage()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -696,7 +696,7 @@ std::unique_ptr<sngxml::dom::Element> BuildProgressMessage::ToXml(const std::str
 int GenericBuildErrorReply::classId = -1;
 
 GenericBuildErrorReply::GenericBuildErrorReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), error(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), error(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -759,7 +759,7 @@ std::unique_ptr<sngxml::dom::Element> GenericBuildErrorReply::ToXml(const std::s
 int CacheModuleRequest::classId = -1;
 
 CacheModuleRequest::CacheModuleRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), projectName(), projectFilePath(), backend(), config(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), projectName(), projectFilePath(), backend(), config(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -828,7 +828,7 @@ std::unique_ptr<sngxml::dom::Element> CacheModuleRequest::ToXml(const std::strin
 int CacheModuleReply::classId = -1;
 
 CacheModuleReply::CacheModuleReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), error(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), error(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -891,7 +891,7 @@ std::unique_ptr<sngxml::dom::Element> CacheModuleReply::ToXml(const std::string&
 int DefinitionSourceLocation::classId = -1;
 
 DefinitionSourceLocation::DefinitionSourceLocation()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), file(), line(), scol(), ecol(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), file(), line(), scol(), ecol(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -960,7 +960,7 @@ std::unique_ptr<sngxml::dom::Element> DefinitionSourceLocation::ToXml(const std:
 int GetDefinitionRequest::classId = -1;
 
 GetDefinitionRequest::GetDefinitionRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), projectName(), projectFilePath(), backend(), config(), identifier(), identifierLocation(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), projectName(), projectFilePath(), backend(), config(), identifier(), identifierLocation(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -1033,7 +1033,7 @@ std::unique_ptr<sngxml::dom::Element> GetDefinitionRequest::ToXml(const std::str
 int GetDefinitionReply::classId = -1;
 
 GetDefinitionReply::GetDefinitionReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), definitionLocation(), ok(), error(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), definitionLocation(), ok(), error(), dataPtr(nullptr), isOwned(false)
 {
 }
 

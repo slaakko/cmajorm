@@ -28,6 +28,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -41,6 +44,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class CMPM_API HelloPmsReply : public sngxml::xmlser::XmlSerializable
@@ -55,6 +59,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -69,6 +76,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class CMPM_API GetFreePortNumberRequest : public sngxml::xmlser::XmlSerializable
@@ -83,6 +91,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -98,6 +109,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class CMPM_API GetFreePortNumberReply : public sngxml::xmlser::XmlSerializable
@@ -112,6 +124,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -126,6 +141,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class CMPM_API ExtendPortLeaseRequest : public sngxml::xmlser::XmlSerializable
@@ -140,6 +156,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -156,6 +175,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class CMPM_API ExtendPortLeaseReply : public sngxml::xmlser::XmlSerializable
@@ -170,6 +190,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -183,6 +206,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class CMPM_API StopPortMapServerRequest : public sngxml::xmlser::XmlSerializable
@@ -197,6 +221,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -210,6 +237,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class CMPM_API StopPortMapServerReply : public sngxml::xmlser::XmlSerializable
@@ -224,6 +252,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -237,6 +268,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class CMPM_API PortLease : public sngxml::xmlser::XmlSerializable
@@ -251,6 +283,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -270,6 +305,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class CMPM_API ViewPortLeaseRequest : public sngxml::xmlser::XmlSerializable
@@ -284,6 +320,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -297,6 +336,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 class CMPM_API ViewPortLeaseReply : public sngxml::xmlser::XmlSerializable
@@ -311,6 +351,9 @@ public:
     const boost::uuids::uuid& ObjectId() const override { return objectId; }
     void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
     int ClassId() const override { return classId; }
+    bool IsOwned() const override { return isOwned; }
+    void SetOwned() override { isOwned = true; }
+    void ResetOwned() override { isOwned = false; }
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
@@ -325,6 +368,7 @@ private:
     static int classId;
     boost::uuids::uuid objectId;
     sngxml::xmlser::XmlContainer* container;
+    bool isOwned;
 };
 
 #endif // PORTMAPMESSAGE_HPP_DC8E9733F60B35A671F1CC8A29699D85F1D0FE2B

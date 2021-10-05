@@ -23,6 +23,7 @@ public:
     virtual ~XmlContainer();
     int Count() const { return idMap.size(); }
     bool IsEmpty() const { return idMap.empty(); }
+    void Clear();
     void Add(XmlSerializable* serializable);
     void AddOrReplace(XmlSerializable* serializable);
     void Remove(const boost::uuids::uuid& objectId);

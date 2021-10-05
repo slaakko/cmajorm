@@ -10,7 +10,7 @@ using namespace soulng::unicode;
 int Location::classId = -1;
 
 Location::Location()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), func(), file(), line(), scol(), ecol(), level(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), func(), file(), line(), scol(), ecol(), level(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -83,7 +83,7 @@ std::unique_ptr<sngxml::dom::Element> Location::ToXml(const std::string& fieldNa
 int Type::classId = -1;
 
 Type::Type()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), name(), id(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), name(), id(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -148,7 +148,7 @@ std::unique_ptr<sngxml::dom::Element> Type::ToXml(const std::string& fieldName) 
 int Result::classId = -1;
 
 Result::Result()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), staticType(), dynamicType(), initialized(), value(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), staticType(), dynamicType(), initialized(), value(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -217,7 +217,7 @@ std::unique_ptr<sngxml::dom::Element> Result::ToXml(const std::string& fieldName
 int ChildResult::classId = -1;
 
 ChildResult::ChildResult()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), expr(), name(), type(), dynType(), value(), count(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), expr(), name(), type(), dynType(), value(), count(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -290,7 +290,7 @@ std::unique_ptr<sngxml::dom::Element> ChildResult::ToXml(const std::string& fiel
 int TargetState::classId = -1;
 
 TargetState::TargetState()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), stopReason(), exitCode(), breakpointId(), signalName(), signalMeaning(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), stopReason(), exitCode(), breakpointId(), signalName(), signalMeaning(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -361,7 +361,7 @@ std::unique_ptr<sngxml::dom::Element> TargetState::ToXml(const std::string& fiel
 int SourceLoc::classId = -1;
 
 SourceLoc::SourceLoc()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), path(), line(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), path(), line(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -426,7 +426,7 @@ std::unique_ptr<sngxml::dom::Element> SourceLoc::ToXml(const std::string& fieldN
 int BreakpointInfo::classId = -1;
 
 BreakpointInfo::BreakpointInfo()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), breakpointId(), numInsts(), location(), error(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), breakpointId(), numInsts(), location(), error(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -497,7 +497,7 @@ std::unique_ptr<sngxml::dom::Element> BreakpointInfo::ToXml(const std::string& f
 int StartDebugRequest::classId = -1;
 
 StartDebugRequest::StartDebugRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), breakpointLocations(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), breakpointLocations(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -560,7 +560,7 @@ std::unique_ptr<sngxml::dom::Element> StartDebugRequest::ToXml(const std::string
 int StartDebugReply::classId = -1;
 
 StartDebugReply::StartDebugReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), location(), state(), breakpointInfos(), error(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), location(), state(), breakpointInfos(), error(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -631,7 +631,7 @@ std::unique_ptr<sngxml::dom::Element> StartDebugReply::ToXml(const std::string& 
 int StopDebugRequest::classId = -1;
 
 StopDebugRequest::StopDebugRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -692,7 +692,7 @@ std::unique_ptr<sngxml::dom::Element> StopDebugRequest::ToXml(const std::string&
 int StopDebugReply::classId = -1;
 
 StopDebugReply::StopDebugReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -753,7 +753,7 @@ std::unique_ptr<sngxml::dom::Element> StopDebugReply::ToXml(const std::string& f
 int GenericDebugErrorReply::classId = -1;
 
 GenericDebugErrorReply::GenericDebugErrorReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), errorMessage(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), errorMessage(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -816,7 +816,7 @@ std::unique_ptr<sngxml::dom::Element> GenericDebugErrorReply::ToXml(const std::s
 int ContinueRequest::classId = -1;
 
 ContinueRequest::ContinueRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -877,7 +877,7 @@ std::unique_ptr<sngxml::dom::Element> ContinueRequest::ToXml(const std::string& 
 int ContinueReply::classId = -1;
 
 ContinueReply::ContinueReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), location(), state(), error(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), location(), state(), error(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -946,7 +946,7 @@ std::unique_ptr<sngxml::dom::Element> ContinueReply::ToXml(const std::string& fi
 int NextRequest::classId = -1;
 
 NextRequest::NextRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -1007,7 +1007,7 @@ std::unique_ptr<sngxml::dom::Element> NextRequest::ToXml(const std::string& fiel
 int NextReply::classId = -1;
 
 NextReply::NextReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), location(), state(), error(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), location(), state(), error(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -1076,7 +1076,7 @@ std::unique_ptr<sngxml::dom::Element> NextReply::ToXml(const std::string& fieldN
 int StepRequest::classId = -1;
 
 StepRequest::StepRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -1137,7 +1137,7 @@ std::unique_ptr<sngxml::dom::Element> StepRequest::ToXml(const std::string& fiel
 int StepReply::classId = -1;
 
 StepReply::StepReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), location(), state(), error(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), location(), state(), error(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -1206,7 +1206,7 @@ std::unique_ptr<sngxml::dom::Element> StepReply::ToXml(const std::string& fieldN
 int FinishRequest::classId = -1;
 
 FinishRequest::FinishRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -1267,7 +1267,7 @@ std::unique_ptr<sngxml::dom::Element> FinishRequest::ToXml(const std::string& fi
 int FinishReply::classId = -1;
 
 FinishReply::FinishReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), location(), state(), error(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), location(), state(), error(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -1336,7 +1336,7 @@ std::unique_ptr<sngxml::dom::Element> FinishReply::ToXml(const std::string& fiel
 int UntilRequest::classId = -1;
 
 UntilRequest::UntilRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), sourceLoc(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), sourceLoc(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -1399,7 +1399,7 @@ std::unique_ptr<sngxml::dom::Element> UntilRequest::ToXml(const std::string& fie
 int UntilReply::classId = -1;
 
 UntilReply::UntilReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), location(), state(), error(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), location(), state(), error(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -1468,7 +1468,7 @@ std::unique_ptr<sngxml::dom::Element> UntilReply::ToXml(const std::string& field
 int BreakRequest::classId = -1;
 
 BreakRequest::BreakRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), breakpointLocation(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), breakpointLocation(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -1531,7 +1531,7 @@ std::unique_ptr<sngxml::dom::Element> BreakRequest::ToXml(const std::string& fie
 int BreakReply::classId = -1;
 
 BreakReply::BreakReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), breakpointInfo(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), breakpointInfo(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -1594,7 +1594,7 @@ std::unique_ptr<sngxml::dom::Element> BreakReply::ToXml(const std::string& field
 int DeleteRequest::classId = -1;
 
 DeleteRequest::DeleteRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), breakpointId(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), breakpointId(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -1657,7 +1657,7 @@ std::unique_ptr<sngxml::dom::Element> DeleteRequest::ToXml(const std::string& fi
 int DeleteReply::classId = -1;
 
 DeleteReply::DeleteReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), error(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), error(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -1722,7 +1722,7 @@ std::unique_ptr<sngxml::dom::Element> DeleteReply::ToXml(const std::string& fiel
 int DepthRequest::classId = -1;
 
 DepthRequest::DepthRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -1783,7 +1783,7 @@ std::unique_ptr<sngxml::dom::Element> DepthRequest::ToXml(const std::string& fie
 int DepthReply::classId = -1;
 
 DepthReply::DepthReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), depth(), error(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), depth(), error(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -1850,7 +1850,7 @@ std::unique_ptr<sngxml::dom::Element> DepthReply::ToXml(const std::string& field
 int FramesRequest::classId = -1;
 
 FramesRequest::FramesRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), lowFrame(), highFrame(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), lowFrame(), highFrame(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -1915,7 +1915,7 @@ std::unique_ptr<sngxml::dom::Element> FramesRequest::ToXml(const std::string& fi
 int FramesReply::classId = -1;
 
 FramesReply::FramesReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), frames(), error(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), frames(), error(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -1982,7 +1982,7 @@ std::unique_ptr<sngxml::dom::Element> FramesReply::ToXml(const std::string& fiel
 int EvaluateRequest::classId = -1;
 
 EvaluateRequest::EvaluateRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), expression(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), expression(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -2045,7 +2045,7 @@ std::unique_ptr<sngxml::dom::Element> EvaluateRequest::ToXml(const std::string& 
 int EvaluateReply::classId = -1;
 
 EvaluateReply::EvaluateReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), result(), error(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), result(), error(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -2112,7 +2112,7 @@ std::unique_ptr<sngxml::dom::Element> EvaluateReply::ToXml(const std::string& fi
 int CountRequest::classId = -1;
 
 CountRequest::CountRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), expression(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), expression(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -2175,7 +2175,7 @@ std::unique_ptr<sngxml::dom::Element> CountRequest::ToXml(const std::string& fie
 int CountReply::classId = -1;
 
 CountReply::CountReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), count(), error(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), count(), error(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -2242,7 +2242,7 @@ std::unique_ptr<sngxml::dom::Element> CountReply::ToXml(const std::string& field
 int EvaluateChildRequest::classId = -1;
 
 EvaluateChildRequest::EvaluateChildRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), expression(), start(), count(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), expression(), start(), count(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -2309,7 +2309,7 @@ std::unique_ptr<sngxml::dom::Element> EvaluateChildRequest::ToXml(const std::str
 int EvaluateChildReply::classId = -1;
 
 EvaluateChildReply::EvaluateChildReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), results(), error(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), success(), results(), error(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -2376,7 +2376,7 @@ std::unique_ptr<sngxml::dom::Element> EvaluateChildReply::ToXml(const std::strin
 int TargetRunningRequest::classId = -1;
 
 TargetRunningRequest::TargetRunningRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -2437,7 +2437,7 @@ std::unique_ptr<sngxml::dom::Element> TargetRunningRequest::ToXml(const std::str
 int TargetRunningReply::classId = -1;
 
 TargetRunningReply::TargetRunningReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -2498,7 +2498,7 @@ std::unique_ptr<sngxml::dom::Element> TargetRunningReply::ToXml(const std::strin
 int TargetInputRequest::classId = -1;
 
 TargetInputRequest::TargetInputRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -2559,7 +2559,7 @@ std::unique_ptr<sngxml::dom::Element> TargetInputRequest::ToXml(const std::strin
 int TargetInputReply::classId = -1;
 
 TargetInputReply::TargetInputReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), line(), eof(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), line(), eof(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -2624,7 +2624,7 @@ std::unique_ptr<sngxml::dom::Element> TargetInputReply::ToXml(const std::string&
 int TargetOutputRequest::classId = -1;
 
 TargetOutputRequest::TargetOutputRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), handle(), output(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), handle(), output(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -2689,7 +2689,7 @@ std::unique_ptr<sngxml::dom::Element> TargetOutputRequest::ToXml(const std::stri
 int TargetOutputReply::classId = -1;
 
 TargetOutputReply::TargetOutputReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -2750,7 +2750,7 @@ std::unique_ptr<sngxml::dom::Element> TargetOutputReply::ToXml(const std::string
 int LogDebugMessageRequest::classId = -1;
 
 LogDebugMessageRequest::LogDebugMessageRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), logMessage(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), logMessage(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -2813,7 +2813,7 @@ std::unique_ptr<sngxml::dom::Element> LogDebugMessageRequest::ToXml(const std::s
 int LogDebugMessageReply::classId = -1;
 
 LogDebugMessageReply::LogDebugMessageReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -2874,7 +2874,7 @@ std::unique_ptr<sngxml::dom::Element> LogDebugMessageReply::ToXml(const std::str
 int KillRequest::classId = -1;
 
 KillRequest::KillRequest()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -2935,7 +2935,7 @@ std::unique_ptr<sngxml::dom::Element> KillRequest::ToXml(const std::string& fiel
 int KillReply::classId = -1;
 
 KillReply::KillReply()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), dataPtr(nullptr), isOwned(false)
 {
 }
 

@@ -128,6 +128,19 @@ namespace System.Xml.Serialization
                     {
                         AddToBundle(bundle, target->Interface(), addedSet);
                     }
+                    else
+                    {
+                        XmlSerializable intf = ptr->Interface();
+                        XmlContainer* container = intf.Container();
+                        if (container != null)
+                        {
+                            target = container->Get(ptr->TargetObjectId());
+                            if (target != null)
+                            {
+                                container->AddToBundle(bundle, intf, addedSet);
+                            }
+                        }
+                    }
                 }
             }
         }

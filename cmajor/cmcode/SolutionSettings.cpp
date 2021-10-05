@@ -10,7 +10,7 @@ using namespace soulng::unicode;
 int SolutionBreakpoint::classId = -1;
 
 SolutionBreakpoint::SolutionBreakpoint()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), file(), line(), condition(), disabled(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), file(), line(), condition(), disabled(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -79,7 +79,7 @@ std::unique_ptr<sngxml::dom::Element> SolutionBreakpoint::ToXml(const std::strin
 int SolutionSettings::classId = -1;
 
 SolutionSettings::SolutionSettings()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), callStackOpen(), localsViewOpen(), openFiles(), currentOpenFile(), currentCursorLine(), breakpoints(), expandedProjects(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), callStackOpen(), localsViewOpen(), openFiles(), currentOpenFile(), currentCursorLine(), breakpoints(), expandedProjects(), dataPtr(nullptr), isOwned(false)
 {
 }
 

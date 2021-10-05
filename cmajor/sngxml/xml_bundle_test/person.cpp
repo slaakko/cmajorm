@@ -11,7 +11,7 @@ using namespace soulng::unicode;
 int Person::classId = -1;
 
 Person::Person()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), name(), age(), vehicles(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), name(), age(), vehicles(), dataPtr(nullptr), isOwned(false)
 {
 }
 

@@ -23,6 +23,19 @@ XmlBundle::XmlBundle() : XmlContainer(), rootObjectId(boost::uuids::nil_uuid())
 {
 }
 
+void XmlBundle::DestroyNonownedObjects()
+{
+    for (const auto& p : IdMap())
+    {
+        XmlSerializable* serializable = p.second;
+        if (!serializable->IsOwned())
+        {
+            serializable->DestroyObject();
+        }
+    }
+    Clear();
+}
+
 void XmlBundle::SetRootObjectId(const boost::uuids::uuid& rootObjectId_)
 {
     rootObjectId = rootObjectId_;
@@ -39,6 +52,21 @@ XmlSerializable* XmlBundle::Root() const
         return nullptr;
     }
 }
+
+XmlSerializable* XmlBundle::ReleaseRoot()
+{
+    if (!rootObjectId.is_nil())
+    {
+        XmlSerializable* serializable = Get(rootObjectId);
+        Remove(rootObjectId);
+        return serializable;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
 
 std::unique_ptr<sngxml::dom::Document> XmlBundle::ToXmlDocument() const
 {

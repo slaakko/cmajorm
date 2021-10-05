@@ -25,6 +25,9 @@ public:
     virtual void SetObjectId(const boost::uuids::uuid& objectId_) = 0;
     virtual int ClassId() const = 0;
     virtual std::string ClassName() const = 0;
+    virtual bool IsOwned() const = 0;
+    virtual void SetOwned() = 0;
+    virtual void ResetOwned() = 0;
     virtual sngxml::xmlser::XmlContainer* Container() const = 0;
     virtual void SetContainer(sngxml::xmlser::XmlContainer* container_) = 0;
     virtual void FromXml(sngxml::dom::Element* element) = 0;

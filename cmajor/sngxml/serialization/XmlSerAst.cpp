@@ -5,6 +5,7 @@
 
 #include <sngxml/serialization/XmlSerAst.hpp>
 #include <sngxml/serialization/XmlSerVisitor.hpp>
+#include <stdexcept>
 
 namespace sngxml { namespace xmlser {
 
@@ -26,6 +27,37 @@ ForwardClassDeclarationNode::ForwardClassDeclarationNode(const std::string& clas
 }
 
 void ForwardClassDeclarationNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+AliasDeclarationNode::AliasDeclarationNode(const std::string& name_, const std::string& subject_) : name(name_), subject(subject_)
+{
+}
+
+void AliasDeclarationNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+BaseClassNode::BaseClassNode(const std::string& id_) : id(id_)
+{
+}
+
+ExternalBaseClassNode::ExternalBaseClassNode(const std::string& id_) : BaseClassNode(id_)
+{
+}
+
+void ExternalBaseClassNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+InternalBaseClassNode::InternalBaseClassNode(const std::string& id_) : BaseClassNode(id_)
+{
+}
+
+void InternalBaseClassNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
 }
@@ -213,7 +245,7 @@ bool NamespaceNode::ContainsNamespaces() const
     return false;
 }
 
-ClassNode::ClassNode(Key key_, const std::string& api_, const std::string& id_) : key(key_), api(api_), id(id_)
+ClassNode::ClassNode(Key key_, const std::string& api_, const std::string& id_) : key(key_), api(api_), id(id_), internalBaseClass(nullptr)
 {
 }
 
@@ -222,9 +254,30 @@ void ClassNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-void ClassNode::SetBaseClassId(const std::string& baseClassId_)
+void ClassNode::AddBaseClass(BaseClassNode* baseClass)
 {
-    baseClassId = baseClassId_;
+    if (baseClass->IsInternal())
+    {
+        if (internalBaseClass)
+        {
+            throw std::runtime_error("at most one internal base class allowed");
+        }
+        internalBaseClass = baseClass;
+    }
+    bases.push_back(std::unique_ptr<BaseClassNode>(baseClass));
+}
+
+std::vector<BaseClassNode*> ClassNode::ExternalBaseClasses() const
+{
+    std::vector<BaseClassNode*> externalBases;
+    for (const auto& baseClass : bases)
+    {
+        if (baseClass->IsExternal())
+        {
+            externalBases.push_back(baseClass.get());
+        }
+    }
+    return externalBases;
 }
 
 void ClassNode::AddMemberVariable(MemberVariableNode* memberVariable)

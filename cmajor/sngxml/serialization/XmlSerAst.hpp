@@ -48,6 +48,45 @@ private:
     std::string classId;
 };
 
+class SNGXML_SERIALIZATION_API AliasDeclarationNode : public Node
+{
+public:
+    AliasDeclarationNode(const std::string& name_, const std::string& subject_);
+    void Accept(Visitor& visitor) override;
+    const std::string& Name() const { return name; }
+    const std::string& Subject() const { return subject; }
+private:
+    std::string name;
+    std::string subject;
+};
+
+class SNGXML_SERIALIZATION_API BaseClassNode : public Node
+{
+public:
+    BaseClassNode(const std::string& id_);
+    const std::string& Id() const { return id; }
+    virtual bool IsExternal() const { return false; }
+    virtual bool IsInternal() const { return false; }
+private:
+    std::string id;
+};
+
+class SNGXML_SERIALIZATION_API ExternalBaseClassNode : public BaseClassNode
+{
+public:
+    ExternalBaseClassNode(const std::string& id_);
+    void Accept(Visitor& visitor) override;
+    bool IsExternal() const override { return true; }
+};
+
+class SNGXML_SERIALIZATION_API InternalBaseClassNode : public BaseClassNode
+{
+public:
+    InternalBaseClassNode(const std::string& id_);
+    void Accept(Visitor& visitor) override;
+    bool IsInternal() const override { return true; }
+};
+
 class SNGXML_SERIALIZATION_API TypeNode : public Node
 {
 };
@@ -281,8 +320,9 @@ public:
     const Key& GetKey() const { return key; }
     const std::string& Api() const { return api; }
     const std::string& Id() const { return id; }
-    void SetBaseClassId(const std::string& baseClassId_);
-    const std::string& BaseClassId() const { return baseClassId; }
+    void AddBaseClass(BaseClassNode* baseClass);
+    BaseClassNode* InternalBaseClass() const { return internalBaseClass; }
+    std::vector<BaseClassNode*> ExternalBaseClasses() const;
     void AddMemberVariable(MemberVariableNode* memberVariable);
     void AddCppBlock(CppBlockNode* cppBlock);
     const std::vector<std::unique_ptr<Node>>& Nodes() const { return nodes; }
@@ -290,7 +330,8 @@ private:
     Key key;
     std::string api;
     std::string id;
-    std::string baseClassId;
+    std::vector<std::unique_ptr<BaseClassNode>> bases;
+    BaseClassNode* internalBaseClass;
     std::vector<std::unique_ptr<Node>> nodes;
 };
 

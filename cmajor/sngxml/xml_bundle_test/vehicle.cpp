@@ -11,7 +11,7 @@ using namespace soulng::unicode;
 int Vehicle::classId = -1;
 
 Vehicle::Vehicle()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), color(), owner(), dataPtr(nullptr)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), color(), owner(), dataPtr(nullptr), isOwned(false)
 {
 }
 

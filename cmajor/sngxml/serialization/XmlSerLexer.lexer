@@ -15,9 +15,9 @@ tokens XmlSerTokens
     (INT, "'int'"), (UINT, "'uint'"), (LONG, "'long'"), (ULONG, "'ulong'"), (FLOAT, "'float'"), (DOUBLE, "'double'"), 
     (CHAR, "'char'"), (WCHAR, "'wchar'"), (UCHAR, "'uchar'"), (UUID, "'uuid'"), (STRING, "'string'"), (WSTRING, "'wstring'"), (USTRING, "'ustring'"),
     (DATE, "'date'"), (DATETIME, "'datetime'"), (TIMESTAMP, "'timestamp'"), (TIME_POINT, "'time_point'"), (DURATION, "'duration'"),
-    (LBRACKET, "'['"), (RBRACKET, "']'"), (LBRACE, "'{'"), (RBRACE, "'}'"), (SEMICOLON, "';'"), (COLON, "':'"), (AST, "'*'"), (LPAREN, "'('"), (RPAREN, "')'"), (COMMA, "','"),
-    (STARTCPP, "'<%'"), (ENDCPP, "'%>'"), (LANGLE, "'<'"), (RANGLE, "'>'"),
-    (HASH, "'#'"), (INCLUDE, "'include'"), (FILEPATH, "'filepath'"), (NAMESPACE, "'namespace'")
+    (LBRACKET, "'['"), (RBRACKET, "']'"), (LBRACE, "'{'"), (RBRACE, "'}'"), (SEMICOLON, "';'"), (COLON, "':'"), (AST, "'*'"), (LPAREN, "'('"), (RPAREN, "')'"), (COMMA, "','"), (ASSIGN, "'='"),
+    (STARTCPP, "'<%'"), (ENDCPP, "'%>'"), (LANGLE, "'<'"), (RANGLE, "'>'"), (COLONCOLON, "'::'"),
+    (HASH, "'#'"), (INCLUDE, "'include'"), (FILEPATH, "'filepath'"), (NAMESPACE, "'namespace'"), (USING, "'using'")
 }
 
 keywords  XmlSerKeywords
@@ -26,7 +26,7 @@ keywords  XmlSerKeywords
     ("int", INT), ("uint", UINT), ("long", LONG), ("ulong", ULONG), ("float", FLOAT), ("double", DOUBLE),
     ("char", CHAR), ("wchar", WCHAR), ("uchar", UCHAR), ("uuid", UUID), ("string", STRING), ("wstring", WSTRING), ("ustring", USTRING),
     ("date", DATE), ("datetime", DATETIME), ("timestamp", TIMESTAMP), ("time_point", TIME_POINT), ("duration", DURATION), ("include", INCLUDE),
-    ("namespace", NAMESPACE)
+    ("namespace", NAMESPACE), ("using", USING)
 }
 
 expressions
@@ -51,7 +51,9 @@ lexer api(SNGXML_SERIALIZATION_API) XmlSerLexer
     "\}" { return RBRACE; }
     "\(" { return LPAREN; }
     "\)" { return RPAREN; }
+    "=" { return ASSIGN; }
     ";" { return SEMICOLON; }
+    "::" { return COLONCOLON; }
     ":" { return COLON; }
     "," { return COMMA; }
     "\*"{ return AST; }
