@@ -19,19 +19,32 @@ namespace sngxml { namespace xmlser {
 
 using namespace soulng::unicode;
 
-XmlBundle::XmlBundle() : XmlContainer(), rootObjectId(boost::uuids::nil_uuid())
+XmlBundle::XmlBundle() : XmlContainer(), rootObjectId(boost::uuids::nil_uuid()), owning(false)
 {
+}
+
+XmlBundle::~XmlBundle()
+{
+    if (owning)
+    {
+        DestroyNonownedObjects();
+    }
 }
 
 void XmlBundle::DestroyNonownedObjects()
 {
+    std::vector<XmlSerializable*> toBeDestroyed;
     for (const auto& p : IdMap())
     {
         XmlSerializable* serializable = p.second;
         if (!serializable->IsOwned())
         {
-            serializable->DestroyObject();
+            toBeDestroyed.push_back(serializable);
         }
+    }
+    for (XmlSerializable* d : toBeDestroyed)
+    {
+        d->DestroyObject();
     }
     Clear();
 }
@@ -118,7 +131,13 @@ std::unique_ptr<XmlBundle> ToXmlBundle(const std::string& xmlStr)
 
 std::unique_ptr<XmlBundle> ToXmlBundle(const std::string& xmlStr, const std::string& systemId)
 {
+    return ToXmlBundle(xmlStr, systemId, true);
+}
+
+std::unique_ptr<XmlBundle> ToXmlBundle(const std::string& xmlStr, const std::string& systemId, bool owning)
+{
     std::unique_ptr<XmlBundle> bundle(new XmlBundle());
+    bundle->SetOwning(owning);
     std::u32string content = ToUtf32(xmlStr);
     std::unique_ptr<sngxml::dom::Document> document = sngxml::dom::ParseDocument(content, systemId);
     std::unique_ptr<sngxml::xpath::XPathObject> bundleObject = sngxml::xpath::Evaluate(U"xmlBundle", document.get());

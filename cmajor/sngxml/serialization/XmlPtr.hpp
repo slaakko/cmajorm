@@ -21,14 +21,11 @@ public:
     virtual ~XmlPtrBase();
     const boost::uuids::uuid& TargetObjectId() const { return targetObjectId; }
     void SetTargetObjectId(const boost::uuids::uuid& targetObjectId_);
-    virtual bool IncludeInBundle() const { return includeInBundle; }
-    void SetIncludeInBundle(bool includeInBundle_);
     void Resolve(XmlContainer* container);
     virtual XmlSerializable* GetPtr() const = 0;
     virtual void SetPtr(XmlSerializable* p) = 0;
 private:
     boost::uuids::uuid targetObjectId;
-    bool includeInBundle;
 };
 
 template<class T>

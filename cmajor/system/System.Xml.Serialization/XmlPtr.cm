@@ -17,7 +17,7 @@ namespace System.Xml.Serialization
 
     public abstract class XmlPtrBase
     {
-        public nothrow XmlPtrBase() : targetObjectId(Uuid()), includeInBundle(true)
+        public nothrow XmlPtrBase() : targetObjectId(Uuid())
         {
         }
         public virtual ~XmlPtrBase()
@@ -31,14 +31,6 @@ namespace System.Xml.Serialization
         {
             targetObjectId = targetObjectId_;
         }
-        public virtual nothrow bool IncludeInBundle() const
-        {
-            return includeInBundle;
-        }
-        public nothrow void SetIncludeInBundle(bool includeInBundle_)
-        {
-             includeInBundle = includeInBundle_;
-        }
         public abstract nothrow XmlSerializable Interface() const;
         public nothrow void Resolve(XmlContainer* container)
         {
@@ -51,7 +43,6 @@ namespace System.Xml.Serialization
         public abstract nothrow void* GetPtr() const;
         public abstract nothrow void SetPtr(void* p);
         private Uuid targetObjectId;
-        private bool includeInBundle;
     }
 
     // XmlPtr<T> is like an ordinary pointer with no ownership semantics,
@@ -125,7 +116,7 @@ namespace System.Xml.Serialization
         {
             XmlSerializable intf = *Get();
             return intf;
-        }       
+        }
         private nothrow void SetId()
         {
             if (!IsNull())

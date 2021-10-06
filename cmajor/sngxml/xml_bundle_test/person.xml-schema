@@ -7,16 +7,15 @@ class Person
     string name;
     int age;
 <%
-    void AddVehicle(Vehicle* v, bool includeInBundle);
+    void AddVehicle(Vehicle* v);
 %>
     unique_xml_ptr<Vehicle>[] vehicles;
 }
 
 <%
-void Person::AddVehicle(Vehicle* v, bool includeInBundle)
+void Person::AddVehicle(Vehicle* v)
 {
     v->SetOwner(this);
     vehicles.push_back(unique_xml_ptr<Vehicle>(v));
-    vehicles.back().SetIncludeInBundle(includeInBundle);
 }
 %>

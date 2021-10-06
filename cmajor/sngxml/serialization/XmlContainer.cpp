@@ -64,34 +64,47 @@ void XmlContainer::SetRootObjectId(const boost::uuids::uuid& objectId)
 {
 }
 
-void XmlContainer::AddToBundle(XmlBundle& bundle, XmlSerializable* object, std::unordered_set<boost::uuids::uuid>& addedSet)
+void XmlContainer::AddToBundle(XmlBundle& bundle, XmlBundleKind kind, int hops, XmlSerializable* object, std::unordered_set<boost::uuids::uuid>& addedSet)
 {
     if (object->ObjectId().is_nil()) return;
     if (addedSet.find(object->ObjectId()) != addedSet.cend()) return;
     bundle.Add(object);
     addedSet.insert(object->ObjectId());
-    std::vector<XmlPtrBase*> ptrs = object->GetPtrs();
-    for (XmlPtrBase* ptr : ptrs)
+    if (kind == XmlBundleKind::deep && (hops == -1 || hops > 0))
     {
-        if (ptr->IncludeInBundle() && !ptr->TargetObjectId().is_nil())
+        std::vector<XmlPtrBase*> ptrs = object->GetPtrs();
+        for (XmlPtrBase* ptr : ptrs)
         {
-            XmlSerializable* targetObject = Get(ptr->TargetObjectId());
-            if (targetObject)
+            if (!ptr->TargetObjectId().is_nil())
             {
-                AddToBundle(bundle, targetObject, addedSet);
-            }
-            else
-            {
-                XmlSerializable* s = ptr->GetPtr();
-                if (s)
+                XmlSerializable* targetObject = Get(ptr->TargetObjectId());
+                if (targetObject)
                 {
-                    XmlContainer* container = s->Container();
-                    if (container)
+                    int nextHops = -1;
+                    if (hops > 0)
                     {
-                        targetObject = container->Get(ptr->TargetObjectId());
-                        if (targetObject)
+                        nextHops = hops - 1;
+                    }
+                    AddToBundle(bundle, kind, nextHops, targetObject, addedSet);
+                }
+                else
+                {
+                    XmlSerializable* s = ptr->GetPtr();
+                    if (s)
+                    {
+                        XmlContainer* container = s->Container();
+                        if (container)
                         {
-                            container->AddToBundle(bundle, targetObject, addedSet);
+                            targetObject = container->Get(ptr->TargetObjectId());
+                            if (targetObject)
+                            {
+                                int nextHops = -1;
+                                if (hops > 0)
+                                {
+                                    nextHops = hops - 1;
+                                }
+                                container->AddToBundle(bundle, kind, nextHops, targetObject, addedSet);
+                            }
                         }
                     }
                 }
@@ -102,10 +115,20 @@ void XmlContainer::AddToBundle(XmlBundle& bundle, XmlSerializable* object, std::
 
 std::unique_ptr<XmlBundle> XmlContainer::CreateBundle(XmlSerializable* object)
 {
+    return CreateBundle(object, XmlBundleKind::shallow);
+}
+
+std::unique_ptr<XmlBundle> XmlContainer::CreateBundle(XmlSerializable* object, XmlBundleKind kind)
+{
+    return CreateBundle(object, kind, -1);
+}
+
+std::unique_ptr<XmlBundle> XmlContainer::CreateBundle(XmlSerializable* object, XmlBundleKind kind, int hops)
+{
     std::unique_ptr<XmlBundle> bundle(new XmlBundle());
     std::unordered_set<boost::uuids::uuid> addedSet;
     bundle->SetRootObjectId(object->ObjectId());
-    AddToBundle(*bundle, object, addedSet);
+    AddToBundle(*bundle, kind, hops, object, addedSet);
     return bundle;
 }
 

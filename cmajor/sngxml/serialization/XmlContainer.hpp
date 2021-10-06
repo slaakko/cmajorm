@@ -15,6 +15,7 @@ namespace sngxml { namespace xmlser {
 
 class XmlSerializable;
 class XmlBundle;
+enum class XmlBundleKind : int;
 
 class SNGXML_SERIALIZATION_API XmlContainer
 {
@@ -30,8 +31,10 @@ public:
     XmlSerializable* Get(const boost::uuids::uuid& objectId) const;
     virtual void SetRootObjectId(const boost::uuids::uuid& objectId);
     const std::unordered_map<boost::uuids::uuid, XmlSerializable*>& IdMap() const { return idMap; }
-    void AddToBundle(XmlBundle& bundle, XmlSerializable* object, std::unordered_set<boost::uuids::uuid>& addedSet);
+    void AddToBundle(XmlBundle& bundle, XmlBundleKind kind, int hops, XmlSerializable* object, std::unordered_set<boost::uuids::uuid>& addedSet);
     std::unique_ptr<XmlBundle> CreateBundle(XmlSerializable* object);
+    std::unique_ptr<XmlBundle> CreateBundle(XmlSerializable* object, XmlBundleKind kind);
+    std::unique_ptr<XmlBundle> CreateBundle(XmlSerializable* object, XmlBundleKind kind, int hops);
 private:
     std::unordered_map<boost::uuids::uuid, XmlSerializable*> idMap;
 };

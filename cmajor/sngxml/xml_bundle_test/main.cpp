@@ -75,15 +75,15 @@ int main()
         p->SetRandomObjectId();
         p->name = "Joe Coder";
         p->age = 25;
-        p->AddVehicle(c.Release(), true);
-        p->AddVehicle(b.Release(), true);
+        p->AddVehicle(c.Release());
+        p->AddVehicle(b.Release());
 
-        std::unique_ptr<sngxml::xmlser::XmlBundle> bundle = container.CreateBundle(p.Get());
+        std::unique_ptr<sngxml::xmlser::XmlBundle> bundle = container.CreateBundle(p.Get(), sngxml::xmlser::XmlBundleKind::deep);
         std::string xmlStr = bundle->ToXmlString();
         std::cout << xmlStr << std::endl;
         
         std::unique_ptr<sngxml::xmlser::XmlBundle> readBundle = sngxml::xmlser::ToXmlBundle(xmlStr);
-        unique_xml_ptr<Person> root(sngxml::xmlser::XmlCast<Person>(readBundle->ReleaseRoot()));
+        xml_ptr<Person> root(sngxml::xmlser::XmlCast<Person>(readBundle->Root()));
         if (root.Get())
         {
             // use root

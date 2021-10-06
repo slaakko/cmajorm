@@ -11,12 +11,20 @@
 
 namespace sngxml { namespace xmlser {
 
+enum class XmlBundleKind : int
+{
+    shallow = 0, deep = 1
+};
+
 class SNGXML_SERIALIZATION_API XmlBundle : public XmlContainer
 {
 public:
     XmlBundle();
+    ~XmlBundle();
     const boost::uuids::uuid& RootObjectId() const { return rootObjectId; }
     void SetRootObjectId(const boost::uuids::uuid& rootObjectId_) override;
+    void SetOwning(bool owning_) { owning = owning_; }
+    bool IsOwning() const { return owning; }
     XmlSerializable* Root() const;
     XmlSerializable* ReleaseRoot();
     std::unique_ptr<sngxml::dom::Document> ToXmlDocument() const;
@@ -26,10 +34,12 @@ public:
     void DestroyNonownedObjects();
 private:
     boost::uuids::uuid rootObjectId;
+    bool owning;
 };
 
 SNGXML_SERIALIZATION_API std::unique_ptr<XmlBundle> ToXmlBundle(const std::string& xmlStr);
 SNGXML_SERIALIZATION_API std::unique_ptr<XmlBundle> ToXmlBundle(const std::string& xmlStr, const std::string& systemId);
+SNGXML_SERIALIZATION_API std::unique_ptr<XmlBundle> ToXmlBundle(const std::string& xmlStr, const std::string& systemId, bool owning);
 
 } } // namespace sngxml::xmlser
 

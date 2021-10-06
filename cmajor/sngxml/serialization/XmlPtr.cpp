@@ -9,7 +9,7 @@
 
 namespace sngxml { namespace xmlser {
 
-XmlPtrBase::XmlPtrBase() : targetObjectId(boost::uuids::nil_uuid()), includeInBundle(true)
+XmlPtrBase::XmlPtrBase() : targetObjectId(boost::uuids::nil_uuid())
 {
 }
 
@@ -20,11 +20,6 @@ XmlPtrBase::~XmlPtrBase()
 void XmlPtrBase::SetTargetObjectId(const boost::uuids::uuid& targetObjectId_)
 {
     targetObjectId = targetObjectId_;
-}
-
-void XmlPtrBase::SetIncludeInBundle(bool includeInBundle_)
-{
-    includeInBundle = includeInBundle_;
 }
 
 void XmlPtrBase::Resolve(XmlContainer* container)

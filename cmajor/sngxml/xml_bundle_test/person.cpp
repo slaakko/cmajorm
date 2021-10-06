@@ -79,9 +79,8 @@ std::unique_ptr<sngxml::dom::Element> Person::ToXml(const std::string& fieldName
     return element;
 }
 
-void Person::AddVehicle(Vehicle* v, bool includeInBundle)
+void Person::AddVehicle(Vehicle* v)
 {
     v->SetOwner(this);
     vehicles.push_back(unique_xml_ptr<Vehicle>(v));
-    vehicles.back().SetIncludeInBundle(includeInBundle);
 }

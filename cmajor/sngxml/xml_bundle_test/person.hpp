@@ -46,7 +46,7 @@ public:
 public:
     std::string name;
     int32_t age;
-    void AddVehicle(Vehicle* v, bool includeInBundle);
+    void AddVehicle(Vehicle* v);
     std::vector<unique_xml_ptr<Vehicle>> vehicles;
     void* dataPtr;
 private:
