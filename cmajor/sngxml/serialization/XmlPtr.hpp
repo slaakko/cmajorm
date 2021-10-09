@@ -103,7 +103,7 @@ public:
     void Reset() { ptr.reset(); SetIdAndOwned(); }
     void Reset(T* ptr_) { ptr.reset(ptr_); SetIdAndOwned(); }
     T* Get() const { return ptr.get(); }
-    T* Release() { T* p = ptr.release(); SetIdAndOwned(); return p; }
+    T* Release() { T* p = ptr.release(); if (p) { if (XmlSerializable* intf = dynamic_cast<XmlSerializable*>(p)) intf->ResetOwned(); } SetIdAndOwned(); return p; }
     T* operator->() { return ptr.get(); }
     const T* operator->() const { return ptr.get(); }
     T& operator*() { return *ptr; }

@@ -9,10 +9,10 @@ namespace xmltest
     {
         try
         {
-            OwningXmlContainer container; // note: this container owns objects added to it
-            Bicycle* bicycle = new Bicycle();
-            Add(bicycle, &container);
-            XmlSerializable serializableBicycle = *bicycle;
+            XmlContainer container; 
+            UniquePtr<Bicycle> bicycle = new Bicycle();
+            Add(bicycle.Get(), &container);
+            XmlSerializable serializableBicycle = *(bicycle.Get());
             int classId = serializableBicycle.ClassId();
             Console.Out() << classId << endl();
             string className = serializableBicycle.ClassName();
@@ -24,9 +24,9 @@ namespace xmltest
             formatter.SetIndentSize(1);
             bicycleDoc.Write(formatter);
 
-            Car* car = new Car();
-            Add(car, &container);
-            XmlSerializable serializabledCar = *car;
+            UniquePtr<Car> car = new Car();
+            Add(car.Get(), &container);
+            XmlSerializable serializabledCar = *(car.Get());
             int carClassId = serializabledCar.ClassId();
             Console.Out() << carClassId << endl();
             string carClassName = serializabledCar.ClassName();

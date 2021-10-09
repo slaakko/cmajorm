@@ -98,12 +98,6 @@ namespace System.Xml.Serialization
         {
             return *ptr;
         }
-        public nothrow void Swap(Self& that)
-        {
-            Swap(ptr, that.ptr);
-            SetId();
-            that.SetId();
-        }
         public override nothrow void* GetPtr() const
         {
             return ptr;
@@ -154,24 +148,24 @@ namespace System.Xml.Serialization
         }
         public explicit nothrow UniqueXmlPtr(T* ptr_) : ptr(ptr_)
         {
-            SetId();
+            SetIdAndOwned();
         }
         suppress UniqueXmlPtr(const Self&);
         public nothrow void operator=(T* ptr_)
         {
             ptr = ptr_;
-            SetId();
+            SetIdAndOwned();
         }
         suppress void operator=(const Self&);
         public nothrow void Reset()
         {
             ptr.Reset();
-            SetId();
+            SetIdAndOwned();
         }
         public nothrow void Reset(T* ptr_)
         {
             ptr.Reset(ptr_);
-            SetId();
+            SetIdAndOwned();
         }
         public inline nothrow T* Get()
         {
@@ -180,7 +174,12 @@ namespace System.Xml.Serialization
         public inline nothrow T* Release()
         {
             T* p = ptr.Release();
-            SetId();
+            if (p != null)
+            {
+                XmlSerializable intf = *p;
+                intf.ResetOwned();
+            }
+            SetIdAndOwned();
             return p;
         }
         public inline nothrow bool IsNull() const
@@ -203,12 +202,6 @@ namespace System.Xml.Serialization
         {
             return *ptr;
         }
-        public nothrow void Swap(Self& that)
-        {
-            Swap(ptr, that.ptr);
-            SetId();
-            that.SetId();
-        }
         public override nothrow void* GetPtr() const
         {
             return ptr.Get();
@@ -216,18 +209,24 @@ namespace System.Xml.Serialization
         public override nothrow void SetPtr(void* p)
         {
             ptr.Reset(cast<T*>(p));
+            if (p != null)
+            {
+                XmlSerializable intf = *Get();
+                intf.SetOwned();
+            }
         }
         public override nothrow XmlSerializable Interface() const
         {
             XmlSerializable intf = *Get();
             return intf;
         }
-        private nothrow void SetId()
+        private nothrow void SetIdAndOwned()
         {
             if (!IsNull())
             {
                 XmlSerializable intf = *Get();
                 SetTargetObjectId(intf.ObjectId());
+                intf.SetOwned();
             }
             else
             {

@@ -17,6 +17,9 @@ namespace System.Xml.Serialization
         string ClassName();
         XmlContainer* Container();
         void SetContainer(XmlContainer* container);
+        bool IsOwned();
+        void SetOwned();
+        void ResetOwned();
         System.Dom.Element* ToXml(const string& elementName);
         void FromXml(System.Dom.Element* element);
         List<XmlPtrBase*> GetPtrs();
@@ -24,23 +27,16 @@ namespace System.Xml.Serialization
 
     public class XmlSerializableProxy
     {
-        public nothrow XmlSerializableProxy(XmlSerializable intf_, bool isOwner_) : intf(intf_), isOwner(isOwner_)
+        public nothrow XmlSerializableProxy(XmlSerializable intf_) : intf(intf_)
         {
             if (intf.ObjectId() == Uuid())
             {
                 intf.SetObjectId(Uuid.Random());
             }
         }
-        public ~XmlSerializableProxy()
+        public void DestroyObject()
         {
-            if (isOwner)
-            {
-                intf.DestroyObject();
-            }
-        }
-        public nothrow void ResetOwner()
-        {
-            isOwner = false;
+            intf.DestroyObject();
         }
         public nothrow XmlSerializable Interface() const
         {
@@ -60,6 +56,18 @@ namespace System.Xml.Serialization
         public nothrow void ResetContainer()
         {
             intf.SetContainer(null);
+        }
+        public nothrow bool IsOwned() const
+        {
+            return intf.IsOwned();
+        }
+        public nothrow void SetOwned()
+        {
+            intf.SetOwned();
+        }
+        public nothrow void ResetOwned()
+        {
+            intf.ResetOwned();
         }
         public nothrow void* Object() const
         {
@@ -90,7 +98,6 @@ namespace System.Xml.Serialization
             return intf.GetPtrs();
         }
         private XmlSerializable intf;
-        private bool isOwner;
     }
 
     public nothrow T* XmlCast<T>(XmlSerializableProxy* proxy)

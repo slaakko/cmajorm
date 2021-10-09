@@ -8,14 +8,6 @@ using System.Collections;
 
 namespace System.Xml.Serialization
 {
-    public class OwningXmlContainer : XmlContainer
-    {
-        public nothrow override bool TakeOwnership() const
-        {
-            return true;
-        }
-    }
-
     public class XmlContainer
     {
         public nothrow XmlContainer()
@@ -23,14 +15,7 @@ namespace System.Xml.Serialization
         }
         public virtual ~XmlContainer()
         {
-            for (const Pair<void*, XmlSerializableProxy*>& p : objectProxyMap)
-            {
-                delete p.second;
-            }
-        }
-        public virtual nothrow bool TakeOwnership() const
-        {
-            return false;
+            Clear();
         }
         public virtual nothrow void SetRootObjectId(const Uuid& objectId)
         {
@@ -43,18 +28,24 @@ namespace System.Xml.Serialization
         {
             return objectProxyMap.IsEmpty();
         }
-        public void Add(XmlSerializable xmlSerializable)
+        public nothrow void Clear()
         {
-            Add(xmlSerializable, TakeOwnership());
+            for (const Pair<void*, XmlSerializableProxy*>& p : objectProxyMap)
+            {
+                delete p.second;
+            }
+            idProxyMap.Clear();
+            objectProxyMap.Clear();
+            
         }
-        public void Add(XmlSerializable xmlSerializable, bool takeOwnership)
+        public void Add(XmlSerializable xmlSerializable)
         {
             XmlSerializableProxy* prev = Get(xmlSerializable.ObjectId());
             if (prev != null)
             {
                 throw XmlSerializationException("object '" + ToString(prev->ObjectId()) + "' already added to XML container");
             }
-            XmlSerializableProxy* proxy = new XmlSerializableProxy(xmlSerializable, takeOwnership);
+            XmlSerializableProxy* proxy = new XmlSerializableProxy(xmlSerializable);
             idProxyMap[proxy->ObjectId()] = proxy;
             objectProxyMap[proxy->Object()] = proxy;
             proxy->SetContainer(this);

@@ -7,7 +7,7 @@ namespace xmltest
 {
     public void TestXmlBundle()
     {
-        XmlContainer container; // XmlContainer does not own the objects by default
+        XmlContainer container; 
 
         UniqueXmlPtr<Car> car = new Car();
         car->SetRegistrationNumber("ABC-123");
@@ -25,14 +25,14 @@ namespace xmltest
         person->AddVehicle(car.Release());
         person->AddVehicle(bicycle.Release());
 
-        XmlBundle bundle = container.CreateBundle(person.Get());
+        XmlBundle bundle = container.CreateBundle(person.Get(), XmlBundleKind.deep);
         string str = bundle.ToXmlString();
         Console.Out() << str << endl();
 
         UniquePtr<XmlBundle> readBundle = ToXmlBundle(str, "string");
         string readStr = readBundle->ToXmlString();
         Console.Out() << readStr << endl();
-        UniqueXmlPtr<Person> root = ReleaseRoot<Person>(readBundle.Get());
+        XmlPtr<Person> root = XmlCast<Person>(readBundle->Root());
         if (!root.IsNull())
         {
             Console.Out() << "yep" << endl();

@@ -9,14 +9,6 @@ using System.IO;
 
 namespace System.Xml.Serialization
 {
-    public class OwningXmlBundle : XmlBundle
-    {
-        public nothrow override bool TakeOwnership() const
-        {
-            return true;
-        }
-    }
-
     public enum XmlBundleKind : int
     {
         shallow = 0, deep = 1
@@ -24,8 +16,44 @@ namespace System.Xml.Serialization
 
     public class XmlBundle : XmlContainer
     {
-        public nothrow XmlBundle() : base()
+        public nothrow XmlBundle() : base(), owning(false)
         {
+        }
+        public ~XmlBundle()
+        {
+            if (owning)
+            {
+                DestroyNonownedObjects();
+            }
+        }
+        public nothrow bool IsOwning() const
+        {
+            return owning;
+        }
+        public nothrow void SetOwning()
+        {
+            owning = true;
+        }
+        public nothrow void ResetOwning()
+        {
+            owning = false;
+        }
+        public nothrow void DestroyNonownedObjects()
+        {
+            List<XmlSerializableProxy*> proxies = GetProxies();
+            List<XmlSerializableProxy*> toBeDestroyed;
+            for (XmlSerializableProxy* proxy : proxies)
+            {
+                if (!proxy->IsOwned())
+                {
+                    toBeDestroyed.Add(proxy);
+                }
+            }
+            for (XmlSerializableProxy* d : toBeDestroyed)
+            {
+                d->DestroyObject();
+            }
+            Clear();
         }
         public nothrow const Uuid& RootObjectId() const
         {
@@ -89,23 +117,20 @@ namespace System.Xml.Serialization
             }
         }
         private Uuid rootObjectId;
+        private bool owning;
     }
 
     public UniquePtr<XmlBundle> ToXmlBundle(const string& xmlStr, const string& systemId)
     {
-        return ToXmlBundle(xmlStr, systemId, false);
+        return ToXmlBundle(xmlStr, systemId, true);
     }
 
     public UniquePtr<XmlBundle> ToXmlBundle(const string& xmlStr, const string& systemId, bool createOwningBundle)
     {
-        UniquePtr<XmlBundle> bundle;
+        UniquePtr<XmlBundle> bundle(new XmlBundle());
         if (createOwningBundle)
         {
-            bundle.Reset(new OwningXmlBundle());
-        }
-        else
-        {
-            bundle.Reset(new XmlBundle());
+            bundle->SetOwning();
         }
         ustring content = ToUtf32(xmlStr);
         UniquePtr<System.Dom.Document> document = System.Dom.ParseDocument(content, systemId);
@@ -163,20 +188,6 @@ namespace System.Xml.Serialization
             }
         }
         return bundle;
-    }
-
-    public nothrow T* ReleaseRoot<T>(XmlBundle* bundle)
-    {
-        XmlSerializableProxy* root = bundle->Root();
-        if (root != null)
-        {
-            root->ResetOwner();
-            return XmlCast<T>(root);
-        }
-        else
-        {
-            return null;
-        }
     }
 }
 

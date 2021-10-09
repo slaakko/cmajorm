@@ -18,11 +18,10 @@ namespace model
         {
             name = name_;
         }
-        public void AddVehicle(Vehicle* vehicle, bool includeInBunde)
+        public void AddVehicle(Vehicle* vehicle)
         {
             vehicle->SetOwner(this);
             vehicles.Add(UniqueXmlPtr<Vehicle>(vehicle));
-            vehicles.Back().SetIncludeInBundle(includeInBunde);
         }
         private string name;
         private List<UniqueXmlPtr<Vehicle>> vehicles;

@@ -58,6 +58,12 @@ private:
     void GenerateFromXmlImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* fromXmlSymbol, StatementBinder* statementBinder);
     void GenerateGetPtrsSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope);
     void GenerateGetPtrsImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* getPtrsSymbol, StatementBinder* statementBinder);
+    void GenerateIsOwnedSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope);
+    void GenerateIsOwnedImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* isOwnedMemFunSymbol, StatementBinder* statementBinder);
+    void GenerateSetOwnedSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope);
+    void GenerateSetOwnedImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* setOwnedMemFunSymbol, StatementBinder* statementBinder);
+    void GenerateResetOwnedSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope);
+    void GenerateResetOwnedImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* setOwnedMemFunSymbol, StatementBinder* statementBinder);
     bool HasXmlBaseClass(ClassTypeSymbol* classType) const;
     void CompileMemberFunction(MemberFunctionSymbol* memberFunctionSymbol, CompoundStatementNode& compoundStatementNode, MemberFunctionNode& memberFunctionNode, 
         std::unique_ptr<BoundFunction>&& boundFunction, StatementBinder* statementBinder);

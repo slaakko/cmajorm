@@ -39,9 +39,13 @@ XmlAttributeProcessor::XmlAttributeProcessor() : AttributeProcessor(U"xml")
     reservedMemberFunctionNames.insert(U"SetObjectXmlAttributes");
     reservedMemberFunctionNames.insert(U"ToXml");
     reservedMemberFunctionNames.insert(U"FromXml");
+    reservedMemberFunctionNames.insert(U"IsOwned");
+    reservedMemberFunctionNames.insert(U"SetOwned");
+    reservedMemberFunctionNames.insert(U"ResetOwned");
     reservedMemberVariableNames.insert(U"classId");
     reservedMemberVariableNames.insert(U"objectId");
     reservedMemberVariableNames.insert(U"container");
+    reservedMemberVariableNames.insert(U"isOwned");
 }
 
 void XmlAttributeProcessor::TypeCheck(AttributeNode* attribute, Symbol* symbol)
@@ -145,6 +149,9 @@ const int setObjectXmlAttributesId = 11;
 const int toXmlId = 12;
 const int fromXmlId = 13;
 const int getPtrsId = 14;
+const int isOwnedMemFunId = 15;
+const int setOwnedMemFunId = 16;
+const int resetOwnedMemFunId = 17;
 
 void XmlAttributeProcessor::GenerateSymbols(AttributeNode* attribute, Symbol* symbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
@@ -174,6 +181,9 @@ void XmlAttributeProcessor::GenerateSymbols(AttributeNode* attribute, Symbol* sy
             GenerateToXmlSymbol(attribute, classTypeSymbol, boundCompileUnit, containerScope);
             GenerateFromXmlSymbol(attribute, classTypeSymbol, boundCompileUnit, containerScope);
             GenerateGetPtrsSymbol(attribute, classTypeSymbol, boundCompileUnit, containerScope);
+            GenerateIsOwnedSymbol(attribute, classTypeSymbol, boundCompileUnit, containerScope);
+            GenerateSetOwnedSymbol(attribute, classTypeSymbol, boundCompileUnit, containerScope);
+            GenerateResetOwnedSymbol(attribute, classTypeSymbol, boundCompileUnit, containerScope);
         }
     }
 }
@@ -316,6 +326,21 @@ void XmlAttributeProcessor::GenerateImplementation(AttributeNode* attribute, Sym
                         GenerateGetPtrsImplementation(attribute, classTypeSymbol, static_cast<MemberFunctionSymbol*>(functionSymbol), statementBinder);
                         break;
                     }
+                    case isOwnedMemFunId:
+                    {
+                        GenerateIsOwnedImplementation(attribute, classTypeSymbol, static_cast<MemberFunctionSymbol*>(functionSymbol), statementBinder);
+                        break;
+                    }
+                    case setOwnedMemFunId:
+                    {
+                        GenerateSetOwnedImplementation(attribute, classTypeSymbol, static_cast<MemberFunctionSymbol*>(functionSymbol), statementBinder);
+                        break;
+                    }
+                    case resetOwnedMemFunId:
+                    {
+                        GenerateSetOwnedImplementation(attribute, classTypeSymbol, static_cast<MemberFunctionSymbol*>(functionSymbol), statementBinder);
+                        break;
+                    }
                     default:
                     {
                         throw Exception("internal error in XML attribute implementation: member function symbol map for class type symbol '" + ToUtf8(classTypeSymbol->FullName()) +
@@ -366,6 +391,12 @@ void XmlAttributeProcessor::GenerateMemberVariableSymbols(AttributeNode* attribu
         containerSymbol->SetAccess(SymbolAccess::public_);
         containerSymbol->SetType(symbolTable.GetTypeByName(U"System.Xml.Serialization.XmlContainer")->AddPointer(attribute->GetSpan(), attribute->ModuleId()));
         classType->AddMember(containerSymbol);
+
+        MemberVariableSymbol* isOwnedSymbol = new MemberVariableSymbol(attribute->GetSpan(), attribute->ModuleId(), U"isOwned");
+        isOwnedSymbol->SetModule(&boundCompileUnit.GetModule());
+        isOwnedSymbol->SetAccess(SymbolAccess::public_);
+        isOwnedSymbol->SetType(symbolTable.GetTypeByName(U"bool"));
+        classType->AddMember(isOwnedSymbol);
     }
 }
 
@@ -1546,6 +1577,201 @@ void XmlAttributeProcessor::GenerateGetPtrsImplementation(AttributeNode* attribu
         references.push_back(std::make_pair(ex.Defined(), ex.DefinedModuleId()));
         references.insert(references.end(), ex.References().begin(), ex.References().end());
         throw Exception("error in XML attribute generation: could not create 'GetPtrs' function for the class '" + ToUtf8(classTypeSymbol->FullName()) + "': " + ex.Message(),
+            classTypeSymbol->GetSpan(), classTypeSymbol->SourceModuleId(), references);
+    }
+}
+
+void XmlAttributeProcessor::GenerateIsOwnedSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+{
+    SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
+    MemberFunctionSymbol* isOwnedMemFunSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"IsOwned");
+    isOwnedMemFunSymbol->SetModule(&boundCompileUnit.GetModule());
+    isOwnedMemFunSymbol->SetGroupName(U"IsOwned");
+    isOwnedMemFunSymbol->SetAccess(SymbolAccess::public_);
+    isOwnedMemFunSymbol->SetConst();
+    ParameterSymbol* thisParam = new ParameterSymbol(attribute->GetSpan(), attribute->ModuleId(), U"this");
+    thisParam->SetType(classTypeSymbol->AddPointer(attribute->GetSpan(), attribute->ModuleId()));
+    isOwnedMemFunSymbol->AddMember(thisParam);
+
+    GetRootModuleForCurrentThread()->GetSymbolTable().SetFunctionIdFor(isOwnedMemFunSymbol);
+
+    isOwnedMemFunSymbol->SetReturnType(symbolTable.GetTypeByName(U"bool"));
+
+    classTypeSymbol->AddMember(isOwnedMemFunSymbol);
+    isOwnedMemFunSymbol->ComputeName();
+
+    auto& m = functionSymbolMap[classTypeSymbol];
+    m.push_back(std::make_pair(isOwnedMemFunSymbol, isOwnedMemFunId));
+}
+
+void XmlAttributeProcessor::GenerateIsOwnedImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* isOwnedMemFunSymbol, StatementBinder* statementBinder)
+{
+    try
+    {
+        FileScope* fileScope = new FileScope();
+        statementBinder->GetBoundCompileUnit().AddFileScope(fileScope);
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&statementBinder->GetBoundCompileUnit(), isOwnedMemFunSymbol));
+        Span span = attribute->GetSpan();
+        boost::uuids::uuid moduleId = attribute->ModuleId();
+        MemberFunctionNode memberFunctionNode(span, moduleId);
+        CompoundStatementNode compoundStatementNode(span, moduleId);
+        compoundStatementNode.SetEndBraceSpan(span);
+
+        StatementNode* statementNode = nullptr;
+        ReturnStatementNode* returnStatementNode = new ReturnStatementNode(span, moduleId, new IdentifierNode(span, moduleId, U"isOwned"));
+        statementNode = returnStatementNode;
+        compoundStatementNode.AddStatement(statementNode);
+
+        CompileMemberFunction(isOwnedMemFunSymbol, compoundStatementNode, memberFunctionNode, std::move(boundFunction), statementBinder);
+    }
+    catch (const Exception& ex)
+    {
+        std::vector<std::pair<Span, boost::uuids::uuid>> references;
+        references.push_back(std::make_pair(ex.Defined(), ex.DefinedModuleId()));
+        references.insert(references.end(), ex.References().begin(), ex.References().end());
+        throw Exception("error in XML attribute generation: could not create 'IsOwned' function for the class '" + ToUtf8(classTypeSymbol->FullName()) + "': " + ex.Message(),
+            classTypeSymbol->GetSpan(), classTypeSymbol->SourceModuleId(), references);
+    }
+}
+
+void XmlAttributeProcessor::GenerateSetOwnedSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+{
+    SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
+    MemberFunctionSymbol* setOwnedMemFunSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"SetOwned");
+    setOwnedMemFunSymbol->SetModule(&boundCompileUnit.GetModule());
+    setOwnedMemFunSymbol->SetGroupName(U"SetOwned");
+    setOwnedMemFunSymbol->SetAccess(SymbolAccess::public_);
+    if (HasXmlBaseClass(classTypeSymbol))
+    {
+        setOwnedMemFunSymbol->SetOverride();
+    }
+    else
+    {
+        setOwnedMemFunSymbol->SetVirtual();
+    }
+    ParameterSymbol* thisParam = new ParameterSymbol(attribute->GetSpan(), attribute->ModuleId(), U"this");
+    thisParam->SetType(classTypeSymbol->AddPointer(attribute->GetSpan(), attribute->ModuleId()));
+    setOwnedMemFunSymbol->AddMember(thisParam);
+
+    GetRootModuleForCurrentThread()->GetSymbolTable().SetFunctionIdFor(setOwnedMemFunSymbol);
+
+    setOwnedMemFunSymbol->SetReturnType(symbolTable.GetTypeByName(U"void"));
+
+    classTypeSymbol->AddMember(setOwnedMemFunSymbol);
+    setOwnedMemFunSymbol->ComputeName();
+
+    auto& m = functionSymbolMap[classTypeSymbol];
+    m.push_back(std::make_pair(setOwnedMemFunSymbol, setOwnedMemFunId));
+}
+
+void XmlAttributeProcessor::GenerateSetOwnedImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* setOwnedMemFunSymbol, StatementBinder* statementBinder)
+{
+    try
+    {
+        FileScope* fileScope = new FileScope();
+        statementBinder->GetBoundCompileUnit().AddFileScope(fileScope);
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&statementBinder->GetBoundCompileUnit(), setOwnedMemFunSymbol));
+        Span span = attribute->GetSpan();
+        boost::uuids::uuid moduleId = attribute->ModuleId();
+        MemberFunctionNode memberFunctionNode(span, moduleId);
+        CompoundStatementNode compoundStatementNode(span, moduleId);
+        compoundStatementNode.SetEndBraceSpan(span);
+
+        StatementNode* statementNode = nullptr;
+        if (HasXmlBaseClass(classTypeSymbol))
+        {
+            ArrowNode* arrowNode = new ArrowNode(span, moduleId, new BaseNode(span, moduleId), new IdentifierNode(span, moduleId, U"SetOwned"));
+            InvokeNode* baseSetOwnedCall = new InvokeNode(span, moduleId, arrowNode);
+            statementNode = new ExpressionStatementNode(span, moduleId, baseSetOwnedCall);
+        }
+        else
+        {
+            AssignmentStatementNode* assignmentStatementNode = new AssignmentStatementNode(span, moduleId,
+                new IdentifierNode(span, moduleId, U"isOwned"),
+                new BooleanLiteralNode(span, moduleId, true));
+            statementNode = assignmentStatementNode;
+        }
+        compoundStatementNode.AddStatement(statementNode);
+
+        CompileMemberFunction(setOwnedMemFunSymbol, compoundStatementNode, memberFunctionNode, std::move(boundFunction), statementBinder);
+    }
+    catch (const Exception& ex)
+    {
+        std::vector<std::pair<Span, boost::uuids::uuid>> references;
+        references.push_back(std::make_pair(ex.Defined(), ex.DefinedModuleId()));
+        references.insert(references.end(), ex.References().begin(), ex.References().end());
+        throw Exception("error in XML attribute generation: could not create 'SetOwned' function for the class '" + ToUtf8(classTypeSymbol->FullName()) + "': " + ex.Message(),
+            classTypeSymbol->GetSpan(), classTypeSymbol->SourceModuleId(), references);
+    }
+}
+
+void XmlAttributeProcessor::GenerateResetOwnedSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+{
+    SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
+    MemberFunctionSymbol* resetOwnedMemFunSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"ResetOwned");
+    resetOwnedMemFunSymbol->SetModule(&boundCompileUnit.GetModule());
+    resetOwnedMemFunSymbol->SetGroupName(U"ResetOwned");
+    resetOwnedMemFunSymbol->SetAccess(SymbolAccess::public_);
+    if (HasXmlBaseClass(classTypeSymbol))
+    {
+        resetOwnedMemFunSymbol->SetOverride();
+    }
+    else
+    {
+        resetOwnedMemFunSymbol->SetVirtual();
+    }
+    ParameterSymbol* thisParam = new ParameterSymbol(attribute->GetSpan(), attribute->ModuleId(), U"this");
+    thisParam->SetType(classTypeSymbol->AddPointer(attribute->GetSpan(), attribute->ModuleId()));
+    resetOwnedMemFunSymbol->AddMember(thisParam);
+
+    GetRootModuleForCurrentThread()->GetSymbolTable().SetFunctionIdFor(resetOwnedMemFunSymbol);
+
+    resetOwnedMemFunSymbol->SetReturnType(symbolTable.GetTypeByName(U"void"));
+
+    classTypeSymbol->AddMember(resetOwnedMemFunSymbol);
+    resetOwnedMemFunSymbol->ComputeName();
+
+    auto& m = functionSymbolMap[classTypeSymbol];
+    m.push_back(std::make_pair(resetOwnedMemFunSymbol, resetOwnedMemFunId));
+}
+
+void XmlAttributeProcessor::GenerateResetOwnedImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* resetOwnedMemFunSymbol, StatementBinder* statementBinder)
+{
+    try
+    {
+        FileScope* fileScope = new FileScope();
+        statementBinder->GetBoundCompileUnit().AddFileScope(fileScope);
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&statementBinder->GetBoundCompileUnit(), resetOwnedMemFunSymbol));
+        Span span = attribute->GetSpan();
+        boost::uuids::uuid moduleId = attribute->ModuleId();
+        MemberFunctionNode memberFunctionNode(span, moduleId);
+        CompoundStatementNode compoundStatementNode(span, moduleId);
+        compoundStatementNode.SetEndBraceSpan(span);
+
+        StatementNode* statementNode = nullptr;
+        if (HasXmlBaseClass(classTypeSymbol))
+        {
+            ArrowNode* arrowNode = new ArrowNode(span, moduleId, new BaseNode(span, moduleId), new IdentifierNode(span, moduleId, U"ResetOwned"));
+            InvokeNode* baseResetOwnedCall = new InvokeNode(span, moduleId, arrowNode);
+            statementNode = new ExpressionStatementNode(span, moduleId, baseResetOwnedCall);
+        }
+        else
+        {
+            AssignmentStatementNode* assignmentStatementNode = new AssignmentStatementNode(span, moduleId,
+                new IdentifierNode(span, moduleId, U"isOwned"),
+                new BooleanLiteralNode(span, moduleId, false));
+            statementNode = assignmentStatementNode;
+        }
+        compoundStatementNode.AddStatement(statementNode);
+
+        CompileMemberFunction(resetOwnedMemFunSymbol, compoundStatementNode, memberFunctionNode, std::move(boundFunction), statementBinder);
+    }
+    catch (const Exception& ex)
+    {
+        std::vector<std::pair<Span, boost::uuids::uuid>> references;
+        references.push_back(std::make_pair(ex.Defined(), ex.DefinedModuleId()));
+        references.insert(references.end(), ex.References().begin(), ex.References().end());
+        throw Exception("error in XML attribute generation: could not create 'ResetOwned' function for the class '" + ToUtf8(classTypeSymbol->FullName()) + "': " + ex.Message(),
             classTypeSymbol->GetSpan(), classTypeSymbol->SourceModuleId(), references);
     }
 }

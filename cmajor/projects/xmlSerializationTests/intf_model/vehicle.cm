@@ -50,6 +50,18 @@ namespace model
         {
             container = container_;
         }
+        public virtual nothrow bool IsOwned() const
+        {
+            return isOwned;
+        }
+        public virtual nothrow void SetOwned()
+        {
+            isOwned = true;
+        }
+        public virtual nothrow void ResetOwned()
+        {
+            isOwned = false;
+        }
         public virtual void SetObjectXmlAttributes(System.Dom.Element* element)
         {
             element->SetAttribute(u"classId", ToUtf32(ToString(classId)));
@@ -100,6 +112,7 @@ namespace model
         private static int classId;
         private Uuid objectId;
         private XmlContainer* container;
+        private bool isOwned;
         private XmlPtr<Person> owner;
         private VehicleColor color;
     }
