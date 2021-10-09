@@ -34,7 +34,7 @@ public:
     void AddToBundle(XmlBundle& bundle, XmlBundleKind kind, int hops, XmlSerializable* object, std::unordered_set<boost::uuids::uuid>& addedSet);
     std::unique_ptr<XmlBundle> CreateBundle(XmlSerializable* object);
     std::unique_ptr<XmlBundle> CreateBundle(XmlSerializable* object, XmlBundleKind kind);
-    std::unique_ptr<XmlBundle> CreateBundle(XmlSerializable* object, XmlBundleKind kind, int hops);
+    std::unique_ptr<XmlBundle> CreateBundle(XmlSerializable* object, XmlBundleKind kind, int depth);
 private:
     std::unordered_map<boost::uuids::uuid, XmlSerializable*> idMap;
 };

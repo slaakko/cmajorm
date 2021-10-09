@@ -64,13 +64,13 @@ void XmlContainer::SetRootObjectId(const boost::uuids::uuid& objectId)
 {
 }
 
-void XmlContainer::AddToBundle(XmlBundle& bundle, XmlBundleKind kind, int hops, XmlSerializable* object, std::unordered_set<boost::uuids::uuid>& addedSet)
+void XmlContainer::AddToBundle(XmlBundle& bundle, XmlBundleKind kind, int depth, XmlSerializable* object, std::unordered_set<boost::uuids::uuid>& addedSet)
 {
     if (object->ObjectId().is_nil()) return;
     if (addedSet.find(object->ObjectId()) != addedSet.cend()) return;
     bundle.Add(object);
     addedSet.insert(object->ObjectId());
-    if (kind == XmlBundleKind::deep && (hops == -1 || hops > 0))
+    if (kind == XmlBundleKind::deep && (depth == -1 || depth > 0))
     {
         std::vector<XmlPtrBase*> ptrs = object->GetPtrs();
         for (XmlPtrBase* ptr : ptrs)
@@ -80,12 +80,12 @@ void XmlContainer::AddToBundle(XmlBundle& bundle, XmlBundleKind kind, int hops, 
                 XmlSerializable* targetObject = Get(ptr->TargetObjectId());
                 if (targetObject)
                 {
-                    int nextHops = -1;
-                    if (hops > 0)
+                    int nextLayerDepth = -1;
+                    if (depth > 0)
                     {
-                        nextHops = hops - 1;
+                        nextLayerDepth = depth - 1;
                     }
-                    AddToBundle(bundle, kind, nextHops, targetObject, addedSet);
+                    AddToBundle(bundle, kind, nextLayerDepth, targetObject, addedSet);
                 }
                 else
                 {
@@ -98,12 +98,12 @@ void XmlContainer::AddToBundle(XmlBundle& bundle, XmlBundleKind kind, int hops, 
                             targetObject = container->Get(ptr->TargetObjectId());
                             if (targetObject)
                             {
-                                int nextHops = -1;
-                                if (hops > 0)
+                                int nextLayerDepth = -1;
+                                if (depth > 0)
                                 {
-                                    nextHops = hops - 1;
+                                    nextLayerDepth = depth - 1;
                                 }
-                                container->AddToBundle(bundle, kind, nextHops, targetObject, addedSet);
+                                container->AddToBundle(bundle, kind, nextLayerDepth, targetObject, addedSet);
                             }
                         }
                     }
@@ -123,12 +123,12 @@ std::unique_ptr<XmlBundle> XmlContainer::CreateBundle(XmlSerializable* object, X
     return CreateBundle(object, kind, -1);
 }
 
-std::unique_ptr<XmlBundle> XmlContainer::CreateBundle(XmlSerializable* object, XmlBundleKind kind, int hops)
+std::unique_ptr<XmlBundle> XmlContainer::CreateBundle(XmlSerializable* object, XmlBundleKind kind, int depth)
 {
     std::unique_ptr<XmlBundle> bundle(new XmlBundle());
     std::unordered_set<boost::uuids::uuid> addedSet;
     bundle->SetRootObjectId(object->ObjectId());
-    AddToBundle(*bundle, kind, hops, object, addedSet);
+    AddToBundle(*bundle, kind, depth, object, addedSet);
     return bundle;
 }
 
