@@ -33,23 +33,13 @@
 #include <chrono>
 #include <limits>
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngcm::ast::Init();
-        cmajor::symbols::Init();
-        sngxml::xpath::Init();
-    }
-    ~InitDone()
-    {
-        sngxml::xpath::Done();
-        cmajor::symbols::Done();
-        sngcm::ast::Done();
-        soulng::util::Done();
-    }
-};
+    soulng::util::Init();
+    sngcm::ast::Init();
+    cmajor::symbols::Init();
+    sngxml::xpath::Init();
+}
 
 using namespace sngcm::ast;
 using namespace soulng::util;
@@ -833,7 +823,7 @@ int main(int argc, const char** argv)
     std::unique_ptr<Module> rootModule;
     try
     { 
-        InitDone initDone;
+        InitApplication();
         SetCompilerVersion(version);
         SetGlobalFlag(GlobalFlags::release);
         SetGlobalFlag(GlobalFlags::profile);

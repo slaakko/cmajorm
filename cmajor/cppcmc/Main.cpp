@@ -39,32 +39,17 @@
 #include <stdexcept>
 #include <chrono>
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngcm::ast::Init();
-        cmajor::symbols::Init();
-        sngxml::xpath::Init();
-        sngxml::xmlser::Init();
+    soulng::util::Init();
+    sngcm::ast::Init();
+    cmajor::symbols::Init();
+    sngxml::xpath::Init();
+    sngxml::xmlser::Init();
 #ifdef _WIN32
-        cmajor::resources::Init();
+    cmajor::resources::Init();
 #endif
-    }
-    ~InitDone()
-    {
-#ifdef _WIN32
-        cmajor::resources::Done();
-#endif
-        sngxml::xpath::Done();
-        sngxml::xmlser::Done();
-        cmajor::symbols::Done();
-        sngcm::ast::Done();
-        soulng::util::Done();
-    }
-};
-
+}
 struct BackendInit
 {
     BackendInit()
@@ -151,9 +136,6 @@ using namespace cmajor::build;
 
 int main(int argc, const char** argv)
 {
-    //boost::uuids::uuid u = boost::uuids::random_generator()();
-    //std::string s = boost::uuids::to_string(u);
-
     SetBackEnd(cmajor::symbols::BackEnd::cmcpp);
     SetToolChain("gcc");
     std::unique_ptr<Module> rootModule;
@@ -162,7 +144,7 @@ int main(int argc, const char** argv)
     try
     {
         std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-        InitDone initDone;
+        InitApplication();
         std::string projectName;
         std::string projectDirectory;
         std::string target = "program";

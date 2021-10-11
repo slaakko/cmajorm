@@ -23,27 +23,15 @@
 #include <stdexcept>
 #include <vector>
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngxml::xpath::Init();
-        sngxml::xmlser::Init();
-        sngcm::ast::Init();
-        cmajor::symbols::Init();
-        cmajor::build::Init();
-    }
-    ~InitDone()
-    {
-        cmajor::build::Done();
-        cmajor::symbols::Done();
-        sngcm::ast::Done();
-        sngxml::xpath::Done();
-        sngxml::xmlser::Done();
-        soulng::util::Done();
-    }
-};
+    soulng::util::Init();
+    sngxml::xpath::Init();
+    sngxml::xmlser::Init();
+    sngcm::ast::Init();
+    cmajor::symbols::Init();
+    cmajor::build::Init();
+}
 
 using namespace soulng::util;
 using namespace soulng::unicode;
@@ -72,13 +60,12 @@ bool CheckCmajorRootEnv()
 
 int main(int argc, const char** argv)
 {
-    if (!CheckCmajorRootEnv()) return 1;
-    InitDone initDone;
     SetReadProjectFunction(cmajor::build::ReadProject);
     SetTypeBindingFunction(cmajor::binder::BindTypes);
     SetAccessCheckFunction(cmajor::binder::HasAccess);
     try
     {
+        InitApplication();
         std::vector<std::string> cmFiles;
         std::vector<std::string> cmpFiles;
         bool modules = false;

@@ -19,19 +19,11 @@ using namespace sngcm::ast;
 using namespace soulng::util;
 using namespace soulng::unicode;
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngcm::ast::Init();
-    }
-    ~InitDone()
-    {
-        sngcm::ast::Done();
-        soulng::util::Done();
-    }
-};
+    soulng::util::Init();
+    sngcm::ast::Init();
+}
 
 void PrintHelp()
 {
@@ -92,26 +84,11 @@ void ParseSolution(const std::string& solutionFileName, int index, bool verbose)
     }
 }
 
-bool CheckCmajorRootEnv()
-{
-    try
-    {
-        soulng::unicode::CmajorRoot();
-    }
-    catch (const std::exception& ex)
-    {
-        std::cerr << ex.what() << std::endl;
-        return false;
-    }
-    return true;
-}
-
 int main(int argc, const char** argv)
 {
-    if (!CheckCmajorRootEnv()) return 1;
-    InitDone initDone;
     try
     {
+        InitApplication();
         bool verbose = false;
         std::vector<std::string> files;
         for (int i = 1; i < argc; ++i)

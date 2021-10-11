@@ -17,19 +17,11 @@
 #include <stdexcept>
 #include <iostream>
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        sngcm::ast::Init();
-        soulng::util::Init();
-    }
-    ~InitDone()
-    {
-        soulng::util::Done();
-        sngcm::ast::Done();
-    }
-};
+    sngcm::ast::Init();
+    soulng::util::Init();
+}
 
 using namespace soulng::util;
 using namespace soulng::unicode;
@@ -124,7 +116,7 @@ int main(int argc, const char** argv)
 {
     try
     {
-        InitDone initDone;
+        InitApplication();
         bool verbose = false;
         std::vector<std::string> solutionFilePaths;
         for (int i = 1; i < argc; ++i)

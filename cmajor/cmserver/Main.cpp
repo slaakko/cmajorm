@@ -19,27 +19,15 @@
 
 using namespace soulng::util;
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngcm::ast::Init();
-        sngxml::xpath::Init();
-        sngxml::xmlser::Init();
-        cmajor::symbols::Init();
-        cmajor::build::Init();
-    }
-    ~InitDone()
-    {
-        cmajor::build::Done();
-        cmajor::symbols::Done();
-        sngxml::xmlser::Done();
-        sngxml::xpath::Done();
-        sngcm::ast::Done();
-        soulng::util::Done();
-    }
-};
+    soulng::util::Init();
+    sngcm::ast::Init();
+    sngxml::xpath::Init();
+    sngxml::xmlser::Init();
+    cmajor::symbols::Init();
+    cmajor::build::Init();
+}
 
 const char* version = "4.2.0";
 
@@ -75,26 +63,11 @@ void PrintHelp()
     std::cout << "  Show configuration." << std::endl;
 }
 
-bool CheckCmajorRootEnv()
-{
-    try
-    {
-        soulng::unicode::CmajorRoot();
-    }
-    catch (const std::exception& ex)
-    {
-        std::cerr << ex.what() << std::endl;
-        return false;
-    }
-    return true;
-}
-
 int main(int argc, const char** argv)
 {
-    if (!CheckCmajorRootEnv()) return 1;
-    InitDone initDone;
     try
     {
+        InitApplication();
         cmajor::symbols::SetBackEnd(cmajor::symbols::BackEnd::cmcpp);
         cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::repository);
         SetToolChain("gcc");

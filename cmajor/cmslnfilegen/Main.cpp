@@ -18,19 +18,11 @@
 using namespace soulng::util;
 using namespace soulng::unicode;
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngxml::xpath::Init();
-    }
-    ~InitDone()
-    {
-        sngxml::xpath::Done();
-        soulng::util::Done();
-    }
-};
+    soulng::util::Init();
+    sngxml::xpath::Init();
+}
 
 void GetProjectData(const std::string& projectFilePath, std::string& projectName, std::string& projectGuid)
 {
@@ -90,26 +82,11 @@ void PrintHelp()
     std::cout << "  Generate solution file $SOLUTION_FILE_PATH$." << std::endl;
 }
 
-bool CheckCmajorRootEnv()
-{
-    try
-    {
-        soulng::unicode::CmajorRoot();
-    }
-    catch (const std::exception& ex)
-    {
-        std::cerr << ex.what() << std::endl;
-        return false;
-    }
-    return true;
-}
-
 int main(int argc, const char** argv)
 {
-    if (!CheckCmajorRootEnv()) return 1;
-    InitDone initDone;
     try
     {
+        InitApplication();
         bool verbose = false;
         bool prevWasName = false;
         bool prevWasFile = false;

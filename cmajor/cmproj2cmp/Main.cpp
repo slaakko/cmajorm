@@ -8,21 +8,12 @@
 #include <stdexcept>
 #include <string>
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngcm::ast::Init();
-        sngxml::xpath::Init();
-    }
-    ~InitDone()
-    {
-        sngxml::xpath::Done();
-        soulng::util::Done();
-        sngcm::ast::Done();
-    }
-};
+    soulng::util::Init();
+    sngcm::ast::Init();
+    sngxml::xpath::Init();
+}
 
 using namespace soulng::util;
 using namespace cmajor::cmproj;
@@ -46,7 +37,7 @@ int main(int argc, const char** argv)
 {
     try
     {
-        InitDone initDone;
+        InitApplication();
         bool verbose = false;
         std::vector<std::string> cmprojFilePaths;
         for (int i = 1; i < argc; ++i)

@@ -27,21 +27,12 @@
 #include <stdexcept>
 #include <chrono>
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngcm::ast::Init();
-        cmajor::symbols::Init();
-    }
-    ~InitDone()
-    {
-        cmajor::symbols::Done();
-        sngcm::ast::Done();
-        soulng::util::Done();
-    }
-};
+    soulng::util::Init();
+    sngcm::ast::Init();
+    cmajor::symbols::Init();
+}
 
 struct BackendInit
 {
@@ -124,7 +115,7 @@ int main(int argc, const char** argv)
     try
     {
         std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-        InitDone initDone;
+        InitApplication();
         std::string projectName;
         std::string projectDirectory;
         std::string target = "program";

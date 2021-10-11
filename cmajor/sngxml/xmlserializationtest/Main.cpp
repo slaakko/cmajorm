@@ -12,47 +12,23 @@
 
 using namespace soulng::util;
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngxml::xpath::Init();
-        sngxml::xmlser::Init();
-    }
-    ~InitDone()
-    {
-        sngxml::xmlser::Done();
-        sngxml::xpath::Done();
-        soulng::util::Done();
-    }
-};
+    soulng::util::Init();
+    sngxml::xpath::Init();
+    sngxml::xmlser::Init();
+}
 
 const int simpleClassClassId = 0;
 const int baseClassClassId = 1;
 const int derivedClassClassId = 2;
 const int xmlTestClassClassId = 3;
 
-bool CheckCmajorRootEnv()
-{
-    try
-    {
-        soulng::unicode::CmajorRoot();
-    }
-    catch (const std::exception& ex)
-    {
-        std::cerr << ex.what() << std::endl;
-        return false;
-    }
-    return true;
-}
-
 int main()
 {
-    if (!CheckCmajorRootEnv()) return 1;
-    InitDone initDone;
     try
     {
+        InitApplication();
         SimpleClass::Register(simpleClassClassId);
         BaseClass::Register(baseClassClassId);
         DerivedClass::Register(derivedClassClassId);

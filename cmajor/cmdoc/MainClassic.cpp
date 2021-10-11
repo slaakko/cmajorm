@@ -4297,25 +4297,14 @@ void PrintHelp()
         std::endl;
 }
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngcm::ast::Init();
-        cmajor::symbols::Init();
-        cmajor::parsing::Init();
-        cmajor::xpath::Init();
-    }
-    ~InitDone()
-    {
-        cmajor::xpath::Done();
-        cmajor::symbols::Done();
-        sngcm::ast::Done();
-        cmajor::parsing::Done();
-        soulng::util::Done();
-    }
-};
+    soulng::util::Init();
+    sngcm::ast::Init();
+    cmajor::symbols::Init();
+    cmajor::parsing::Init();
+    cmajor::xpath::Init();
+}
 
 int main(int argc, const char** argv)
 {
@@ -4327,7 +4316,7 @@ int main(int argc, const char** argv)
             return 0;
         }
         SetGlobalFlag(GlobalFlags::info);
-        InitDone initDone;
+        InitApplication();
         std::vector<std::string> projectFiles;
         for (int i = 1; i < argc; ++i)
         {

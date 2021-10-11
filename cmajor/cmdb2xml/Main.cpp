@@ -13,21 +13,12 @@
 #include <stdexcept>
 #include <iostream>
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngxml::xpath::Init();
-        cmajor::debug::Init();
-    }
-    ~InitDone()
-    {
-        cmajor::debug::Done();
-        sngxml::xpath::Done();
-        soulng::util::Done();
-    }
-};
+    soulng::util::Init();
+    sngxml::xpath::Init();
+    cmajor::debug::Init();
+}
 
 using namespace soulng::util;
 
@@ -45,26 +36,11 @@ void PrintHelp()
     std::cout << "  Be verbose." << std::endl;
 }
 
-bool CheckCmajorRootEnv()
-{
-    try
-    {
-        soulng::unicode::CmajorRoot();
-    }
-    catch (const std::exception& ex)
-    {
-        std::cerr << ex.what() << std::endl;
-        return false;
-    }
-    return true;
-}
-
 int main(int argc, const char** argv)
 {
-    if (!CheckCmajorRootEnv()) return 1;
-    InitDone initDone;
     try
     {
+        InitApplication();
         bool verbose = false;
         for (int i = 1; i < argc; ++i)
         {

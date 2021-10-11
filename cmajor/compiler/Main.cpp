@@ -33,31 +33,17 @@
 #include <stdexcept>
 #include <chrono>
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngcm::ast::Init();
-        cmajor::symbols::Init();
-        sngxml::xpath::Init();
-        sngxml::xmlser::Init();
+    soulng::util::Init();
+    sngcm::ast::Init();
+    cmajor::symbols::Init();
+    sngxml::xpath::Init();
+    sngxml::xmlser::Init();
 #ifdef _WIN32
-        cmajor::resources::Init();
+    cmajor::resources::Init();
 #endif
-    }
-    ~InitDone()
-    {
-#ifdef _WIN32
-        cmajor::resources::Done();
-#endif
-        sngxml::xmlser::Done();
-        sngxml::xpath::Done();
-        cmajor::symbols::Done();
-        sngcm::ast::Done();
-        soulng::util::Done();
-    }
-};
+}
 
 struct BackendSelector
 {
@@ -215,30 +201,14 @@ void AddWarningsTo(sngxml::dom::Element* diagnosticsElement, Module* module)
 }
 #endif 
 
-bool CheckCmajorRootEnv()
-{
-    try
-    {
-        soulng::unicode::CmajorRoot();
-    }
-    catch (const std::exception& ex)
-    {
-        std::cerr << ex.what() << std::endl;
-        return false;
-    }
-    return true;
-}
-
 int main(int argc, const char** argv)
 {
-    if (!CheckCmajorRootEnv()) return 1;
-    InitDone initDone;
-
     std::unique_ptr<Module> rootModule;
     std::vector<std::unique_ptr<Module>> rootModules;
     std::set<std::string> builtProjects;
     try
     {
+        InitApplication();
         std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
         bool all = false;
         std::string projectName;

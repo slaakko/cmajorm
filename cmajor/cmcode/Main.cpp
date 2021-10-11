@@ -19,55 +19,27 @@
 #include <stdexcept>
 #include <string>
 
-struct InitDone
+void InitApplication(HINSTANCE instance)
 {
-    InitDone(HINSTANCE instance)
-    {
-        soulng::util::Init();
-        sngxml::xpath::Init();
-        sngxml::xmlser::Init();
-        cmajor::wing::Init(instance);
-        cmajor::service::Init();
-        cmajor::view::Init();
-        cmcode::ConfigInit();
-        cmpm::Register();
-        cmmsg::Register();
-    }
-    ~InitDone()
-    {
-        cmcode::ConfigDone();
-        cmajor::view::Done();
-        cmajor::service::Done();
-        cmajor::wing::Done();
-        sngxml::xmlser::Done();
-        sngxml::xpath::Done();
-        soulng::util::Done();
-    }
-};
+    soulng::util::Init();
+    sngxml::xpath::Init();
+    sngxml::xmlser::Init();
+    cmajor::wing::Init(instance);
+    cmajor::service::Init();
+    cmajor::view::Init();
+    cmcode::ConfigInit();
+    cmpm::Register();
+    cmmsg::Register();
+}
 
 using namespace cmcode;
 using namespace soulng::unicode;
 
-bool CheckCmajorRootEnv()
-{
-    try
-    {
-        soulng::unicode::CmajorRoot();
-    }
-    catch (const std::exception& ex)
-    {
-        ShowErrorMessageBox(nullptr, ex.what());
-        return false;
-    }
-    return true;
-}
-
 int WinMain(HINSTANCE instance, HINSTANCE prevInstance, LPSTR cmdLine, int cmdShow)
 {
-    if (!CheckCmajorRootEnv()) return 1;
-    InitDone initDone(instance);
     try
     {
+        InitApplication(instance);
         std::string filePath;
         std::string commandLine(cmdLine);
         if (!commandLine.empty())

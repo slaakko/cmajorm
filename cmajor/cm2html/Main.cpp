@@ -17,19 +17,11 @@ using namespace sngcm::ast;
 using namespace soulng::util;
 using namespace soulng::unicode;
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        sngcm::ast::Init();
-        soulng::util::Init();
-    }
-    ~InitDone()
-    {
-        soulng::util::Done();
-        sngcm::ast::Done();
-    }
-};
+    sngcm::ast::Init();
+    soulng::util::Init();
+}
 
 std::string HtmlEscape(const std::string& s)
 {
@@ -219,7 +211,7 @@ int main(int argc, const char** argv)
 {
     try
     {
-        InitDone initDone;
+        InitApplication();
         if (argc < 2)
         {
             PrintHelp();

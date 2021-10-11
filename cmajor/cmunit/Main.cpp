@@ -42,23 +42,13 @@
 #include <iostream>
 #include <chrono>
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngcm::ast::Init();
-        cmajor::symbols::Init();
-        sngxml::xpath::Init();
-    }
-    ~InitDone()
-    {
-        sngxml::xpath::Done();
-        cmajor::symbols::Done();
-        sngcm::ast::Done();
-        soulng::util::Done();
-    }
-};
+    soulng::util::Init();
+    sngcm::ast::Init();
+    cmajor::symbols::Init();
+    sngxml::xpath::Init();
+}
 
 using namespace sngcm::ast;
 using namespace soulng::util;
@@ -854,7 +844,7 @@ int main(int argc, const char** argv)
     std::unique_ptr<Module> rootModule;
     try
     {
-        InitDone initDone;
+        InitApplication();
         SetCompilerVersion(version);
         std::unique_ptr<sngxml::dom::Element> cmunitElement(new sngxml::dom::Element(U"cmunit"));
         cmunitElement->SetAttribute(U"start", ToUtf32(GetCurrentDateTime().ToString()));

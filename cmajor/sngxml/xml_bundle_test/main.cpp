@@ -11,34 +11,11 @@
 #include <boost/uuid/random_generator.hpp>
 #include <iostream>
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngxml::xpath::Init();
-        sngxml::xmlser::Init();
-    }
-    ~InitDone()
-    {
-        sngxml::xmlser::Done();
-        sngxml::xpath::Done();
-        soulng::util::Done();
-    }
-};
-
-bool CheckCmajorRootEnv()
-{
-    try
-    {
-        soulng::unicode::CmajorRoot();
-    }
-    catch (const std::exception& ex)
-    {
-        std::cerr << ex.what() << std::endl;
-        return false;
-    }
-    return true;
+    soulng::util::Init();
+    sngxml::xpath::Init();
+    sngxml::xmlser::Init();
 }
 
 // these should match in the C++ and Cmajor code:
@@ -49,10 +26,9 @@ const int personClassId = 2;
 
 int main()
 {
-    if (!CheckCmajorRootEnv()) return 1;
-    InitDone initDone;
     try
     {
+        InitApplication();
         Car::Register(carClassId);
         Bicycle::Register(bicycleClassId);
         Person::Register(personClassId);

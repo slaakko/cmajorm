@@ -24,31 +24,18 @@
 #endif
 #include <thread>
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngxml::xpath::Init();
-        sngxml::xmlser::Init();
-        cmajor::debug::Init();
+    soulng::util::Init();
+    sngxml::xpath::Init();
+    sngxml::xmlser::Init();
+    cmajor::debug::Init();
 #ifdef _WIN32
-        cmajor::cmpm::InitPortMapClient();
+    cmajor::cmpm::InitPortMapClient();
 #endif
-        cmmsg::Register();
-        cmpm::Register();
-    }
-    ~InitDone()
-    {
-#ifdef _WIN32
-        cmajor::cmpm::DonePortMapClient();
-#endif
-        cmajor::debug::Done();
-        sngxml::xmlser::Done();
-        sngxml::xpath::Done();
-        soulng::util::Done();
-    }
-};
+    cmmsg::Register();
+    cmpm::Register();
+}
 
 using namespace soulng::util;
 
@@ -85,29 +72,14 @@ void PrintHelp()
     std::cout << "  Optional. Set kill channel port number to PORT_NUMBER." << std::endl;
 }
 
-bool CheckCmajorRootEnv()
-{
-    try
-    {
-        soulng::unicode::CmajorRoot();
-    }
-    catch (const std::exception& ex)
-    {
-        std::cerr << ex.what() << std::endl;
-        return false;
-    }
-    return true;
-}
-
 int main(int argc, const char** argv)
 {
-    if (!CheckCmajorRootEnv()) return 1;
     bool server = false;
     bool client = false;
-    InitDone initDone;
     int portMapServicePort = -1;
     try
     {
+        InitApplication();
         bool verbose = false;
         std::string executable;
         std::vector<std::string> args;

@@ -38,34 +38,19 @@
 #include <mutex>
 #include <condition_variable>
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngcm::ast::Init();
-        cmajor::symbols::Init();
-        sngxml::xpath::Init();
-        sngxml::xmlser::Init();
+    soulng::util::Init();
+    sngcm::ast::Init();
+    cmajor::symbols::Init();
+    sngxml::xpath::Init();
+    sngxml::xmlser::Init();
 #ifdef _WIN32
-        cmajor::resources::Init();
+    cmajor::resources::Init();
 #endif
-        cmajor::cmpm::InitPortMapClient();
-        cmmsg::Register();
-    }
-    ~InitDone()
-    {
-        cmajor::cmpm::DonePortMapClient();
-#ifdef _WIN32
-        cmajor::resources::Done();
-#endif
-        sngxml::xmlser::Done();
-        sngxml::xpath::Done();
-        cmajor::symbols::Done();
-        sngcm::ast::Done();
-        soulng::util::Done();
-    }
-};
+    cmajor::cmpm::InitPortMapClient();
+    cmmsg::Register();
+}
 
 using namespace soulng::util;
 using namespace soulng::unicode;
@@ -146,24 +131,8 @@ struct PortMapClientRun
 
 std::mutex mtx;
 
-bool CheckCmajorRootEnv()
-{
-    try
-    {
-        CmajorRoot();
-    }
-    catch (const std::exception& ex)
-    {
-        std::cerr << ex.what() << std::endl;
-        return false;
-    }
-    return true;
-}
-
 int main(int argc, const char** argv)
 {
-    if (!CheckCmajorRootEnv()) return 1;
-    InitDone initDone;
     #ifdef TRACE    
     soulng::util::BeginTracing();
     soulng::util::SetThreadId('M');
@@ -176,6 +145,7 @@ int main(int argc, const char** argv)
     bool progress = false;
     try
     {
+        InitApplication();
         int port = 54325;
         int keepAliveServerPort = cmbs::defaultKeepAliveServerPort;
         int portMapServicePort = -1;

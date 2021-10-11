@@ -11,30 +11,20 @@
 
 using namespace soulng::util;
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngxml::xpath::Init();
-        sngxml::xmlser::Init();
-        cmpm::Register();
-        cmajor::cmpm::Init();
-    }
-    ~InitDone()
-    {
-        sngxml::xmlser::Done();
-        cmajor::cmpm::Done();
-        sngxml::xpath::Done();
-        soulng::util::Done();
-    }
-};
+    soulng::util::Init();
+    sngxml::xpath::Init();
+    sngxml::xmlser::Init();
+    cmpm::Register();
+    cmajor::cmpm::Init();
+}
 
 int main(int argc, const char** argv)
 {
     try
     { 
-        InitDone initDone;
+        InitApplication();
         cmajor::cmpm::RunPortMapServer();
     }
     catch (const std::exception& ex)

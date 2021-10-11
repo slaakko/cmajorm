@@ -30,19 +30,11 @@ std::string CmajorRootDir()
     return std::string(e);
 }
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngxml::xpath::Init();
-    }
-    ~InitDone()
-    {
-        sngxml::xpath::Done();
-        soulng::util::Done();
-    }
-};
+    soulng::util::Init();
+    sngxml::xpath::Init();
+}
 
 void PrintHelp(CodeFormatter& formatter)
 {
@@ -551,27 +543,12 @@ void BoostVersion(CodeFormatter& formatter, CodeFormatter& errorFormatter, const
     }
 }
 
-bool CheckCmajorRootEnv()
-{
-    try
-    {
-        soulng::unicode::CmajorRoot();
-    }
-    catch (const std::exception& ex)
-    {
-        std::cerr << ex.what() << std::endl;
-        return false;
-    }
-    return true;
-}
-
 int main(int argc, const char** argv)
 {
-    if (!CheckCmajorRootEnv()) return 1;
-    InitDone initDone;
     CodeFormatter errorFormatter(std::cerr);
     try
     {
+        InitApplication();
         CodeFormatter formatter(std::cout);
         std::string boostLibDir;
         std::string boostIncludeDir;

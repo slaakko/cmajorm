@@ -14,17 +14,10 @@
 #include <iostream>
 #include <fstream>
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-    }
-    ~InitDone()
-    {
-        soulng::util::Done();
-    }
-};
+    soulng::util::Init();
+}
 
 void PrintHelp()
 {
@@ -40,26 +33,11 @@ void PrintHelp()
     std::cout << "  Filter trace using given filter expression." << std::endl;
 }
 
-bool CheckCmajorRootEnv()
-{
-    try
-    {
-        soulng::unicode::CmajorRoot();
-    }
-    catch (const std::exception& ex)
-    {
-        std::cerr << ex.what() << std::endl;
-        return false;
-    }
-    return true;
-}
-
 int main(int argc, const char** argv)
 {
-    if (!CheckCmajorRootEnv()) return 1;
-    InitDone initDone;
     try
     {
+        InitApplication();
         std::string traceFilePath;
         bool verbose = false;
         std::string filterExpr;

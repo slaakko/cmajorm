@@ -14,21 +14,12 @@
 #include <iostream>
 #include <stdexcept>
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngcm::ast::Init();
-        cmajor::symbols::Init();
-    }
-    ~InitDone()
-    {
-        cmajor::symbols::Done();
-        sngcm::ast::Done();
-        soulng::util::Done();
-    }
-};
+    soulng::util::Init();
+    sngcm::ast::Init();
+    cmajor::symbols::Init();
+}
 
 const char* version = "4.2.0";
 
@@ -49,7 +40,7 @@ int main(int argc, const char** argv)
     std::unique_ptr<Module> rootModule;
     try
     {
-        InitDone initDone;
+        InitApplication();
         if (argc < 2)
         {
             PrintHelp();

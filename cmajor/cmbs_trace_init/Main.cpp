@@ -2,24 +2,16 @@
 #include <soulng/util/InitDone.hpp>
 #include <iostream>
 
-struct InitDone
+void Init()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-    }
-    ~InitDone()
-    {
-        soulng::util::Done();
-    }
-};
-
+    soulng::util::Init();
+}
 
 int main()
 {
     try
     {
-        InitDone initDone;
+        Init();
         CreateTraceFunctions();
     }
     catch (const std::exception& ex)

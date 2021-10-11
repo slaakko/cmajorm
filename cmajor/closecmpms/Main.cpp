@@ -10,30 +10,20 @@
 #include <soulng/util/InitDone.hpp>
 #include <cmajor/cmsvc/PortMapService.hpp>
 
-struct InitDone
+void Init()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-        sngxml::xpath::Init();
-        sngxml::xmlser::Init();
-        cmajor::service::Init();
-        cmpm::Register();
-    }
-    ~InitDone()
-    {
-        cmajor::service::Done();
-        sngxml::xmlser::Done();
-        sngxml::xpath::Done();
-        soulng::util::Done();
-    }
-};
+    soulng::util::Init();
+    sngxml::xpath::Init();
+    sngxml::xmlser::Init();
+    cmajor::service::Init();
+    cmpm::Register();
+}
 
 int main()
 {
     try
     {
-        InitDone initDone;
+        Init();
         cmajor::service::StopPortMapServer();
     }
     catch (...)

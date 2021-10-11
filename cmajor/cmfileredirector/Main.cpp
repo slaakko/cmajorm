@@ -9,23 +9,16 @@
 #include <iostream>
 #include <stdexcept>
 
-struct InitDone
+void InitApplication()
 {
-    InitDone()
-    {
-        soulng::util::Init();
-    }
-    ~InitDone()
-    {
-        soulng::util::Done();
-    }
-};
+    soulng::util::Init();
+}
 
 int main(int argc, const char** argv)
 {
     try
     {
-        InitDone initDone;
+        InitApplication();
         if (argc < 4)
         {
             std::cout << "cmfileredirector { -<handle_to_redirect> <filename_to_redirect_to> }... <executable_to_launch> { <argument_to_executable> }..." << std::endl;

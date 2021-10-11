@@ -16,53 +16,26 @@
 #include <cmpm/Register.hpp>
 #include <stdexcept>
 
-struct InitDone
+void InitApplication(HINSTANCE instance)
 {
-    InitDone(HINSTANCE instance)
-    {
-        soulng::util::Init();
-        sngxml::xpath::Init();
-        sngxml::xmlser::Init();
-        cmajor::wing::Init(instance);
-        cmajor::service::Init();
-        cmajor::view::Init();
-        cmpm::Register();
-    }
-    ~InitDone()
-    {
-        cmajor::view::Done();
-        cmajor::service::Done();
-        cmajor::wing::Done();
-        sngxml::xmlser::Done();
-        sngxml::xpath::Done();
-        soulng::util::Done();
-    }
-};
+    soulng::util::Init();
+    sngxml::xpath::Init();
+    sngxml::xmlser::Init();
+    cmajor::wing::Init(instance);
+    cmajor::service::Init();
+    cmajor::view::Init();
+    cmpm::Register();
+}
 
 using namespace cmajor::pmv;
 using namespace cmajor::wing;
 
-bool CheckCmajorRootEnv()
-{
-    try
-    {
-        soulng::unicode::CmajorRoot();
-    }
-    catch (const std::exception& ex)
-    {
-        ShowErrorMessageBox(nullptr, ex.what());
-        return false;
-    }
-    return true;
-}
-
 
 int WinMain(HINSTANCE instance, HINSTANCE prevInstance, LPSTR cmdLine, int cmdShow)
 {
-    if (!CheckCmajorRootEnv()) return 1;
-    InitDone initDone(instance);
     try
     {
+        InitApplication(instance);
         MainWindow mainWindow;
         mainWindow.SetIcon(Application::GetResourceManager().GetIcon("cmpmv.icon"));
         mainWindow.SetSmallIcon(Application::GetResourceManager().GetIcon("cmpmv.icon"));
