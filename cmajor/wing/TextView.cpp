@@ -965,8 +965,26 @@ void TextView::InsertLines(int lineIndex, int columnIndex, const std::vector<std
         OnLineInserted(args);
         ++lineIndex;
     }
+    bool lineDeleted = false;
+    if (lineIndex < lines.size())
+    {
+        if (IsEmptyOrSpaceLine(*lines[lineIndex]))
+        {
+            lines.erase(lines.begin() + lineIndex);
+            LineEventArgs args(lineIndex, -1);
+            OnLineDeleted(args);
+            lineDeleted = true;
+        }
+    }
     SetTextExtent();
-    SetCaretLineCol(lineIndex, 1 + LineNumberFieldLength() + indent);
+    if (lineDeleted)
+    {
+        SetCaretLineCol(lineIndex, 1 + LineNumberFieldLength() + lines[lineIndex - 1]->length());
+    }
+    else
+    {
+        SetCaretLineCol(lineIndex, 1 + LineNumberFieldLength() + indent);
+    }
     ScrollToCaret();
     Invalidate();
     InvalidateLines(lineIndex + 1, static_cast<int>(lineIndex + linesToInsert.size() + 1));
@@ -1009,6 +1027,10 @@ void TextView::NewLine(int lineIndex, int columnIndex)
         lines.push_back(std::unique_ptr<std::u32string>(new std::u32string()));
     }
     std::u32string& line = *lines[lineIndex];
+    if (columnIndex > line.length())
+    {
+        columnIndex = line.length();
+    }
     std::u32string toInsert = TrimEnd(line.substr(columnIndex));
     bool lineChanged = false;
     if (!toInsert.empty())

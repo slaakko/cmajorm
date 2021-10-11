@@ -1,50 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-<package 
-	name="cmajor" 
-	appName="Cmajor" 
-	version="4.1.0" 
-	publisher="Seppo Laakko" 
-	sourceRootDir="../../cmajor" 
-	targetRootDir="C:/cmajor" 
-	compression="bzip2" 
-	id="0b6afac5-782c-434a-8dcc-d8cf30922fd3"
-	iconFilePath="$TARGET_ROOT_DIR$/bin/cmcodesmall.ico"
-	includeUninstaller="true">
+<package appName="Cmajor" compression="bzip2" iconFilePath="$TARGET_ROOT_DIR$/bin/cmcodesmall.ico" id="0b6afac5-782c-434a-8dcc-d8cf30922fd3" includeUninstaller="true" name="cmajor" publisher="Seppo Laakko" sourceRootDir="../../cmajor" targetRootDir="C:/cmajor" version="4.2.0">
  <preinstall>
   <include filePath="installation\x64\Release\checkcmajor.exe"/>
   <run command="$PREINSTALL_DIR$\checkcmajor"/>
  </preinstall>
- <environment>
-  <variable name="CMAJOR_ROOT" value="$TARGET_ROOT_DIR$"/>
-  <pathDirectory value="$TARGET_ROOT_DIR$/bin"/>
- </environment>
- <links>
-  <linkDirectory path="$START_MENU_PROGRAMS_FOLDER$/Cmajor"/>
-  <link 
-   linkFilePath="$START_MENU_PROGRAMS_FOLDER$/Cmajor/Cmajor Code.lnk" 
-   path="$TARGET_ROOT_DIR$/bin/cmcode.exe" 
-   workingDirectory="$TARGET_ROOT_DIR$/bin"
-   description="Cmajor Code" 
-   iconPath="$TARGET_ROOT_DIR$/bin/cmcode.exe"
-   iconIndex="0"/>
-  <link 
-   linkFilePath="$START_MENU_PROGRAMS_FOLDER$/Cmajor/CmDevEnv.lnk" 
-   path="$TARGET_ROOT_DIR$/bin/cmdevenv.exe" 
-   workingDirectory="$TARGET_ROOT_DIR$/bin"
-   description="CmDevEnv" 
-   iconPath="$TARGET_ROOT_DIR$/bin/cmdevenv.exe"
-   iconIndex="0"/>
-  <link
-   linkFilePath="$DESKTOP_FOLDER$/Cmajor Code.lnk"
-   path="$TARGET_ROOT_DIR$/bin/cmcode.exe" 
-   workingDirectory="$TARGET_ROOT_DIR$/bin"
-   description="Cmajor Code" 
-   iconPath="$TARGET_ROOT_DIR$/bin/cmcode.exe"
-   iconIndex="0"/>
- </links>
  <component name="binaries">
-  <directory name="bin">
-  </directory>
+  <directory name="bin"/>
  </component>
  <component name="configuration">
   <directory name="config">
@@ -59,8 +19,7 @@
   </directory>
  </component>
  <component name="documentation">
-  <directory name="doc">
-  </directory>
+  <directory name="doc"/>
  </component>
  <component name="libraries">
   <directory name="lib">
@@ -70,13 +29,13 @@
  <component name="projects">
   <directory name="projects">
    <exclude dir="*"/>
-   <exclude dir="lib" cascade="true"/>
-   <exclude dir="bin" cascade="true"/>
+   <exclude cascade="true" dir="lib"/>
+   <exclude cascade="true" dir="bin"/>
    <include dir="cm"/>
    <include dir="cmsx">
-	<exclude dir="config"/>
+    <exclude dir="config"/>
     <exclude dir="fs"/>
-	<exclude dir="sbin"/>
+    <exclude dir="sbin"/>
    </include>
    <include dir="examples"/>
    <include dir="sirius"/>
@@ -85,8 +44,7 @@
   </directory>
  </component>
  <component name="resources">
-  <directory name="res">
-  </directory>
+  <directory name="res"/>
  </component>
  <component name="system">
   <directory name="system">
@@ -168,13 +126,21 @@
   </directory>
  </component>
  <component name="unit-test">
-  <directory name="unitTest">
-  </directory>
+  <directory name="unitTest"/>
  </component>
  <component name="vs">
-  <directory name="vs">
-  </directory>
+  <directory name="vs"/>
  </component>
+ <environment>
+  <variable name="CMAJOR_ROOT" value="$TARGET_ROOT_DIR$"/>
+  <pathDirectory value="$TARGET_ROOT_DIR$/bin"/>
+ </environment>
+ <links>
+  <linkDirectory path="$START_MENU_PROGRAMS_FOLDER$/Cmajor"/>
+  <link description="Cmajor Code" iconIndex="0" iconPath="$TARGET_ROOT_DIR$/bin/cmcode.exe" linkFilePath="$START_MENU_PROGRAMS_FOLDER$/Cmajor/Cmajor Code.lnk" path="$TARGET_ROOT_DIR$/bin/cmcode.exe" workingDirectory="$TARGET_ROOT_DIR$/bin"/>
+  <link description="CmDevEnv" iconIndex="0" iconPath="$TARGET_ROOT_DIR$/bin/cmdevenv.exe" linkFilePath="$START_MENU_PROGRAMS_FOLDER$/Cmajor/CmDevEnv.lnk" path="$TARGET_ROOT_DIR$/bin/cmdevenv.exe" workingDirectory="$TARGET_ROOT_DIR$/bin"/>
+  <link description="Cmajor Code" iconIndex="0" iconPath="$TARGET_ROOT_DIR$/bin/cmcode.exe" linkFilePath="$DESKTOP_FOLDER$/Cmajor Code.lnk" path="$TARGET_ROOT_DIR$/bin/cmcode.exe" workingDirectory="$TARGET_ROOT_DIR$/bin"/>
+ </links>
  <uninstall>
   <run command="closecmpms"/>
  </uninstall>
