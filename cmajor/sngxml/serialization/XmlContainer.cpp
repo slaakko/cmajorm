@@ -89,23 +89,15 @@ void XmlContainer::AddToBundle(XmlBundle& bundle, XmlBundleKind kind, int depth,
                 }
                 else
                 {
-                    XmlSerializable* s = ptr->GetPtr();
-                    if (s)
+                    targetObject = ptr->GetPtr();
+                    if (targetObject)
                     {
-                        XmlContainer* container = s->Container();
-                        if (container)
+                        int nextLayerDepth = -1;
+                        if (depth > 0)
                         {
-                            targetObject = container->Get(ptr->TargetObjectId());
-                            if (targetObject)
-                            {
-                                int nextLayerDepth = -1;
-                                if (depth > 0)
-                                {
-                                    nextLayerDepth = depth - 1;
-                                }
-                                container->AddToBundle(bundle, kind, nextLayerDepth, targetObject, addedSet);
-                            }
+                            nextLayerDepth = depth - 1;
                         }
+                        AddToBundle(bundle, kind, nextLayerDepth, targetObject, addedSet);
                     }
                 }
             }

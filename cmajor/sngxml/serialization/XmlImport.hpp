@@ -176,6 +176,15 @@ void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, 
                 xmlPtr.SetTargetObjectId(objectId);
             }
         }
+        else
+        {
+            std::u32string objectIdAttr = element->GetAttribute(U"objectId");
+            if (!objectIdAttr.empty())
+            {
+                boost::uuids::uuid objectId = boost::lexical_cast<boost::uuids::uuid>(ToUtf8(objectIdAttr));
+                xmlPtr.SetTargetObjectId(objectId);
+            }
+        }
     }
 }
 
@@ -188,6 +197,15 @@ void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, 
     {
         std::u32string value = element->GetAttribute(U"value");
         if (value != U"null")
+        {
+            std::u32string objectIdAttr = element->GetAttribute(U"objectId");
+            if (!objectIdAttr.empty())
+            {
+                boost::uuids::uuid objectId = boost::lexical_cast<boost::uuids::uuid>(ToUtf8(objectIdAttr));
+                xmlPtr.SetTargetObjectId(objectId);
+            }
+        }
+        else
         {
             std::u32string objectIdAttr = element->GetAttribute(U"objectId");
             if (!objectIdAttr.empty())

@@ -246,6 +246,7 @@ std::unique_ptr<sngxml::dom::Element> ToXml(const sngxml::xmlser::XmlPtr<T>& xml
     {
         std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
         element->SetAttribute(U"value", U"null");
+        element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(xmlPtr.TargetObjectId())));
         return element;
     }
 }
@@ -263,6 +264,7 @@ std::unique_ptr<sngxml::dom::Element> ToXml(const sngxml::xmlser::UniqueXmlPtr<T
     {
         std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
         element->SetAttribute(U"value", U"null");
+        element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(xmlPtr.TargetObjectId())));
         return element;
     }
 }

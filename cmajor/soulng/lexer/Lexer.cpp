@@ -405,16 +405,19 @@ void GetColumns(const char32_t* start, const char32_t* end, const Span& external
 std::u32string Lexer::ErrorLines(const Token& token) const
 {
     std::u32string lines;
-    const char32_t* lineStart = LineStart(start, token.match.begin);
-    const char32_t* lineEnd = LineEnd(end, token.match.end);
-    lines.append(std::u32string(lineStart, token.match.begin));
-    lines.append(token.match.ToString());
-    lines.append(std::u32string(token.match.end, lineEnd));
-    lines.append(1, '\n');
-    lines.append(token.match.begin - lineStart, ' ');
-    lines.append(std::max(static_cast<int64_t>(1), token.match.end - token.match.begin), '^');
-    lines.append(lineEnd - token.match.end, ' ');
-    lines.append(1, '\n');
+    if (token.match.begin && token.match.end)
+    {
+        const char32_t* lineStart = LineStart(start, token.match.begin);
+        const char32_t* lineEnd = LineEnd(end, token.match.end);
+        lines.append(std::u32string(lineStart, token.match.begin));
+        lines.append(token.match.ToString());
+        lines.append(std::u32string(token.match.end, lineEnd));
+        lines.append(1, '\n');
+        lines.append(token.match.begin - lineStart, ' ');
+        lines.append(std::max(static_cast<int64_t>(1), token.match.end - token.match.begin), '^');
+        lines.append(lineEnd - token.match.end, ' ');
+        lines.append(1, '\n');
+    }
     return lines;
 }
 
