@@ -52,7 +52,7 @@ GotoLineDialog::GotoLineDialog() : Window(WindowCreateParams().WindowClassName("
     std::unique_ptr<TextBox> textBoxPtr(new TextBox(TextBoxCreateParams().Defaults()));
     textBox = textBoxPtr.get();
     textBox->TextChanged().AddHandler(this, &GotoLineDialog::TextBoxTextChanged);
-    Size textBoxSize = Size(ScreenMetrics::Get().MMToHorizontalPixels(20), defaultTextBoxSize.Height);
+    Size textBoxSize = Size(ScreenMetrics::Get().MMToHorizontalPixels(20), defaultTextBoxSize.Height + 4);
     std::unique_ptr<Control> paddedControl(new PaddedControl(PaddedControlCreateParams(textBoxPtr.release()).SetSize(PaddedSize(textBoxSize, DefaultPadding()))));
     std::unique_ptr<Control> borderedControl(new BorderedControl(BorderedControlCreateParams(paddedControl.release()).
         SetSize(BorderedSize(PaddedSize(textBoxSize, DefaultPadding()), BorderStyle::single)).Location(textBoxLocation).SetAnchors(Anchors::top | Anchors::left)));

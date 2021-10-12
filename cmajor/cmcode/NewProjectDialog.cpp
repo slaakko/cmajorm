@@ -51,7 +51,7 @@ NewProjectDialog::NewProjectDialog() : Window(WindowCreateParams().WindowClassNa
         SetAnchors(Anchors::left | Anchors::top)));
     AddChild(projectNameLabelPtr.release());
 
-    Size projectNameTextBoxSize(ScreenMetrics::Get().MMToHorizontalPixels(120), defaultTextBoxSize.Height);
+    Size projectNameTextBoxSize(ScreenMetrics::Get().MMToHorizontalPixels(120), defaultTextBoxSize.Height + 4);
     std::unique_ptr<TextBox> projectNameTextBoxPtr(new TextBox(TextBoxCreateParams().Defaults()));
     projectNameTextBox = projectNameTextBoxPtr.get();
     projectNameTextBox->TextChanged().AddHandler(this, &NewProjectDialog::ProjectNameTextBoxTextChanged);
@@ -91,7 +91,7 @@ NewProjectDialog::NewProjectDialog() : Window(WindowCreateParams().WindowClassNa
     AddChild(projectLocationLabelPtr.release());
 
     Point projectLocationTextBoxLocation(16, 16 + defaultControlSpacing.Height + 24 + 24 + 24 + 24 + 24);
-    Size projectLocationTextBoxSize(ScreenMetrics::Get().MMToHorizontalPixels(120), defaultTextBoxSize.Height);
+    Size projectLocationTextBoxSize(ScreenMetrics::Get().MMToHorizontalPixels(120), defaultTextBoxSize.Height + 4);
     std::unique_ptr<TextBox> projectLocationTextBoxPtr(new TextBox(TextBoxCreateParams().Defaults()));
     projectLocationTextBox = projectLocationTextBoxPtr.get();
     projectLocationTextBox->TextChanged().AddHandler(this, &NewProjectDialog::ProjectLocationTextBoxTextChanged);
@@ -114,7 +114,7 @@ NewProjectDialog::NewProjectDialog() : Window(WindowCreateParams().WindowClassNa
     AddChild(solutionNameLabelPtr.release());
 
     Point solutionNameTextBoxLocation(16, 16 + 2 * defaultControlSpacing.Height + 24 + 24 + 24 + 24 + 24 + 24 + 24);
-    Size solutionNameTextBoxSize(ScreenMetrics::Get().MMToHorizontalPixels(120), defaultTextBoxSize.Height);
+    Size solutionNameTextBoxSize(ScreenMetrics::Get().MMToHorizontalPixels(120), defaultTextBoxSize.Height + 4);
     std::unique_ptr<TextBox> solutionNameTextBoxPtr(new TextBox(TextBoxCreateParams().Defaults()));
     solutionNameTextBox = solutionNameTextBoxPtr.get();
     solutionNameTextBox->TextChanged().AddHandler(this, &NewProjectDialog::SolutionNameTextBoxTextChanged);

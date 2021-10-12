@@ -33,7 +33,7 @@ AddNewProjectDialog::AddNewProjectDialog() : Window(WindowCreateParams().WindowC
         SetAnchors(Anchors::left | Anchors::top)));
     AddChild(projectNameLabelPtr.release());
 
-    Size projectNameTextBoxSize(ScreenMetrics::Get().MMToHorizontalPixels(120), defaultTextBoxSize.Height);
+    Size projectNameTextBoxSize(ScreenMetrics::Get().MMToHorizontalPixels(120), defaultTextBoxSize.Height + 4);
     std::unique_ptr<TextBox> projectNameTextBoxPtr(new TextBox(TextBoxCreateParams().Defaults()));
     projectNameTextBox = projectNameTextBoxPtr.get();
     projectNameTextBox->TextChanged().AddHandler(this, &AddNewProjectDialog::ProjectNameTextBoxTextChanged);
@@ -73,7 +73,7 @@ AddNewProjectDialog::AddNewProjectDialog() : Window(WindowCreateParams().WindowC
     AddChild(projectLocationLabelPtr.release());
 
     Point projectLocationTextBoxLocation(16, 16 + defaultControlSpacing.Height + 24 + 24 + 24 + 24 + 24);
-    Size projectLocationTextBoxSize(ScreenMetrics::Get().MMToHorizontalPixels(120), defaultTextBoxSize.Height);
+    Size projectLocationTextBoxSize(ScreenMetrics::Get().MMToHorizontalPixels(120), defaultTextBoxSize.Height + 4);
     std::unique_ptr<TextBox> projectLocationTextBoxPtr(new TextBox(TextBoxCreateParams().Defaults()));
     projectLocationTextBox = projectLocationTextBoxPtr.get();
     projectLocationTextBox->TextChanged().AddHandler(this, &AddNewProjectDialog::ProjectLocationTextBoxTextChanged);

@@ -52,9 +52,9 @@ BuildSettingsDialog::BuildSettingsDialog() : Window(WindowCreateParams().WindowC
     projectBuildThreadsTextBox = projectBuildThreadsTextBoxPtr.get();
     projectBuildThreadsTextBox->TextChanged().AddHandler(this, &BuildSettingsDialog::TextBoxTextChanged);
     std::unique_ptr<Control> paddedTextBox(new PaddedControl(PaddedControlCreateParams(projectBuildThreadsTextBoxPtr.release()).
-        SetSize(PaddedSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(10), defaultTextBoxSize.Height), DefaultPadding()))));
+        SetSize(PaddedSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(10), defaultTextBoxSize.Height + 4), DefaultPadding()))));
     std::unique_ptr<Control> borderedTextBox(new BorderedControl(BorderedControlCreateParams(paddedTextBox.release()).Location(projectBuildThreadsTextBoxLocation).
-        SetSize(BorderedSize(PaddedSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(10), defaultTextBoxSize.Height), DefaultPadding()), BorderStyle::single)).SetAnchors(Anchors::top | Anchors::left)));
+        SetSize(BorderedSize(PaddedSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(10), defaultTextBoxSize.Height + 4), DefaultPadding()), BorderStyle::single)).SetAnchors(Anchors::top | Anchors::left)));
     AddChild(borderedTextBox.release());
 
     Point singleThreadedCheckBoxLocation(16, 16 + 16 + 24 + 24);

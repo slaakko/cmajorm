@@ -37,7 +37,7 @@ SearchDialog::SearchDialog(bool hasCurrentFile_) : Window(WindowCreateParams().W
     std::unique_ptr<TextBox> searchTextBoxPtr(new TextBox(TextBoxCreateParams().Defaults()));
     searchTextBox = searchTextBoxPtr.get();
     searchTextBox->TextChanged().AddHandler(this, &SearchDialog::SearchTextBoxTextChanged);
-    Size searchTextBoxSize(ScreenMetrics::Get().MMToHorizontalPixels(120), defaultTextBoxSize.Height);
+    Size searchTextBoxSize(ScreenMetrics::Get().MMToHorizontalPixels(120), defaultTextBoxSize.Height + 4);
     std::unique_ptr<Control> paddedSearchTextBox(new PaddedControl(PaddedControlCreateParams(searchTextBoxPtr.release()).SetSize(PaddedSize(searchTextBoxSize, DefaultPadding())).
         Location(searchTextBoxLocation)));
     std::unique_ptr<Control> borderedSearchTextBox(new BorderedControl(BorderedControlCreateParams(paddedSearchTextBox.release()).Location(searchTextBoxLocation).

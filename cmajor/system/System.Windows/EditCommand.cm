@@ -178,6 +178,25 @@ namespace System.Windows
         private int numSpaces;
     }
 
+    public class InsertIntoLineCommand : EditCommand
+    {
+        public nothrow InsertIntoLineCommand(int lineIndex_, int columnIndex_, const ustring& text_) :
+            lineIndex(lineIndex_), columnIndex(columnIndex_), text(text_)
+        {
+        }
+        public override nothrow void Undo(TextView* textView)
+        {
+            textView->RemoveFromLine(lineIndex, columnIndex, text.Length());
+        }
+        public override nothrow void Redo(TextView* textView)
+        {
+            textView->InsertIntoLine(lineIndex, columnIndex, text);
+        }
+        private int lineIndex;
+        private int columnIndex;
+        private ustring text;
+    }
+    
     public class InsertLinesCommand : EditCommand
     {
         public nothrow InsertLinesCommand(int lineIndex_, int columnIndex_, const List<ustring>& lines_) :
@@ -199,7 +218,7 @@ namespace System.Windows
 
     public class RemoveSelectionCommand : EditCommand
     {
-        public nothrow RemoveSelectionCommand(const Selection& selection_, const SelectionData& selectionData_, bool wholeLine_) : 
+        public nothrow RemoveSelectionCommand(const Selection& selection_, const SelectionData& selectionData_, bool wholeLine_) :
             selection(selection_), selectionData(selectionData_), wholeLine(wholeLine_)
         {
         }

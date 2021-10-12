@@ -82,9 +82,9 @@ OptionsDialog::OptionsDialog() : Window(WindowCreateParams().WindowClassName("cm
     numberOfRecentSolutionsTextBox = numberOfRecentSolutionsTextBoxPtr.get();
     numberOfRecentSolutionsTextBox->TextChanged().AddHandler(this, &OptionsDialog::TextBoxTextChanged);
     std::unique_ptr<Control> paddedTextBox(new PaddedControl(PaddedControlCreateParams(numberOfRecentSolutionsTextBoxPtr.release()).
-        SetSize(PaddedSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(10), defaultTextBoxSize.Height), DefaultPadding()))));
+        SetSize(PaddedSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(10), defaultTextBoxSize.Height + 4), DefaultPadding()))));
     std::unique_ptr<Control> borderedTextBox(new BorderedControl(BorderedControlCreateParams(paddedTextBox.release()).Location(numberOfRecentSolutionsTextBoxLocation).
-        SetSize(BorderedSize(PaddedSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(10), defaultTextBoxSize.Height), DefaultPadding()), BorderStyle::single)).SetAnchors(Anchors::top | Anchors::left)));
+        SetSize(BorderedSize(PaddedSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(10), defaultTextBoxSize.Height + 4), DefaultPadding()), BorderStyle::single)).SetAnchors(Anchors::top | Anchors::left)));
     AddChild(borderedTextBox.release());
 
     std::unique_ptr<CheckBox> codeCompletionCheckBoxPtr(new CheckBox(CheckBoxCreateParams().Text("Code completion").Location(Point(16, 24 + 24 + 24 + 24)).SetAnchors(Anchors::top | Anchors::left)));
@@ -102,9 +102,9 @@ OptionsDialog::OptionsDialog() : Window(WindowCreateParams().WindowClassName("cm
     parsingFrequencyTextBox = parsingFrequencyTextBoxPtr.get();
     parsingFrequencyTextBox->TextChanged().AddHandler(this, &OptionsDialog::ParsingFrequencyTextBoxTextChanged);
     std::unique_ptr<Control> paddedPFTextBox(new PaddedControl(PaddedControlCreateParams(parsingFrequencyTextBoxPtr.release()).
-        SetSize(PaddedSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(10), defaultTextBoxSize.Height), DefaultPadding()))));
+        SetSize(PaddedSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(10), defaultTextBoxSize.Height + 4), DefaultPadding()))));
     std::unique_ptr<Control> borderedPFTextBox(new BorderedControl(BorderedControlCreateParams(paddedPFTextBox.release()).Location(parsingFrequencyTextBoxLocation).
-        SetSize(BorderedSize(PaddedSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(10), defaultTextBoxSize.Height), DefaultPadding()), BorderStyle::single)).SetAnchors(Anchors::top | Anchors::left)));
+        SetSize(BorderedSize(PaddedSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(10), defaultTextBoxSize.Height + 4), DefaultPadding()), BorderStyle::single)).SetAnchors(Anchors::top | Anchors::left)));
     AddChild(borderedPFTextBox.release());
 
     int x = s.Width - defaultButtonSize.Width - defaultControlSpacing.Width;

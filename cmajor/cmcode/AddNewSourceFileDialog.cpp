@@ -52,7 +52,7 @@ AddNewSourceFileDialog::AddNewSourceFileDialog() : Window(WindowCreateParams().W
         SetAnchors(Anchors::left | Anchors::top)));
     AddChild(sourceFileNameLabelPtr.release());
 
-    Size sourceFileNameTextBoxSize(ScreenMetrics::Get().MMToHorizontalPixels(120), defaultTextBoxSize.Height);
+    Size sourceFileNameTextBoxSize(ScreenMetrics::Get().MMToHorizontalPixels(120), defaultTextBoxSize.Height + 4);
     std::unique_ptr<TextBox> sourceFileNameTextBoxPtr(new TextBox(TextBoxCreateParams().Defaults()));
     sourceFileNameTextBox = sourceFileNameTextBoxPtr.get();
     sourceFileNameTextBox->TextChanged().AddHandler(this, &AddNewSourceFileDialog::SourceFileNameTextBoxTextChanged);

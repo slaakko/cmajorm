@@ -1458,9 +1458,47 @@ namespace System.Windows
                 RemoveSelection();
             }
             List<ustring> linesToInsert = SplitTextIntoLines(text);
-            AddInsertLinesCommand(lineIndex, columnIndex, linesToInsert);
-            InsertLines(lineIndex, columnIndex, linesToInsert);
+            if (linesToInsert.Count() == 1 && !IsEmptyOrSpaceLine(lines[lineIndex]))
+            {
+                AddInsertIntoLineCommand(lineIndex, columnIndex, linesToInsert.Front());
+                InsertIntoLine(lineIndex, columnIndex, linesToInsert.Front());
+            }
+            else
+            {
+                AddInsertLinesCommand(lineIndex, columnIndex, linesToInsert);
+                InsertLines(lineIndex, columnIndex, linesToInsert);
+            }
             editCommandList.EndGroup();
+        }
+        public nothrow void AddInsertIntoLineCommand(int lineIndex, int columnIndex, const ustring& text)
+        {
+            editCommandList.AddCommand(new InsertIntoLineCommand(lineIndex, columnIndex, text));
+        }
+        public nothrow void InsertIntoLine(int lineIndex, int columnIndex, const ustring& text)
+        {
+            lines[lineIndex].Insert(columnIndex, text);
+            LineEventArgs args(lineIndex, -1);
+            OnLineChanged(args);
+            SetTextExtent();
+            SetCaretLineCol(lineIndex + 1, 1 + LineNumberFieldLength() + columnIndex + cast<int>(text.Length()));
+            ScrollToCaret();
+            Invalidate();
+            InvalidateLines(lineIndex + 1, lineIndex + 1);
+            SetDirty();
+            SetCCDirty();
+        }
+        public nothrow void RemoveFromLine(int lineIndex, int columnIndex, long count)
+        {
+            lines[lineIndex].Remove(columnIndex, count);
+            LineEventArgs args(lineIndex, -1);
+            OnLineChanged(args);
+            SetTextExtent();
+            SetCaretLineCol(lineIndex + 1, 1 + LineNumberFieldLength() + columnIndex);
+            ScrollToCaret();
+            Invalidate();
+            InvalidateLines(lineIndex + 1, lineIndex + 1);
+            SetDirty();
+            SetCCDirty();
         }
         public nothrow void AddInsertLinesCommand(int lineIndex, int columnIndex, const List<ustring>& linesToInsert)
         {
@@ -1468,46 +1506,45 @@ namespace System.Windows
         }
         public nothrow void InsertLines(int lineIndex, int columnIndex, const List<ustring>& linesToInsert)
         {
-            if (linesToInsert.Count() == 1 || linesToInsert.Count() == 2 && IsEmptyOrSpaceLine(linesToInsert[1]))
+            int indent = 0;
+            if (lineIndex > 0 && lineIndex < lines.Count())
             {
-                while (lineIndex >= lines.Count())
+                indent = GetIndent(lines[lineIndex - 1], lineIndex - 1);
+            }
+            int indentLineIndex = lineIndex - 1;
+            for (const ustring& lineToInsert : linesToInsert)
+            {
+                lines.Insert(lines.Begin() + lineIndex, lineToInsert);
+                SetLineNumberFieldLength(cast<int>(lines.Count()));
+                LineEventArgs insertedArgs(lineIndex, indentLineIndex);
+                OnLineInserted(insertedArgs);
+                ++lineIndex;
+            }
+            bool lineDeleted = false;
+            if (lineIndex < lines.Count())
+            {
+                if (IsEmptyOrSpaceLine(lines[lineIndex]))
                 {
-                    lines.Add(ustring());
+                    lines.Remove(lines.Begin() + lineIndex);
+                    LineEventArgs args(lineIndex, -1);
+                    OnLineDeleted(args);
+                    lineDeleted = true;
                 }
-                ustring& line = lines[lineIndex];
-                line.Insert(columnIndex, linesToInsert.Front());
-                LineEventArgs args(lineIndex, -1);
-                OnLineChanged(args);
-                SetCaretLineCol(lineIndex + 1, cast<int>(columnIndex + linesToInsert.Front().Length() + 1 + LineNumberFieldLength()));
-                ScrollToCaret();
-                InvalidateLineCol(lineIndex + 1, 1 + LineNumberFieldLength());
-                SetDirty();
-                SetCCDirty();
+            }
+            SetTextExtent();
+            if (lineDeleted)
+            {
+                SetCaretLineCol(lineIndex, 1 + LineNumberFieldLength() + cast<int>(lines[lineIndex - 1].Length()));
             }
             else
             {
-                int indent = 0;
-                if (lineIndex > 0 && lineIndex < lines.Count())
-                {
-                    indent = GetIndent(lines[lineIndex - 1], lineIndex - 1);
-                }
-                int indentLineIndex = lineIndex - 1;
-                for (const ustring& lineToInsert : linesToInsert)
-                {
-                    lines.Insert(lines.Begin() + lineIndex, lineToInsert);
-                    SetLineNumberFieldLength(cast<int>(lines.Count()));
-                    LineEventArgs insertedArgs(lineIndex, indentLineIndex);
-                    OnLineInserted(insertedArgs);
-                    ++lineIndex;
-                }
-                SetTextExtent();
                 SetCaretLineCol(lineIndex, 1 + LineNumberFieldLength() + indent);
-                ScrollToCaret();
-                Invalidate();
-                InvalidateLines(lineIndex + 1, cast<int>(lineIndex + linesToInsert.Count() + 1));
-                SetDirty();
-                SetCCDirty();
             }
+            ScrollToCaret();
+            Invalidate();
+            InvalidateLines(lineIndex + 1, cast<int>(lineIndex + linesToInsert.Count() + 1));
+            SetDirty();
+            SetCCDirty();
         }
         public nothrow void DeleteLines(int lineIndex, int columnIndex, const List<ustring>& linesToDelete)
         {
@@ -1657,6 +1694,10 @@ namespace System.Windows
                 lines.Add(ustring());
             }
             ustring& line = lines[lineIndex];
+            if (columnIndex > line.Length())
+            {
+                columnIndex = cast<int>(line.Length());
+            }
             ustring toInsert = TrimEnd(line.Substring(columnIndex));
             bool lineChanged = false;
             if (!toInsert.IsEmpty())

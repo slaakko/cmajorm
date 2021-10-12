@@ -52,7 +52,7 @@ AddNewTextFileDialog::AddNewTextFileDialog() : Window(WindowCreateParams().Windo
         SetAnchors(Anchors::left | Anchors::top)));
     AddChild(fileNameLabelPtr.release());
 
-    Size fileNameTextBoxSize(ScreenMetrics::Get().MMToHorizontalPixels(120), defaultTextBoxSize.Height);
+    Size fileNameTextBoxSize(ScreenMetrics::Get().MMToHorizontalPixels(120), defaultTextBoxSize.Height + 4);
     std::unique_ptr<TextBox> fileNameTextBoxPtr(new TextBox(TextBoxCreateParams().Defaults()));
     fileNameTextBox = fileNameTextBoxPtr.get();
     fileNameTextBox->TextChanged().AddHandler(this, &AddNewTextFileDialog::FileNameTextBoxTextChanged);
