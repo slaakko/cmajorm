@@ -32,6 +32,17 @@ void InitApplication(HINSTANCE instance)
     cmmsg::Register();
 }
 
+void FinalizeApplication()
+{
+    cmcode::ConfigDone();
+    cmajor::view::Done();
+    cmajor::service::Done();
+    cmajor::wing::Done();
+    sngxml::xmlser::Done();
+    sngxml::xpath::Done();
+    soulng::util::Done();
+}
+
 using namespace cmcode;
 using namespace soulng::unicode;
 
@@ -63,5 +74,6 @@ int WinMain(HINSTANCE instance, HINSTANCE prevInstance, LPSTR cmdLine, int cmdSh
         ShowErrorMessageBox(nullptr, ex.what());
         return 1;
     }
+    FinalizeApplication();
     return 0;
 }
