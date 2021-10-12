@@ -12,7 +12,7 @@ namespace spring
 {
     public class SaveImageDialog : Window
     {
-        public SaveImageDialog(const string& diagramFileName_, const Layout& layout_) : 
+        public SaveImageDialog(const string& diagramFileName_, const Layout& layout_) :
             base("spring.saveImageDialog", DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(),
             DefaultControlBackgroundColor(), "Save image", Point.Default(), Size(ScreenMetrics.Get().MMToHorizontalPixels(100), ScreenMetrics.Get().MMToVerticalPixels(100)), Dock.none, Anchors.none,
             WindowState.normal), diagramFileName(diagramFileName_), layout(layout_)
@@ -74,7 +74,7 @@ namespace spring
             Label* leftLabel = leftLabelPtr.Get();
             marginsGroupBox->AddChild(leftLabelPtr.Release());
             Point leftTextBoxLoc(leftLabelLoc.x + labelColumnWidth, leftLabelLoc.y);
-            Size textBoxSize(ScreenMetrics.Get().MMToHorizontalPixels(20), defaultTextBoxSize.h + 2 * DefaultControlPadding() + 2 * DefaultSingleBorderWidth());
+            Size textBoxSize(ScreenMetrics.Get().MMToHorizontalPixels(20), defaultTextBoxSize.h + 4 + 2 * DefaultControlPadding() + 2 * DefaultSingleBorderWidth());
             UniquePtr<TextBox> leftTextBoxPtr(new TextBox(ToString(margins.left)));
             leftTextBox = leftTextBoxPtr.Get();
             leftTextBox->TextChangedEvent().AddHandler(LeftChanged);
@@ -148,7 +148,7 @@ namespace spring
             browseButton = browseButtonPtr.Get();
             browseButton->ClickEvent().AddHandler(BrowseClick);
             AddChild(browseButtonPtr.Release());
-            
+
             int x = s.w - defaultButtonSize.w - defaultControlSpacing.w;
             int y = s.h - defaultButtonSize.h - defaultControlSpacing.h;
             UniquePtr<Button> cancelButtonPtr(new Button("Cancel", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));

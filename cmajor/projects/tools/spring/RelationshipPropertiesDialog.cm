@@ -24,7 +24,7 @@ namespace spring
             Size defaultTextBoxSize = ScreenMetrics.Get().DefaultTextBoxSize();
             Size kindGroupBoxSize(ScreenMetrics.Get().MMToHorizontalPixels(40), ScreenMetrics.Get().MMToVerticalPixels(25));
             UniquePtr<GroupBox> kindGroupBoxPtr(new GroupBox("Kind", Point(defaultControlSpacing.w, defaultControlSpacing.h), kindGroupBoxSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
-            kindGroupBox = kindGroupBoxPtr.Get(); 
+            kindGroupBox = kindGroupBoxPtr.Get();
             AddChild(kindGroupBoxPtr.Release());
             Point kindGroupBoxLoc = kindGroupBox->Location();
             UniquePtr<RadioButton> inheritanceRadioButtonPtr(new RadioButton("Inheritance", Point(kindGroupBoxLoc.x, kindGroupBoxLoc.y + defaultControlSpacing.h),
@@ -59,7 +59,7 @@ namespace spring
             Size cardinalityGroupBoxSize(ScreenMetrics.Get().MMToHorizontalPixels(40), ScreenMetrics.Get().MMToVerticalPixels(25));
             UniquePtr<GroupBox> cardinalityGroupBoxPtr(new GroupBox("Cardinality", Point(defaultControlSpacing.w + kindGroupBoxLoc.x + kindGroupBoxSize.w, defaultControlSpacing.h), cardinalityGroupBoxSize,
                 Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
-            cardinalityGroupBox = cardinalityGroupBoxPtr.Get(); 
+            cardinalityGroupBox = cardinalityGroupBoxPtr.Get();
             AddChild(cardinalityGroupBoxPtr.Release());
             Point cardinalityGroupBoxLoc = cardinalityGroupBox->Location();
             UniquePtr<RadioButton> zeroRadioButtonPtr(new RadioButton("Zero", Point(defaultControlSpacing.w, cardinalityGroupBoxLoc.y + defaultControlSpacing.h),
@@ -95,11 +95,11 @@ namespace spring
             sourceTextBox->TextChangedEvent().AddHandler(SourceTextBoxTextChanged);
             UniquePtr<PaddedControl> paddedSourceTextBox(new PaddedControl(sourceTextBoxPtr.Release()));
             UniquePtr<BorderedControl> borderedPaddedSourceTextBox(new BorderedControl(paddedSourceTextBox.Release(), Point(column1Width, sourceTextLabelLoc.y), Size(column2Width,
-                defaultTextBoxSize.h + DefaultSingleBorderWidth() + 2 * DefaultControlPadding()),
+                defaultTextBoxSize.h + 4 + DefaultSingleBorderWidth() + 2 * DefaultControlPadding()),
                 Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
             AddChild(borderedPaddedSourceTextBox.Release());
 
-            Point targetTextLabelLoc(defaultControlSpacing.w, sourceTextLabelLoc.y + sourceTextLabelSize.h + defaultControlSpacing.h);
+            Point targetTextLabelLoc(defaultControlSpacing.w, sourceTextLabelLoc.y + sourceTextLabelSize.h + defaultControlSpacing.h + 4);
             UniquePtr<Label> targetTextLabelPtr(new Label("Target text:", targetTextLabelLoc, Size(), Dock.none, cast<Anchors>(Anchors.left | Anchors.top), true));
             Label* targetTextLabel = targetTextLabelPtr.Get();
             AddChild(targetTextLabelPtr.Release());
@@ -109,7 +109,7 @@ namespace spring
             targetTextBox->TextChangedEvent().AddHandler(TargetTextBoxTextChanged);
             UniquePtr<PaddedControl> paddedTargetTextBox(new PaddedControl(targetTextBoxPtr.Release()));
             UniquePtr<BorderedControl> borderedPaddedTargetTextBox(new BorderedControl(paddedTargetTextBox.Release(), Point(column1Width, targetTextLabelLoc.y), Size(column2Width,
-                defaultTextBoxSize.h + DefaultSingleBorderWidth() + 2 * DefaultControlPadding()),
+                defaultTextBoxSize.h + 4 + DefaultSingleBorderWidth() + 2 * DefaultControlPadding()),
                 Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
             AddChild(borderedPaddedTargetTextBox.Release());
 
