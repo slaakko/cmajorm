@@ -382,7 +382,7 @@
 	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span><br/>
 	</span>
 	<span class="line">
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">XmlContainer</span>&nbsp;<span class="identifier">container</span><span class="other">;</span>&nbsp;<span class="comment">// XmlContainer does not own the objects by default</span>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">XmlContainer</span>&nbsp;<span class="identifier">container</span><span class="other">;</span>&nbsp;<span class="comment">// XmlContainer does not own the objects</span>
 	<br/>
 	</span>
 	<span class="line">
@@ -437,7 +437,7 @@
 	<br/>
 	</span>
 	<span class="line">
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">XmlBundle</span>&nbsp;<span class="identifier">bundle</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">container</span><span class="other">.</span><span class="identifier">CreateBundle</span><span class="other">(</span><span class="identifier">person</span><span class="other">.</span><span class="identifier">Get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">XmlBundle</span>&nbsp;<span class="identifier">bundle</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">container</span><span class="other">.</span><span class="identifier">CreateBundle</span><span class="other">(</span><span class="identifier">person</span><span class="other">.</span><span class="identifier">Get</span><span class="other">(</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="identifier">XmlBundleKind</span><span class="other">.</span><span class="identifier">deep</span><span class="other">)</span><span class="other">;</span><br/>
 	</span>
 	<span class="line">
 	<br/>
@@ -463,7 +463,7 @@
 		We have created an instance of the 
 		<a href="../content/System.Xml.Serialization/doc/class_XmlContainer_3A675CCAF06087583804E6C45EE63670AAC7C2B4.html">XmlContainer</a> class,
 		and then created instances of <em>Car</em>, <em>Bicycle</em> and <em>Person</em> classes and added them to the container.
-		The container does not by default own the objects added to it, so have we used <em>UniqueXmlPtr</em> for the <em>Car</em>, 
+		The container does not own the objects added to it, so have we used <em>UniqueXmlPtr</em> for the <em>Car</em>, 
 		<em>Bicycle</em> and <em>Person</em>. The vehicles are released and added to the person object, because the person takes ownership of the vehicles 
 		added to it.
 	</p>
@@ -472,10 +472,10 @@
 		Then we have created an <a href="../content/System.Xml.Serialization/doc/class_XmlBundle_09EF3A12BD430DECAEEE5D0E67BDE0151E1D654A.html">XmlBundle</a> 
 		from the container by calling the <em>CreateBundle</em> function of the container. The XML bundle contains a reference to a <em>root</em> object,
 		an object passed to the <em>CreateBundle</em> function, and also references to objects reachable from the root by traversing them 
-		using the <em>XmlPtr</em> and <em>UniqueXmlPtr</em> pointer objects. 
-		If you don't want an object to be added to a bundle, you can call the <em>SetIncludeInBundle</em> member function of the 
-		<a href="../content/System.Xml.Serialization/doc/class_XmlPtrBase_118F102367E9E5B890C372D12976532DD05C82A2.html">XmlPtrBase</a> with <strong>false</strong>
-		argument. 
+		using the <em>XmlPtr</em> and <em>UniqueXmlPtr</em> pointer objects. There are two kinds of bundles: shallow and deep.
+		The shallow container does not contain other than the root object, 
+		but the deep container contains closure of objects reachable from the root up a depth. 
+		By default the depth is -1 which means the depth is unlimited.
 	</p>
 	
 	<p>
@@ -490,27 +490,27 @@
 	</p>
 
 	<pre>
-	&lt;xmlBundle rootObjectId="54c3707d-cade-1ee5-4697-f36011a7c08c">
-	 &lt;object classId="2" className="model.Person" objectId="54c3707d-cade-1ee5-4697-f36011a7c08c">
-	  &lt;name value="Joe Coder"/>
-	  &lt;vehicles>
-	   &lt;item objectId="a31587c6-0497-473f-5701-3ba9fd5d467f"/>
-	   &lt;item objectId="76e6cef3-d9f3-284f-f90e-e68b5473c1e0"/>
-	  &lt;/vehicles>
-	 &lt;/object>
-	 &lt;object classId="0" className="model.Car" objectId="a31587c6-0497-473f-5701-3ba9fd5d467f">
+	&lt;xmlBundle rootObjectId="1d897be9-da8b-3291-31ca-24819238918a">
+	 &lt;object classId="0" className="model.Car" objectId="ed184f7f-ac6d-d70b-8738-905f4f88741a">
 	  &lt;color value="0"/>
-	  &lt;owner objectId="54c3707d-cade-1ee5-4697-f36011a7c08c"/>
+	  &lt;owner objectId="1d897be9-da8b-3291-31ca-24819238918a"/>
 	  &lt;registrationNumber value="ABC-123"/>
 	 &lt;/object>
-	 &lt;object classId="1" className="model.Bicycle" objectId="76e6cef3-d9f3-284f-f90e-e68b5473c1e0">
+	 &lt;object classId="2" className="model.Person" objectId="1d897be9-da8b-3291-31ca-24819238918a">
+	  &lt;name value="Joe Coder"/>
+	  &lt;vehicles>
+	   &lt;item objectId="ed184f7f-ac6d-d70b-8738-905f4f88741a"/>
+	   &lt;item objectId="51e07f96-05aa-748e-0090-a8108855c0b5"/>
+	  &lt;/vehicles>
+	 &lt;/object>
+	 &lt;object classId="1" className="model.Bicycle" objectId="51e07f96-05aa-748e-0090-a8108855c0b5">
 	  &lt;color value="1"/>
-	  &lt;owner objectId="54c3707d-cade-1ee5-4697-f36011a7c08c"/>
+	  &lt;owner objectId="1d897be9-da8b-3291-31ca-24819238918a"/>
 	  &lt;price value="1000"/>
 	 &lt;/object>
 	&lt;/xmlBundle>
 	</pre>
-	
+
 	<p>
 		The object IDs are string representations of the 
 		<a href="../content/System.Base/doc/class_Uuid_81014B41FA199BCF75CA0E6799422874FC800AB7.html">UUID</a> class.
@@ -644,7 +644,7 @@
 	<span class="other">{</span><br/>
 	</span>
 	<span class="line">
-	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="identifier">UniqueXmlPtr</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span>&nbsp;<span class="identifier">Load</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fileName</span><span class="other">)</span><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span>&nbsp;<span class="identifier">Load</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fileName</span><span class="other">)</span><br/>
 	</span>
 	<span class="line">
 	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span><br/>
@@ -656,7 +656,7 @@
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">XmlBundle</span><span class="other">&gt;</span>&nbsp;<span class="identifier">bundle</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ToXmlBundle</span><span class="other">(</span><span class="identifier">xmlStr</span><span class="other">,</span>&nbsp;<span class="identifier">fileName</span><span class="other">)</span><span class="other">;</span><br/>
 	</span>
 	<span class="line">
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">UniqueXmlPtr</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span>&nbsp;<span class="identifier">root</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReleaseRoot</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span><span class="other">(</span><span class="identifier">bundle</span><span class="other">.</span><span class="identifier">Get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">UniqueXmlPtr</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span>&nbsp;<span class="identifier">root</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">XmlCast</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span><span class="other">(</span><span class="identifier">bundle</span><span class="other">.</span><span class="identifier">Root</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span><br/>
 	</span>
 	<span class="line">
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span>&nbsp;<span class="other">(</span><span class="identifier">root</span><span class="other">.</span><span class="identifier">IsNull</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><br/>
@@ -683,7 +683,8 @@
 
 	<p>
 		The <em>ToXmlBundle</em> function parses an XML document from the passed XML string, creates the XML classes using class identifiers 
-		contained by the object elements, and resolves the relations of objects using object IDs.
+		contained by the object elements, and resolves the relations of objects using object IDs. 
+		By default the bundle returned from the <em>ToXmlBundle</em> function destroys objects that are not owned by UniqueXmlPtrs.
 	</p>
 	
 	<h3 id="main">1.6 Main</h3>
@@ -732,6 +733,10 @@
 	</span>
 	<span class="line">
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">UniqueXmlPtr</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span>&nbsp;<span class="identifier">person</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">Load</span><span class="other">(</span><span class="string">&quot;traffic.xml&quot;</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// use person...</span>
+	<br/>
 	</span>
 	<span class="line">
 	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span><br/>
@@ -841,9 +846,7 @@
 	
 	<p>
 		An <a href="../content/System.Xml.Serialization/doc/class_XmlBundle_09EF3A12BD430DECAEEE5D0E67BDE0151E1D654A.html">XmlBundle</a>
-		contains a root object and objects reachable from the root using those <em>XmlPtr</em>s and <em>UniqueXmlPtr</em>s for which
-		IncludeInBundle() is true. This is true by default but you can set it to false by calling the <em>SetIncludeInBundle()</em> member 
-		function of the <a href="../content/System.Xml.Serialization/doc/class_XmlPtrBase_118F102367E9E5B890C372D12976532DD05C82A2.html">XmlPtrBase</a> class.
+		contains a root object and objects reachable from the root using those <em>XmlPtr</em>s and <em>UniqueXmlPtr</em>s. 
 	</p>
 	
 	<p>

@@ -28,7 +28,7 @@
 <span class="other">{</span><br/>
 </span>
 <span class="line">
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="identifier">UniqueXmlPtr</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span>&nbsp;<span class="identifier">Load</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fileName</span><span class="other">)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span>&nbsp;<span class="identifier">Load</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fileName</span><span class="other">)</span><br/>
 </span>
 <span class="line">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span><br/>
@@ -40,7 +40,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">XmlBundle</span><span class="other">&gt;</span>&nbsp;<span class="identifier">bundle</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ToXmlBundle</span><span class="other">(</span><span class="identifier">xmlStr</span><span class="other">,</span>&nbsp;<span class="identifier">fileName</span><span class="other">)</span><span class="other">;</span><br/>
 </span>
 <span class="line">
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">UniqueXmlPtr</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span>&nbsp;<span class="identifier">root</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReleaseRoot</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span><span class="other">(</span><span class="identifier">bundle</span><span class="other">.</span><span class="identifier">Get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">UniqueXmlPtr</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span>&nbsp;<span class="identifier">root</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">XmlCast</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span><span class="other">(</span><span class="identifier">bundle</span><span class="other">.</span><span class="identifier">Root</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span><br/>
 </span>
 <span class="line">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span>&nbsp;<span class="other">(</span><span class="identifier">root</span><span class="other">.</span><span class="identifier">IsNull</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><br/>

@@ -7,11 +7,11 @@ using System.Xml.Serialization;
 
 namespace model
 {
-    public UniqueXmlPtr<Person> Load(const string& fileName)
+    public UniquePtr<Person> Load(const string& fileName)
     {
         string xmlStr = File.ReadAllText(fileName);
         UniquePtr<XmlBundle> bundle = ToXmlBundle(xmlStr, fileName);
-        UniqueXmlPtr<Person> root = ReleaseRoot<Person>(bundle.Get());
+        UniqueXmlPtr<Person> root = XmlCast<Person>(bundle.Root());
         if (root.IsNull())
         {
             throw Exception("Person expected");
