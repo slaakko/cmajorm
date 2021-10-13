@@ -5,7 +5,7 @@
 
 #ifndef SNGXML_XML_SERIALIZABLE_INCLUDED
 #define SNGXML_XML_SERIALIZABLE_INCLUDED
-#include <sngxml/serialization/XmlSerApi.hpp>
+#include <sngxml/serialization/XmlSerializationContext.hpp>
 #include <sngxml/dom/Element.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <string>
@@ -31,7 +31,7 @@ public:
     virtual sngxml::xmlser::XmlContainer* Container() const = 0;
     virtual void SetContainer(sngxml::xmlser::XmlContainer* container_) = 0;
     virtual void FromXml(sngxml::dom::Element* element) = 0;
-    virtual std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& elementName) const = 0;
+    virtual std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& elementName, XmlSerializationContext& ctx) const = 0;
     virtual std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const = 0;
     void SetRandomObjectId();
 };

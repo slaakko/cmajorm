@@ -54,7 +54,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> ProjectBreakpoint::GetPtrs() const
     return ptrs;
 }
 
-void ProjectBreakpoint::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void ProjectBreakpoint::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -67,12 +67,21 @@ ProjectBreakpoint::~ProjectBreakpoint()
 
 std::unique_ptr<sngxml::dom::Element> ProjectBreakpoint::ToXml(const std::string& fieldName) const
 {
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> ProjectBreakpoint::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    SetObjectXmlAttributes(element.get());
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(file, "file").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(line, "line").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(condition, "condition").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(disabled, "disabled").release()));
+    if (!ctx.GetFlag(sngxml::xmlser::XmlSerializationFlags::suppressMetadata))
+    {
+        SetObjectXmlAttributes(element.get());
+    }
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(file, "file", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(line, "line", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(condition, "condition", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(disabled, "disabled", ctx).release()));
     return element;
 }
 
@@ -121,7 +130,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> ProjectSettings::GetPtrs() const
     return ptrs;
 }
 
-void ProjectSettings::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void ProjectSettings::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -134,10 +143,19 @@ ProjectSettings::~ProjectSettings()
 
 std::unique_ptr<sngxml::dom::Element> ProjectSettings::ToXml(const std::string& fieldName) const
 {
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> ProjectSettings::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    SetObjectXmlAttributes(element.get());
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(programArguments, "programArguments").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(breakpoints, "breakpoints").release()));
+    if (!ctx.GetFlag(sngxml::xmlser::XmlSerializationFlags::suppressMetadata))
+    {
+        SetObjectXmlAttributes(element.get());
+    }
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(programArguments, "programArguments", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(breakpoints, "breakpoints", ctx).release()));
     return element;
 }
 

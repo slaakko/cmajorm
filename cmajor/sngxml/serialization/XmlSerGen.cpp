@@ -286,7 +286,8 @@ void HeaderGeneratorVisitor::Visit(ClassNode& node)
         formatter.WriteLine("sngxml::xmlser::XmlContainer* Container() const override { return container; }");
         formatter.WriteLine("void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }");
     }
-    formatter.WriteLine("std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;");
+    formatter.WriteLine("std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;");
+    formatter.WriteLine("std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const override;");
     formatter.WriteLine("void FromXml(sngxml::dom::Element* element) override;");
     formatter.WriteLine("std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;");
     if (!node.InternalBaseClass())
@@ -556,7 +557,7 @@ ToXmlMemberVariableGeneratorVisitor::ToXmlMemberVariableGeneratorVisitor(CodeFor
 
 void ToXmlMemberVariableGeneratorVisitor::Visit(MemberVariableNode& node)
 {
-    formatter.WriteLine("element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(" + node.Id() + ", \"" + node.Id() + "\").release()));");
+    formatter.WriteLine("element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(" + node.Id() + ", \"" + node.Id() + "\", ctx).release()));");
 }
 
 class FromXmlMemberVariableGeneratorVisitor : public DefaultVisitor
@@ -834,7 +835,7 @@ void SourceGeneratorVisitor::Visit(ClassNode& node)
     formatter.WriteLine("}");
     formatter.WriteLine();
 
-    formatter.WriteLine("void " + node.Id() + "::SetObjectXmlAttributes(sngxml::dom::Element * element) const");
+    formatter.WriteLine("void " + node.Id() + "::SetObjectXmlAttributes(sngxml::dom::Element* element) const");
     formatter.WriteLine("{");
     formatter.IncIndent();
     formatter.WriteLine("element->SetAttribute(U\"classId\", ToUtf32(std::to_string(classId)));");
@@ -852,14 +853,28 @@ void SourceGeneratorVisitor::Visit(ClassNode& node)
     formatter.WriteLine("std::unique_ptr<sngxml::dom::Element> " + node.Id() + "::ToXml(const std::string& fieldName) const");
     formatter.WriteLine("{");
     formatter.IncIndent();
+    formatter.WriteLine("sngxml::xmlser::XmlSerializationContext ctx;");
+    formatter.WriteLine("return ToXml(fieldName, ctx);");
+    formatter.DecIndent();
+    formatter.WriteLine("}");
+    formatter.WriteLine();
+
+    formatter.WriteLine("std::unique_ptr<sngxml::dom::Element> " + node.Id() + "::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const");
+    formatter.WriteLine("{");
+    formatter.IncIndent();
     if (!node.InternalBaseClass())
     {
         formatter.WriteLine("std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));");
+        formatter.WriteLine("if (!ctx.GetFlag(sngxml::xmlser::XmlSerializationFlags::suppressMetadata))");
+        formatter.WriteLine("{");
+        formatter.IncIndent();
         formatter.WriteLine("SetObjectXmlAttributes(element.get());");
+        formatter.DecIndent();
+        formatter.WriteLine("}");
     }
     else
     {
-        formatter.WriteLine("std::unique_ptr<sngxml::dom::Element> element = " + node.InternalBaseClass()->Id() + "::ToXml(fieldName);");
+        formatter.WriteLine("std::unique_ptr<sngxml::dom::Element> element = " + node.InternalBaseClass()->Id() + "::ToXml(fieldName, ctx);");
     }
     ToXmlMemberVariableGeneratorVisitor toXmlMemberVariableGeneratorVisitor(formatter);
     node.Accept(toXmlMemberVariableGeneratorVisitor);

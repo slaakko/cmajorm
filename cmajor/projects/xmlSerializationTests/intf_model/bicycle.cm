@@ -65,10 +65,15 @@ namespace model
             element->SetAttribute(u"objectId", ToUtf32(ToString(ObjectId())));
             element->SetAttribute(u"className", ToUtf32(ClassName()));
         }
-        public override System.Dom.Element* ToXml(const string& elementName)
+        public System.Dom.Element* ToXml(const string& elementName)
         {
-            System.Dom.Element* element = base->ToXml(elementName);
-            element->AppendChild(UniquePtr<System.Dom.Node>(ToXml(price, "price").Release()));
+            System.Xml.Serialization.XmlSerializationContext ctx;
+            return ToXml(elementName, ctx);
+        }
+        public override System.Dom.Element* ToXml(const string& elementName, System.Xml.Serialization.XmlSerializationContext& ctx)
+        {
+            System.Dom.Element* element = base->ToXml(elementName, ctx);
+            element->AppendChild(UniquePtr<System.Dom.Node>(ToXml(price, "price", ctx).Release()));
             return element;
         }
         public override void FromXml(System.Dom.Element* element)

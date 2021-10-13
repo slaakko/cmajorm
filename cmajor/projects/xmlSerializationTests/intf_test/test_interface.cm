@@ -9,7 +9,7 @@ namespace xmltest
     {
         try
         {
-            XmlContainer container; 
+            XmlContainer container;
             UniquePtr<Bicycle> bicycle = new Bicycle();
             Add(bicycle.Get(), &container);
             XmlSerializable serializableBicycle = *(bicycle.Get());
@@ -19,7 +19,8 @@ namespace xmltest
             Console.Out() << className << endl();
 
             System.Dom.Document bicycleDoc;
-            bicycleDoc.AppendChild(UniquePtr<System.Dom.Node>(serializableBicycle.ToXml("object")));
+            System.Xml.Serialization.XmlSerializationContext ctx;
+            bicycleDoc.AppendChild(UniquePtr<System.Dom.Node>(serializableBicycle.ToXml("object", ctx)));
             CodeFormatter formatter(Console.Out());
             formatter.SetIndentSize(1);
             bicycleDoc.Write(formatter);
@@ -33,7 +34,7 @@ namespace xmltest
             Console.Out() << carClassName << endl();
 
             System.Dom.Document carDoc;
-            carDoc.AppendChild(UniquePtr<System.Dom.Node>(serializabledCar.ToXml("object")));
+            carDoc.AppendChild(UniquePtr<System.Dom.Node>(serializabledCar.ToXml("object", ctx)));
             carDoc.Write(formatter);
 
             XmlSerializableProxy* bicycleProxy = container.Get(bicycle->ObjectId());

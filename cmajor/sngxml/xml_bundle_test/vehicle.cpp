@@ -54,7 +54,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> Vehicle::GetPtrs() const
     return ptrs;
 }
 
-void Vehicle::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void Vehicle::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -65,12 +65,15 @@ Vehicle::~Vehicle()
 {
 }
 
-std::unique_ptr<sngxml::dom::Element> Vehicle::ToXml(const std::string& fieldName) const
+std::unique_ptr<sngxml::dom::Element> Vehicle::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    SetObjectXmlAttributes(element.get());
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(color, "color").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(owner, "owner").release()));
+    if (!ctx.GetFlag(sngxml::xmlser::XmlSerializationFlags::suppressMetadata))
+    {
+        SetObjectXmlAttributes(element.get());
+    }
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(color, "color", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(owner, "owner", ctx).release()));
     return element;
 }
 

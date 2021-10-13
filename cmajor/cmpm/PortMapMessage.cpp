@@ -50,7 +50,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> HelloPmsRequest::GetPtrs() const
     return ptrs;
 }
 
-void HelloPmsRequest::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void HelloPmsRequest::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -63,8 +63,17 @@ HelloPmsRequest::~HelloPmsRequest()
 
 std::unique_ptr<sngxml::dom::Element> HelloPmsRequest::ToXml(const std::string& fieldName) const
 {
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> HelloPmsRequest::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    SetObjectXmlAttributes(element.get());
+    if (!ctx.GetFlag(sngxml::xmlser::XmlSerializationFlags::suppressMetadata))
+    {
+        SetObjectXmlAttributes(element.get());
+    }
     return element;
 }
 
@@ -112,7 +121,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> HelloPmsReply::GetPtrs() const
     return ptrs;
 }
 
-void HelloPmsReply::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void HelloPmsReply::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -125,9 +134,18 @@ HelloPmsReply::~HelloPmsReply()
 
 std::unique_ptr<sngxml::dom::Element> HelloPmsReply::ToXml(const std::string& fieldName) const
 {
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> HelloPmsReply::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    SetObjectXmlAttributes(element.get());
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(version, "version").release()));
+    if (!ctx.GetFlag(sngxml::xmlser::XmlSerializationFlags::suppressMetadata))
+    {
+        SetObjectXmlAttributes(element.get());
+    }
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(version, "version", ctx).release()));
     return element;
 }
 
@@ -176,7 +194,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> GetFreePortNumberRequest::GetPtrs() con
     return ptrs;
 }
 
-void GetFreePortNumberRequest::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void GetFreePortNumberRequest::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -189,10 +207,19 @@ GetFreePortNumberRequest::~GetFreePortNumberRequest()
 
 std::unique_ptr<sngxml::dom::Element> GetFreePortNumberRequest::ToXml(const std::string& fieldName) const
 {
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> GetFreePortNumberRequest::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    SetObjectXmlAttributes(element.get());
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(processName, "processName").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(pid, "pid").release()));
+    if (!ctx.GetFlag(sngxml::xmlser::XmlSerializationFlags::suppressMetadata))
+    {
+        SetObjectXmlAttributes(element.get());
+    }
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(processName, "processName", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(pid, "pid", ctx).release()));
     return element;
 }
 
@@ -240,7 +267,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> GetFreePortNumberReply::GetPtrs() const
     return ptrs;
 }
 
-void GetFreePortNumberReply::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void GetFreePortNumberReply::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -253,9 +280,18 @@ GetFreePortNumberReply::~GetFreePortNumberReply()
 
 std::unique_ptr<sngxml::dom::Element> GetFreePortNumberReply::ToXml(const std::string& fieldName) const
 {
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> GetFreePortNumberReply::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    SetObjectXmlAttributes(element.get());
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(portNumber, "portNumber").release()));
+    if (!ctx.GetFlag(sngxml::xmlser::XmlSerializationFlags::suppressMetadata))
+    {
+        SetObjectXmlAttributes(element.get());
+    }
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(portNumber, "portNumber", ctx).release()));
     return element;
 }
 
@@ -305,7 +341,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> ExtendPortLeaseRequest::GetPtrs() const
     return ptrs;
 }
 
-void ExtendPortLeaseRequest::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void ExtendPortLeaseRequest::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -318,11 +354,20 @@ ExtendPortLeaseRequest::~ExtendPortLeaseRequest()
 
 std::unique_ptr<sngxml::dom::Element> ExtendPortLeaseRequest::ToXml(const std::string& fieldName) const
 {
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> ExtendPortLeaseRequest::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    SetObjectXmlAttributes(element.get());
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(processName, "processName").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(pid, "pid").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(portNumbers, "portNumbers").release()));
+    if (!ctx.GetFlag(sngxml::xmlser::XmlSerializationFlags::suppressMetadata))
+    {
+        SetObjectXmlAttributes(element.get());
+    }
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(processName, "processName", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(pid, "pid", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(portNumbers, "portNumbers", ctx).release()));
     return element;
 }
 
@@ -369,7 +414,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> ExtendPortLeaseReply::GetPtrs() const
     return ptrs;
 }
 
-void ExtendPortLeaseReply::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void ExtendPortLeaseReply::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -382,8 +427,17 @@ ExtendPortLeaseReply::~ExtendPortLeaseReply()
 
 std::unique_ptr<sngxml::dom::Element> ExtendPortLeaseReply::ToXml(const std::string& fieldName) const
 {
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> ExtendPortLeaseReply::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    SetObjectXmlAttributes(element.get());
+    if (!ctx.GetFlag(sngxml::xmlser::XmlSerializationFlags::suppressMetadata))
+    {
+        SetObjectXmlAttributes(element.get());
+    }
     return element;
 }
 
@@ -430,7 +484,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> StopPortMapServerRequest::GetPtrs() con
     return ptrs;
 }
 
-void StopPortMapServerRequest::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void StopPortMapServerRequest::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -443,8 +497,17 @@ StopPortMapServerRequest::~StopPortMapServerRequest()
 
 std::unique_ptr<sngxml::dom::Element> StopPortMapServerRequest::ToXml(const std::string& fieldName) const
 {
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> StopPortMapServerRequest::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    SetObjectXmlAttributes(element.get());
+    if (!ctx.GetFlag(sngxml::xmlser::XmlSerializationFlags::suppressMetadata))
+    {
+        SetObjectXmlAttributes(element.get());
+    }
     return element;
 }
 
@@ -491,7 +554,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> StopPortMapServerReply::GetPtrs() const
     return ptrs;
 }
 
-void StopPortMapServerReply::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void StopPortMapServerReply::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -504,8 +567,17 @@ StopPortMapServerReply::~StopPortMapServerReply()
 
 std::unique_ptr<sngxml::dom::Element> StopPortMapServerReply::ToXml(const std::string& fieldName) const
 {
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> StopPortMapServerReply::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    SetObjectXmlAttributes(element.get());
+    if (!ctx.GetFlag(sngxml::xmlser::XmlSerializationFlags::suppressMetadata))
+    {
+        SetObjectXmlAttributes(element.get());
+    }
     return element;
 }
 
@@ -558,7 +630,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> PortLease::GetPtrs() const
     return ptrs;
 }
 
-void PortLease::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void PortLease::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -571,14 +643,23 @@ PortLease::~PortLease()
 
 std::unique_ptr<sngxml::dom::Element> PortLease::ToXml(const std::string& fieldName) const
 {
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> PortLease::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    SetObjectXmlAttributes(element.get());
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(portNumber, "portNumber").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(processName, "processName").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(pid, "pid").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(leaseStartTime, "leaseStartTime").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(leaseRenewalTime, "leaseRenewalTime").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(leaseState, "leaseState").release()));
+    if (!ctx.GetFlag(sngxml::xmlser::XmlSerializationFlags::suppressMetadata))
+    {
+        SetObjectXmlAttributes(element.get());
+    }
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(portNumber, "portNumber", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(processName, "processName", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(pid, "pid", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(leaseStartTime, "leaseStartTime", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(leaseRenewalTime, "leaseRenewalTime", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(leaseState, "leaseState", ctx).release()));
     return element;
 }
 
@@ -625,7 +706,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> ViewPortLeaseRequest::GetPtrs() const
     return ptrs;
 }
 
-void ViewPortLeaseRequest::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void ViewPortLeaseRequest::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -638,8 +719,17 @@ ViewPortLeaseRequest::~ViewPortLeaseRequest()
 
 std::unique_ptr<sngxml::dom::Element> ViewPortLeaseRequest::ToXml(const std::string& fieldName) const
 {
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> ViewPortLeaseRequest::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    SetObjectXmlAttributes(element.get());
+    if (!ctx.GetFlag(sngxml::xmlser::XmlSerializationFlags::suppressMetadata))
+    {
+        SetObjectXmlAttributes(element.get());
+    }
     return element;
 }
 
@@ -687,7 +777,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> ViewPortLeaseReply::GetPtrs() const
     return ptrs;
 }
 
-void ViewPortLeaseReply::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void ViewPortLeaseReply::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -700,9 +790,18 @@ ViewPortLeaseReply::~ViewPortLeaseReply()
 
 std::unique_ptr<sngxml::dom::Element> ViewPortLeaseReply::ToXml(const std::string& fieldName) const
 {
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> ViewPortLeaseReply::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    SetObjectXmlAttributes(element.get());
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(portLeases, "portLeases").release()));
+    if (!ctx.GetFlag(sngxml::xmlser::XmlSerializationFlags::suppressMetadata))
+    {
+        SetObjectXmlAttributes(element.get());
+    }
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(portLeases, "portLeases", ctx).release()));
     return element;
 }
 

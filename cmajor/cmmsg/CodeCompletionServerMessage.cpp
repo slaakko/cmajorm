@@ -52,7 +52,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> CodeCompletionRequest::GetPtrs() const
     return ptrs;
 }
 
-void CodeCompletionRequest::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void CodeCompletionRequest::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -65,10 +65,19 @@ CodeCompletionRequest::~CodeCompletionRequest()
 
 std::unique_ptr<sngxml::dom::Element> CodeCompletionRequest::ToXml(const std::string& fieldName) const
 {
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> CodeCompletionRequest::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    SetObjectXmlAttributes(element.get());
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(created, "created").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(received, "received").release()));
+    if (!ctx.GetFlag(sngxml::xmlser::XmlSerializationFlags::suppressMetadata))
+    {
+        SetObjectXmlAttributes(element.get());
+    }
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(created, "created", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(received, "received", ctx).release()));
     return element;
 }
 
@@ -118,7 +127,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> CodeCompletionReply::GetPtrs() const
     return ptrs;
 }
 
-void CodeCompletionReply::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void CodeCompletionReply::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -131,11 +140,20 @@ CodeCompletionReply::~CodeCompletionReply()
 
 std::unique_ptr<sngxml::dom::Element> CodeCompletionReply::ToXml(const std::string& fieldName) const
 {
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> CodeCompletionReply::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    SetObjectXmlAttributes(element.get());
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(requestCreated, "requestCreated").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(requestReceived, "requestReceived").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(created, "created").release()));
+    if (!ctx.GetFlag(sngxml::xmlser::XmlSerializationFlags::suppressMetadata))
+    {
+        SetObjectXmlAttributes(element.get());
+    }
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(requestCreated, "requestCreated", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(requestReceived, "requestReceived", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(created, "created", ctx).release()));
     return element;
 }
 
@@ -181,7 +199,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> LoadEditModuleRequest::GetPtrs() const
     return ptrs;
 }
 
-void LoadEditModuleRequest::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void LoadEditModuleRequest::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -194,10 +212,16 @@ LoadEditModuleRequest::~LoadEditModuleRequest()
 
 std::unique_ptr<sngxml::dom::Element> LoadEditModuleRequest::ToXml(const std::string& fieldName) const
 {
-    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionRequest::ToXml(fieldName);
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(projectFilePath, "projectFilePath").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(backend, "backend").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(config, "config").release()));
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> LoadEditModuleRequest::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
+    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionRequest::ToXml(fieldName, ctx);
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(projectFilePath, "projectFilePath", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(backend, "backend", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(config, "config", ctx).release()));
     return element;
 }
 
@@ -247,7 +271,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> LoadEditModuleReply::GetPtrs() const
     return ptrs;
 }
 
-void LoadEditModuleReply::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void LoadEditModuleReply::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -260,14 +284,20 @@ LoadEditModuleReply::~LoadEditModuleReply()
 
 std::unique_ptr<sngxml::dom::Element> LoadEditModuleReply::ToXml(const std::string& fieldName) const
 {
-    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionReply::ToXml(fieldName);
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(key, "key").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(result, "result").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(startLoading, "startLoading").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(startParsing, "startParsing").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(endParsing, "endParsing").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(endLoading, "endLoading").release()));
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> LoadEditModuleReply::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
+    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionReply::ToXml(fieldName, ctx);
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(key, "key", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(result, "result", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(startLoading, "startLoading", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(startParsing, "startParsing", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(endParsing, "endParsing", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(endLoading, "endLoading", ctx).release()));
     return element;
 }
 
@@ -310,7 +340,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> ResetEditModuleCacheRequest::GetPtrs() 
     return ptrs;
 }
 
-void ResetEditModuleCacheRequest::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void ResetEditModuleCacheRequest::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -323,7 +353,13 @@ ResetEditModuleCacheRequest::~ResetEditModuleCacheRequest()
 
 std::unique_ptr<sngxml::dom::Element> ResetEditModuleCacheRequest::ToXml(const std::string& fieldName) const
 {
-    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionRequest::ToXml(fieldName);
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> ResetEditModuleCacheRequest::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
+    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionRequest::ToXml(fieldName, ctx);
     return element;
 }
 
@@ -368,7 +404,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> ResetEditModuleCacheReply::GetPtrs() co
     return ptrs;
 }
 
-void ResetEditModuleCacheReply::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void ResetEditModuleCacheReply::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -381,9 +417,15 @@ ResetEditModuleCacheReply::~ResetEditModuleCacheReply()
 
 std::unique_ptr<sngxml::dom::Element> ResetEditModuleCacheReply::ToXml(const std::string& fieldName) const
 {
-    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionReply::ToXml(fieldName);
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(result, "result").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> ResetEditModuleCacheReply::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
+    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionReply::ToXml(fieldName, ctx);
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(result, "result", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error", ctx).release()));
     return element;
 }
 
@@ -431,7 +473,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> ParseSourceRequest::GetPtrs() const
     return ptrs;
 }
 
-void ParseSourceRequest::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void ParseSourceRequest::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -444,12 +486,18 @@ ParseSourceRequest::~ParseSourceRequest()
 
 std::unique_ptr<sngxml::dom::Element> ParseSourceRequest::ToXml(const std::string& fieldName) const
 {
-    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionRequest::ToXml(fieldName);
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(projectFilePath, "projectFilePath").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(backend, "backend").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(config, "config").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(sourceFilePath, "sourceFilePath").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(sourceCode, "sourceCode").release()));
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> ParseSourceRequest::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
+    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionRequest::ToXml(fieldName, ctx);
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(projectFilePath, "projectFilePath", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(backend, "backend", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(config, "config", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(sourceFilePath, "sourceFilePath", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(sourceCode, "sourceCode", ctx).release()));
     return element;
 }
 
@@ -500,7 +548,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> ParseSourceReply::GetPtrs() const
     return ptrs;
 }
 
-void ParseSourceReply::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void ParseSourceReply::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -513,15 +561,21 @@ ParseSourceReply::~ParseSourceReply()
 
 std::unique_ptr<sngxml::dom::Element> ParseSourceReply::ToXml(const std::string& fieldName) const
 {
-    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionReply::ToXml(fieldName);
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ok, "ok").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(errors, "errors").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(synchronized, "synchronized").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(cursorContainer, "cursorContainer").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ruleContext, "ruleContext").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(startParsing, "startParsing").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(endParsing, "endParsing").release()));
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> ParseSourceReply::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
+    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionReply::ToXml(fieldName, ctx);
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ok, "ok", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(errors, "errors", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(synchronized, "synchronized", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(cursorContainer, "cursorContainer", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ruleContext, "ruleContext", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(startParsing, "startParsing", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(endParsing, "endParsing", ctx).release()));
     return element;
 }
 
@@ -571,7 +625,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> GetCCListRequest::GetPtrs() const
     return ptrs;
 }
 
-void GetCCListRequest::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void GetCCListRequest::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -584,14 +638,20 @@ GetCCListRequest::~GetCCListRequest()
 
 std::unique_ptr<sngxml::dom::Element> GetCCListRequest::ToXml(const std::string& fieldName) const
 {
-    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionRequest::ToXml(fieldName);
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(projectFilePath, "projectFilePath").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(backend, "backend").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(config, "config").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(sourceFilePath, "sourceFilePath").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ccText, "ccText").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ruleContext, "ruleContext").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(cursorLine, "cursorLine").release()));
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> GetCCListRequest::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
+    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionRequest::ToXml(fieldName, ctx);
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(projectFilePath, "projectFilePath", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(backend, "backend", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(config, "config", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(sourceFilePath, "sourceFilePath", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ccText, "ccText", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ruleContext, "ruleContext", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(cursorLine, "cursorLine", ctx).release()));
     return element;
 }
 
@@ -639,7 +699,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> GetCCListReply::GetPtrs() const
     return ptrs;
 }
 
-void GetCCListReply::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void GetCCListReply::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -652,12 +712,18 @@ GetCCListReply::~GetCCListReply()
 
 std::unique_ptr<sngxml::dom::Element> GetCCListReply::ToXml(const std::string& fieldName) const
 {
-    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionReply::ToXml(fieldName);
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ok, "ok").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ccList, "ccList").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(startGetCCList, "startGetCCList").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(endGetCCList, "endGetCCList").release()));
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> GetCCListReply::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
+    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionReply::ToXml(fieldName, ctx);
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ok, "ok", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ccList, "ccList", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(startGetCCList, "startGetCCList", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(endGetCCList, "endGetCCList", ctx).release()));
     return element;
 }
 
@@ -705,7 +771,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> GetParamHelpListRequest::GetPtrs() cons
     return ptrs;
 }
 
-void GetParamHelpListRequest::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void GetParamHelpListRequest::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -718,12 +784,18 @@ GetParamHelpListRequest::~GetParamHelpListRequest()
 
 std::unique_ptr<sngxml::dom::Element> GetParamHelpListRequest::ToXml(const std::string& fieldName) const
 {
-    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionRequest::ToXml(fieldName);
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(projectFilePath, "projectFilePath").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(backend, "backend").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(config, "config").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(sourceFilePath, "sourceFilePath").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(symbolIndex, "symbolIndex").release()));
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> GetParamHelpListRequest::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
+    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionRequest::ToXml(fieldName, ctx);
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(projectFilePath, "projectFilePath", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(backend, "backend", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(config, "config", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(sourceFilePath, "sourceFilePath", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(symbolIndex, "symbolIndex", ctx).release()));
     return element;
 }
 
@@ -771,7 +843,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> GetParamHelpListReply::GetPtrs() const
     return ptrs;
 }
 
-void GetParamHelpListReply::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void GetParamHelpListReply::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -784,12 +856,18 @@ GetParamHelpListReply::~GetParamHelpListReply()
 
 std::unique_ptr<sngxml::dom::Element> GetParamHelpListReply::ToXml(const std::string& fieldName) const
 {
-    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionReply::ToXml(fieldName);
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ok, "ok").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(list, "list").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(startGetParamHelpList, "startGetParamHelpList").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(endGetParamHelpList, "endGetParamHelpList").release()));
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> GetParamHelpListReply::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
+    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionReply::ToXml(fieldName, ctx);
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ok, "ok", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(list, "list", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(startGetParamHelpList, "startGetParamHelpList", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(endGetParamHelpList, "endGetParamHelpList", ctx).release()));
     return element;
 }
 
@@ -832,7 +910,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> StopCCRequest::GetPtrs() const
     return ptrs;
 }
 
-void StopCCRequest::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void StopCCRequest::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -845,7 +923,13 @@ StopCCRequest::~StopCCRequest()
 
 std::unique_ptr<sngxml::dom::Element> StopCCRequest::ToXml(const std::string& fieldName) const
 {
-    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionRequest::ToXml(fieldName);
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> StopCCRequest::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
+    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionRequest::ToXml(fieldName, ctx);
     return element;
 }
 
@@ -888,7 +972,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> StopCCReply::GetPtrs() const
     return ptrs;
 }
 
-void StopCCReply::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void StopCCReply::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -901,7 +985,13 @@ StopCCReply::~StopCCReply()
 
 std::unique_ptr<sngxml::dom::Element> StopCCReply::ToXml(const std::string& fieldName) const
 {
-    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionReply::ToXml(fieldName);
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> StopCCReply::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
+    std::unique_ptr<sngxml::dom::Element> element = CodeCompletionReply::ToXml(fieldName, ctx);
     return element;
 }
 
@@ -948,7 +1038,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> KeepAliveCCRequest::GetPtrs() const
     return ptrs;
 }
 
-void KeepAliveCCRequest::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void KeepAliveCCRequest::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -961,8 +1051,17 @@ KeepAliveCCRequest::~KeepAliveCCRequest()
 
 std::unique_ptr<sngxml::dom::Element> KeepAliveCCRequest::ToXml(const std::string& fieldName) const
 {
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> KeepAliveCCRequest::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    SetObjectXmlAttributes(element.get());
+    if (!ctx.GetFlag(sngxml::xmlser::XmlSerializationFlags::suppressMetadata))
+    {
+        SetObjectXmlAttributes(element.get());
+    }
     return element;
 }
 
@@ -1009,7 +1108,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> KeepAliveCCReply::GetPtrs() const
     return ptrs;
 }
 
-void KeepAliveCCReply::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void KeepAliveCCReply::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -1022,8 +1121,17 @@ KeepAliveCCReply::~KeepAliveCCReply()
 
 std::unique_ptr<sngxml::dom::Element> KeepAliveCCReply::ToXml(const std::string& fieldName) const
 {
+    sngxml::xmlser::XmlSerializationContext ctx;
+    return ToXml(fieldName, ctx);
+}
+
+std::unique_ptr<sngxml::dom::Element> KeepAliveCCReply::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
+{
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    SetObjectXmlAttributes(element.get());
+    if (!ctx.GetFlag(sngxml::xmlser::XmlSerializationFlags::suppressMetadata))
+    {
+        SetObjectXmlAttributes(element.get());
+    }
     return element;
 }
 

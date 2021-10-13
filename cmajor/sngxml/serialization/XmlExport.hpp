@@ -127,7 +127,7 @@ SNGXML_SERIALIZATION_API inline std::string ToString(const duration& dur)
 }
 
 template<class T>
-concept XmlExportableClassType = std::is_class_v<T> && requires(T t, const std::string& u) { t.ToXml(u); };
+concept XmlExportableClassType = std::is_class_v<T> && requires(T t, const std::string& u, XmlSerializationContext& c) { t.ToXml(u, c); };
 
 template<class T>
 concept XmlExportableEnumType = std::is_enum_v<T>;
@@ -150,39 +150,42 @@ concept XmlExportable =
 requires { XmlExportableScalarType<T>; } || requires { XmlExportableClassType<T>;  };
 
 template<XmlExportableScalarType T>
-std::unique_ptr<sngxml::dom::Element> ToXml(const T& value, const std::string& fieldName)
+std::unique_ptr<sngxml::dom::Element> ToXml(const T& value, const std::string& fieldName, XmlSerializationContext& ctx)
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     element->SetAttribute(U"value", ToUtf32(ToString(value)));
     return element;
 }
 
-SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& value, const std::string& fieldName);
-SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const std::u16string& value, const std::string& fieldName);
-SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const std::u32string& value, const std::string& fieldName);
-SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const uuid& value, const std::string& fieldName);
-SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const date& value, const std::string& fieldName);
-SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const datetime& value, const std::string& fieldName);
-SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const timestamp& value, const std::string& fieldName);
-SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const time_point& value, const std::string& fieldName);
-SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const duration& value, const std::string& fieldName);
+SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& value, const std::string& fieldName, XmlSerializationContext& ctx);
+SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const std::u16string& value, const std::string& fieldName, XmlSerializationContext& ctx);
+SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const std::u32string& value, const std::string& fieldName, XmlSerializationContext& ctx);
+SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const uuid& value, const std::string& fieldName, XmlSerializationContext& ctx);
+SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const date& value, const std::string& fieldName, XmlSerializationContext& ctx);
+SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const datetime& value, const std::string& fieldName, XmlSerializationContext& ctx);
+SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const timestamp& value, const std::string& fieldName, XmlSerializationContext& ctx);
+SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const time_point& value, const std::string& fieldName, XmlSerializationContext& ctx);
+SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const duration& value, const std::string& fieldName, XmlSerializationContext& ctx);
 
 SNGXML_SERIALIZATION_API std::string MakeClassNameStr(const std::string& typeName);
 
 template<XmlExportableClassType T> 
-std::unique_ptr<sngxml::dom::Element> ToXml(const T& object, const std::string& fieldName)
+std::unique_ptr<sngxml::dom::Element> ToXml(const T& object, const std::string& fieldName, XmlSerializationContext& ctx)
 {
-    std::unique_ptr<sngxml::dom::Element> element = object.ToXml(fieldName);
-    if (const XmlSerializable* intf = dynamic_cast<const XmlSerializable*>(&object))
+    std::unique_ptr<sngxml::dom::Element> element = object.ToXml(fieldName, ctx);
+    if (!ctx.GetFlag(XmlSerializationFlags::suppressMetadata))
     {
-        element->SetAttribute(U"classId", ToUtf32(std::to_string(intf->ClassId())));
-        element->SetAttribute(U"className", ToUtf32(intf->ClassName()));
+        if (const XmlSerializable* intf = dynamic_cast<const XmlSerializable*>(&object))
+        {
+            element->SetAttribute(U"classId", ToUtf32(std::to_string(intf->ClassId())));
+            element->SetAttribute(U"className", ToUtf32(intf->ClassName()));
+        }
     }
     return element;
 }
 
 template<XmlExportableEnumType T>
-std::unique_ptr<sngxml::dom::Element> ToXml(const T& value, const std::string& fieldName)
+std::unique_ptr<sngxml::dom::Element> ToXml(const T& value, const std::string& fieldName, XmlSerializationContext& ctx)
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     element->SetAttribute(U"value", ToUtf32(std::to_string(static_cast<int64_t>(value))));
@@ -190,16 +193,19 @@ std::unique_ptr<sngxml::dom::Element> ToXml(const T& value, const std::string& f
 }
 
 template<XmlExportableClassType T>
-std::unique_ptr<sngxml::dom::Element> ToXml(const std::unique_ptr<T>& objectPtr, const std::string& fieldName)
+std::unique_ptr<sngxml::dom::Element> ToXml(const std::unique_ptr<T>& objectPtr, const std::string& fieldName, XmlSerializationContext& ctx)
 {
     if (objectPtr)
     {
-        std::unique_ptr<sngxml::dom::Element> element = objectPtr->ToXml(fieldName);
-        T* p = objectPtr.get();
-        if (XmlSerializable* intf = dynamic_cast<XmlSerializable*>(p))
+        std::unique_ptr<sngxml::dom::Element> element = objectPtr->ToXml(fieldName, ctx);
+        if (!ctx.GetFlag(XmlSerializationFlags::suppressMetadata))
         {
-            element->SetAttribute(U"classId", ToUtf32(std::to_string(intf->ClassId())));
-            element->SetAttribute(U"className", ToUtf32(intf->ClassName()));
+            T* p = objectPtr.get();
+            if (XmlSerializable* intf = dynamic_cast<XmlSerializable*>(p))
+            {
+                element->SetAttribute(U"classId", ToUtf32(std::to_string(intf->ClassId())));
+                element->SetAttribute(U"className", ToUtf32(intf->ClassName()));
+            }
         }
         return element;
     }
@@ -212,16 +218,19 @@ std::unique_ptr<sngxml::dom::Element> ToXml(const std::unique_ptr<T>& objectPtr,
 }
 
 template<XmlExportableClassType T>
-std::unique_ptr<sngxml::dom::Element> ToXml(const std::shared_ptr<T>& objectPtr, const std::string& fieldName)
+std::unique_ptr<sngxml::dom::Element> ToXml(const std::shared_ptr<T>& objectPtr, const std::string& fieldName, XmlSerializationContext& ctx)
 {
     if (objectPtr)
     {
-        std::unique_ptr<sngxml::dom::Element> element = objectPtr->ToXml(fieldName);
-        T* p = objectPtr.get();
-        if (XmlSerializable* intf = dynamic_cast<XmlSerializable*>(p))
+        std::unique_ptr<sngxml::dom::Element> element = objectPtr->ToXml(fieldName, ctx);
+        if (!ctx.GetFlag(XmlSerializationFlags::suppressMetadata))
         {
-            element->SetAttribute(U"classId", intf->ClassId());
-            element->SetAttribute(U"className", intf->ClassName());
+            T* p = objectPtr.get();
+            if (XmlSerializable* intf = dynamic_cast<XmlSerializable*>(p))
+            {
+                element->SetAttribute(U"classId", intf->ClassId());
+                element->SetAttribute(U"className", intf->ClassName());
+            }
         }
         return element;
     }
@@ -234,7 +243,7 @@ std::unique_ptr<sngxml::dom::Element> ToXml(const std::shared_ptr<T>& objectPtr,
 }
 
 template<XmlExportableClassType T>
-std::unique_ptr<sngxml::dom::Element> ToXml(const sngxml::xmlser::XmlPtr<T>& xmlPtr, const std::string& fieldName)
+std::unique_ptr<sngxml::dom::Element> ToXml(const sngxml::xmlser::XmlPtr<T>& xmlPtr, const std::string& fieldName, XmlSerializationContext& ctx)
 {
     if (xmlPtr.Get())
     {
@@ -252,7 +261,7 @@ std::unique_ptr<sngxml::dom::Element> ToXml(const sngxml::xmlser::XmlPtr<T>& xml
 }
 
 template<XmlExportableClassType T>
-std::unique_ptr<sngxml::dom::Element> ToXml(const sngxml::xmlser::UniqueXmlPtr<T>& xmlPtr, const std::string& fieldName)
+std::unique_ptr<sngxml::dom::Element> ToXml(const sngxml::xmlser::UniqueXmlPtr<T>& xmlPtr, const std::string& fieldName, XmlSerializationContext& ctx)
 {
     if (xmlPtr.Get())
     {
@@ -270,68 +279,68 @@ std::unique_ptr<sngxml::dom::Element> ToXml(const sngxml::xmlser::UniqueXmlPtr<T
 }
 
 template<XmlExportableClassType T>
-std::unique_ptr<sngxml::dom::Element> ToXml(const std::vector<T>& v, const std::string& fieldName)
+std::unique_ptr<sngxml::dom::Element> ToXml(const std::vector<T>& v, const std::string& fieldName, XmlSerializationContext& ctx)
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     for (const T& item : v)
     {
-        element->AppendChild(std::unique_ptr<sngxml::dom::Node>(ToXml(item, "item").release()));
+        element->AppendChild(std::unique_ptr<sngxml::dom::Node>(ToXml(item, "item", ctx).release()));
     }
     return element;
 }
 
 template<XmlExportableScalarType T>
-std::unique_ptr<sngxml::dom::Element> ToXml(const std::vector<T>& v, const std::string& fieldName)
+std::unique_ptr<sngxml::dom::Element> ToXml(const std::vector<T>& v, const std::string& fieldName, XmlSerializationContext& ctx)
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     for (const T& item : v)
     {
-        element->AppendChild(std::unique_ptr<sngxml::dom::Node>(ToXml(item, "item").release()));
+        element->AppendChild(std::unique_ptr<sngxml::dom::Node>(ToXml(item, "item", ctx).release()));
     }
     return element;
 }
 
 
 template<XmlExportableClassType T>
-std::unique_ptr<sngxml::dom::Element> ToXml(const std::vector<std::unique_ptr<T>>& v, const std::string& fieldName)
+std::unique_ptr<sngxml::dom::Element> ToXml(const std::vector<std::unique_ptr<T>>& v, const std::string& fieldName, XmlSerializationContext& ctx)
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     for (const std::unique_ptr<T>& item : v)
     {
-        element->AppendChild(std::unique_ptr<sngxml::dom::Node>(ToXml(item, "item").release()));
+        element->AppendChild(std::unique_ptr<sngxml::dom::Node>(ToXml(item, "item", ctx).release()));
     }
     return element;
 }
 
 template<XmlExportableClassType T>
-std::unique_ptr<sngxml::dom::Element> ToXml(const std::vector<std::shared_ptr<T>>& v, const std::string& fieldName)
+std::unique_ptr<sngxml::dom::Element> ToXml(const std::vector<std::shared_ptr<T>>& v, const std::string& fieldName, XmlSerializationContext& ctx)
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     for (const std::shared_ptr<T>& item : v)
     {
-        element->AppendChild(std::unique_ptr<sngxml::dom::Node>(ToXml(item, "item").release()));
+        element->AppendChild(std::unique_ptr<sngxml::dom::Node>(ToXml(item, "item", ctx).release()));
     }
     return element;
 }
 
 template<XmlExportableClassType T>
-std::unique_ptr<sngxml::dom::Element> ToXml(const std::vector<sngxml::xmlser::XmlPtr<T>>& v, const std::string& fieldName)
+std::unique_ptr<sngxml::dom::Element> ToXml(const std::vector<sngxml::xmlser::XmlPtr<T>>& v, const std::string& fieldName, XmlSerializationContext& ctx)
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     for (const sngxml::xmlser::XmlPtr<T>& item : v)
     {
-        element->AppendChild(std::unique_ptr<sngxml::dom::Node>(ToXml(item, "item").release()));
+        element->AppendChild(std::unique_ptr<sngxml::dom::Node>(ToXml(item, "item", ctx).release()));
     }
     return element;
 }
 
 template<XmlExportableClassType T>
-std::unique_ptr<sngxml::dom::Element> ToXml(const std::vector<sngxml::xmlser::UniqueXmlPtr<T>>& v, const std::string& fieldName)
+std::unique_ptr<sngxml::dom::Element> ToXml(const std::vector<sngxml::xmlser::UniqueXmlPtr<T>>& v, const std::string& fieldName, XmlSerializationContext& ctx)
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     for (const sngxml::xmlser::UniqueXmlPtr<T>& item : v)
     {
-        element->AppendChild(std::unique_ptr<sngxml::dom::Node>(ToXml(item, "item").release()));
+        element->AppendChild(std::unique_ptr<sngxml::dom::Node>(ToXml(item, "item", ctx).release()));
     }
     return element;
 }

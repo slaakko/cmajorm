@@ -34,7 +34,8 @@ public:
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const override;
     void FromXml(sngxml::dom::Element* element) override;
     std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
     virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
@@ -65,7 +66,8 @@ public:
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const override;
     void FromXml(sngxml::dom::Element* element) override;
     std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
     virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
@@ -97,7 +99,8 @@ public:
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const override;
     void FromXml(sngxml::dom::Element* element) override;
     std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
     virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
@@ -130,7 +133,8 @@ public:
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const override;
     void FromXml(sngxml::dom::Element* element) override;
     std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
     virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
@@ -162,7 +166,8 @@ public:
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const override;
     void FromXml(sngxml::dom::Element* element) override;
     std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
     virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
@@ -196,7 +201,8 @@ public:
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const override;
     void FromXml(sngxml::dom::Element* element) override;
     std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
     virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
@@ -227,7 +233,8 @@ public:
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const override;
     void FromXml(sngxml::dom::Element* element) override;
     std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
     virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
@@ -258,7 +265,8 @@ public:
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const override;
     void FromXml(sngxml::dom::Element* element) override;
     std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
     virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
@@ -289,7 +297,8 @@ public:
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const override;
     void FromXml(sngxml::dom::Element* element) override;
     std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
     virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
@@ -326,7 +335,8 @@ public:
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const override;
     void FromXml(sngxml::dom::Element* element) override;
     std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
     virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
@@ -357,7 +367,8 @@ public:
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const override;
     void FromXml(sngxml::dom::Element* element) override;
     std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
     virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;

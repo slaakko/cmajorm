@@ -11,7 +11,7 @@ namespace System.Xml.Serialization
 {
     public concept XmlExportableClassType<T>
     {
-        Element* T.ToXml(const string& fieldName);
+        Element* T.ToXml(const string& fieldName, XmlSerializationContext& ctx);
     }
 
     public concept XmlExportableScalarType<T>
@@ -58,24 +58,27 @@ namespace System.Xml.Serialization
             T is System.Duration;
     }
 
-    public UniquePtr<Element> ToXml(const System.Uuid& value, const string& fieldName)
+    public UniquePtr<Element> ToXml(const System.Uuid& value, const string& fieldName, XmlSerializationContext& ctx)
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
         element->SetAttribute(u"value", ToUtf32(ToString(value)));
         return element;
     }
 
-    public UniquePtr<Element> ToXml<T>(const T& object, const string& fieldName)
+    public UniquePtr<Element> ToXml<T>(const T& object, const string& fieldName, XmlSerializationContext& ctx)
         where T is XmlExportableClassType
     {
-        UniquePtr<Element> element = object.ToXml(fieldName);
-        XmlSerializable intf = object;
-        int classId = intf.ClassId();
-        element->SetAttribute(u"classId", ToUtf32(ToString(classId)));
+        UniquePtr<Element> element = object.ToXml(fieldName, ctx);
+        if (!ctx.GetFlag(System.Xml.Serialization.XmlSerializationFlags.suppressMetadata))
+        {
+            XmlSerializable intf = object;
+            int classId = intf.ClassId();
+            element->SetAttribute(u"classId", ToUtf32(ToString(classId)));
+        }
         return element;
     }
 
-    public UniquePtr<Element> ToXml<T>(const UniquePtr<T>& objectPtr, const string& fieldName)
+    public UniquePtr<Element> ToXml<T>(const UniquePtr<T>& objectPtr, const string& fieldName, XmlSerializationContext& ctx)
         where T is XmlExportableClassType
     {
         if (objectPtr.IsNull())
@@ -86,16 +89,19 @@ namespace System.Xml.Serialization
         }
         else
         {
-            UniquePtr<Element> element = objectPtr->ToXml(fieldName);
-            T* p = objectPtr.Get();
-            XmlSerializable intf = *p;
-            int classId = intf.ClassId();
-            element->SetAttribute(u"classId", ToUtf32(ToString(classId)));
+            UniquePtr<Element> element = objectPtr->ToXml(fieldName, ctx);
+            if (!ctx.GetFlag(System.Xml.Serialization.XmlSerializationFlags.suppressMetadata))
+            {
+                T* p = objectPtr.Get();
+                XmlSerializable intf = *p;
+                int classId = intf.ClassId();
+                element->SetAttribute(u"classId", ToUtf32(ToString(classId)));
+            }
             return element;
         }
     }
 
-    public UniquePtr<Element> ToXml<T>(const SharedPtr<T>& objectPtr, const string& fieldName)
+    public UniquePtr<Element> ToXml<T>(const SharedPtr<T>& objectPtr, const string& fieldName, XmlSerializationContext& ctx)
         where T is XmlExportableClassType
     {
         if (objectPtr.IsNull())
@@ -106,16 +112,19 @@ namespace System.Xml.Serialization
         }
         else
         {
-            UniquePtr<Element> element = objectPtr->ToXml(fieldName);
-            T* p = objectPtr.Get();
-            XmlSerializable intf = *p;
-            int classId = intf.ClassId();
-            element->SetAttribute(u"classId", ToUtf32(ToString(classId)));
+            UniquePtr<Element> element = objectPtr->ToXml(fieldName, ctx);
+            if (!ctx.GetFlag(System.Xml.Serialization.XmlSerializationFlags.suppressMetadata))
+            {
+                T* p = objectPtr.Get();
+                XmlSerializable intf = *p;
+                int classId = intf.ClassId();
+                element->SetAttribute(u"classId", ToUtf32(ToString(classId)));
+            }
             return element;
         }
     }
 
-    public UniquePtr<Element> ToXml<T>(const XmlPtr<T>& xmlPtr, const string& fieldName)
+    public UniquePtr<Element> ToXml<T>(const XmlPtr<T>& xmlPtr, const string& fieldName, XmlSerializationContext& ctx)
         where T is XmlExportableClassType
     {
         if (xmlPtr.IsNull())
@@ -132,7 +141,7 @@ namespace System.Xml.Serialization
         }
     }
 
-    public UniquePtr<Element> ToXml<T>(const UniqueXmlPtr<T>& xmlPtr, const string& fieldName)
+    public UniquePtr<Element> ToXml<T>(const UniqueXmlPtr<T>& xmlPtr, const string& fieldName, XmlSerializationContext& ctx)
         where T is XmlExportableClassType
     {
         if (xmlPtr.IsNull())
@@ -149,97 +158,97 @@ namespace System.Xml.Serialization
         }
     }
 
-    public UniquePtr<Element> ToXml<T>(const List<T>& list, const string& fieldName)
+    public UniquePtr<Element> ToXml<T>(const List<T>& list, const string& fieldName, XmlSerializationContext& ctx)
         where T is XmlExportable
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
         for (const T& item : list)
         {
-            element->AppendChild(UniquePtr<Node>(ToXml(item, "item").Release()));
+            element->AppendChild(UniquePtr<Node>(ToXml(item, "item", ctx).Release()));
         }
         return element;
     }
 
-    public UniquePtr<Element> ToXml<T>(const List<UniquePtr<T>>& list, const string& fieldName)
+    public UniquePtr<Element> ToXml<T>(const List<UniquePtr<T>>& list, const string& fieldName, XmlSerializationContext& ctx)
         where T is XmlExportableClassType
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
         for (const UniquePtr<T>& item : list)
         {
-            element->AppendChild(UniquePtr<Node>(ToXml(item, "item").Release()));
+            element->AppendChild(UniquePtr<Node>(ToXml(item, "item", ctx).Release()));
         }
         return element;
     }
 
-    public UniquePtr<Element> ToXml<T>(const List<SharedPtr<T>>& list, const string& fieldName)
+    public UniquePtr<Element> ToXml<T>(const List<SharedPtr<T>>& list, const string& fieldName, XmlSerializationContext& ctx)
         where T is XmlExportableClassType
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
         for (const SharedPtr<T>& item : list)
         {
-            element->AppendChild(UniquePtr<Node>(ToXml(item, "item").Release()));
+            element->AppendChild(UniquePtr<Node>(ToXml(item, "item", ctx).Release()));
         }
         return element;
     }
 
-    public UniquePtr<Element> ToXml<T>(const List<XmlPtr<T>>& list, const string& fieldName)
+    public UniquePtr<Element> ToXml<T>(const List<XmlPtr<T>>& list, const string& fieldName, XmlSerializationContext& ctx)
         where T is XmlExportableClassType
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
         for (const XmlPtr<T>& item : list)
         {
-            element->AppendChild(UniquePtr<Node>(ToXml(item, "item").Release()));
+            element->AppendChild(UniquePtr<Node>(ToXml(item, "item", ctx).Release()));
         }
         return element;
     }
 
-    public UniquePtr<Element> ToXml<T>(const List<UniqueXmlPtr<T>>& list, const string& fieldName)
+    public UniquePtr<Element> ToXml<T>(const List<UniqueXmlPtr<T>>& list, const string& fieldName, XmlSerializationContext& ctx)
         where T is XmlExportableClassType
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
         for (const UniqueXmlPtr<T>& item : list)
         {
-            element->AppendChild(UniquePtr<Node>(ToXml(item, "item").Release()));
+            element->AppendChild(UniquePtr<Node>(ToXml(item, "item", ctx).Release()));
         }
         return element;
     }
 
-    public UniquePtr<Element> ToXml(const string& value, const string& fieldName)
+    public UniquePtr<Element> ToXml(const string& value, const string& fieldName, XmlSerializationContext& ctx)
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
         element->SetAttribute(u"value", ToUtf32(value));
         return element;
     }
 
-    public UniquePtr<Element> ToXml(const wstring& value, const string& fieldName)
+    public UniquePtr<Element> ToXml(const wstring& value, const string& fieldName, XmlSerializationContext& ctx)
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
         element->SetAttribute(u"value", ToUtf32(value));
         return element;
     }
 
-    public UniquePtr<Element> ToXml(const ustring& value, const string& fieldName)
+    public UniquePtr<Element> ToXml(const ustring& value, const string& fieldName, XmlSerializationContext& ctx)
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
         element->SetAttribute(u"value", value);
         return element;
     }
 
-    public UniquePtr<Element> ToXml(const System.TimePoint& value, const string& fieldName)
+    public UniquePtr<Element> ToXml(const System.TimePoint& value, const string& fieldName, XmlSerializationContext& ctx)
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
         element->SetAttribute(u"value", ToUtf32(ToString(value.Rep())));
         return element;
     }
 
-    public UniquePtr<Element> ToXml(const System.Duration& value, const string& fieldName)
+    public UniquePtr<Element> ToXml(const System.Duration& value, const string& fieldName, XmlSerializationContext& ctx)
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
         element->SetAttribute(u"value", ToUtf32(ToString(value.Rep())));
         return element;
     }
 
-    public UniquePtr<Element> ToXml<T>(const T& value, const string& fieldName)
+    public UniquePtr<Element> ToXml<T>(const T& value, const string& fieldName, XmlSerializationContext& ctx)
         where T is XmlExportableScalarType
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
@@ -247,7 +256,7 @@ namespace System.Xml.Serialization
         return element;
     }
 
-    public UniquePtr<Element> ToXml<T>(T value, const string& fieldName)
+    public UniquePtr<Element> ToXml<T>(T value, const string& fieldName, XmlSerializationContext& ctx)
         where T is XmlExportableEnumeratedType
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
@@ -256,21 +265,21 @@ namespace System.Xml.Serialization
         return element;
     }
 
-    public UniquePtr<Element> ToXml(const System.Date& value, const string& fieldName)
+    public UniquePtr<Element> ToXml(const System.Date& value, const string& fieldName, XmlSerializationContext& ctx)
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
         element->SetAttribute(u"value", ToUtf32(value.ToString()));
         return element;
     }
 
-    public UniquePtr<Element> ToXml(const System.DateTime& value, const string& fieldName)
+    public UniquePtr<Element> ToXml(const System.DateTime& value, const string& fieldName, XmlSerializationContext& ctx)
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
         element->SetAttribute(u"value", ToUtf32(value.ToString()));
         return element;
     }
 
-    public UniquePtr<Element> ToXml(const System.Timestamp& value, const string& fieldName)
+    public UniquePtr<Element> ToXml(const System.Timestamp& value, const string& fieldName, XmlSerializationContext& ctx)
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
         element->SetAttribute(u"value", ToUtf32(value.ToString()));

@@ -48,7 +48,7 @@ std::vector<sngxml::xmlser::XmlPtrBase*> Car::GetPtrs() const
     return ptrs;
 }
 
-void Car::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+void Car::SetObjectXmlAttributes(sngxml::dom::Element* element) const
 {
     element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
     element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
@@ -59,10 +59,10 @@ Car::~Car()
 {
 }
 
-std::unique_ptr<sngxml::dom::Element> Car::ToXml(const std::string& fieldName) const
+std::unique_ptr<sngxml::dom::Element> Car::ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const
 {
-    std::unique_ptr<sngxml::dom::Element> element = Vehicle::ToXml(fieldName);
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(registrationNumber, "registrationNumber").release()));
+    std::unique_ptr<sngxml::dom::Element> element = Vehicle::ToXml(fieldName, ctx);
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(registrationNumber, "registrationNumber", ctx).release()));
     return element;
 }
 

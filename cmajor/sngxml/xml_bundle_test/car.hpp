@@ -27,7 +27,7 @@ public:
     void DestroyObject() override { delete this; }
     int ClassId() const override { return classId; }
     std::string ClassName() const override;
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const override;
     void FromXml(sngxml::dom::Element* element) override;
     std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
     void SetObjectXmlAttributes(sngxml::dom::Element* element) const override;

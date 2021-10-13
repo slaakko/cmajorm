@@ -20,7 +20,7 @@ namespace System.Xml.Serialization
         bool IsOwned();
         void SetOwned();
         void ResetOwned();
-        System.Dom.Element* ToXml(const string& elementName);
+        System.Dom.Element* ToXml(const string& elementName, XmlSerializationContext& ctx);
         void FromXml(System.Dom.Element* element);
         List<XmlPtrBase*> GetPtrs();
     }
@@ -87,7 +87,12 @@ namespace System.Xml.Serialization
         }
         public System.Dom.Element* ToXml(const string& elementName)
         {
-            return intf.ToXml(elementName);
+            XmlSerializationContext ctx;
+            return ToXml(elementName, ctx);
+        }
+        public System.Dom.Element* ToXml(const string& elementName, XmlSerializationContext& ctx)
+        {
+            return intf.ToXml(elementName, ctx);
         }
         public void FromXml(System.Dom.Element* element)
         {

@@ -88,7 +88,8 @@ std::unique_ptr<sngxml::dom::Document> XmlBundle::ToXmlDocument() const
     for (const auto& p : IdMap())
     {
         XmlSerializable* serializable = p.second;
-        std::unique_ptr<sngxml::dom::Element> element = serializable->ToXml("object");
+        XmlSerializationContext ctx;
+        std::unique_ptr<sngxml::dom::Element> element = serializable->ToXml("object", ctx);
         rootElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(element.release()));
     }
     std::unique_ptr<sngxml::dom::Document> document(new sngxml::dom::Document());

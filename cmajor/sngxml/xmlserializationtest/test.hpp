@@ -1,5 +1,5 @@
-#ifndef TEST_HPP_03908BDD6AE840D2388CF6A916D601CB77831F32
-#define TEST_HPP_03908BDD6AE840D2388CF6A916D601CB77831F32
+#ifndef TEST_HPP_4022209C1104C780FE295AA2C5E6439DA402B7EA
+#define TEST_HPP_4022209C1104C780FE295AA2C5E6439DA402B7EA
 #include <sngxml/serialization/XmlPtr.hpp>
 #include <soulng/util/Time.hpp>
 #include <chrono>
@@ -33,7 +33,8 @@ public:
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const override;
     void FromXml(sngxml::dom::Element* element) override;
     std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
     virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
@@ -65,7 +66,8 @@ public:
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const override;
     void FromXml(sngxml::dom::Element* element) override;
     std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
     virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
@@ -90,7 +92,8 @@ public:
     void DestroyObject() override { delete this; }
     int ClassId() const override { return classId; }
     std::string ClassName() const override;
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const override;
     void FromXml(sngxml::dom::Element* element) override;
     std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
     void SetObjectXmlAttributes(sngxml::dom::Element* element) const override;
@@ -122,7 +125,8 @@ public:
     std::string ClassName() const override;
     sngxml::xmlser::XmlContainer* Container() const override { return container; }
     void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName, sngxml::xmlser::XmlSerializationContext& ctx) const override;
     void FromXml(sngxml::dom::Element* element) override;
     std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
     virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
@@ -173,4 +177,4 @@ private:
     bool isOwned;
 };
 
-#endif // TEST_HPP_03908BDD6AE840D2388CF6A916D601CB77831F32
+#endif // TEST_HPP_4022209C1104C780FE295AA2C5E6439DA402B7EA

@@ -146,12 +146,13 @@ const int setContainerId = 8;
 const int classIdId = 9;
 const int classNameId = 10;
 const int setObjectXmlAttributesId = 11;
-const int toXmlId = 12;
-const int fromXmlId = 13;
-const int getPtrsId = 14;
-const int isOwnedMemFunId = 15;
-const int setOwnedMemFunId = 16;
-const int resetOwnedMemFunId = 17;
+const int toXmlPlainId = 12;
+const int toXmlId = 13;
+const int fromXmlId = 14;
+const int getPtrsId = 15;
+const int isOwnedMemFunId = 16;
+const int setOwnedMemFunId = 17;
+const int resetOwnedMemFunId = 18;
 
 void XmlAttributeProcessor::GenerateSymbols(AttributeNode* attribute, Symbol* symbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
@@ -178,6 +179,7 @@ void XmlAttributeProcessor::GenerateSymbols(AttributeNode* attribute, Symbol* sy
             GenerateClassIdFunctionSymbol(attribute, classTypeSymbol, boundCompileUnit, containerScope);
             GenerateClassNameFunctionSymbol(attribute, classTypeSymbol, boundCompileUnit, containerScope);
             GenerateSetObjectXmlAttributesSymbol(attribute, classTypeSymbol, boundCompileUnit, containerScope);
+            GenerateToXmlPlainSymbol(attribute, classTypeSymbol, boundCompileUnit, containerScope);
             GenerateToXmlSymbol(attribute, classTypeSymbol, boundCompileUnit, containerScope);
             GenerateFromXmlSymbol(attribute, classTypeSymbol, boundCompileUnit, containerScope);
             GenerateGetPtrsSymbol(attribute, classTypeSymbol, boundCompileUnit, containerScope);
@@ -309,6 +311,11 @@ void XmlAttributeProcessor::GenerateImplementation(AttributeNode* attribute, Sym
                     case setObjectXmlAttributesId:
                     {
                         GenerateSetObjectXmlAttributesImplementation(attribute, classTypeSymbol, static_cast<MemberFunctionSymbol*>(functionSymbol), statementBinder);
+                        break;
+                    }
+                    case toXmlPlainId:
+                    {
+                        GenerateToXmlPlainImplementation(attribute, classTypeSymbol, static_cast<MemberFunctionSymbol*>(functionSymbol), statementBinder);
                         break;
                     }
                     case toXmlId:
@@ -1159,6 +1166,69 @@ void XmlAttributeProcessor::GenerateSetObjectXmlAttributesImplementation(Attribu
     }
 }
 
+void XmlAttributeProcessor::GenerateToXmlPlainSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+{
+    SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
+    MemberFunctionSymbol* toXmlSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"ToXml");
+    toXmlSymbol->SetModule(&boundCompileUnit.GetModule());
+    toXmlSymbol->SetGroupName(U"ToXml");
+    toXmlSymbol->SetAccess(SymbolAccess::public_);
+
+    ParameterSymbol* thisParam = new ParameterSymbol(attribute->GetSpan(), attribute->ModuleId(), U"this");
+    thisParam->SetType(classTypeSymbol->AddPointer(attribute->GetSpan(), attribute->ModuleId()));
+    toXmlSymbol->AddMember(thisParam);
+
+    ParameterSymbol* elementNameParam = new ParameterSymbol(attribute->GetSpan(), attribute->ModuleId(), U"elementName");
+    elementNameParam->SetType(symbolTable.GetTypeByName(U"String<char>")->AddConst(attribute->GetSpan(), attribute->ModuleId())->AddLvalueReference(attribute->GetSpan(), attribute->ModuleId()));
+    toXmlSymbol->AddMember(elementNameParam);
+
+    GetRootModuleForCurrentThread()->GetSymbolTable().SetFunctionIdFor(toXmlSymbol);
+
+    TypeSymbol* elementTypeSymbol = symbolTable.GetTypeByName(U"System.Dom.Element")->AddPointer(attribute->GetSpan(), attribute->ModuleId());
+    toXmlSymbol->SetReturnType(elementTypeSymbol);
+
+    classTypeSymbol->AddMember(toXmlSymbol);
+    toXmlSymbol->ComputeName();
+
+    auto& m = functionSymbolMap[classTypeSymbol];
+    m.push_back(std::make_pair(toXmlSymbol, toXmlPlainId));
+}
+
+void XmlAttributeProcessor::GenerateToXmlPlainImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* toXmlSymbol, StatementBinder* statementBinder)
+{
+    try
+    {
+        FileScope* fileScope = new FileScope();
+        statementBinder->GetBoundCompileUnit().AddFileScope(fileScope);
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&statementBinder->GetBoundCompileUnit(), toXmlSymbol));
+        Span span = attribute->GetSpan();
+        boost::uuids::uuid moduleId = attribute->ModuleId();
+        MemberFunctionNode memberFunctionNode(span, moduleId);
+        CompoundStatementNode compoundStatementNode(span, moduleId);
+        compoundStatementNode.SetEndBraceSpan(span);
+
+        ConstructionStatementNode* constructionStatementNode = new ConstructionStatementNode(span, moduleId,
+            new IdentifierNode(span, moduleId, U"System.Xml.Serialization.XmlSerializationContext"), new IdentifierNode(span, moduleId, U"ctx"));
+        compoundStatementNode.AddStatement(constructionStatementNode);
+
+        InvokeNode* invokeToXmlNode = new InvokeNode(span, moduleId, new IdentifierNode(span, moduleId, U"ToXml"));
+        invokeToXmlNode->AddArgument(new IdentifierNode(span, moduleId, U"elementName"));
+        invokeToXmlNode->AddArgument(new IdentifierNode(span, moduleId, U"ctx"));
+        ReturnStatementNode* returnStatementNode = new ReturnStatementNode(span, moduleId, invokeToXmlNode);
+        compoundStatementNode.AddStatement(returnStatementNode);
+
+        CompileMemberFunction(toXmlSymbol, compoundStatementNode, memberFunctionNode, std::move(boundFunction), statementBinder);
+    }
+    catch (const Exception& ex)
+    {
+        std::vector<std::pair<Span, boost::uuids::uuid>> references;
+        references.push_back(std::make_pair(ex.Defined(), ex.DefinedModuleId()));
+        references.insert(references.end(), ex.References().begin(), ex.References().end());
+        throw Exception("error in XML attribute generation: could not create 'ToXml' function for the class '" + ToUtf8(classTypeSymbol->FullName()) + "': " + ex.Message(),
+            classTypeSymbol->GetSpan(), classTypeSymbol->SourceModuleId(), references);
+    }
+}
+
 void XmlAttributeProcessor::GenerateToXmlSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
@@ -1181,6 +1251,10 @@ void XmlAttributeProcessor::GenerateToXmlSymbol(AttributeNode* attribute, ClassT
     ParameterSymbol* elementNameParam = new ParameterSymbol(attribute->GetSpan(), attribute->ModuleId(), U"elementName");
     elementNameParam->SetType(symbolTable.GetTypeByName(U"String<char>")->AddConst(attribute->GetSpan(), attribute->ModuleId())->AddLvalueReference(attribute->GetSpan(), attribute->ModuleId()));
     toXmlSymbol->AddMember(elementNameParam);
+
+    ParameterSymbol* ctxParam = new ParameterSymbol(attribute->GetSpan(), attribute->ModuleId(), U"ctx");
+    ctxParam->SetType(symbolTable.GetTypeByName(U"System.Xml.Serialization.XmlSerializationContext")->AddLvalueReference(attribute->GetSpan(), attribute->ModuleId()));
+    toXmlSymbol->AddMember(ctxParam);
 
     GetRootModuleForCurrentThread()->GetSymbolTable().SetFunctionIdFor(toXmlSymbol);
 
@@ -1215,6 +1289,7 @@ void XmlAttributeProcessor::GenerateToXmlImplementation(AttributeNode* attribute
             ArrowNode* arrowNode = new ArrowNode(span, moduleId, new BaseNode(span, moduleId), new IdentifierNode(span, moduleId, U"ToXml"));
             InvokeNode* invokeNode = new InvokeNode(span, moduleId, arrowNode);
             invokeNode->AddArgument(new IdentifierNode(span, moduleId, U"elementName"));
+            invokeNode->AddArgument(new IdentifierNode(span, moduleId, U"ctx"));
             constructionStatementNode->AddArgument(invokeNode);
             constructionStatementNode->SetAssignment();
             compoundStatementNode.AddStatement(constructionStatementNode);
@@ -1232,10 +1307,19 @@ void XmlAttributeProcessor::GenerateToXmlImplementation(AttributeNode* attribute
             constructionStatementNode->SetAssignment();
             compoundStatementNode.AddStatement(constructionStatementNode);
 
+            //if (!ctx.GetFlag(sngxml.xmlser.XmlSerializationFlags.suppressMetadata)
+
+            DotNode* dotNode = new DotNode(span, moduleId, new IdentifierNode(span, moduleId, U"ctx"), new IdentifierNode(span, moduleId, U"GetFlag"));
+            InvokeNode* invokeNode = new InvokeNode(span, moduleId, dotNode);
+            invokeNode->AddArgument(new IdentifierNode(span, moduleId, U"System.XmlSerialization.XmlSerializationFlags.suppressMetadata"));
+            NotNode* cond = new NotNode(span, moduleId, invokeNode);
+
             InvokeNode* invokeSetObjectXmlAttributesNode = new InvokeNode(span, moduleId, new IdentifierNode(span, moduleId, U"SetObjectXmlAttributes"));
             invokeSetObjectXmlAttributesNode->AddArgument(new IdentifierNode(span, moduleId, U"element"));
             ExpressionStatementNode* expressionStatement = new ExpressionStatementNode(span, moduleId, invokeSetObjectXmlAttributesNode);
-            compoundStatementNode.AddStatement(expressionStatement);
+            IfStatementNode* ifStatementNode = new IfStatementNode(span, moduleId, cond, expressionStatement, nullptr);
+
+            compoundStatementNode.AddStatement(ifStatementNode);
         }
 
         for (MemberVariableSymbol* memberVariableSymbol : classTypeSymbol->MemberVariables())
@@ -1266,6 +1350,7 @@ void XmlAttributeProcessor::GenerateToXmlImplementation(AttributeNode* attribute
             InvokeNode* toXmlInvokeNode = new InvokeNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), toXmlDotNode);
             toXmlInvokeNode->AddArgument(new IdentifierNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), memberVariableSymbol->Name()));
             toXmlInvokeNode->AddArgument(new StringLiteralNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), ToUtf8(memberVariableSymbol->Name())));
+            toXmlInvokeNode->AddArgument(new IdentifierNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), U"ctx"));
             DotNode* dotNode = new DotNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), toXmlInvokeNode, new IdentifierNode(
                 memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), U"Release"));
             InvokeNode* dotInvokeNode = new InvokeNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), dotNode);

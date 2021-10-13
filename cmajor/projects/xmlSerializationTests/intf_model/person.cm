@@ -68,12 +68,17 @@ namespace model
             element->SetAttribute(u"objectId", ToUtf32(ToString(ObjectId())));
             element->SetAttribute(u"className", ToUtf32(ClassName()));
         }
-        public virtual System.Dom.Element* ToXml(const string& elementName)
+        public System.Dom.Element* ToXml(const string& elementName)
+        {
+            System.Xml.Serialization.XmlSerializationContext ctx;
+            return ToXml(elementName, ctx);
+        }
+        public virtual System.Dom.Element* ToXml(const string& elementName, System.Xml.Serialization.XmlSerializationContext& ctx)
         {
             System.Dom.Element* element = new System.Dom.Element(ToUtf32(elementName));
             SetObjectXmlAttributes(element);
-            element->AppendChild(UniquePtr<System.Dom.Node>(System.Xml.Serialization.ToXml(name, "name").Release()));
-            element->AppendChild(UniquePtr<System.Dom.Node>(System.Xml.Serialization.ToXml(vehicles, "vehicles").Release()));
+            element->AppendChild(UniquePtr<System.Dom.Node>(System.Xml.Serialization.ToXml(name, "name", ctx).Release()));
+            element->AppendChild(UniquePtr<System.Dom.Node>(System.Xml.Serialization.ToXml(vehicles, "vehicles", ctx).Release()));
             return element;
         }
         public virtual void FromXml(System.Dom.Element* element)
