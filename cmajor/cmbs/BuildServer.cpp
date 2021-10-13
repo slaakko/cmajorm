@@ -545,8 +545,7 @@ GetDefinitionReply BuildServer::ProcessGetDefinitionRequest(const GetDefinitionR
             {
                 int32_t line = boost::lexical_cast<int32_t>(getDefinitionRequest.identifierLocation.line);
                 int32_t scol = boost::lexical_cast<int32_t>(getDefinitionRequest.identifierLocation.scol);
-                int32_t ecol = boost::lexical_cast<int32_t>(getDefinitionRequest.identifierLocation.ecol);
-                SymbolLocation identifierLocation(module->Id(), fileIndex, line, scol, ecol);
+                SymbolLocation identifierLocation(module->Id(), fileIndex, line, scol);
                 SymbolLocation* definitionLocation = module->GetSymbolTable().GetDefinitionLocation(identifierLocation);
                 if (definitionLocation)
                 {
@@ -564,7 +563,6 @@ GetDefinitionReply BuildServer::ProcessGetDefinitionRequest(const GetDefinitionR
                     reply.definitionLocation.file = filePath;
                     reply.definitionLocation.line = definitionLocation->line;
                     reply.definitionLocation.scol = definitionLocation->scol;
-                    reply.definitionLocation.ecol = definitionLocation->ecol;
                     reply.ok = true;
                 }
                 else

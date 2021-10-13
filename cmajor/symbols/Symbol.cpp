@@ -164,7 +164,7 @@ uint32_t AccessFlag(Emitter& emitter, SymbolAccess access)
 
 bool operator==(const SymbolLocation& left, const SymbolLocation& right)
 {
-    return left.moduleId == right.moduleId && left.fileIndex == right.fileIndex && left.line == right.line && left.scol == right.scol && left.ecol == right.ecol;
+    return left.moduleId == right.moduleId && left.fileIndex == right.fileIndex && left.line == right.line && left.scol == right.scol;
 }
 
 bool operator<(const SymbolLocation& left, const SymbolLocation& right)
@@ -175,9 +175,7 @@ bool operator<(const SymbolLocation& left, const SymbolLocation& right)
     if (left.fileIndex > right.fileIndex) return false;
     if (left.line < right.line) return true;
     if (left.line > right.line) return false;
-    if (left.scol < right.scol) return true;
-    if (left.scol > right.scol) return false;
-    return left.ecol < right.ecol;
+    return left.scol < right.scol;
 }
 
 SymbolLocation MakeSymbolLocation(const Span& span, Module* module)
@@ -185,7 +183,7 @@ SymbolLocation MakeSymbolLocation(const Span& span, Module* module)
     int32_t scol = 0;
     int32_t ecol = 0;
     module->GetColumns(span, scol, ecol);
-    return SymbolLocation(module->Id(),span.fileIndex, span.line, scol, ecol);
+    return SymbolLocation(module->Id(),span.fileIndex, span.line, scol);
 }
 
 Symbol::Symbol(SymbolType symbolType_, const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
@@ -1092,7 +1090,7 @@ bool Symbol::GetLocation(SymbolLocation& definitionLocation) const
     int32_t scol = 0;
     int32_t ecol = 0;
     sourceModule->GetColumns(span, scol, ecol);
-    definitionLocation = SymbolLocation(sourceModule->Id(), span.fileIndex, span.line, scol, ecol);
+    definitionLocation = SymbolLocation(sourceModule->Id(), span.fileIndex, span.line, scol);
     return true;
 }
 

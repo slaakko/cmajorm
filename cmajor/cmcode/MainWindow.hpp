@@ -192,6 +192,7 @@ private:
     void EditorSelectionChanged();
     void EditorRightClick(RightClickEventArgs& args);
     bool GetDefinitionSourceLocationAt(const Point& loc, TextView* textView, std::string& identifier, DefinitionSourceLocation& sourceLocation);
+    int GetEndColumn(TextView* textView, const DefinitionSourceLocation& sourceLocation) const;
     sngcm::ast::Project* CurrentProject();
     DefinitionSourceLocation CurrentLocation() const;
     void ChangeBreakpoints(CancelArgs& args);

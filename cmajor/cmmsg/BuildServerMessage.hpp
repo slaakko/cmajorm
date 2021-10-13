@@ -489,7 +489,6 @@ public:
     std::string file;
     int32_t line;
     int32_t scol;
-    int32_t ecol;
     void* dataPtr;
 private:
     static int classId;

@@ -66,6 +66,10 @@ bool operator!=(const ArrayKey& left, const ArrayKey& right)
 
 void MapIdentifierToSymbolDefinition(IdentifierNode* identifierNode, Symbol* symbol)
 {
+    if (identifierNode->GetSpan().fileIndex == 15 && identifierNode->GetSpan().line == 13)
+    {
+        int x = 0;
+    }
     if (identifierNode->IsInternal()) return;
     if (!identifierNode->GetSpan().Valid()) return;
     if (identifierNode->ModuleId().is_nil()) return;
@@ -1678,6 +1682,10 @@ void SymbolTable::MapIdentifierToSymbolDefinition(IdentifierNode* identifierNode
 {
     if (identifierSymbolDefinitionMap.find(identifierNode) != identifierSymbolDefinitionMap.cend()) return;
     identifierSymbolDefinitionMap[identifierNode] = symbol;
+    if (identifierNode->GetSpan().fileIndex == 15)
+    {
+        int x = 0;
+    }
     SymbolLocation identifierLocation = MakeSymbolLocation(identifierNode->GetSpan(), module);
     SymbolLocation definitionLocation;
     if (symbol->GetLocation(definitionLocation))
@@ -1867,13 +1875,11 @@ void SymbolTable::WriteSymbolDefinitionMap(SymbolWriter& writer)
         writer.GetBinaryWriter().Write(left.fileIndex);
         writer.GetBinaryWriter().Write(left.line);
         writer.GetBinaryWriter().Write(left.scol);
-        writer.GetBinaryWriter().Write(left.ecol);
         const SymbolLocation& right = p.second;
         writer.GetBinaryWriter().Write(right.moduleId);
         writer.GetBinaryWriter().Write(right.fileIndex);
         writer.GetBinaryWriter().Write(right.line);
         writer.GetBinaryWriter().Write(right.scol);
-        writer.GetBinaryWriter().Write(right.ecol);
     }
 }
 
@@ -1887,13 +1893,11 @@ void SymbolTable::ReadSymbolDefinitionMap(SymbolReader& reader)
         left.fileIndex = reader.GetBinaryReader().ReadInt();
         left.line = reader.GetBinaryReader().ReadInt();
         left.scol = reader.GetBinaryReader().ReadInt();
-        left.ecol = reader.GetBinaryReader().ReadInt();
         SymbolLocation right;
         reader.GetBinaryReader().ReadUuid(right.moduleId);
         right.fileIndex = reader.GetBinaryReader().ReadInt();
         right.line = reader.GetBinaryReader().ReadInt();
         right.scol = reader.GetBinaryReader().ReadInt();
-        right.ecol = reader.GetBinaryReader().ReadInt();
         symbolDefinitionMap[left] = right;
     }
 }

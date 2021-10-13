@@ -891,7 +891,7 @@ std::unique_ptr<sngxml::dom::Element> CacheModuleReply::ToXml(const std::string&
 int DefinitionSourceLocation::classId = -1;
 
 DefinitionSourceLocation::DefinitionSourceLocation()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), file(), line(), scol(), ecol(), dataPtr(nullptr), isOwned(false)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), file(), line(), scol(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -926,7 +926,6 @@ void DefinitionSourceLocation::FromXml(sngxml::dom::Element* element)
     sngxml::xmlser::FromXml(element, "file", file);
     sngxml::xmlser::FromXml(element, "line", line);
     sngxml::xmlser::FromXml(element, "scol", scol);
-    sngxml::xmlser::FromXml(element, "ecol", ecol);
 }
 
 std::vector<sngxml::xmlser::XmlPtrBase*> DefinitionSourceLocation::GetPtrs() const
@@ -953,7 +952,6 @@ std::unique_ptr<sngxml::dom::Element> DefinitionSourceLocation::ToXml(const std:
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(file, "file").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(line, "line").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(scol, "scol").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ecol, "ecol").release()));
     return element;
 }
 

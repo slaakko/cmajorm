@@ -57,7 +57,8 @@ const uint8_t moduleFormat_14 = uint8_t('E');
 const uint8_t moduleFormat_15 = uint8_t('F');
 const uint8_t moduleFormat_16 = uint8_t('G');
 const uint8_t moduleFormat_17 = uint8_t('H');
-const uint8_t currentModuleFormat = moduleFormat_17;
+const uint8_t moduleFormat_18 = uint8_t('I');
+const uint8_t currentModuleFormat = moduleFormat_18;
 
 enum class ModuleFlags : uint8_t
 {

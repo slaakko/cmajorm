@@ -271,6 +271,10 @@ int Lexer::MappedLineNumber(const SourcePos& sourcePos) const
 
 void Lexer::ConvertExternal(Span& span)
 {
+    if (span.fileIndex == 15)
+    {
+        int x = 0;
+    }
     Token startToken = GetToken(span.start);
     span.start = static_cast<int>(startToken.match.begin - start);
     Token endToken = GetToken(span.end);

@@ -110,18 +110,17 @@ std::string SymbolFlagStr(SymbolFlags symbolFlags, bool noAccess);
 class SYMBOLS_API SymbolLocation
 {
 public:
-    SymbolLocation() : moduleId(boost::uuids::nil_uuid()), fileIndex(0), line(0), scol(0), ecol(0)
+    SymbolLocation() : moduleId(boost::uuids::nil_uuid()), fileIndex(0), line(0), scol(0)
     {
     }
-    SymbolLocation(const boost::uuids::uuid& moduleId_, int32_t fileIndex_, int32_t line_, int32_t scol_, int32_t ecol_) : 
-        moduleId(moduleId_), fileIndex(fileIndex_), line(line_), scol(scol_), ecol(ecol_)
+    SymbolLocation(const boost::uuids::uuid& moduleId_, int32_t fileIndex_, int32_t line_, int32_t scol_) : 
+        moduleId(moduleId_), fileIndex(fileIndex_), line(line_), scol(scol_)
     {
     }
     boost::uuids::uuid moduleId;
     int32_t fileIndex;
     int32_t line;
     int32_t scol;
-    int32_t ecol;
 };
 
 SYMBOLS_API bool operator==(const SymbolLocation& left, const SymbolLocation& right);

@@ -2841,17 +2841,31 @@ bool MainWindow::GetDefinitionSourceLocationAt(const Point& loc, TextView* textV
                         c = textView->GetCharAt(line, column);
                     }
                 }
-                int ecol = column;
                 identifier = ToUtf8(id);
                 sourceLocation.file = textView->FilePath();
                 sourceLocation.line = line;
                 sourceLocation.scol = scol;
-                sourceLocation.ecol = ecol;
                 return true;
             }
         }
     }
     return false;
+}
+
+int MainWindow::GetEndColumn(TextView* textView, const DefinitionSourceLocation& sourceLocation) const
+{
+    char32_t c = textView->GetCharAt(sourceLocation.line, sourceLocation.scol);
+    int line = sourceLocation.line;
+    int ecol = sourceLocation.scol;
+    while (ecol <= textView->GetLineLength(line) && (IsIdStart(c) || IsIdCont(c)))
+    {
+        ++ecol;
+        if (ecol <= textView->GetLineLength(line))
+        {
+            c = textView->GetCharAt(line, ecol);
+        }
+    }
+    return ecol;
 }
 
 sngcm::ast::Project* MainWindow::CurrentProject()
@@ -2931,7 +2945,7 @@ void MainWindow::GotoLocation(const DefinitionSourceLocation& location)
         {
             int line = location.line;
             int scol = location.scol;
-            int ecol = location.ecol;
+            int ecol = GetEndColumn(textView, location);
             Selection selection;
             selection.start.line = line;
             selection.start.col = scol;
@@ -2980,7 +2994,6 @@ DefinitionSourceLocation MainWindow::CurrentLocation() const
             int column = textView->CaretColumn();
             currentLocation.line = line;
             currentLocation.scol = column;
-            currentLocation.ecol = column;
         }
     }
     return currentLocation;
