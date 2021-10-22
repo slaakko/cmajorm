@@ -17,6 +17,7 @@ build:
 	$(MAKE) -C cmtoolchain
 	$(MAKE) -C cmtoolchainconfig
 	$(MAKE) -C cmmsg
+	$(MAKE) -C cmpm
 	$(MAKE) -C cmdebug
 	$(MAKE) -C symbols
 	$(MAKE) -C cmmid
@@ -148,6 +149,7 @@ clean:
 	$(MAKE) -C cmtoolchain clean
 	$(MAKE) -C cmtoolchainconfig clean
 	$(MAKE) -C cmmsg clean
+	$(MAKE) -C cmpm clean
 	$(MAKE) -C cmdebug clean
 	$(MAKE) -C symbols clean
 	$(MAKE) -C cmmid clean
@@ -177,4 +179,5 @@ clean:
 	$(MAKE) -C cmtrace2txt clean
 	$(MAKE) -C eh clean
 	$(MAKE) -C rt clean
+
 
