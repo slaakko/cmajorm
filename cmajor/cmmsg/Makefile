@@ -1,6 +1,6 @@
 include Makefile.common
 
-OBJECTS = BuildServerMessage.o CmdbMessage.o CmdbMessageMap.o CodeCompletionServerMessage.o
+OBJECTS = BuildServerMessage.o CmdbMessage.o CmdbMessageMap.o CodeCompletionServerMessage.o Register.o
 
 %.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<

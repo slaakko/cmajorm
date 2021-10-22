@@ -28,8 +28,8 @@ endif
 	$(CXX) $(CXXFLAGS) -o ../bin/$(exename) $(OBJECTS) \
 -lcmbuild -lcmsngjsonjson -lcmtoolchain -lcmast2dom -lcmbdt2dom -lcmdoclib -lcmcodegen \
 -lcmcodegenlinux -lcmcodegenwin -lcmcodegenllvm -lcmcodegenbase -lcmcodegencpp  -lcmbinder -lcmmid -lcmsymbols -lcmdebug \
--lcmllvm -lcmcppbe -lcmcppi -lcmir -lcmcommon -lcmsngcmcmparser -lcmsngcmcmlexer -lcmsngcmcmnothrowparser -lcmsngcmcmnothrowlexer -lcmsngcmast -lcmtoolchain \
--lcmsngxmlxpath -lcmsngxmldom -lcmsngxmlxml -lcmsngparser -lcmsnglexer -lcmsngutil \
+-lcmllvm -lcmcppbe -lcmcppi -lcmir -lcmcommon -lcmsngcmcmparser -lcmsngcmcmlexer -lcmsngcmcmnothrowparser -lcmsngcmcmnothrowlexer -lcmsngcmast -lcmtoolchain -lserialization \
+-lcmsngxmlxpath -lcmsngxmldom -lcmsngxmlxml -lcmsngrex -lcmsngparser -lcmsnglexer -lcmsngutil \
 $(LLVMLIBS) -lboost_filesystem -lboost_iostreams -lboost_system -ldl -ltinfo -lz
 
 clean:
