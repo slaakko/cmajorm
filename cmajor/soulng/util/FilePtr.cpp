@@ -6,6 +6,7 @@
 #include <soulng/util/FilePtr.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <soulng/util/FileLocking.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <stdexcept>
 #include <stdio.h>
 #ifdef _WIN32
@@ -17,10 +18,11 @@ namespace soulng { namespace util {
 FILE* OpenRead(const char* fileName)
 {
     LockFile(fileName, LockKind::read);
+    std::string nativeFilePath = soulng::util::Utf8StringToPlatformString(fileName);
 #if defined(_WIN32) && !defined(__MINGW32__)
-    FILE* file = _fsopen(fileName, "rb", _SH_DENYWR);
+    FILE* file = _fsopen(nativeFilePath.c_str(), "rb", _SH_DENYWR);
 #else
-    FILE* file = std::fopen(fileName, "rb");
+    FILE* file = std::fopen(nativeFilePath.c_str(), "rb");
 #endif
     if (!file)
     {
@@ -32,10 +34,11 @@ FILE* OpenRead(const char* fileName)
 FILE* OpenWrite(const char* fileName)
 {
     LockFile(fileName, LockKind::write);
+    std::string nativeFilePath = soulng::util::Utf8StringToPlatformString(fileName);
 #if defined(_WIN32) && !defined(__MINGW32__)
-    FILE* file = _fsopen(fileName, "wb", _SH_DENYWR);
+    FILE* file = _fsopen(nativeFilePath.c_str(), "wb", _SH_DENYWR);
 #else
-    FILE* file = std::fopen(fileName, "wb");
+    FILE* file = std::fopen(nativeFilePath.c_str(), "wb");
 #endif
     if (!file)
     {

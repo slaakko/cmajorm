@@ -1,0 +1,149 @@
+using System;
+using System.Windows;
+
+namespace FileExplorer
+{
+    public nothrow System.Windows.Color DefaultParentPathSelectorBackgroundColor()
+    {
+        return System.Windows.Color.White();
+    }
+
+    public nothrow System.Windows.Color DefaultParentPathSelectorMouseOverColor()
+    {
+        return System.Windows.Color(230u, 243u, 255u);
+    }
+
+    public nothrow System.Windows.Color DefaultParentPathSelectorMouseClickColor()
+    {
+        return System.Windows.Color(204u, 232u, 255u);
+    }
+
+    public nothrow Padding DefaultParentPathSelectorImagePadding()
+    {
+        return Padding(2, 7, 2, 7);
+    }
+
+    public nothrow ControlCreateParams& ParentPathSelectorControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return controlCreateParams.SetWindowClassName("FileExplorer.ParentPathSelector").
+            SetWindowClassBackgroundColor(SystemColor.COLOR_WINDOW).
+            SetBackgroundColor(DefaultParentPathSelectorBackgroundColor()).
+            SetSize(Size(20, 0)).SetDock(Dock.left);
+    }
+
+    public class ParentPathSelectorCreateParams
+    {
+        public nothrow ParentPathSelectorCreateParams(ControlCreateParams& controlCreateParams_, ImageList* imageList_) :
+            controlCreateParams(controlCreateParams_),
+            imageList(imageList_),
+            mouseOverColor(DefaultParentPathSelectorMouseOverColor()),
+            mouseClickColor(DefaultParentPathSelectorMouseClickColor()),
+            imagePadding(DefaultParentPathSelectorImagePadding())
+        {
+        }
+        public nothrow ParentPathSelectorCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public nothrow ParentPathSelectorCreateParams& SetMouseOverColor(const System.Windows.Color& mouseOverColor_)
+        {
+            mouseOverColor = mouseOverColor_;
+            return *this;
+        }
+        public nothrow ParentPathSelectorCreateParams& SetMouseClickColor(const System.Windows.Color& mouseClickColor_)
+        {
+            mouseClickColor = mouseClickColor_;
+            return *this;
+        }
+        public nothrow ParentPathSelectorCreateParams& SetImagePadding(const Padding& imagePadding_)
+        {
+            imagePadding = imagePadding_;
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public ImageList* imageList;
+        public System.Windows.Color mouseOverColor;
+        public System.Windows.Color mouseClickColor;
+        public Padding imagePadding;
+    }
+
+    public class ParentPathSelector : Control
+    {
+        public enum State
+        {
+            idle, mouseOver, clicked
+        }
+        public nothrow ParentPathSelector(ParentPathSelectorCreateParams& createParams) :
+            base(createParams.controlCreateParams),
+            state(State.idle),
+            mouseOverBrush(createParams.mouseOverColor),
+            mouseClickBrush(createParams.mouseClickColor),
+            imagePadding(createParams.imagePadding)
+        {
+            ImageList* imageList = createParams.imageList;
+            bitmap = imageList->GetImage(imageList->GetImageIndex("up.arrow.bitmap"));
+        }
+        public nothrow void SetState(State state_)
+        {
+            if (state != state_)
+            {
+                state = state_;
+                Invalidate();
+            }
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            args.graphics.Clear(BackgroundColor());
+            if (state == State.mouseOver)
+            {
+                Point loc;
+                Rect rect(loc, GetSize());
+                args.graphics.FillRectangleChecked(mouseOverBrush, rect);
+            }
+            else if (state == State.clicked)
+            {
+                Point loc;
+                Rect rect(loc, GetSize());
+                args.graphics.FillRectangleChecked(mouseClickBrush, rect);
+            }
+            Point loc;
+            Size sz = GetSize();
+            Rect rect(loc, sz);
+            if (sz.w > 0 && sz.h > 0)
+            {
+                PointF imageLoc(imagePadding.left, imagePadding.top);
+                RectF r(imageLoc, SizeF(bitmap->GetWidth() + imagePadding.Horizontal(), bitmap->GetHeight() + imagePadding.Vertical()));
+                RectF s(PointF(0, 0), SizeF(bitmap->GetWidth() + imagePadding.Horizontal(), bitmap->GetHeight() + imagePadding.Vertical()));
+                ImageAttributes attributes;
+                attributes.SetColorKeyChecked(System.Windows.Color.DefaultBitmapTransparent(), System.Windows.Color.DefaultBitmapTransparent(),
+                    ColorAdjustType.default_);
+                args.graphics.DrawImageChecked(*bitmap, r, s, Unit.pixel, attributes);
+            }
+        }
+        protected override void OnMouseEnter()
+        {
+            base->OnMouseEnter();
+            SetState(State.mouseOver);
+        }
+        protected override void OnMouseLeave()
+        {
+            base->OnMouseLeave();
+            SetState(State.idle);
+        }
+        protected override void OnMouseDown(MouseEventArgs& args)
+        {
+            base->OnMouseDown(args);
+            SetState(State.clicked);
+        }
+        protected override void OnMouseUp(MouseEventArgs& args)
+        {
+            base->OnMouseUp(args);
+            SetState(State.mouseOver);
+        }
+        private State state;
+        private Bitmap* bitmap;
+        private SolidBrush mouseOverBrush;
+        private SolidBrush mouseClickBrush;
+        private Padding imagePadding;
+    }
+}

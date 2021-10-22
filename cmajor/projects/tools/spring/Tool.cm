@@ -299,7 +299,9 @@ namespace spring
         }
         public override void MouseNormalRightClick(MouseArgs& args)
         {
-            UniquePtr<ContextMenu> contextMenu(new ContextMenu());
+            UniquePtr<ContextMenu> contextMenu(new ContextMenu(
+                ContextMenuCreateParams(
+                    MenuBoxCreateParams(MenuControlCreateParams(ContextMenuControlCreateParams(ControlCreateParams().Defaults()))))));
             bool isRectangleSelection = args.diagram->GetSelection() is RectangleSelection*;
             if (!isRectangleSelection && args.diagram->GetSelection()->Count() <= 1)
             {

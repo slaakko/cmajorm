@@ -6,6 +6,7 @@
 #ifndef SOULNG_UTIL_PATH_INCLUDED
 #define SOULNG_UTIL_PATH_INCLUDED
 #include <soulng/util/UtilApi.hpp>
+#include <boost/filesystem/path.hpp>
 #include <stdexcept>
 
 namespace soulng { namespace util {
@@ -40,6 +41,7 @@ public:
 };
 
 UTIL_API std::string MakeNativePath(const std::string& path);
+UTIL_API boost::filesystem::path MakeNativeBoostPath(const std::string& path);
 
 } } // namespace soulng::util
 

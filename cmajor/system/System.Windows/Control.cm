@@ -74,6 +74,11 @@ namespace System.Windows
         return ExtendedWindowStyle.WS_EX_DEFAULT;
     }
 
+    public inline nothrow SystemColor DefaultWindowClassBackgroundColor()
+    {
+        return SystemColor.COLOR_WINDOW;
+    }
+
     public nothrow Color DefaultControlBackgroundColor()
     {
         return GetSystemColor(SystemColor.COLOR_MENU);
@@ -91,20 +96,123 @@ namespace System.Windows
         return Size(8, 8);
     }
 
+    public class ControlCreateParams
+    {
+        public nothrow ControlCreateParams() :
+            windowClassName(),
+            windowClassStyle(DefaultWindowClassStyle()),
+            windowStyle(DefaultChildWindowStyle()),
+            extendedWindowStyle(DefaultExtendedWindowStyle()),
+            windowClassBackgroundColor(DefaultWindowClassBackgroundColor()),
+            backgroundColor(DefaultControlBackgroundColor()),
+            text(),
+            location(),
+            size(),
+            anchors(cast<Anchors>(Anchors.left | Anchors.top)),
+            dock(Dock.none)
+        {
+        }
+        public nothrow ControlCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public nothrow ControlCreateParams& SetWindowClassName(const string& windowClassName_)
+        {
+            windowClassName = windowClassName_;
+            return *this;
+        }
+        public nothrow ControlCreateParams& SetWindowClassStyle(WindowClassStyle windowClassStyle_)
+        {
+            windowClassStyle = windowClassStyle_;
+            return *this;
+        }
+        public nothrow ControlCreateParams& SetWindowStyle(WindowStyle windowStyle_)
+        {
+            windowStyle = windowStyle_;
+            return *this;
+        }
+        public nothrow ControlCreateParams& SetExtendedWindowStyle(ExtendedWindowStyle extendedWindowStyle_)
+        {
+            extendedWindowStyle = extendedWindowStyle_;
+            return *this;
+        }
+        public nothrow ControlCreateParams& SetWindowClassBackgroundColor(SystemColor systemColor)
+        {
+            windowClassBackgroundColor = systemColor;
+            return *this;
+        }
+        public nothrow ControlCreateParams& SetBackgroundColor(const Color& backgroundColor_)
+        {
+            backgroundColor = backgroundColor_;
+            return *this;
+        }
+        public nothrow ControlCreateParams& SetText(const string& text_)
+        {
+            text = text_;
+            return *this;
+        }
+        public nothrow ControlCreateParams& SetLocation(const Point& location_)
+        {
+            location = location_;
+            return *this;
+        }
+        public nothrow ControlCreateParams& SetSize(const Size& size_)
+        {
+            size = size_;
+            return *this;
+        }
+        public nothrow ControlCreateParams& SetDock(Dock dock_)
+        {
+            dock = dock_;
+            return *this;
+        }
+        public nothrow ControlCreateParams& SetAnchors(Anchors anchors_)
+        {
+            anchors = anchors_;
+            return *this;
+        }
+        public string windowClassName;
+        public WindowClassStyle windowClassStyle;
+        public WindowStyle windowStyle;
+        public ExtendedWindowStyle extendedWindowStyle;
+        public SystemColor windowClassBackgroundColor;
+        public Color backgroundColor;
+        public string text;
+        public Point location;
+        public Size size;
+        public Dock dock;
+        public Anchors anchors;
+    }
+
     public abstract class Control : Component
     {
         private enum Flags : short
         {
-            none = 0, mouseInClient = 1 << 0, lbuttonPressed = 1 << 1, menuWantsKeys = 1 << 2, keyDownHandled = 1 << 3, focused = 1 << 4, caretCreated = 1 << 5, caretShown = 1 << 6,
-            disabled = 1 << 7, hidden = 1 << 8, tabStop = 1 << 9, baseOnCreatedCalled = 1 << 10, mouseHoverTimerStarted = 1 << 11, doubleBuffered = 1 << 12,
-            scrollSubject = 1 << 13
+            none = 0, mouseInClient = 1 << 0, lbuttonPressed = 1 << 1, menuWantsKeys = 1 << 2, keyDownHandled = 1 << 3, focused = 1 << 4,
+            caretCreated = 1 << 5, caretShown = 1 << 6, disabled = 1 << 7, hidden = 1 << 8, tabStop = 1 << 9, baseOnCreatedCalled = 1 << 10,
+            mouseHoverTimerStarted = 1 << 11, doubleBuffered = 1 << 12, scrollSubject = 1 << 13
         }
-        public Control(const char* windowClassName_, WindowClassStyle windowClassStyle_, WindowStyle style_, ExtendedWindowStyle exStyle_,
+        public Control(const string& windowClassName_, WindowClassStyle windowClassStyle_, WindowStyle style_, ExtendedWindowStyle exStyle_,
             const Color& backgroundColor_, const string& text_, const Point& location_, const Size& size_, Dock dock_, Anchors anchors_) :
             windowClassName(windowClassName_), windowClassStyle(windowClassStyle_), style(style_), exStyle(exStyle_),
-            backgroundColor(backgroundColor_), handle(null), text(text_), location(location_), size(size_), contentLocation(0, 0), contentSize(), dock(dock_), anchors(anchors_), flags(Flags.none),
+            windowClassBackgroundColor(DefaultWindowClassBackgroundColor()), backgroundColor(backgroundColor_), handle(null), text(text_),
+            location(location_), size(size_), contentLocation(0, 0), contentSize(), dock(dock_), anchors(anchors_), flags(Flags.none),
             arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW)), caretShowCount(0), font(null), fontHandle(null), originalWndProc(null),
             mouseHoverMs(0u), mouseHoverRectSize(DefaultMouseHoverRectSize())
+        {
+            Init();
+        }
+        public Control(ControlCreateParams& createParams) :
+            windowClassName(createParams.windowClassName), windowClassStyle(createParams.windowClassStyle), style(createParams.windowStyle),
+            exStyle(createParams.extendedWindowStyle), windowClassBackgroundColor(createParams.windowClassBackgroundColor),
+            backgroundColor(createParams.backgroundColor), handle(null), text(createParams.text), location(createParams.location),
+            size(createParams.size), contentLocation(0, 0), contentSize(), dock(createParams.dock), anchors(createParams.anchors), flags(Flags.none),
+            arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW)), caretShowCount(0), font(null), fontHandle(null), originalWndProc(null),
+            mouseHoverMs(0u), mouseHoverRectSize(DefaultMouseHoverRectSize())
+        {
+            Init();
+        }
+        private void Init()
         {
             if ((style & WindowStyle.WS_DISABLED) != 0)
             {
@@ -130,6 +238,7 @@ namespace System.Windows
             if (handle != null)
             {
                 Application.GetWindowManager().RemoveWindow(this);
+                WinDestroyWindow(handle);
             }
         }
         protected void CreateWindow()
@@ -156,7 +265,8 @@ namespace System.Windows
             Control* parentControl = ParentControl();
             if (parentControl != null)
             {
-                parentText = "parent:" + string(typename(*parentControl)) + "." + parentControl->Text() + ".parentHandle=" + ToHexString(cast<ulong>(parentControl->Handle()));
+                parentText = "parent:" + string(typename(*parentControl)) + "." + parentControl->Text() + ".parentHandle=" +
+                    ToHexString(cast<ulong>(parentControl->Handle()));
             }
             return parentText;
         }
@@ -184,13 +294,14 @@ namespace System.Windows
             if (handle != null) return;
             Control* parentControl = ParentControl();
             SetWindowCreateStyleFromFlags();
-            if (Application.GetWindowManager().IsSystemClassName(windowClassName))
+            if (Application.GetWindowManager().IsSystemClassName(windowClassName.Chars()))
             {
-                handle = CreateWindowByClassName(windowClassName, text.Chars(), style, exStyle, location, size, parentControl);
+                handle = CreateWindowByClassName(windowClassName.Chars(), text.Chars(), style, exStyle, location, size, parentControl);
             }
             else
             {
-                ushort windowClass = Application.GetWindowManager().RegisterWindowClass(windowClassName, windowClassStyle, 0);
+                ushort windowClass = Application.GetWindowManager().RegisterWindowClass(
+                    windowClassName.Chars(), windowClassStyle, windowClassBackgroundColor);
                 handle = CreateWindowByClassAtom(windowClass, text.Chars(), style, exStyle, location, size, parentControl);
             }
             if (!createList.IsEmpty())
@@ -1585,6 +1696,7 @@ namespace System.Windows
                 {
                     TranslateMousePos(args.location);
                 }
+                SetCursor();
                 OnMouseMove(args);
             }
             if (mouseHoverMs != 0u && !MouseHoverTimerStarted())
@@ -2217,7 +2329,8 @@ namespace System.Windows
         {
             flags = cast<Flags>(flags & ~Flags.scrollSubject);
         }
-        private const char* windowClassName;
+        private string windowClassName;
+        private int windowClassBackgroundColor;
         private WindowClassStyle windowClassStyle;
         private Color backgroundColor;
         private WindowStyle style;

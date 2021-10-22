@@ -1,0 +1,60 @@
+using System;
+using System.Windows;
+
+namespace FileExplorer
+{
+    public nothrow System.Windows.Color DefaultPathDividerBackgroundColor()
+    {
+        return System.Windows.Color.White();
+    }
+
+    public nothrow System.Windows.Color DefaultPathDividerLineColor()
+    {
+        return System.Windows.Color(204u, 206u, 219u);
+    }
+
+    public nothrow ControlCreateParams& PathDividerControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return controlCreateParams.SetWindowClassName("FileExplorer.PathDivider").
+            SetWindowClassBackgroundColor(SystemColor.COLOR_WINDOW).
+            SetBackgroundColor(DefaultPathDividerBackgroundColor()).
+            SetSize(Size(1, 0)).SetDock(Dock.left);
+    }
+    
+    public class PathDividerCreateParams
+    {
+        public nothrow PathDividerCreateParams(ControlCreateParams& controlCreateParams_) :
+            controlCreateParams(controlCreateParams_),
+            lineColor(DefaultPathDividerLineColor())
+        {
+        }
+        public nothrow PathDividerCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public nothrow PathDividerCreateParams& SetLineColor(const System.Windows.Color& lineColor_)
+        {
+            lineColor = lineColor_;
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public System.Windows.Color lineColor;
+    }
+
+    public class PathDivider : Control
+    {
+        public nothrow PathDivider(PathDividerCreateParams& createParams) :
+            base(createParams.controlCreateParams),
+            pen(createParams.lineColor)
+        {
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            PointF start(0, 0);
+            Size sz = GetSize();
+            PointF end(0, sz.h);
+            args.graphics.DrawLine(pen, start, end);
+        }
+        private Pen pen;
+    }
+}

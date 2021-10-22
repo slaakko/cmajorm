@@ -892,6 +892,10 @@ void TextView::InsertChar(int lineIndex, int columnIndex, char32_t c)
         lines.push_back(std::unique_ptr<std::u32string>(new std::u32string()));
     }
     std::u32string& line = *lines[lineIndex];
+    if (columnIndex > line.length())
+    {
+        columnIndex = line.length();
+    }
     line.insert(columnIndex, 1, c);
     if (c == '}' && StartsWith(line, std::u32string(IndentSize(), ' ')))
     {
@@ -1462,6 +1466,10 @@ void TextView::IndentSelection()
     if (selection.IsEmpty()) return;
     int startLineIndex = selection.start.line - 1;
     int endLineIndex = selection.end.line - 1;
+    if (endLineIndex >= lines.size())
+    {
+        endLineIndex = lines.size() - 1;
+    }
     std::u32string indentString(IndentSize(), ' ');
     for (int i = startLineIndex; i <= endLineIndex; ++i)
     {

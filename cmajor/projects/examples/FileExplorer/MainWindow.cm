@@ -1,0 +1,226 @@
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace FileExplorer
+{
+    PathBar* MakePathBar(ImageList* imageList)
+    {
+        PathBar* pathBar = new PathBar(PathBarCreateParams(PathBarControlCreateParams(ControlCreateParams().Defaults())),
+            EmptyViewControlCreateParams(ControlCreateParams().SetDock(Dock.left).SetSize(Size(100, 0))),
+            ParentPathSelectorCreateParams(ParentPathSelectorControlCreateParams(ControlCreateParams().Defaults()), imageList),
+            PathDividerCreateParams(PathDividerControlCreateParams(ControlCreateParams().Defaults())),
+            PathViewCreateParams(PathViewControlCreateParams(ControlCreateParams().SetDock(Dock.fill))));
+        return pathBar;
+    }
+
+    public class MainWindow : Window
+    {
+        public MainWindow(const string& caption) : base(
+            WindowCreateParams(WindowControlCreateParams(
+                ControlCreateParams().SetWindowClassBackgroundColor(SystemColor.COLOR_WINDOW).SetBackgroundColor(Color.White()),
+                caption)).Defaults())
+        {
+            imageList.AddImage("computer.bitmap");
+            imageList.AddImage("hard_drive.bitmap");
+            imageList.AddImage("folder_closed.bitmap");
+            imageList.AddImage("folder_opened.bitmap");
+            imageList.AddImage("file.bitmap");
+            imageList.AddImage("up.arrow.bitmap");
+            logicalDrives = GetLogicalDrives();
+            computer.Reset(new ComputerNode());
+            computer->SetMainWindow(this);
+            for (const string& driveName : logicalDrives)
+            {
+                UniquePtr<DriveNode> drivePtr(new DriveNode(driveName));
+                DriveNode* drive = drivePtr.Get();
+                drive->SetRootDirectory(new DirectoryNode(driveName + "/"));
+                computer->AddDrive(drivePtr.Release());
+            }
+            UniquePtr<PathBar> pathBarPtr(MakePathBar(&imageList));
+            pathBar = pathBarPtr.Get();
+            pathBar->GetParentPathSelector()->ClickEvent().AddHandler(ParentPathSelectorClick);
+            pathBar->GetPathView()->PathComponentSelectedEvent().AddHandler(PathComponentSelected);
+            UniquePtr<BorderedControl> borderedControl = new BorderedControl(BorderedControlCreateParams(BorderedControlControlCreateParams(
+                ControlCreateParams().SetSize(Size(0, 32)).SetDock(Dock.top), pathBar), pathBarPtr.Release()).
+                SetNormalBorderColor(DefaultPathBarFrameColor()));
+            AddChild(borderedControl.Release());
+            UniquePtr<SplitContainer> splitContainerPtr(new SplitContainer(Orientation.horizontal, 500, Point(), Size(), Dock.fill, Anchors.none));
+            splitContainer = splitContainerPtr.Get();
+            AddChild(splitContainerPtr.Release());
+            UniquePtr<DirectoryTreeView> directoryTreeViewPtr(new DirectoryTreeView(&imageList, computer.Get()));
+            directoryTreeView = directoryTreeViewPtr.Get();
+            directoryTreeView->SetMainWindow(this);
+            directoryTreeView->SizeChangedEvent().AddHandler(DirectoryTreeViewSizeChanged);
+            splitContainer->Pane1Container()->AddChild(directoryTreeViewPtr.Release());
+            UniquePtr<ContentView> contentViewPtr(new ContentView(&imageList));
+            contentView = contentViewPtr.Get();
+            contentView->SetMainWindow(this);
+            contentView->SizeChangedEvent().AddHandler(ContentViewSizeChanged);
+            splitContainer->Pane2Container()->AddChild(contentViewPtr.Release());
+            setSplitterDistance = true;
+        }
+        public nothrow inline ContentView* GetContentView() const
+        {
+            return contentView;
+        }
+        public nothrow inline DirectoryTreeView* GetDirectoryTreeView() const
+        {
+            return directoryTreeView;
+        }
+        public nothrow inline PathBar* GetPathBar() const
+        {
+            return pathBar;
+        }
+        public nothrow void AddListViewEventHandlers(ListView* listView)
+        {
+            listView->ItemClickEvent().AddHandler(ListViewItemClick);
+            listView->ItemRightClickEvent().AddHandler(ListViewItemRightClick);
+            listView->ItemDoubleClickEvent().AddHandler(ListViewItemDoubleClick);
+        }
+        protected override void OnShown()
+        {
+            base->OnShown();
+            if (setSplitterDistance)
+            {
+                setSplitterDistance = false;
+                Size sz = GetSize();
+                splitContainer->SetSplitterDistance(cast<int>(sz.w * 1.0 / 3.0));
+            }
+        }
+        protected override void OnKeyDown(KeyEventArgs& args)
+        {
+            try
+            {
+                base->OnKeyDown(args);
+                if (!args.handled)
+                {
+                    switch (args.key)
+                    {
+                        case Keys.escape:
+                        {
+                            RemoveContextMenu();
+                            args.handled = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        protected override void MouseUpNotification(MouseEventArgs& args)
+        {
+            try
+            {
+                if (args.buttons == MouseButtons.lbutton)
+                {
+                    RemoveContextMenu();
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        private void ListViewItemClick(ListViewItemEventArgs& args)
+        {
+            if (args.item != null)
+            {
+                ListView* view = args.item->View();
+                if (view != null)
+                {
+                    view->SetSelectedItem(args.item);
+                }
+            }
+        }
+        private void ListViewItemRightClick(ListViewItemEventArgs& args)
+        {
+            if (args.item != null)
+            {
+                ListView* view = args.view;
+                if (view != null)
+                {
+                    view->SetSelectedItem(args.item);
+                    void* data = args.item->Data();
+                    if (data != null)
+                    {
+                        Node* node = cast<Node*>(data);
+                        UniquePtr<ContextMenu> contextMenu(new ContextMenu());
+                        node->AddMenuItems(contextMenu.Get(), false);
+                        if (contextMenu->HasMenuItems())
+                        {
+                            view->TranslateContentLocation(args.location);
+                            Point screenLoc = view->ClientToScreen(args.location);
+                            ShowContextMenu(contextMenu.Release(), screenLoc);
+                        }
+                    }
+                }
+            }
+        }
+        private void ListViewItemDoubleClick(ListViewItemEventArgs& args)
+        {
+            if (args.item != null && args.item->Data() != null)
+            {
+                Node* node = cast<Node*>(args.item->Data());
+                node->ExecuteDefaultAction();
+            }
+        }
+        private void DirectoryTreeViewSizeChanged(uint windowState)
+        {
+            Size sz = directoryTreeView->GetSize();
+            pathBar->SetEmptyViewWidth(sz.w);
+        }
+        private void ContentViewSizeChanged(uint windowState)
+        {
+            Size sz = contentView->GetSize();
+            pathBar->SetPathViewMaxWidth(sz.w);
+        }
+        private void ParentPathSelectorClick()
+        {
+            Node* currentNode = pathBar->CurrentNode();
+            if (currentNode == null)
+            {
+                currentNode = directoryTreeView->SelectedNode();
+            }
+            if (currentNode != null)
+            {
+                currentNode = currentNode->Parent();
+                if (currentNode != null)
+                {
+                    if (currentNode->IsRootDirectory())
+                    {
+                        currentNode = currentNode->Parent();
+                    }
+                }
+            }
+            if (currentNode != null)
+            {
+                currentNode->Open();
+            }
+        }
+        private void PathComponentSelected(PathComponentEventArgs& args)
+        {
+            PathComponent* pathComponent = args.pathComponent;
+            if (pathComponent != null)
+            {
+                void* data = pathComponent->Data();
+                if (data != null)
+                {
+                    Node* node = cast<Node*>(data);
+                    node->Open();
+                }
+            }
+        }
+        private bool setSplitterDistance;
+        private ImageList imageList;
+        private List<string> logicalDrives;
+        private UniquePtr<ComputerNode> computer;
+        private PathBar* pathBar;
+        private SplitContainer* splitContainer;
+        private DirectoryTreeView* directoryTreeView;
+        private ContentView* contentView;
+    }
+}

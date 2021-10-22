@@ -8,6 +8,189 @@ using System.Collections;
 
 namespace System.Windows
 {
+    public nothrow Color DefaultToolTipWindowColor()
+    {
+        return Color.FloralWhite();
+    }
+
+    public nothrow Color DefaultToolButtonTransparentColor()
+    {
+        return Color.DefaultBitmapTransparent();
+    }
+
+    public nothrow int DefaultToolButtonHeight()
+    {
+        return 38;
+    }
+
+    public nothrow ToolBar.Style DefaultToolBarStyle()
+    {
+        return ToolBar.Style.regular;
+    }
+
+    public nothrow Padding DefaultToolBarPadding()
+    {
+        return Padding(0, 0, 0, 0);
+    }
+
+    public nothrow Padding DefaultToolButtonPadding()
+    {
+        return Padding(0, 0, 0, 0);
+    }
+
+    public nothrow Color DefaultToolBarDarkColor()
+    {
+        return Color(100u, 100u, 100u);
+    }
+
+    public nothrow Color DefaultToolBarLightColor()
+    {
+        return Color.White();
+    }
+
+    public nothrow Color DefaultToolBarMediumLightColor()
+    {
+        return Color(227u, 227u, 227u);
+    }
+
+    public nothrow Color DefaultToolBarMediumDarkColor()
+    {
+        return Color(160u, 160u, 160u);
+    }
+
+    public nothrow Color DefaultToolBarDisabledColor()
+    {
+        return Color(204u, 204u, 207u);
+    }
+
+    public nothrow Color DefaultToolBarToolButtonSeparatorColor1()
+    {
+        return Color(204u, 206u, 219u);
+    }
+
+    public nothrow Color DefaultToolBarToolButtonSeparatorColor2()
+    {
+        return Color(245u, 245u, 245u);
+    }
+
+    public nothrow ControlCreateParams& ToolBarControlCreateParams(ControlCreateParams& controlCreateParams,
+        const Padding& padding,
+        const Padding& buttonPadding,
+        int toolButtonHeight)
+    {
+        return controlCreateParams.SetWindowClassName("System.Windows.ToolBar").SetLocation(Point(padding.left, padding.top)).
+            SetSize(Size(0, toolButtonHeight + padding.Vertical() + buttonPadding.Vertical())).SetDock(Dock.top);
+    }
+
+    public nothrow ControlCreateParams& ToolBarControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return ToolBarControlCreateParams(controlCreateParams, DefaultToolBarPadding(), DefaultToolButtonPadding(), DefaultToolButtonHeight());
+    }
+
+    public class ToolBarCreateParams
+    {
+        public nothrow ToolBarCreateParams(ControlCreateParams& controlCreateParams_) :
+            controlCreateParams(controlCreateParams_),
+            toolTipWindowColor(DefaultToolTipWindowColor()),
+            toolButtonTransparentColor(DefaultToolButtonTransparentColor()),
+            toolButtonHeight(DefaultToolButtonHeight()),
+            style(DefaultToolBarStyle()),
+            padding(DefaultToolBarPadding()),
+            buttonPadding(DefaultToolButtonPadding()),
+            darkColor(DefaultToolBarDarkColor()),
+            lightColor(DefaultToolBarLightColor()),
+            mediumLightColor(DefaultToolBarMediumLightColor()),
+            mediumDarkColor(DefaultToolBarMediumDarkColor()),
+            disabledColor(DefaultToolBarDisabledColor()),
+            toolButtonSeparatorColor1(DefaultToolBarToolButtonSeparatorColor1()),
+            toolButtonSeparatorColor2(DefaultToolBarToolButtonSeparatorColor2())
+        {
+        }
+        public nothrow ToolBarCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public nothrow ToolBarCreateParams& SetToolTipWindowColor(const Color& toolTipWindowColor_)
+        {
+            toolTipWindowColor = toolTipWindowColor_;
+            return *this;
+        }
+        public nothrow ToolBarCreateParams& SetToolButtonTransparentColor(const Color& toolButtonTransparentColor_)
+        {
+            toolButtonTransparentColor = toolButtonTransparentColor_;
+            return *this;
+        }
+        public nothrow ToolBarCreateParams& SetToolButtonHeight(int toolButtonHeight_)
+        {
+            toolButtonHeight = toolButtonHeight_;
+            return *this;
+        }
+        public nothrow ToolBarCreateParams& SetStyle(ToolBar.Style style_)
+        {
+            style = style_;
+            return *this;
+        }
+        public nothrow ToolBarCreateParams& SetPadding(const Padding& padding_)
+        {
+            padding = padding_;
+            return *this;
+        }
+        public nothrow ToolBarCreateParams& SetButtonPadding(const Padding& buttonPadding_)
+        {
+            buttonPadding = buttonPadding_;
+            return *this;
+        }
+        public nothrow ToolBarCreateParams& SetDarkColor(const Color& darkColor_)
+        {
+            darkColor = darkColor_;
+            return *this;
+        }
+        public nothrow ToolBarCreateParams& SetLightColor(const Color& lightColor_)
+        {
+            lightColor = lightColor_;
+            return *this;
+        }
+        public nothrow ToolBarCreateParams& SetMediumLightColor(const Color& mediumLightColor_)
+        {
+            mediumLightColor = mediumLightColor_;
+            return *this;
+        }
+        public nothrow ToolBarCreateParams& SetMediumDarkColor(const Color& mediumDarkColor_)
+        {
+            mediumDarkColor = mediumDarkColor_;
+            return *this;
+        }
+        public nothrow ToolBarCreateParams& SetDisabledColor(const Color& disabledColor_)
+        {
+            disabledColor = disabledColor_;
+            return *this;
+        }
+        public nothrow ToolBarCreateParams& SetToolButtonSeparatorColor1(const Color& toolButtonSeparatorColor1_)
+        {
+            toolButtonSeparatorColor1 = toolButtonSeparatorColor1_;
+            return *this;
+        }
+        public nothrow ToolBarCreateParams& SetToolButtonSeperatorColor2(const Color& toolButtonSeparatorColor2_)
+        {
+            toolButtonSeparatorColor2 = toolButtonSeparatorColor2_;
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public Color toolTipWindowColor;
+        public Color toolButtonTransparentColor;
+        public int toolButtonHeight;
+        public ToolBar.Style style;
+        public Padding padding;
+        public Padding buttonPadding;
+        public Color darkColor;
+        public Color lightColor;
+        public Color mediumLightColor;
+        public Color mediumDarkColor;
+        public Color disabledColor;
+        public Color toolButtonSeparatorColor1;
+        public Color toolButtonSeparatorColor2;
+    }
+
     public class ToolBar : Control
     {
         private enum Flags : sbyte
@@ -18,22 +201,24 @@ namespace System.Windows
         {
             regular = 0, radioButtonGroup = 1
         }
-        public ToolBar(const Color& backgroundColor, const Color& toolTipWindowColor, const Color& toolButtonTransparentColor_, const Point& location, const Size& size, Dock dock, Anchors anchors,
+        public ToolBar(const Color& backgroundColor, const Color& toolTipWindowColor, const Color& toolButtonTransparentColor_, const Point& location,
+            const Size& size, Dock dock, Anchors anchors,
             int toolButtonHeight_, Style style_, const Padding& padding_, const Padding& buttonPadding_) :
             base("System.Windows.ToolBar", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
             backgroundColor, "toolBar", location, size, dock, anchors), flags(Flags.none), toolButtonTransparentColor(toolButtonTransparentColor_),
             toolButtonHeight(toolButtonHeight_), darkColor(Color(100u, 100u, 100u)), lightColor(Color.White()), mediumLightColor(227u, 227u, 227u),
             mediumDarkColor(160u, 160u, 160u), disabledColor(Color(204u, 204u, 207u)),
             toolButtonSeparatorColor1(204u, 206u, 219u), toolButtonSeparatorColor2(245u, 245u, 245u), mouseInToolButton(null), mouseDownToolButton(null),
-            pressedStateToolButton(null), style(style_), toolTipWindow(new ToolTip(toolTipWindowColor)), padding(padding_), buttonPadding(buttonPadding_), toolButtons(this),
-            centerFormat(StringAlignment.center, StringAlignment.center)
+            pressedStateToolButton(null), style(style_), toolTipWindow(new ToolTip(toolTipWindowColor)), padding(padding_), buttonPadding(buttonPadding_),
+            toolButtons(this), centerFormat(StringAlignment.center, StringAlignment.center)
         {
             SetMouseHoverMs(DefaultMouseHoverMs());
         }
-        public ToolBar(int toolButtonHeight, const Color& toolTipWindowColor, const Color& toolButtonTransparentColor, Style style, const Padding& padding,
-            const Padding& buttonPadding) :
+        public ToolBar(int toolButtonHeight, const Color& toolTipWindowColor, const Color& toolButtonTransparentColor, Style style,
+            const Padding& padding, const Padding& buttonPadding) :
             this(DefaultControlBackgroundColor(), toolTipWindowColor, toolButtonTransparentColor, Point(padding.left, padding.top),
-                Size(0, toolButtonHeight + padding.Vertical() + buttonPadding.Vertical()), Dock.top, Anchors.none, toolButtonHeight, style, padding, buttonPadding)
+                Size(0, toolButtonHeight + padding.Vertical() + buttonPadding.Vertical()), Dock.top, Anchors.none, toolButtonHeight, style,
+                padding, buttonPadding)
         {
         }
         public ToolBar(Style style) : this(38, Color.FloralWhite(), Color.DefaultBitmapTransparent(), style, DefaultPadding(), DefaultButtonPadding())
@@ -41,6 +226,26 @@ namespace System.Windows
         }
         public ToolBar() : this(Style.regular)
         {
+        }
+        public ToolBar(ToolBarCreateParams& createParams) :
+            base(createParams.controlCreateParams),
+            flags(Flags.none), toolButtonTransparentColor(createParams.toolButtonTransparentColor),
+            toolButtonHeight(createParams.toolButtonHeight),
+            darkColor(createParams.darkColor),
+            lightColor(createParams.lightColor),
+            mediumLightColor(createParams.mediumLightColor),
+            mediumDarkColor(createParams.mediumDarkColor),
+            disabledColor(createParams.disabledColor),
+            toolButtonSeparatorColor1(createParams.toolButtonSeparatorColor1),
+            toolButtonSeparatorColor2(createParams.toolButtonSeparatorColor2),
+            mouseInToolButton(null), mouseDownToolButton(null), pressedStateToolButton(null),
+            style(createParams.style), toolTipWindow(new ToolTip(createParams.toolTipWindowColor)),
+            padding(createParams.padding),
+            buttonPadding(createParams.buttonPadding),
+            toolButtons(this),
+            centerFormat(StringAlignment.center, StringAlignment.center)
+        {
+            SetMouseHoverMs(DefaultMouseHoverMs());
         }
         public void SetTextToolButtonFont(const Font& textToolButtonFont_)
         {

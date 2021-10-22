@@ -49,7 +49,10 @@ namespace cmcode
             Point projectNameLabelLocation(16, 16);
             UniquePtr<Label> projectNameLabelPtr(new Label("Project name:", projectNameLabelLocation, defaultLabelSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
             AddChild(projectNameLabelPtr.Release());
+            UniquePtr<TextBox> projectNameTextBoxPtr(new TextBox(TextBoxCreateParams(TextBoxControlCreateParams(ControlCreateParams().Defaults())).Defaults()));
+            /*
             UniquePtr<TextBox> projectNameTextBoxPtr(new TextBox(""));
+            */
             projectNameTextBox = projectNameTextBoxPtr.Get();
             projectNameTextBox->TextChangedEvent().AddHandler(ProjectNameTextBoxTextChanged);
             Point projectNameTextBoxLocation(20, 16 + 24);

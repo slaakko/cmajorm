@@ -1,0 +1,81 @@
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace FileExplorer
+{
+    public class ComputerNode : Node
+    {
+        public nothrow ComputerNode() : base("Computer")
+        {
+        }
+        public nothrow void AddDrive(DriveNode* drive)
+        {
+            drive->SetParent(this);
+            drives.Add(UniquePtr<DriveNode>(drive));
+        }
+        public inline nothrow const List<UniquePtr<DriveNode>>& Drives() const
+        {
+            return drives;
+        }
+        public override nothrow MainWindow* GetMainWindow() const
+        {
+            return mainWindow;
+        }
+        public nothrow void SetMainWindow(MainWindow* mainWindow_)
+        {
+            mainWindow = mainWindow_;
+        }
+        public nothrow override string ImageName() const
+        {
+            return "computer.bitmap";
+        }
+        public override nothrow TreeViewNode* ToTreeViewNode(bool createChildren, ImageList* imageList)
+        {
+            UniquePtr<TreeViewNode> rootPtr(new TreeViewNode(Name()));
+            TreeViewNode* root = rootPtr.Get();
+            root->SetImageIndex(imageList->GetImageIndex(ImageName()));
+            SetTreeViewNode(root);
+            if (createChildren)
+            {
+                for (const UniquePtr<DriveNode>& drive : drives)
+                {
+                    UniquePtr<TreeViewNode> childPtr(drive->ToTreeViewNode(false, imageList));
+                    TreeViewNode* child = childPtr.Get();
+                    if (imageList != null)
+                    {
+                        int imageIndex = imageList->GetImageIndex(drive->ImageName());
+                        if (imageIndex != -1)
+                        {
+                            child->SetImageIndex(imageIndex);
+                        }
+                    }
+                    root->AddChild(childPtr.Release());
+                }
+            }
+            return rootPtr.Release();
+        }
+        public override Control* CreateView(ImageList* imageList)
+        {
+            ListView* listView = new ListView(ListViewCreateParams(ListViewControlCreateParams(ControlCreateParams().Defaults())).Defaults());
+            listView->SetData(this);
+            MainWindow* mainWindow = GetMainWindow();
+            if (mainWindow != null)
+            {
+                mainWindow->AddListViewEventHandlers(listView);
+            }
+            listView->SetDoubleBuffered();
+            listView->SetImageList(imageList);
+            listView->AddColumn("Drive", 200);
+            for (const UniquePtr<DriveNode>& drive : drives)
+            {
+                ListViewItem* driveItem = listView->AddItem();
+                drive->SetData(driveItem, imageList);
+            }
+            return listView;
+        }
+        private List<UniquePtr<DriveNode>> drives;
+        private MainWindow* mainWindow;
+    }
+}
+

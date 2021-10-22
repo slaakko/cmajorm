@@ -1,0 +1,20 @@
+using System;
+using System.Windows;
+
+namespace FileExplorer
+{
+    public class FileNode : Node
+    {
+        public nothrow FileNode(const string& name_) : base(name_)
+        {
+        }
+        public override nothrow string ImageName() const
+        {
+            return "file.bitmap";
+        }
+        public override nothrow bool CanOpen() const
+        {
+            return false;
+        }
+    }
+}

@@ -620,4 +620,29 @@ std::string PlatformStringToUtf8(const std::string& platformString)
 
 #endif
 
+#if defined(_WIN32)
+
+std::string Utf8StringToPlatformString(const std::string& utf8String)
+{
+    if (utf8String.empty()) return std::string();
+    std::u16string utf16 = ToUtf16(utf8String);
+    int bufSize = 4096;
+    std::unique_ptr<char> buf(new char[bufSize]);
+    int result = WideCharToMultiByte(CP_ACP, 0, (LPCWCH)utf16.c_str(), -1, (LPSTR)buf.get(), bufSize, nullptr, nullptr);
+    if (result == 0)
+    {
+        return utf8String;
+    }
+    return std::string(buf.get());
+}
+
+#else
+
+std::string Utf8StringToPlatformString(const std::string& utf8String)
+{
+    return utf8String;
+}
+
+#endif
+
 } } // namespace soulng::util

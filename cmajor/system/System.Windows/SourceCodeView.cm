@@ -83,16 +83,40 @@ namespace System.Windows
         return code;
     }
 
+    public nothrow ControlCreateParams& SourceCodeViewControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return controlCreateParams.SetWindowClassName("System.Windows.SourceCodeView").SetWindowClassStyle(DoubleClickWindowClassStyle()).
+            SetWindowStyle(cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP)).
+            SetWindowClassBackgroundColor(SystemColor.COLOR_WINDOW).SetBackgroundColor(Color.White());
+    }
+    
+    public class SourceCodeViewCreateParams
+    {
+        public nothrow SourceCodeViewCreateParams(TextViewCreateParams& textViewCreateParams_) : textViewCreateParams(textViewCreateParams_)
+        {
+        }
+        public nothrow SourceCodeViewCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public TextViewCreateParams& textViewCreateParams;
+    }
+    
     public class SourceCodeView : TextView
     {
-        public SourceCodeView(const FontFamily& fontFamily, float fontSize, const Color& backgroundColor, const Color& textColor, const Point& location, const Size& size,
-            Dock dock, Anchors anchors) : base(fontFamily, fontSize, backgroundColor, textColor, location, size, dock, anchors), numLineNumberDigits(0)
+        public SourceCodeView(const FontFamily& fontFamily, float fontSize, const Color& backgroundColor, const Color& textColor, const Point& location,
+            const Size& size, Dock dock, Anchors anchors) :
+            base(fontFamily, fontSize, backgroundColor, textColor, location, size, dock, anchors), numLineNumberDigits(0)
         {
             BuildDefaultStyles();
         }
         public SourceCodeView(const Point& location, const Size& size, Dock dock, Anchors anchors) :
             this(FontFamily("Consolas"), 10.0f, Color.White(), Color.Black(), location, size, dock, anchors)
         {
+        }
+        public SourceCodeView(SourceCodeViewCreateParams& createParams) : base(createParams.textViewCreateParams), numLineNumberDigits(0)
+        {
+            BuildDefaultStyles();
         }
         protected override void OnFontChanged()
         {

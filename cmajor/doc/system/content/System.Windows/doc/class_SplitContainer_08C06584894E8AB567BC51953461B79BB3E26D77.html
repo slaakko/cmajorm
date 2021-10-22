@@ -8,7 +8,7 @@
  <body onload="drawInheritanceDiagram()">
   <h1>SplitContainer Class</h1>
   <h2>Definition</h2>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#232">232</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#309">309</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
   <h2>Inheritance</h2>
   <div class="diagram">
    <svg height="0" id="inheritance_svg_diagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
@@ -23,6 +23,10 @@
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span></td>
     <td xml:space="preserve"><a href="../../System.Windows/doc/class_SplitContainer_08C06584894E8AB567BC51953461B79BB3E26D77.html#constructor_SplitContainer_36476A0E8A0A1C0AF034CA4868057480B177E038">SplitContainer</a>(<a href="../../System.Windows/doc/enumerated_type_Orientation_A0D1492534C539F1E37B919510F0C0085A5E95C4.html">Orientation</a>&nbsp;orientation, <span class="kw">int</span>&nbsp;splitterDistance, <span class="kw">const</span>&nbsp;<a href="../../System.Windows/doc/class_Point_35143E033252FDE6DCE37C651138B784E91DD333.html">Point</a>&amp;&nbsp;location, <span class="kw">const</span>&nbsp;<a href="../../System.Windows/doc/class_Size_B49441BF62A86F3B1B7DE12E42C41CE95772B742.html">Size</a>&amp;&nbsp;size, <a href="../../System.Windows/doc/enumerated_type_Dock_F3522E08789EF98D0AE1EC3CA9AD34EBDC0FA6A3.html">Dock</a>&nbsp;dock, <a href="../../System.Windows/doc/enumerated_type_Anchors_34D957CCCC3A24FA4AE026335783601B0A15F2CA.html">Anchors</a>&nbsp;anchors)</td>
    </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span></td>
+    <td xml:space="preserve"><a href="../../System.Windows/doc/class_SplitContainer_08C06584894E8AB567BC51953461B79BB3E26D77.html#constructor_SplitContainer_85F0B8A9C2F8A44CDBED002B25D2390011525FBB">SplitContainer</a>(<a href="../../System.Windows/doc/class_SplitContainerCreateParams_6FE3A9B2EA9CDF0E9FF0C8E5D75F127AA08EBE24.html">SplitContainerCreateParams</a>&amp;&nbsp;createParams)</td>
+   </tr>
   </table>
   <h2>Member Functions</h2>
   <table>
@@ -33,6 +37,10 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../System.Windows/doc/class_Splitter_924212F86B2539F70B580E6D98723F57D7256E1A.html">Splitter</a>*</td>
     <td xml:space="preserve"><a href="../../System.Windows/doc/class_SplitContainer_08C06584894E8AB567BC51953461B79BB3E26D77.html#member_function_GetSplitter_SplitContainer_0A9D30DE0E8579C0EDC771E925C98CD24E847F1F">GetSplitter</a>()&nbsp;<span class="kw">const</span></td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../System.Windows/doc/class_SplitContainer_08C06584894E8AB567BC51953461B79BB3E26D77.html#member_function_Init_SplitContainer_E0386923F7C5651E9EBEDE6DEE44F8A439DEF7E0">Init</a>()</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span></td>
@@ -106,14 +114,21 @@
   <h3 id="constructor_SplitContainer_57D6EEA70C7D2BDEBC496D097CE944F69C509CBE" xml:space="preserve">SplitContainer&nbsp;Constructor</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;SplitContainer(<a href="../../System.Windows/doc/enumerated_type_Orientation_A0D1492534C539F1E37B919510F0C0085A5E95C4.html">Orientation</a>&nbsp;orientation_, <a href="../../System.Windows/doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html">Control</a>*&nbsp;pane1_, <a href="../../System.Windows/doc/class_Splitter_924212F86B2539F70B580E6D98723F57D7256E1A.html">Splitter</a>*&nbsp;splitter_, <a href="../../System.Windows/doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html">Control</a>*&nbsp;pane2_, <span class="kw">int</span>&nbsp;splitterWidth, <span class="kw">int</span>&nbsp;splitterDistance_, <span class="kw">const</span>&nbsp;<a href="../../System.Windows/doc/class_Point_35143E033252FDE6DCE37C651138B784E91DD333.html">Point</a>&amp;&nbsp;location, <span class="kw">const</span>&nbsp;<a href="../../System.Windows/doc/class_Size_B49441BF62A86F3B1B7DE12E42C41CE95772B742.html">Size</a>&amp;&nbsp;size, <a href="../../System.Windows/doc/enumerated_type_Dock_F3522E08789EF98D0AE1EC3CA9AD34EBDC0FA6A3.html">Dock</a>&nbsp;dock, <a href="../../System.Windows/doc/enumerated_type_Anchors_34D957CCCC3A24FA4AE026335783601B0A15F2CA.html">Anchors</a>&nbsp;anchors)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#234">234</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#311">311</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="constructor_SplitContainer_36476A0E8A0A1C0AF034CA4868057480B177E038" xml:space="preserve">SplitContainer&nbsp;Constructor</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;SplitContainer(<a href="../../System.Windows/doc/enumerated_type_Orientation_A0D1492534C539F1E37B919510F0C0085A5E95C4.html">Orientation</a>&nbsp;orientation, <span class="kw">int</span>&nbsp;splitterDistance, <span class="kw">const</span>&nbsp;<a href="../../System.Windows/doc/class_Point_35143E033252FDE6DCE37C651138B784E91DD333.html">Point</a>&amp;&nbsp;location, <span class="kw">const</span>&nbsp;<a href="../../System.Windows/doc/class_Size_B49441BF62A86F3B1B7DE12E42C41CE95772B742.html">Size</a>&amp;&nbsp;size, <a href="../../System.Windows/doc/enumerated_type_Dock_F3522E08789EF98D0AE1EC3CA9AD34EBDC0FA6A3.html">Dock</a>&nbsp;dock, <a href="../../System.Windows/doc/enumerated_type_Anchors_34D957CCCC3A24FA4AE026335783601B0A15F2CA.html">Anchors</a>&nbsp;anchors)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#249">249</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#319">319</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="constructor_SplitContainer_85F0B8A9C2F8A44CDBED002B25D2390011525FBB" xml:space="preserve">SplitContainer&nbsp;Constructor</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;SplitContainer(<a href="../../System.Windows/doc/class_SplitContainerCreateParams_6FE3A9B2EA9CDF0E9FF0C8E5D75F127AA08EBE24.html">SplitContainerCreateParams</a>&amp;&nbsp;createParams)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#327">327</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -121,84 +136,91 @@
   <h3 id="member_function_GetOrientation_SplitContainer_BBB2435CD0D5BBCF41C9F98BBBE63B13EB9B280F" xml:space="preserve">GetOrientation&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../System.Windows/doc/enumerated_type_Orientation_A0D1492534C539F1E37B919510F0C0085A5E95C4.html">Orientation</a>&nbsp;GetOrientation()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#291">291</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#379">379</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_GetSplitter_SplitContainer_0A9D30DE0E8579C0EDC771E925C98CD24E847F1F" xml:space="preserve">GetSplitter&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../System.Windows/doc/class_Splitter_924212F86B2539F70B580E6D98723F57D7256E1A.html">Splitter</a>*&nbsp;GetSplitter()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#299">299</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#387">387</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_Init_SplitContainer_E0386923F7C5651E9EBEDE6DEE44F8A439DEF7E0" xml:space="preserve">Init&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">void</span>&nbsp;Init()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#334">334</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_OnPaint_SplitContainer_4E5B9326006CCC6754993CE5E84384AB66EB07CA" xml:space="preserve">OnPaint&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;OnPaint(<a href="../../System.Windows/doc/class_PaintEventArgs_63FE804F70147A1F51601ACBD09A02FF79B3A015.html">PaintEventArgs</a>&amp;&nbsp;args)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#257">257</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#345">345</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_OnSplitterDistanceChanged_SplitContainer_6F9B9B6AD4310B5297896A889431E52FF20F44C6" xml:space="preserve">OnSplitterDistanceChanged&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;OnSplitterDistanceChanged()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#327">327</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#415">415</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_Pane1_SplitContainer_CAA07C2B97223E4B4C2699525A8E5736F78CC54A" xml:space="preserve">Pane1&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../System.Windows/doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html">Control</a>*&nbsp;Pane1()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#331">331</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#419">419</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_Pane1Container_SplitContainer_9296DB3CA0A29D46945776589B1783E69BBD538C" xml:space="preserve">Pane1Container&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../System.Windows/doc/class_ContainerControl_C51C940ECF1618F86A97329C20B6483B7DF45EF5.html">ContainerControl</a>*&nbsp;Pane1Container()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#295">295</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#383">383</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_Pane2_SplitContainer_520347E1C552CFB062EE44A937E81EE6E7209D19" xml:space="preserve">Pane2&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../System.Windows/doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html">Control</a>*&nbsp;Pane2()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#335">335</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#423">423</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_Pane2Container_SplitContainer_84DA7CF6CFB9D5812A4C969160B4EAA730A9D43A" xml:space="preserve">Pane2Container&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../System.Windows/doc/class_ContainerControl_C51C940ECF1618F86A97329C20B6483B7DF45EF5.html">ContainerControl</a>*&nbsp;Pane2Container()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#303">303</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#391">391</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_PrintWindowTree_SplitContainer_3BE7AB3C467D1B2C90E5432D0B4BBAB7C8056E3D" xml:space="preserve">PrintWindowTree&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;PrintWindowTree(<span class="kw">int</span>&nbsp;level)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#273">273</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#361">361</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_SetSplitterDistance_SplitContainer_AC388C825B87761D196DB8CFB29AC71E39D5CAFF" xml:space="preserve">SetSplitterDistance&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;SetSplitterDistance(<span class="kw">int</span>&nbsp;splitterDistance_)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#311">311</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#399">399</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_SplitterDistance_SplitContainer_052FA46E56F6A1A0EC7AA4108D2DB8E9D431B985" xml:space="preserve">SplitterDistance&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;SplitterDistance()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#307">307</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#395">395</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_SplitterDistanceChangedEvent_SplitContainer_08C80659DB2D5F11658F48861F92CC6E54887E88" xml:space="preserve">SplitterDistanceChangedEvent&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../System.Windows/doc/class_Event_Handler_Args_6357F10179232929FBED1BC40D35731A9597AAAB.html">Event</a>&lt;<a href="../../System.Windows/doc/ns_System.Windows.html#class_delegate_SplitterEventHandler_B2FA8B8F1015B7D1488BE03AC73FBC7814AC39FA">SplitterEventHandler</a>, <a href="../../System.Windows/doc/class_EmptyEventArgs_1C4BF7F329FDEB84CB8AED99745D1FFFAF3AD5E2.html">EmptyEventArgs</a>>&amp;&nbsp;SplitterDistanceChangedEvent()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#339">339</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html#427">427</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/SplitContainer.cm.html">System.Windows/SplitContainer.cm</a></span>
   <br/>
   <br/>
   <hr/>

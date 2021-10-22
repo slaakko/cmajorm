@@ -7,6 +7,36 @@ using System;
 
 namespace System.Windows
 {
+    public nothrow ControlCreateParams& RadioButtonControlCreateParams(ControlCreateParams& controlCreateParams, ButtonStyle buttonStyle)
+    {
+        return controlCreateParams.SetWindowClassName("BUTTON").
+            SetWindowStyle(cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | buttonStyle));
+    }
+
+    public nothrow ControlCreateParams& RadioButtonControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return RadioButtonControlCreateParams(controlCreateParams, cast<ButtonStyle>(ButtonStyle.BS_RADIOBUTTON | ButtonStyle.BS_NOTIFY));
+    }
+    
+    public class RadioButtonCreateParams
+    {
+        public nothrow RadioButtonCreateParams(ControlCreateParams& controlCreateParams_) :
+            controlCreateParams(controlCreateParams_), autoSize(true)
+        {
+        }
+        public nothrow RadioButtonCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public nothrow RadioButtonCreateParams& SetAutoSize(bool autoSize_)
+        {
+            autoSize = autoSize_;
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public bool autoSize;
+    }
+    
     public class RadioButton : ButtonBase
     {
         private enum Flags : sbyte
@@ -14,9 +44,10 @@ namespace System.Windows
             none = 0, checked = 1 << 0, autoSize = 1 << 1, autoSized = 1 << 2
         }
 
-        public RadioButton(const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, bool autoSize) :
-            base("BUTTON", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | ButtonStyle.BS_RADIOBUTTON | ButtonStyle.BS_NOTIFY), DefaultExtendedWindowStyle(),
-            backgroundColor, text, location, size, dock, anchors), flags(Flags.none)
+        public RadioButton(const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors,
+            bool autoSize) : base("BUTTON", DefaultWindowClassStyle(),
+            cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | ButtonStyle.BS_RADIOBUTTON | ButtonStyle.BS_NOTIFY),
+            DefaultExtendedWindowStyle(), backgroundColor, text, location, size, dock, anchors), flags(Flags.none)
         {
             if (autoSize)
             {
@@ -30,6 +61,17 @@ namespace System.Windows
         public RadioButton(const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, bool autoSize) :
             this(DefaultControlBackgroundColor(), text, location, size, dock, anchors, autoSize)
         {
+        }
+        public RadioButton(RadioButtonCreateParams& createParams) : base(createParams.controlCreateParams), flags(Flags.none)
+        {
+            if (createParams.autoSize)
+            {
+                SetAutoSizeFlag();
+            }
+            else
+            {
+                ResetAutoSizeFlag();
+            }
         }
         public bool Checked()
         {

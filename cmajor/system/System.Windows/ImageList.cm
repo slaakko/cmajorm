@@ -1,0 +1,71 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Windows
+{
+    public class ImageList
+    {
+        public nothrow ImageList()
+        {
+        }
+        public void AddImage(const string& imageName)
+        {
+            AddImage(imageName, new Bitmap(Bitmap.FromResource(imageName)));
+        }
+        public void AddDisabledImage(const string& imageName)
+        {
+            int imageIndex = GetImageIndex(imageName);
+            if (imageIndex != -1)
+            {
+                Bitmap* bitmap = images[imageIndex].Get();
+                Bitmap* disabledImage = new Bitmap(bitmap->ToGrayBitmap());
+                AddImage(imageName + ".disabled", disabledImage);
+            }
+            else
+            {
+                throw Exception("image '" + imageName + "' not found");
+            }
+        }
+        public void AddImage(const string& imageName, Bitmap* bitmap)
+        {
+            int imageIndex = cast<int>(images.Count());
+            images.Add(UniquePtr<Bitmap>(bitmap));
+            imageIndexMap[imageName] = imageIndex;
+        }
+        public nothrow int GetImageIndex(const string& imageName)
+        {
+            Map<string, int>.ConstIterator it = imageIndexMap.CFind(imageName);
+            if (it != imageIndexMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        public nothrow int GetDisabledImageIndex(const string& imageName)
+        {
+            return GetImageIndex(imageName + ".disabled");
+        }
+        public Bitmap* GetImage(int imageIndex) const
+        {
+            if (imageIndex >= 0 && imageIndex < images.Count())
+            {
+                return images[imageIndex].Get();
+            }
+            else
+            {
+                return null;
+            }
+        }
+        private Map<string, int> imageIndexMap;
+        private List<UniquePtr<Bitmap>> images;
+    }
+}
+

@@ -887,7 +887,8 @@ void* OpenFile(const char* filePath, OpenMode openMode, int32_t& errorStringHand
     {
         mode += "b";
     }
-    FILE* file = std::fopen(filePath, mode.c_str());
+    std::string nativeFilePath = soulng::util::Utf8StringToPlatformString(filePath);
+    FILE* file = std::fopen(nativeFilePath.c_str(), mode.c_str());
     if (!file)
     {
         errorStringHandle = InstallError("could not open file '" + std::string(filePath) + "': " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));

@@ -522,6 +522,11 @@ void* WinCreateWindowByClassName(const char* windowClass, const char* windowName
     return handle;
 }
 
+void WinDestroyWindow(void* windowHandle)
+{
+    DestroyWindow((HWND)windowHandle);
+}
+
 void WinPostQuitMessage(int exitCode)
 {
     PostQuitMessage(exitCode);
@@ -2009,6 +2014,11 @@ bool WinGetCursorPos(int& x, int& y)
 int WinGetCurrentProcessId()
 {
     return soulng::util::GetPid();
+}
+
+int WinGetLogicalDrives()
+{
+    return GetLogicalDrives();
 }
 
 #ifdef __MINGW32__

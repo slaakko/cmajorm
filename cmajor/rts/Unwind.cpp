@@ -8,9 +8,14 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <signal.h>
 
 #ifdef _WIN32
-__declspec(thread) void* unwindList = nullptr;
+    #if defined(__MINGW32__)
+        void* unwindList = nullptr;
+    #else
+        __declspec(thread) void* unwindList = nullptr;
+    #endif
 #else
 __thread void* unwindList = nullptr;
 #endif

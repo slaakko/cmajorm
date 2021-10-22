@@ -153,7 +153,8 @@ namespace cmcode
             stopPending(false), targetStopped(true), toolTipWindow(new ToolTip()),
             clipboardListener(Handle()), cmajorCodeFormat("cmajor.code"), pid(WinGetCurrentProcessId()), disableBuildServerToolButton(false), locations(this)
         {
-            UniquePtr<MenuBar> menuBarPtr(new MenuBar());
+            UniquePtr<MenuBar> menuBarPtr(new MenuBar(MenuBarCreateParams(MenuControlCreateParams(
+                MenuBarControlCreateParams(ControlCreateParams().Defaults()))).Defaults()));
             menuBar = menuBarPtr.Get();
             menuBar->DisableMenuKey();
             UniquePtr<MenuItem> fileMenuItem(new MenuItem("&File"));
@@ -389,9 +390,12 @@ namespace cmcode
                 traceMenuItem->AddMenuItem(testMenuItemPtr.Release());
                 menuBar->AddMenuItem(traceMenuItem.Release());
             }
-
-            UniquePtr<ToolBar> toolBarPtr(new ToolBar(30, ToolButtonToolTipColor(), Color.DefaultBitmapTransparent(), ToolBar.Style.regular,
-                Padding(4, 4, 4, 4), Padding(2, 0, 2, 0)));
+            Padding toolBarPadding(4, 4, 4, 4);
+            Padding toolButtonPadding(2, 0, 2, 0);
+            int toolButtonHeight = 30;
+            UniquePtr<ToolBar> toolBarPtr(new ToolBar(ToolBarCreateParams(ToolBarControlCreateParams(ControlCreateParams().Defaults(),
+                toolBarPadding, toolButtonPadding, toolButtonHeight)).
+                SetPadding(toolBarPadding).SetButtonPadding(toolButtonPadding).SetToolButtonHeight(toolButtonHeight)));
             toolBar = toolBarPtr.Get();
             toolBar->SetTextToolButtonFont(Font(FontFamily("Segoe UI"), 9.0f));
             UniquePtr<BorderedControl> borderedToolBar(new BorderedControl(
@@ -577,7 +581,11 @@ namespace cmcode
                 TabControlSelectedBorderColor(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
             UniquePtr<TabPage> outputTabPagePtr(new TabPage("Output", "output"));
             outputTabPage = outputTabPagePtr.Get();
-            UniquePtr<LogView> outputLogViewPtr(new LogView(Point(), Size(), Dock.none, Anchors.none));
+            //UniquePtr<LogView> outputLogViewPtr(new LogView(Point(), Size(), Dock.none, Anchors.none));
+
+            UniquePtr<LogView> outputLogViewPtr(new LogView(LogViewCreateParams(LogViewTextViewCreateParams(LogViewControlCreateParams(
+                ControlCreateParams().Defaults()))).Defaults()));
+
             outputLogView = outputLogViewPtr.Get();
             outputLogView->SetDoubleBuffered();
             UniquePtr<Control> scrollableOutputLogView(new ScrollableControl(outputLogViewPtr.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));

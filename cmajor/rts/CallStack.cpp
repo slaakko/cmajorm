@@ -40,7 +40,15 @@ CallStack::CallStack()
 
 #ifdef _WIN32
 
+#if defined(__MINGW32__)
+
+CallStack* callStack = nullptr;
+
+#else
+
 __declspec(thread) CallStack* callStack = nullptr;
+
+#endif
 
 #else
 
@@ -50,7 +58,15 @@ __thread CallStack* callStack = nullptr;
 
 #ifdef _WIN32
 
+#if defined(__MINGW32__)
+
+std::string* stackTrace = nullptr;
+
+#else
+
 __declspec(thread) std::string* stackTrace = nullptr;
+
+#endif
 
 #else
 

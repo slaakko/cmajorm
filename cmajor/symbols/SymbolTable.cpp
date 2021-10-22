@@ -1680,12 +1680,9 @@ Symbol* SymbolTable::GetMappedSymbol(Node* node) const
 
 void SymbolTable::MapIdentifierToSymbolDefinition(IdentifierNode* identifierNode, Module* module, Symbol* symbol)
 {
+    if (GetGlobalFlag(GlobalFlags::cmdoc)) return;
     if (identifierSymbolDefinitionMap.find(identifierNode) != identifierSymbolDefinitionMap.cend()) return;
     identifierSymbolDefinitionMap[identifierNode] = symbol;
-    if (identifierNode->GetSpan().fileIndex == 15)
-    {
-        int x = 0;
-    }
     SymbolLocation identifierLocation = MakeSymbolLocation(identifierNode->GetSpan(), module);
     SymbolLocation definitionLocation;
     if (symbol->GetLocation(definitionLocation))

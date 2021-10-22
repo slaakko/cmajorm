@@ -9,12 +9,39 @@ using System.Windows.API;
 
 namespace System.Windows
 {
+    public nothrow ControlCreateParams& ScrollableControlControlCreateParams(ControlCreateParams& controlCreateParams, Control* child)
+    {
+        return controlCreateParams.SetWindowClassName("System.Windows.ScrollableControl").SetBackgroundColor(child->BackgroundColor());
+    }
+
+    public class ScrollableControlCreateParams
+    {
+        public nothrow ScrollableControlCreateParams(ControlCreateParams& controlCreateParams_, Control* child_) :
+            controlCreateParams(controlCreateParams_), child(child_)
+        {
+        }
+        public nothrow ScrollableControlCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public Control* child;
+    }
+
     public class ScrollableControl : Control
     {
         public ScrollableControl(Control* child_, const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base("System.Windows.ScrollableControl", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
             child_->BackgroundColor(), "scrollableControl", location, size, dock, anchors), container(this), child(child_),
-            verticalScrollUnit(0), horizontalScrollUnit(0), vpage(0u), vpos(0), vmin(0), vmax(0), hpage(0u), hpos(0), hmin(0), hmax(0), verticalScrollBarShown(false), horizontalScrollBarShown(false)
+            verticalScrollUnit(0), horizontalScrollUnit(0), vpage(0u), vpos(0), vmin(0), vmax(0), hpage(0u), hpos(0), hmin(0), hmax(0),
+            verticalScrollBarShown(false), horizontalScrollBarShown(false)
+        {
+            container.AddChild(child);
+        }
+        public ScrollableControl(ScrollableControlCreateParams& createParams) :
+            base(createParams.controlCreateParams), container(this), child(createParams.child),
+            verticalScrollUnit(0), horizontalScrollUnit(0), vpage(0u), vpos(0), vmin(0), vmax(0), hpage(0u), hpos(0), hmin(0), hmax(0),
+            verticalScrollBarShown(false), horizontalScrollBarShown(false)
         {
             container.AddChild(child);
         }

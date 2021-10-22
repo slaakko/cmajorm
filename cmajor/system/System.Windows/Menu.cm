@@ -29,13 +29,69 @@ namespace System.Windows
         return color;
     }
 
+    public nothrow Color DefaultMenuMouseOverColor()
+    {
+        return Color(201u, 222u, 245u);
+    }
+
+    public nothrow Color DefaultMenuOpenColor()
+    {
+        return Color.White();
+    }
+
+    public nothrow ControlCreateParams& MenuControlControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return controlCreateParams.SetWindowClassBackgroundColor(SystemColor.COLOR_MENU).SetBackgroundColor(DefaultMenuBackgroundColor());
+    }
+
+    public class MenuControlCreateParams
+    {
+        public nothrow MenuControlCreateParams(ControlCreateParams& controlCreateParams_) :
+            controlCreateParams(controlCreateParams_),
+            fontFamilyName("Segoe UI"),
+            fontSize(9.0f),
+            textColor(DefaultMenuTextColor()),
+            disabledTextColor(DefaultDisabledMenuTextColor()),
+            mouseOverColor(DefaultMenuMouseOverColor()),
+            menuOpenColor(DefaultMenuOpenColor())
+        {
+        }
+        public nothrow MenuControlCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public string fontFamilyName;
+        public float fontSize;
+        public Color textColor;
+        public Color disabledTextColor;
+        public Color mouseOverColor;
+        public Color menuOpenColor;
+    }
+
     public abstract class MenuControl : Control
     {
-        public MenuControl(const Font& font_, const char* windowClassName, WindowClassStyle windowClassStyle, WindowStyle style, ExtendedWindowStyle exStyle,
+        public MenuControl(const Font& font_, const string& windowClassName, WindowClassStyle windowClassStyle, WindowStyle style,
+            ExtendedWindowStyle exStyle,
             const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base(windowClassName, windowClassStyle, style, exStyle, backgroundColor, text, location, size, dock, anchors),
-            font(font_), textColor(DefaultMenuTextColor()), disabledTextColor(DefaultDisabledMenuTextColor()), mouseOverColor(201u, 222u, 245u), menuOpenColor(Color.White()),
-            shadowColor(ShadowColor()), textBrush(textColor), disabledTextBrush(disabledTextColor), backgroundBrush(BackgroundColor()), mouseOverBrush(mouseOverColor), menuOpenBrush(menuOpenColor),
+            font(font_), textColor(DefaultMenuTextColor()), disabledTextColor(DefaultDisabledMenuTextColor()), mouseOverColor(201u, 222u, 245u),
+            menuOpenColor(Color.White()), shadowColor(ShadowColor()), textBrush(textColor), disabledTextBrush(disabledTextColor),
+            backgroundBrush(BackgroundColor()), mouseOverBrush(mouseOverColor), menuOpenBrush(menuOpenColor),
+            shadowBrush(shadowColor), blackBrush(Color.Black()), blackPen(Color.Black()), darkPen(Color.DarkGray()),
+            format(StringAlignment.near, StringAlignment.near, HotKeyPrefix.show)
+        {
+        }
+        public MenuControl(MenuControlCreateParams& createParams) :
+            base(createParams.controlCreateParams),
+            font(FontFamily(createParams.fontFamilyName), createParams.fontSize),
+            textColor(createParams.textColor),
+            disabledTextColor(createParams.disabledTextColor),
+            mouseOverColor(createParams.mouseOverColor),
+            menuOpenColor(createParams.menuOpenColor),
+            shadowColor(ShadowColor()),
+            textBrush(textColor), disabledTextBrush(disabledTextColor),
+            backgroundBrush(BackgroundColor()), mouseOverBrush(mouseOverColor), menuOpenBrush(menuOpenColor),
             shadowBrush(shadowColor), blackBrush(Color.Black()), blackPen(Color.Black()), darkPen(Color.DarkGray()),
             format(StringAlignment.near, StringAlignment.near, HotKeyPrefix.show)
         {
@@ -182,14 +238,32 @@ namespace System.Windows
         private StringFormat format;
     }
 
+    public const int initialMenuBarHeight = 20;
+
+    public nothrow ControlCreateParams& MenuBarControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return controlCreateParams.SetWindowClassBackgroundColor(SystemColor.COLOR_MENU).SetBackgroundColor(DefaultMenuBackgroundColor()).
+            SetWindowClassName("System.Windows.MenuBar").SetDock(Dock.top).SetSize(Size(0, initialMenuBarHeight));
+    }
+
+    public class MenuBarCreateParams
+    {
+        public nothrow MenuBarCreateParams(MenuControlCreateParams& menuControlCreateParams_) : menuControlCreateParams(menuControlCreateParams_)
+        {
+        }
+        public nothrow MenuBarCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public MenuControlCreateParams& menuControlCreateParams;
+    }
+
     public class MenuBar : MenuControl
     {
         private enum Flags : sbyte
         {
             none, open = 1 << 0, menuChanged = 1 << 1, menuBoxAdded = 1 << 2, menuInvalidated = 1 << 3, menuKeyDisabled = 1 << 4
         }
-
-        private const int initialHeight = 20;
 
         internal Color ShadowColor()
         {
@@ -198,14 +272,20 @@ namespace System.Windows
             return shadowColor;
         }
 
-        public MenuBar(const Font& font_) : base(font_, "System.Windows.MenuBar", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
-            DefaultMenuBackgroundColor(), "menuBar", Point(), Size(0, initialHeight), Dock.top, Anchors.none),
+        public MenuBar(const Font& font_) : base(font_, "System.Windows.MenuBar", DefaultWindowClassStyle(), DefaultChildWindowStyle(),
+            DefaultExtendedWindowStyle(), DefaultMenuBackgroundColor(), "menuBar", Point(), Size(0, initialMenuBarHeight), Dock.top, Anchors.none),
             flags(Flags.none), children(this), latestOpenedMenuItem(null), selectedMenuItem(null), latestMouseDownMenuItem(null)
         {
             SetMenuChanged();
         }
         public MenuBar() : this(Font(FontFamily("Segoe UI"), 9.0f))
         {
+        }
+        public MenuBar(MenuBarCreateParams& createParams) :
+            base(createParams.menuControlCreateParams),
+            flags(Flags.none), children(this), latestOpenedMenuItem(null), selectedMenuItem(null), latestMouseDownMenuItem(null)
+        {
+            SetMenuChanged();
         }
         public void CloseMenu()
         {
@@ -872,11 +952,34 @@ namespace System.Windows
         private MenuBox* menuBox;
     }
 
+    public nothrow ControlCreateParams& MenuBoxControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return controlCreateParams.SetWindowStyle(HiddenChildWindowStyle()).
+            SetWindowClassBackgroundColor(SystemColor.COLOR_MENU).SetBackgroundColor(DefaultMenuBackgroundColor()).
+            SetWindowClassName("System.Windows.MenuBox");
+    }
+
+    public class MenuBoxCreateParams
+    {
+        public nothrow MenuBoxCreateParams(MenuControlCreateParams& menuControlCreateParams_) : menuControlCreateParams(menuControlCreateParams_)
+        {
+        }
+        public nothrow MenuBoxCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public MenuControlCreateParams& menuControlCreateParams;
+    }
+
     public class MenuBox : MenuControl
     {
         public MenuBox(const Font& font, MenuBar* menuBar_, MenuItem* rootItem_) :
             base(font, "System.Windows.MenuBox", DefaultWindowClassStyle(), HiddenChildWindowStyle(), DefaultExtendedWindowStyle(),
             Color.White(), "menuBox", Point(), Size(), Dock.none, Anchors.none), menuBar(menuBar_), rootItem(rootItem_), paintThisMenuBox(false)
+        {
+        }
+        public MenuBox(MenuBoxCreateParams& createParams, MenuBar* menuBar_, MenuItem* rootItem_) :
+            base(createParams.menuControlCreateParams), menuBar(menuBar_), rootItem(rootItem_), paintThisMenuBox(false)
         {
         }
         public nothrow void SetPaintThisMenuBox(bool paintThisMenuBox_)
@@ -1080,12 +1183,43 @@ namespace System.Windows
         private List<UniquePtr<ClickAction>> clickActions;
     }
 
+    public nothrow ControlCreateParams& ContextMenuControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return controlCreateParams.SetWindowStyle(HiddenChildWindowStyle()).
+            SetWindowClassBackgroundColor(SystemColor.COLOR_MENU).SetBackgroundColor(DefaultMenuBackgroundColor()).
+            SetWindowClassName("System.Windows.ContextMenu");
+    }
+
+    public nothrow MenuBoxCreateParams& ContextMenuMenuBoxCreateParams(MenuBoxCreateParams& menuBoxCreateParams)
+    {
+        return menuBoxCreateParams;
+    }
+
+    public class ContextMenuCreateParams
+    {
+        public nothrow ContextMenuCreateParams(MenuBoxCreateParams& menuBoxCreateParams_) : menuBoxCreateParams(menuBoxCreateParams_)
+        {
+        }
+        public nothrow ContextMenuCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public MenuBoxCreateParams& menuBoxCreateParams;
+    }
+
     public class ContextMenu : MenuBox
     {
-        public ContextMenu(const Font& font) : base(font, null, new MenuItem("root")), rootItemPtr(GetRootItem()), latestOpenedMenuItem(null), selectedMenuItem(null), latestMouseDownMenuItem(null)
+        public ContextMenu(const Font& font) :
+            base(font, null, new MenuItem("root")),
+            rootItemPtr(GetRootItem()), latestOpenedMenuItem(null), selectedMenuItem(null), latestMouseDownMenuItem(null)
         {
         }
         public ContextMenu() : this(Font(FontFamily("Segoe UI"), 9.0f))
+        {
+        }
+        public ContextMenu(ContextMenuCreateParams& createParams) :
+            base(createParams.menuBoxCreateParams, null, new MenuItem("root")),
+            rootItemPtr(GetRootItem()), latestOpenedMenuItem(null), selectedMenuItem(null), latestMouseDownMenuItem(null)
         {
         }
         public void AddMenuItem(MenuItemBase* menuItem)

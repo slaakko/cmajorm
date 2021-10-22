@@ -25,6 +25,29 @@ namespace System.Windows
         ES_WANTRETURN = 0x1000
     }
 
+    public nothrow ControlCreateParams& TextBoxControlCreateParams(ControlCreateParams& controlCreateParams, TextBoxStyle textBoxStyle)
+    {
+        return controlCreateParams.SetWindowClassName("EDIT").SetWindowClassBackgroundColor(SystemColor.COLOR_WINDOW).SetBackgroundColor(Color.White()).
+            SetWindowStyle(cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | textBoxStyle));
+    }
+
+    public nothrow ControlCreateParams& TextBoxControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return TextBoxControlCreateParams(controlCreateParams, cast<TextBoxStyle>(TextBoxStyle.ES_LEFT | TextBoxStyle.ES_AUTOHSCROLL));
+    }
+
+    public class TextBoxCreateParams
+    {
+        public nothrow TextBoxCreateParams(ControlCreateParams& controlCreateParams_) : controlCreateParams(controlCreateParams_)
+        {
+        }
+        public nothrow TextBoxCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+    }
+
     public class TextBox : Control
     {
         private enum Flags : sbyte
@@ -32,9 +55,10 @@ namespace System.Windows
             none = 0, selectAll = 1 << 0, multiline = 1 << 1
         }
 
-        public TextBox(TextBoxStyle textBoxStyle, const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            base("EDIT", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | textBoxStyle), DefaultExtendedWindowStyle(), backgroundColor,
-            text, location, size, dock, anchors)
+        public TextBox(TextBoxStyle textBoxStyle, const Color& backgroundColor, const string& text, const Point& location, const Size& size,
+            Dock dock, Anchors anchors) :
+            base("EDIT", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | textBoxStyle),
+            DefaultExtendedWindowStyle(), backgroundColor, text, location, size, dock, anchors)
         {
             if ((textBoxStyle & TextBoxStyle.ES_MULTILINE) != 0)
             {
@@ -47,6 +71,13 @@ namespace System.Windows
         }
         public TextBox(const string& text) : this(text, Point(), Size(), Dock.none, Anchors.none)
         {
+        }
+        public TextBox(TextBoxCreateParams& createParams) : base(createParams.controlCreateParams)
+        {
+            if ((cast<TextBoxStyle>(cast<long>(createParams.controlCreateParams.windowStyle)) & TextBoxStyle.ES_MULTILINE) != 0)
+            {
+                SetMultiline();
+            }
         }
         public nothrow inline bool IsMultiline() const
         {

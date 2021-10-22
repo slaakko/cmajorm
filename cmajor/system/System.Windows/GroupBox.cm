@@ -7,6 +7,31 @@ using System;
 
 namespace System.Windows
 {
+    public ControlCreateParams& GroupBoxControlCreateParams(ControlCreateParams& controlCreateParams, ButtonStyle buttonStyle)
+    {
+        controlCreateParams.SetWindowClassName("BUTTON");
+        controlCreateParams.SetWindowStyle(cast<WindowStyle>(DefaultChildWindowStyle() | buttonStyle));
+        controlCreateParams.SetBackgroundColor(DefaultControlBackgroundColor());
+        return controlCreateParams;
+    }
+
+    public ControlCreateParams& GroupBoxControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return GroupBoxControlCreateParams(controlCreateParams, ButtonStyle.BS_GROUPBOX);
+    }
+
+    public class GroupBoxCreateParams
+    {
+        public nothrow GroupBoxCreateParams(ControlCreateParams& controlCreateParams_) : controlCreateParams(controlCreateParams_)
+        {
+        }
+        public nothrow GroupBoxCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+    }
+
     public class GroupBox : ButtonBase
     {
         public GroupBox(const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
@@ -14,7 +39,11 @@ namespace System.Windows
             backgroundColor, text, location, size, dock, anchors), children(this), checkedRadioButton(null)
         {
         }
-        public GroupBox(const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) : this(DefaultControlBackgroundColor(), text, location, size, dock, anchors)
+        public GroupBox(const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            this(DefaultControlBackgroundColor(), text, location, size, dock, anchors)
+        {
+        }
+        public GroupBox(GroupBoxCreateParams& createParams) : base(createParams.controlCreateParams), children(this), checkedRadioButton(null)
         {
         }
         public void AddChild(Control* child)

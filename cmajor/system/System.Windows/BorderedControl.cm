@@ -32,6 +32,64 @@ namespace System.Windows
         return 0;
     }
 
+    public nothrow Color DefaultBorderedControlNormalBorderdColor()
+    {
+        return Color.Black();
+    }
+
+    public nothrow Color DefaultBorderedControlFocusedBorderColor()
+    {
+        return Color.Blue();
+    }
+
+    public nothrow ControlCreateParams& BorderedControlControlCreateParams(ControlCreateParams& controlCreateParams, Control* child)
+    {
+        return controlCreateParams.SetWindowClassName("System.Windows.BorderedControl").SetBackgroundColor(child->BackgroundColor());
+    }
+
+    public class BorderedControlCreateParams
+    {
+        public nothrow BorderedControlCreateParams(ControlCreateParams& controlCreateParams_, Control* child_) :
+            controlCreateParams(controlCreateParams_),
+            child(child_),
+            borderStyle(BorderStyle.single),
+            borderWidth(GetBorderWidth(borderStyle)),
+            normalBorderColor(DefaultBorderedControlNormalBorderdColor()),
+            focusedBorderColor(DefaultBorderedControlFocusedBorderColor())
+        {
+        }
+        public nothrow BorderedControlCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public nothrow BorderedControlCreateParams& SetBordedStyle(BorderStyle borderStyle_)
+        {
+            borderStyle = borderStyle_;
+            return *this;
+        }
+        public nothrow BorderedControlCreateParams& SetBorderWidth(int borderWidth_)
+        {
+            borderWidth = borderWidth_;
+            return *this;
+        }
+        public nothrow BorderedControlCreateParams& SetNormalBorderColor(const Color& normalBorderColor_)
+        {
+            normalBorderColor = normalBorderColor_;
+            return *this;
+        }
+        public nothrow  BorderedControlCreateParams& SetFocusedBorderColor(const Color& focusedBorderColor_)
+        {
+            focusedBorderColor = focusedBorderColor_;
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public Control* child;
+        public BorderStyle borderStyle;
+        public int borderWidth;
+        public Color normalBorderColor;
+        public Color focusedBorderColor;
+    }
+
     public class BorderedControl : Control
     {
         private enum Flags : sbyte
@@ -42,20 +100,35 @@ namespace System.Windows
             const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base("System.Windows.BorderedControl", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
             child_->BackgroundColor(), "borderedControl", location, size, dock, anchors),
-            container(this), borderStyle(borderStyle_), normalBorderColor(normalBorderColor_), focusedBorderColor(focusedBorderColor_), borderWidth(GetBorderWidth(borderStyle)), child(child_)
+            container(this), borderStyle(borderStyle_), normalBorderColor(normalBorderColor_), focusedBorderColor(focusedBorderColor_),
+            borderWidth(GetBorderWidth(borderStyle)), child(child_)
         {
             container.AddChild(child);
             SetChildPos();
         }
-        public BorderedControl(Control* child, BorderStyle borderStyle,
-            const Point& location, const Size& size, Dock dock, Anchors anchors) : this(child, borderStyle, Color.Black(), Color.Blue(), location, size, dock, anchors)
+        public BorderedControl(Control* child, BorderStyle borderStyle, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            this(child, borderStyle, Color.Black(), Color.Blue(), location, size, dock, anchors)
         {
         }
-        public BorderedControl(Control* child, const Point& location, const Size& size, Dock dock, Anchors anchors) : this(child, BorderStyle.single, location, size, dock, anchors)
+        public BorderedControl(Control* child, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            this(child, BorderStyle.single, location, size, dock, anchors)
         {
         }
         public BorderedControl(Control* child) : this(child, Point(), Size(), Dock.none, Anchors.none)
         {
+        }
+        public BorderedControl(BorderedControlCreateParams& createParams) :
+            base(createParams.controlCreateParams),
+            container(this),
+            borderStyle(createParams.borderStyle),
+            borderWidth(createParams.borderWidth),
+            normalBorderColor(createParams.normalBorderColor),
+            focusedBorderColor(createParams.focusedBorderColor),
+            child(createParams.child),
+            flags(Flags.none)
+        {
+            container.AddChild(child);
+            SetChildPos();
         }
         public nothrow void SetNormalBorderColor(const Color& normalBorderColor_)
         {

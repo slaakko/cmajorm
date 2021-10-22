@@ -54,7 +54,7 @@ namespace System.Windows
         return true;
     }
 
-    public nothrow System.Windows.Color DefaultSelectionBackgroundColor()
+    public nothrow System.Windows.Color DefaultTextViewSelectionBackgroundColor()
     {
         return System.Windows.Color(153u, 201u, 239u);
     }
@@ -150,22 +150,109 @@ namespace System.Windows
     public class delegate void CutEventHandler();
     public class delegate void PasteEventHandler();
 
+    public nothrow ControlCreateParams& TextViewControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return controlCreateParams.SetWindowClassName("System.Windows.TextView").SetWindowClassStyle(DoubleClickWindowClassStyle()).
+            SetWindowStyle(cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP)).
+            SetWindowClassBackgroundColor(SystemColor.COLOR_WINDOW).SetBackgroundColor(Color.White());
+    }
+
+    public class TextViewCreateParams
+    {
+        public nothrow TextViewCreateParams(ControlCreateParams& controlCreateParams_) :
+            controlCreateParams(controlCreateParams_),
+            fontFamilyName("Consolas"),
+            fontSize(10.0f),
+            padding(),
+            textColor(Color.Black()),
+            selectionBackgroundColor(DefaultTextViewSelectionBackgroundColor()),
+            indentSize(1)
+        {
+        }
+        public nothrow TextViewCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public nothrow TextViewCreateParams& SetFontFamilyName(const string& fontFamilyName_)
+        {
+            fontFamilyName = fontFamilyName_;
+            return *this;
+        }
+        public nothrow TextViewCreateParams& SetFontSize(float fontSize_)
+        {
+            fontSize = fontSize_;
+            return *this;
+        }
+        public nothrow TextViewCreateParams& SetPadding(const Padding& padding_)
+        {
+            padding = padding_;
+            return *this;
+        }
+        public nothrow TextViewCreateParams& SetTextColor(const Color& textColor_)
+        {
+            textColor = textColor_;
+            return *this;
+        }
+        public nothrow TextViewCreateParams& SetSelectionBackgroundColor(const Color& selectionBackgroundColor_)
+        {
+            selectionBackgroundColor = selectionBackgroundColor_;
+            return *this;
+        }
+        public nothrow TextViewCreateParams& SetIndentSize(int indentSize_)
+        {
+            indentSize = indentSize_;
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public string fontFamilyName;
+        public float fontSize;
+        public Padding padding;
+        public Color textColor;
+        public Color selectionBackgroundColor;
+        public int indentSize;
+    }
+
     public class TextView : Control
     {
         private enum Flags : sbyte
         {
-            none = 0, changed = 1 << 0, painting = 1 << 1, readOnly = 1 << 2, fixed = 1 << 3, dirty = 1 << 4, ccdirty = 1 << 5, mouseExtendSelection = 1 << 6,
-            ccOpen = 1 << 7
+            none = 0, changed = 1 << 0, painting = 1 << 1, readOnly = 1 << 2, fixed = 1 << 3, dirty = 1 << 4, ccdirty = 1 << 5,
+            mouseExtendSelection = 1 << 6, ccOpen = 1 << 7
         }
 
-        public TextView(const FontFamily& fontFamily_, float fontSize_, const Color& backgroundColor, const Color& textColor_, const Point& location, const Size& size,
-            Dock dock, Anchors anchors) :
-            base("System.Windows.TextView", DoubleClickWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP), DefaultExtendedWindowStyle(), backgroundColor,
-            "textView", location, size, dock, anchors), flags(Flags.none), drawFormat(StringAlignment.near, StringAlignment.near), fontFamily(fontFamily_), fontSize(fontSize_),
-            charWidth(0), charHeight(0), textWidth(0), textHeight(0), maxLineLength(0), cursor(LoadStandardCursor(StandardCursorId.IDC_IBEAM)), caretLine(1), caretColumn(1),
+        public TextView(const FontFamily& fontFamily_, float fontSize_, const Color& backgroundColor, const Color& textColor_, const Point& location,
+            const Size& size, Dock dock, Anchors anchors) :
+            base("System.Windows.TextView", DoubleClickWindowClassStyle(),
+                cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP), DefaultExtendedWindowStyle(), backgroundColor,
+            "textView", location, size, dock, anchors), flags(Flags.none), drawFormat(StringAlignment.near, StringAlignment.near),
+            fontFamily(fontFamily_), fontSize(fontSize_),
+            charWidth(0), charHeight(0), textWidth(0), textHeight(0), maxLineLength(0), cursor(LoadStandardCursor(StandardCursorId.IDC_IBEAM)),
+            caretLine(1), caretColumn(1),
             caretTimerPeriod(defaultCaretTimerPeriod), update(false), topLine(1), topLineDiff(0.0f), leftCol(1), leftColDiff(0.0f),
-            padding(), selectionBackgroundColor(DefaultSelectionBackgroundColor()), textColor(textColor_), editCommandList(this), selection(),
+            padding(), selectionBackgroundColor(DefaultTextViewSelectionBackgroundColor()), textColor(textColor_), editCommandList(this), selection(),
             indentSize(1)
+        {
+            Init();
+        }
+        public TextView(const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            this(FontFamily("Consolas"), 10.0f, Color.White(), Color.Black(), location, size, dock, anchors)
+        {
+        }
+        public TextView(TextViewCreateParams& createParams) :
+            base(createParams.controlCreateParams),
+            flags(Flags.none),
+            drawFormat(StringAlignment.near, StringAlignment.near),
+            fontFamily(createParams.fontFamilyName),
+            fontSize(createParams.fontSize),
+            charWidth(0), charHeight(0), textWidth(0), textHeight(0), maxLineLength(0), cursor(LoadStandardCursor(StandardCursorId.IDC_IBEAM)),
+            caretLine(1), caretColumn(1),
+            caretTimerPeriod(defaultCaretTimerPeriod), update(false), topLine(1), topLineDiff(0.0f), leftCol(1), leftColDiff(0.0f),
+            padding(createParams.padding), selectionBackgroundColor(createParams.selectionBackgroundColor), textColor(createParams.textColor),
+            editCommandList(this), selection(), indentSize(createParams.indentSize)
+        {
+            Init();
+        }
+        private void Init()
         {
             uint caretTimeOut = 0u;
             bool succeeded = ReadCaretTimeoutFromRegistry(caretTimeOut);
@@ -177,10 +264,6 @@ namespace System.Windows
             fonts.Add(UniquePtr<Font>(font));
             SetChanged();
             measureString = "// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/AstReader.hpp' using cpp2cm version 1.0.0";
-        }
-        public TextView(const Point& location, const Size& size, Dock dock, Anchors anchors) : this(FontFamily("Consolas"), 10.0f, Color.White(), Color.Black(),
-            location, size, dock, anchors)
-        {
         }
         public nothrow const System.Windows.Color& GetTextColor() const
         {

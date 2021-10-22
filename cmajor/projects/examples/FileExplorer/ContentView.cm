@@ -1,0 +1,65 @@
+using System;
+using System.Windows;
+
+namespace FileExplorer
+{
+    public nothrow System.Windows.Color DefaultContentViewFrameColor()
+    {
+        return System.Windows.Color(204u, 206u, 219u);
+    }
+
+    public class ContentView : ContainerControl
+    {
+        public ContentView(ImageList* imageList_) : base(ControlCreateParams().SetWindowClassName("FileExplorer.ContentView").
+            SetWindowClassBackgroundColor(SystemColor.COLOR_WINDOW).SetBackgroundColor(Color.White()).SetDock(Dock.fill)),
+            imageList(imageList_)
+        {
+            AddChild(MakeFramedControl(new EmptyView(EmptyViewControlCreateParams(ControlCreateParams().Defaults()))));
+        }
+        public nothrow void SetMainWindow(MainWindow* mainWindow_)
+        {
+            mainWindow = mainWindow_;
+        }
+        public nothrow void ViewContent(Node* node)
+        {
+            if (framedChild != null)
+            {
+                RemoveChild(framedChild);
+                framedChild = null;
+                child = null;
+            }
+            Control* view = node->CreateView(imageList);
+            if (view == null)
+            {
+                view = new EmptyView(EmptyViewControlCreateParams(ControlCreateParams().Defaults()));
+            }
+            UniquePtr<Control> framedView = MakeFramedControl(view);
+            AddChild(framedView.Release());
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            child->Invalidate();
+            framedChild->Invalidate();
+            base->OnPaint(args);
+        }
+        private Control* MakeFramedControl(Control* child_)
+        {
+            child = child_;
+            child->SetScrollSubject();
+            PaddedControl* paddedControl = new PaddedControl(PaddedControlCreateParams(PaddedControlControlCreateParams(
+                ControlCreateParams().Defaults(), child), child).Defaults());
+            BorderedControl* borderedControl = new BorderedControl(BorderedControlCreateParams(BorderedControlControlCreateParams(
+                ControlCreateParams().Defaults(), paddedControl), paddedControl).SetNormalBorderColor(DefaultContentViewFrameColor()));
+            ScrollableControl* scrollableControl = new ScrollableControl(ScrollableControlCreateParams(ScrollableControlControlCreateParams(
+                ControlCreateParams().SetDock(Dock.fill), borderedControl), borderedControl).Defaults());
+            framedChild = scrollableControl;
+            return scrollableControl;
+        }
+        private ImageList* imageList;
+        private MainWindow* mainWindow;
+        private Control* framedChild;
+        private Control* child;
+    }
+}
+
+

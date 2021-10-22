@@ -8,7 +8,7 @@
  <body onload="drawInheritanceDiagram()">
   <h1>ScrollableControl Class</h1>
   <h2>Definition</h2>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#12">12</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#31">31</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <h2>Inheritance</h2>
   <div class="diagram">
    <svg height="0" id="inheritance_svg_diagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
@@ -19,9 +19,17 @@
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span></td>
     <td xml:space="preserve"><a href="../../System.Windows/doc/class_ScrollableControl_48DEFDE877DCFC20AF5583A7BF0107DECD45A1F6.html#constructor_ScrollableControl_45BE08D835FE55C916A608F3857B9C8F92D1316A">ScrollableControl</a>(<a href="../../System.Windows/doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html">Control</a>*&nbsp;child_, <span class="kw">const</span>&nbsp;<a href="../../System.Windows/doc/class_Point_35143E033252FDE6DCE37C651138B784E91DD333.html">Point</a>&amp;&nbsp;location, <span class="kw">const</span>&nbsp;<a href="../../System.Windows/doc/class_Size_B49441BF62A86F3B1B7DE12E42C41CE95772B742.html">Size</a>&amp;&nbsp;size, <a href="../../System.Windows/doc/enumerated_type_Dock_F3522E08789EF98D0AE1EC3CA9AD34EBDC0FA6A3.html">Dock</a>&nbsp;dock, <a href="../../System.Windows/doc/enumerated_type_Anchors_34D957CCCC3A24FA4AE026335783601B0A15F2CA.html">Anchors</a>&nbsp;anchors)</td>
    </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span></td>
+    <td xml:space="preserve"><a href="../../System.Windows/doc/class_ScrollableControl_48DEFDE877DCFC20AF5583A7BF0107DECD45A1F6.html#constructor_ScrollableControl_78DF74AEF20BF9C3C308B2E979B6FD635A4D7ED7">ScrollableControl</a>(<a href="../../System.Windows/doc/class_ScrollableControlCreateParams_0929518FB10BB95D51C88125F45309CC8D39A694.html">ScrollableControlCreateParams</a>&amp;&nbsp;createParams)</td>
+   </tr>
   </table>
   <h2>Member Functions</h2>
   <table>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../System.Windows/doc/class_ScrollableControl_48DEFDE877DCFC20AF5583A7BF0107DECD45A1F6.html#member_function_ChildSizeOrContentSizeChanged_ScrollableControl_5575EDB779C53EC61C3447A51ECF08C7319625D4">ChildSizeOrContentSizeChanged</a>(<a href="../../System.Windows/doc/class_ControlEventArgs_BCD2FFDE3BCD23FBA6EC6DD01D8448A7E3B418C6.html">ControlEventArgs</a>&amp;&nbsp;args)</td>
+   </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">internal</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../System.Windows/doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html">Control</a>*</td>
     <td xml:space="preserve"><a href="../../System.Windows/doc/class_ScrollableControl_48DEFDE877DCFC20AF5583A7BF0107DECD45A1F6.html#member_function_GetFirstEnabledTabStopControl_ScrollableControl_14DB26468B12FFCA0763CC7C67E6EE8BE15CA964">GetFirstEnabledTabStopControl</a>()&nbsp;<span class="kw">const</span></td>
@@ -57,6 +65,10 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span></td>
     <td xml:space="preserve"><a href="../../System.Windows/doc/class_ScrollableControl_48DEFDE877DCFC20AF5583A7BF0107DECD45A1F6.html#member_function_OnChildLostFocus_ScrollableControl_DA36D858BD2865FE664D9EC1EC1D2FA2CB6B6D59">OnChildLostFocus</a>(<a href="../../System.Windows/doc/class_ControlEventArgs_BCD2FFDE3BCD23FBA6EC6DD01D8448A7E3B418C6.html">ControlEventArgs</a>&amp;&nbsp;args)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../System.Windows/doc/class_ScrollableControl_48DEFDE877DCFC20AF5583A7BF0107DECD45A1F6.html#member_function_OnChildSizeChanged_ScrollableControl_6E47B9FD32321837FDDE526BC16F51E65B6ADA07">OnChildSizeChanged</a>(<a href="../../System.Windows/doc/class_ControlEventArgs_BCD2FFDE3BCD23FBA6EC6DD01D8448A7E3B418C6.html">ControlEventArgs</a>&amp;&nbsp;args)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span></td>
@@ -166,141 +178,162 @@
   <h3 id="constructor_ScrollableControl_45BE08D835FE55C916A608F3857B9C8F92D1316A" xml:space="preserve">ScrollableControl&nbsp;Constructor</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;ScrollableControl(<a href="../../System.Windows/doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html">Control</a>*&nbsp;child_, <span class="kw">const</span>&nbsp;<a href="../../System.Windows/doc/class_Point_35143E033252FDE6DCE37C651138B784E91DD333.html">Point</a>&amp;&nbsp;location, <span class="kw">const</span>&nbsp;<a href="../../System.Windows/doc/class_Size_B49441BF62A86F3B1B7DE12E42C41CE95772B742.html">Size</a>&amp;&nbsp;size, <a href="../../System.Windows/doc/enumerated_type_Dock_F3522E08789EF98D0AE1EC3CA9AD34EBDC0FA6A3.html">Dock</a>&nbsp;dock, <a href="../../System.Windows/doc/enumerated_type_Anchors_34D957CCCC3A24FA4AE026335783601B0A15F2CA.html">Anchors</a>&nbsp;anchors)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#14">14</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#33">33</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="constructor_ScrollableControl_78DF74AEF20BF9C3C308B2E979B6FD635A4D7ED7" xml:space="preserve">ScrollableControl&nbsp;Constructor</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;ScrollableControl(<a href="../../System.Windows/doc/class_ScrollableControlCreateParams_0929518FB10BB95D51C88125F45309CC8D39A694.html">ScrollableControlCreateParams</a>&amp;&nbsp;createParams)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#41">41</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h2>Member Function Details</h2>
+  <h3 id="member_function_ChildSizeOrContentSizeChanged_ScrollableControl_5575EDB779C53EC61C3447A51ECF08C7319625D4" xml:space="preserve">ChildSizeOrContentSizeChanged&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">void</span>&nbsp;ChildSizeOrContentSizeChanged(<a href="../../System.Windows/doc/class_ControlEventArgs_BCD2FFDE3BCD23FBA6EC6DD01D8448A7E3B418C6.html">ControlEventArgs</a>&amp;&nbsp;args)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#88">88</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
   <h3 id="member_function_GetFirstEnabledTabStopControl_ScrollableControl_14DB26468B12FFCA0763CC7C67E6EE8BE15CA964" xml:space="preserve">GetFirstEnabledTabStopControl&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">internal</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../System.Windows/doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html">Control</a>*&nbsp;GetFirstEnabledTabStopControl()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#318">318</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#364">364</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_GetLastEnabledTabStopControl_ScrollableControl_0575164DF374416466E26F9185C930C53624C7B1" xml:space="preserve">GetLastEnabledTabStopControl&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">internal</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../System.Windows/doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html">Control</a>*&nbsp;GetLastEnabledTabStopControl()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#322">322</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#368">368</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_IsDecoratorControl_ScrollableControl_9B67A7445AE0E7CE0F364FAC6865AC5F0D9F165A" xml:space="preserve">IsDecoratorControl&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;IsDecoratorControl()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#21">21</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#48">48</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_MakeUpdateRect_ScrollableControl_D7DB6B0610A0EECD690A5973D23BB2FB4EACEFFC" xml:space="preserve">MakeUpdateRect&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../System.Windows/doc/class_Rect_C255A91AF4F1B9387B2DB8A813B811225805DB1B.html">Rect</a>&nbsp;MakeUpdateRect(<span class="kw">int</span>&nbsp;xAmount, <span class="kw">int</span>&nbsp;yAmount)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#326">326</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#372">372</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_OnChildContentChanged_ScrollableControl_776A5DA8CDAC75D651F799268DECDC8B40803DAF" xml:space="preserve">OnChildContentChanged&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;OnChildContentChanged(<a href="../../System.Windows/doc/class_ControlEventArgs_BCD2FFDE3BCD23FBA6EC6DD01D8448A7E3B418C6.html">ControlEventArgs</a>&amp;&nbsp;args)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#37">37</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#69">69</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_OnChildContentLocationChanged_ScrollableControl_FE010991951C7FE6470F3426E8B57946BB03F2CB" xml:space="preserve">OnChildContentLocationChanged&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;OnChildContentLocationChanged(<a href="../../System.Windows/doc/class_ControlEventArgs_BCD2FFDE3BCD23FBA6EC6DD01D8448A7E3B418C6.html">ControlEventArgs</a>&amp;&nbsp;args)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#43">43</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#75">75</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_OnChildContentSizeChanged_ScrollableControl_A51793DA294343C69B4D19B727AAB7E81EAAA6AC" xml:space="preserve">OnChildContentSizeChanged&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;OnChildContentSizeChanged(<a href="../../System.Windows/doc/class_ControlEventArgs_BCD2FFDE3BCD23FBA6EC6DD01D8448A7E3B418C6.html">ControlEventArgs</a>&amp;&nbsp;args)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#56">56</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#137">137</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_OnChildGotFocus_ScrollableControl_78B994588BDE9D39E546A63217C0E038342C6A4C" xml:space="preserve">OnChildGotFocus&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;OnChildGotFocus(<a href="../../System.Windows/doc/class_ControlEventArgs_BCD2FFDE3BCD23FBA6EC6DD01D8448A7E3B418C6.html">ControlEventArgs</a>&amp;&nbsp;args)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#96">96</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#142">142</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_OnChildLostFocus_ScrollableControl_DA36D858BD2865FE664D9EC1EC1D2FA2CB6B6D59" xml:space="preserve">OnChildLostFocus&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;OnChildLostFocus(<a href="../../System.Windows/doc/class_ControlEventArgs_BCD2FFDE3BCD23FBA6EC6DD01D8448A7E3B418C6.html">ControlEventArgs</a>&amp;&nbsp;args)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#105">105</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#151">151</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_OnChildSizeChanged_ScrollableControl_6E47B9FD32321837FDDE526BC16F51E65B6ADA07" xml:space="preserve">OnChildSizeChanged&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;OnChildSizeChanged(<a href="../../System.Windows/doc/class_ControlEventArgs_BCD2FFDE3BCD23FBA6EC6DD01D8448A7E3B418C6.html">ControlEventArgs</a>&amp;&nbsp;args)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#64">64</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_OnHScroll_ScrollableControl_AD757E9DA12D79FB0E8064D1C50BAD5F534DC48C" xml:space="preserve">OnHScroll&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;OnHScroll(<a href="../../System.Windows/doc/class_ScrollEventArgs_1775F7BAE59516E08B920737C29C2AC872ED21E3.html">ScrollEventArgs</a>&amp;&nbsp;args)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#114">114</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#160">160</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_OnLocationChanged_ScrollableControl_D257C9D26B72B292D45560C572CD9E8C86B98C0D" xml:space="preserve">OnLocationChanged&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;OnLocationChanged()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#25">25</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#52">52</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_OnMouseWheel_ScrollableControl_733897B46F9C7D3C19E92389A4D97B169F62A77F" xml:space="preserve">OnMouseWheel&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;OnMouseWheel(<a href="../../System.Windows/doc/class_MouseWheelEventArgs_96D03C993083E54627615A505324CFEC759959A8.html">MouseWheelEventArgs</a>&amp;&nbsp;args)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#266">266</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#312">312</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_OnSizeChanged_ScrollableControl_1524BACEC830E575654F7CFC7BAF018307CB3500" xml:space="preserve">OnSizeChanged&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;OnSizeChanged(<span class="kw">uint</span>&nbsp;windowState)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#31">31</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#58">58</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_OnVScroll_ScrollableControl_2B459438BB9C2FC53B16A125E39AFC9B11500E4D" xml:space="preserve">OnVScroll&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;OnVScroll(<a href="../../System.Windows/doc/class_ScrollEventArgs_1775F7BAE59516E08B920737C29C2AC872ED21E3.html">ScrollEventArgs</a>&amp;&nbsp;args)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#208">208</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#254">254</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_ScrollLineDown_ScrollableControl_E5B10A8CB5DED02A1067081CC0024CB5338A425C" xml:space="preserve">ScrollLineDown&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;ScrollLineDown()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#162">162</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#208">208</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_ScrollLineUp_ScrollableControl_F1EC444CC1DE0680B5701767021B905D1DE11D2F" xml:space="preserve">ScrollLineUp&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;ScrollLineUp()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#185">185</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#231">231</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_TranslateChildGraphics_ScrollableControl_E9FBDB85B848ED38299456CB3488E2BAC02A53C2" xml:space="preserve">TranslateChildGraphics&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;TranslateChildGraphics(<a href="../../System.Windows/doc/class_Graphics_33E6C1D2BA4F982058938AEC59F3465D29EA832B.html">Graphics</a>&amp;&nbsp;graphics)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#295">295</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#341">341</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_TranslateContentLocation_ScrollableControl_BB57DA34B9146506DE9F94E9C739E4DF5B68ACB6" xml:space="preserve">TranslateContentLocation&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;TranslateContentLocation(<a href="../../System.Windows/doc/class_Point_35143E033252FDE6DCE37C651138B784E91DD333.html">Point</a>&amp;&nbsp;location)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#311">311</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#357">357</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_TranslateMousePos_ScrollableControl_C21A06D084EE0A58C59BFEFE03432F7CDFDC6F18" xml:space="preserve">TranslateMousePos&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;TranslateMousePos(<a href="../../System.Windows/doc/class_Point_35143E033252FDE6DCE37C651138B784E91DD333.html">Point</a>&amp;&nbsp;location)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#304">304</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html#350">350</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/ScrollableControl.cm.html">System.Windows/ScrollableControl.cm</a></span>
   <br/>
   <br/>
   <hr/>

@@ -527,6 +527,11 @@ void* WinCreateWindowByClassName(const char* windowClass, const char* windowName
     return handle;
 }
 
+void WinDestroyWindow(void* windowHandle)
+{
+    DestroyWindow((HWND)windowHandle);
+}
+
 void WinPostQuitMessage(int exitCode)
 {
     PostQuitMessage(exitCode);
@@ -2108,4 +2113,9 @@ void WinBeginTest()
 void WinEndTest()
 {
     test = false;
+}
+
+int WinGetLogicalDrives()
+{
+    return GetLogicalDrives();
 }

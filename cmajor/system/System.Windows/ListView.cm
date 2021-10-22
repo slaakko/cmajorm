@@ -1,0 +1,1144 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Windows
+{
+    public class ListViewItemEventArgs
+    {
+        public nothrow ListViewItemEventArgs(ListView* view_, ListViewItem* item_) : view(view_), item(item_), location(), control(false)
+        {
+        }
+        public ListView* view;
+        public ListViewItem* item;
+        public Point location;
+        public bool control;
+    }
+
+    public class ListViewColumnEventArgs
+    {
+        public nothrow ListViewColumnEventArgs(ListView* view_, ListViewColumn* column_) : view(view_), column(column_)
+        {
+        }
+        public ListView* view;
+        public ListViewColumn* column;
+    }
+
+    public class delegate void ListViewItemEventHandler(ListViewItemEventArgs& args);
+    public class delegate void ListViewColumnEventHandler(ListViewColumnEventArgs& args);
+
+    public nothrow Color DefaultListViewBackgroundColor()
+    {
+        return Color.White();
+    }
+
+    public nothrow string DefaultListViewFontFamilyName()
+    {
+        return "Segoe UI";
+    }
+
+    public nothrow float DefaultListViewFontSize()
+    {
+        return 9.0f;
+    }
+
+    public nothrow Color DefaultListViewColumnTextColor()
+    {
+        return Color(76u, 96u, 122u);
+    }
+
+    public nothrow Color DefaultListViewItemTextColor()
+    {
+        return Color.Black();
+    }
+
+    public nothrow Color DefaultListViewDisabledItemTextColor()
+    {
+        return Color(201u, 201u, 201u);
+    }
+
+    public nothrow Color DefaultListViewColumnDividerColor()
+    {
+        return Color(229u, 229u, 229u);
+    }
+
+    public nothrow Color DefaultListViewItemSelectedColor()
+    {
+        return Color(204u, 232u, 255u);
+    }
+
+    public nothrow Padding DefaultListViewColumnHeaderPadding()
+    {
+        return Padding(4, 0, 4, 4);
+    }
+
+    public nothrow Padding DefaultListViewItemPadding()
+    {
+        return Padding(4, 0, 4, 0);
+    }
+
+    public nothrow Padding DefaultListViewItemColumnPadding()
+    {
+        return Padding(4, 0, 4, 0);
+    }
+
+    public nothrow Padding DefaultListViewColumnDividerPadding()
+    {
+        return Padding(1, 0, 1, 0);
+    }
+
+    public nothrow Padding DefaultListViewImagePadding()
+    {
+        return Padding(2, 2, 2, 2);
+    }
+
+    public ControlCreateParams& ListViewControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return controlCreateParams.SetWindowClassName("System.Windows.ListView").SetWindowClassStyle(DoubleClickWindowClassStyle()).
+            SetWindowClassBackgroundColor(SystemColor.COLOR_WINDOW).SetBackgroundColor(DefaultListViewBackgroundColor());
+    }
+
+    public class ListViewCreateParams
+    {
+        public nothrow ListViewCreateParams(ControlCreateParams& controlCreateParams_) :
+            controlCreateParams(controlCreateParams_),
+            allowMultiselect(false),
+            fontFamilyName(DefaultListViewFontFamilyName()),
+            fontSize(DefaultListViewFontSize()),
+            columnTextColor(DefaultListViewColumnTextColor()),
+            itemTextColor(DefaultListViewItemTextColor()),
+            disabledItemTextColor(DefaultListViewDisabledItemTextColor()),
+            columnDividerColor(DefaultListViewColumnDividerColor()),
+            itemSelectedColor(DefaultListViewItemSelectedColor()),
+            columnHeaderPadding(DefaultListViewColumnHeaderPadding()),
+            itemPadding(DefaultListViewItemPadding()),
+            itemColumnPadding(DefaultListViewItemColumnPadding()),
+            columnDividerPadding(DefaultListViewColumnDividerPadding()),
+            imagePadding(DefaultListViewImagePadding())
+        {
+        }
+        public nothrow ListViewCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public nothrow ListViewCreateParams& SetAllowMultiselect(bool allowMultiselect_)
+        {
+            allowMultiselect = allowMultiselect_;
+            return *this;
+        }
+        public nothrow ListViewCreateParams& SetFontFamilyName(const string& fontFamilyName_)
+        {
+            fontFamilyName = fontFamilyName_;
+            return *this;
+        }
+        public nothrow ListViewCreateParams& SetFontSize(float fontSize_)
+        {
+            fontSize = fontSize_;
+            return *this;
+        }
+        public nothrow ListViewCreateParams& SetColumnTextColor(const Color& columnTextColor_)
+        {
+            columnTextColor = columnTextColor_;
+            return *this;
+        }
+        public nothrow ListViewCreateParams& SetItemTextColor(const Color& itemTextColor_)
+        {
+            itemTextColor = itemTextColor_;
+            return *this;
+        }
+        public nothrow ListViewCreateParams& SetDisabledItemTextColor(const Color& disabledItemTextColor_)
+        {
+            disabledItemTextColor = disabledItemTextColor_;
+            return *this;
+        }
+        public nothrow ListViewCreateParams& SetColumnDividerColor(const Color& columnDividerColor_)
+        {
+            columnDividerColor = columnDividerColor_;
+            return *this;
+        }
+        public nothrow ListViewCreateParams& SetItemSelectedColor(const Color& itemSelectedColor_)
+        {
+            itemSelectedColor = itemSelectedColor_;
+            return *this;
+        }
+        public nothrow ListViewCreateParams& SetColumnHeaderPadding(const Padding& columnHeaderPadding_)
+        {
+            columnHeaderPadding = columnHeaderPadding_;
+            return *this;
+        }
+        public nothrow ListViewCreateParams& SetItemPadding(const Padding& itemPadding_)
+        {
+            itemPadding = itemPadding_;
+            return *this;
+        }
+        public nothrow ListViewCreateParams& SetItemColumnPadding(const Padding& itemColumnPadding_)
+        {
+            itemColumnPadding = itemColumnPadding_;
+            return *this;
+        }
+        public nothrow ListViewCreateParams& SetColumnDividerPadding(const Padding& columnDividerPadding_)
+        {
+            columnDividerPadding = columnDividerPadding_;
+            return *this;
+        }
+        public nothrow ListViewCreateParams& SetImagePadding(const Padding& imagePadding_)
+        {
+            imagePadding = imagePadding_;
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public bool allowMultiselect;
+        public string fontFamilyName;
+        public float fontSize;
+        public Color columnTextColor;
+        public Color itemTextColor;
+        public Color disabledItemTextColor;
+        public Color columnDividerColor;
+        public Color itemSelectedColor;
+        public Padding columnHeaderPadding;
+        public Padding itemPadding;
+        public Padding itemColumnPadding;
+        public Padding columnDividerPadding;
+        public Padding imagePadding;
+    }
+
+    public class ListView : Control
+    {
+        public enum Flags : int
+        {
+            none = 0, measured = 1 << 0, allowMultiselect = 1 << 1
+        }
+        public ListView(ListViewCreateParams& createParams) :
+            base(createParams.controlCreateParams),
+            flags(Flags.none), imageList(null),
+            columnHeaderTextBrush(createParams.columnTextColor),
+            itemTextBrush(createParams.itemTextColor),
+            disabledItemTextBrush(createParams.disabledItemTextColor),
+            itemSelectedBrush(createParams.itemSelectedColor),
+            columnDividerPen(createParams.columnDividerColor),
+            stringFormat(),
+            columnHeaderPadding(createParams.columnHeaderPadding),
+            itemPadding(createParams.itemPadding),
+            itemColumnPadding(createParams.itemColumnPadding),
+            columnDividerPadding(createParams.columnDividerPadding),
+            imagePadding(createParams.imagePadding),
+            charWidth(0),
+            charHeight(0),
+            columnDividerWidth(1),
+            ellipsisWidth(0),
+            mouseDownItem(null),
+            mouseEnterItem(null),
+            selectedItem(null),
+            mouseDownColumnDivider(null),
+            data(null),
+            arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW)),
+            columnSizeCursor(Application.GetResourceManager().GetCursor("column.size.system.windows.cursor"))
+        {
+            if (createParams.allowMultiselect)
+            {
+                SetFlag(Flags.allowMultiselect);
+            }
+            SetFont(Font(FontFamily(createParams.fontFamilyName), createParams.fontSize));
+        }
+        public nothrow inline ImageList* GetImageList() const
+        {
+            return imageList;
+        }
+        public nothrow void SetImageList(ImageList* imageList_)
+        {
+            imageList = imageList_;
+        }
+        public const StringFormat& GetStringFormat() const
+        {
+            return stringFormat;
+        }
+        public nothrow const Brush& ColumnHeaderTextBrush() const
+        {
+            return columnHeaderTextBrush;
+        }
+        public nothrow const Brush* ItemTextBrush() const
+        {
+            return &itemTextBrush;
+        }
+        public nothrow const Brush* DisabledItemTextBrush() const
+        {
+            return &disabledItemTextBrush;
+        }
+        public nothrow const Brush& ItemSelectedBrush() const
+        {
+            return itemSelectedBrush;
+        }
+        public nothrow const Pen& ColumnDividerPen() const
+        {
+            return columnDividerPen;
+        }
+        public nothrow const Padding& ColumnHeaderPadding() const
+        {
+            return columnHeaderPadding;
+        }
+        public nothrow const Padding& ItemPadding() const
+        {
+            return itemPadding;
+        }
+        public nothrow const Padding& ItemColumnPadding() const
+        {
+            return itemColumnPadding;
+        }
+        public nothrow const Padding& ColumnDividerPadding() const
+        {
+            return columnDividerPadding;
+        }
+        public nothrow const Padding& ImagePadding() const
+        {
+            return imagePadding;
+        }
+        public nothrow inline bool GetFlag(Flags flag) const
+        {
+            return (flags & flag) != Flags.none;
+        }
+        public nothrow void SetFlag(Flags flag)
+        {
+            flags = cast<Flags>(flags | flag);
+        }
+        public nothrow void ResetFlag(Flags flag)
+        {
+            flags = cast<Flags>(flags & ~flag);
+        }
+        public nothrow int ColumnCount() const
+        {
+            return cast<int>(columns.Count());
+        }
+        public nothrow void AddColumn(const string& name, int width)
+        {
+            ListViewColumn* column = new ListViewColumn(this, name, width);
+            columns.Add(UniquePtr<ListViewColumn>(column));
+            columnDividers.Add(UniquePtr<ListViewColumnDivider>(new ListViewColumnDivider(this, column)));
+        }
+        public const ListViewColumn& GetColumn(int columnIndex) const
+        {
+            if (columnIndex < 0 || columnIndex >= ColumnCount())
+            {
+                throw Exception("invalid column index");
+            }
+            return *columns[columnIndex];
+        }
+        public ListViewColumn& GetColumn(int columnIndex)
+        {
+            if (columnIndex < 0 || columnIndex >= ColumnCount())
+            {
+                throw Exception("invalid column index");
+            }
+            return *columns[columnIndex];
+        }
+        public int ItemCount() const
+        {
+            return cast<int>(items.Count());
+        }
+        public ListViewItem* AddItem()
+        {
+            ListViewItem* item = new ListViewItem(this);
+            items.Add(UniquePtr<ListViewItem>(item));
+            return item;
+        }
+        public const ListViewItem& GetItem(int itemIndex) const
+        {
+            if (itemIndex < 0 || itemIndex >= ItemCount())
+            {
+                throw Exception("invalid item index");
+            }
+            return *items[itemIndex];
+        }
+        public ListViewItem& GetItem(int itemIndex)
+        {
+            if (itemIndex < 0 || itemIndex >= ItemCount())
+            {
+                throw Exception("invalid item index");
+            }
+            return *items[itemIndex];
+        }
+        public nothrow inline ListViewItem* SelectedItem() const
+        {
+            return selectedItem;
+        }
+        public nothrow void SetSelectedItem(ListViewItem* selectedItem_)
+        {
+            if (GetFlag(Flags.allowMultiselect))
+            {
+                ResetSelectedItems();
+            }
+            if (selectedItem != selectedItem_)
+            {
+                if (selectedItem != null)
+                {
+                    selectedItem->ResetSelected();
+                }
+                selectedItem = selectedItem_;
+                if (selectedItem != null)
+                {
+                    selectedItem->SetSelected();
+                }
+            }
+        }
+        public nothrow List<ListViewItem*> GetSelectedItems() const
+        {
+            List<ListViewItem*> result;
+            for (const UniquePtr<ListViewItem>& item : items)
+            {
+                if (item->IsSelected())
+                {
+                    result.Add(item.Get());
+                }
+            }
+            return result;
+        }
+        public nothrow void ResetSelectedItems()
+        {
+            for (const UniquePtr<ListViewItem>& item : items)
+            {
+                if (item.Get() != SelectedItem())
+                {
+                    if (item->IsSelected())
+                    {
+                        item->ResetSelected();
+                    }
+                }
+            }
+        }
+        public nothrow ListViewItem* ItemAt(const Point& location) const
+        {
+            for (const UniquePtr<ListViewItem>& item : items)
+            {
+                Rect rect(item->Location(), item->GetSize());
+                if (rect.Contains(location))
+                {
+                    return item.Get();
+                }
+            }
+            return null;
+        }
+        public nothrow ListViewColumnDivider* ColumnDividerAt(const Point& location) const
+        {
+            for (const UniquePtr<ListViewColumnDivider>& columnDivider : columnDividers)
+            {
+                Rect rect(columnDivider->Location(), columnDivider->GetSize());
+                if (rect.Contains(location))
+                {
+                    return columnDivider.Get();
+                }
+            }
+            return null;
+        }
+        public nothrow inline float TextHeight() const
+        {
+            return charHeight;
+        }
+        public nothrow inline float ColumnDividerWidth() const
+        {
+            return columnDividerWidth;
+        }
+        public nothrow float EllipsisWidth() const
+        {
+            return ellipsisWidth;
+        }
+        public void FireColumnWidthChanged(ListViewColumn* column)
+        {
+            ListViewColumnEventArgs args(this, column);
+            OnColumnWidthChanged(args);
+        }
+        public nothrow void SetData(void* data_)
+        {
+            data = data_;
+        }
+        public nothrow inline void* Data() const
+        {
+            return data;
+        }
+        public nothrow Event<ListViewItemEventHandler, ListViewItemEventArgs>& ItemClickEvent()
+        {
+            return itemClickEvent;
+        }
+        public nothrow Event<ListViewItemEventHandler, ListViewItemEventArgs>& ItemRightClickEvent()
+        {
+            return itemRightClickEvent;
+        }
+        public nothrow Event<ListViewItemEventHandler, ListViewItemEventArgs>& ItemDoubleClickEvent()
+        {
+            return itemDoubleClickEvent;
+        }
+        public nothrow Event<ListViewItemEventHandler, ListViewItemEventArgs>& ItemEnterEvent()
+        {
+            return itemEnterEvent;
+        }
+        public nothrow Event<ListViewItemEventHandler, ListViewItemEventArgs>& ItemLeaveEvent()
+        {
+            return itemLeaveEvent;
+        }
+        public nothrow Event<ListViewColumnEventHandler, ListViewColumnEventArgs>& ColumnWidthChangedEvent()
+        {
+            return columnWidthChangedEvent;
+        }
+        protected override void OnSizeChanged(uint windowState)
+        {
+            base->OnSizeChanged(windowState);
+            SetContentLocation(Point(0, 0));
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            try
+            {
+                if (!GetFlag(Flags.measured))
+                {
+                    SetFlag(Flags.measured);
+                    Measure(args.graphics);
+                }
+                Size contentSize(0, 0);
+                args.graphics.Clear(BackgroundColor());
+                PointF origin;
+                MeasureItems(args.graphics, contentSize);
+                DrawColumnHeader(args.graphics, origin);
+                DrawItems(args.graphics, origin);
+                SetContentSize(contentSize);
+                base->OnPaint(args);
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+        protected override void OnMouseDown(MouseEventArgs& args)
+        {
+            try
+            {
+                mouseDownItem = null;
+                ListViewItem* item = ItemAt(args.location);
+                if (item != null)
+                {
+                    mouseDownItem = item;
+                }
+                else
+                {
+                    SetSelectedItem(null);
+                }
+                if (args.buttons == MouseButtons.lbutton)
+                {
+                    ListViewColumnDivider* columnDivider = ColumnDividerAt(args.location);
+                    if (columnDivider != null)
+                    {
+                        columnDivider->OnLButtonDown(args.location);
+                        mouseDownColumnDivider = columnDivider;
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        protected override void OnMouseUp(MouseEventArgs& args)
+        {
+            try
+            {
+                ListViewItem* item = ItemAt(args.location);
+                if (item == mouseDownItem)
+                {
+                    ListViewItemEventArgs itemArgs(this, item);
+                    if ((args.buttons & MouseButtons.lbutton) != MouseButtons.none)
+                    {
+                        if (GetFlag(Flags.allowMultiselect))
+                        {
+                            if ((args.buttons & MouseButtons.control) != MouseButtons.none)
+                            {
+                                itemArgs.control = true;
+                            }
+                        }
+                        itemClickEvent.Fire(itemArgs);
+                    }
+                    else if (args.buttons == MouseButtons.rbutton)
+                    {
+                        itemArgs.location = args.location;
+                        itemRightClickEvent.Fire(itemArgs);
+                    }
+                }
+                mouseDownItem = null;
+                if (args.buttons == MouseButtons.lbutton)
+                {
+                    if (mouseDownColumnDivider != null)
+                    {
+                        mouseDownColumnDivider->OnLButtonUp();
+                        mouseDownColumnDivider = null;
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        protected override void OnMouseDoubleClick(MouseEventArgs& args)
+        {
+            try
+            {
+                ListViewItem* item = ItemAt(args.location);
+                if (item != null)
+                {
+                    ListViewItemEventArgs args(this, item);
+                    itemDoubleClickEvent.Fire(args);
+                }
+                mouseDownItem = null;
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        protected override void OnMouseEnter()
+        {
+            try
+            {
+                mouseEnterItem = null;
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        protected override void OnMouseLeave()
+        {
+            try
+            {
+                if (mouseEnterItem != null)
+                {
+                    ListViewItemEventArgs leaveItemArgs(this, mouseEnterItem);
+                    itemLeaveEvent.Fire(leaveItemArgs);
+                    mouseEnterItem = null;
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        protected override void OnMouseMove(MouseEventArgs& args)
+        {
+            try
+            {
+                if (mouseEnterItem == null)
+                {
+                    mouseEnterItem = ItemAt(args.location);
+                    if (mouseEnterItem != null)
+                    {
+                        ListViewItemEventArgs itemArgs(this, mouseEnterItem);
+                        itemEnterEvent.Fire(itemArgs);
+                    }
+                }
+                else
+                {
+                    ListViewItem* item = ItemAt(args.location);
+                    if (item != mouseEnterItem)
+                    {
+                        ListViewItemEventArgs leaveItemArgs(this, mouseEnterItem);
+                        itemLeaveEvent.Fire(leaveItemArgs);
+                        mouseEnterItem = item;
+                        if (mouseEnterItem != null)
+                        {
+                            ListViewItemEventArgs enterItemArgs(this, mouseEnterItem);
+                            itemEnterEvent.Fire(enterItemArgs);
+                        }
+                    }
+                }
+                if (args.buttons == MouseButtons.lbutton)
+                {
+                    if (mouseDownColumnDivider != null)
+                    {
+                        if (mouseDownColumnDivider->HasMouseCapture())
+                        {
+                            mouseDownColumnDivider->OnMouseMove(args.location);
+                        }
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        protected virtual void OnColumnWidthChanged(ListViewColumnEventArgs& args)
+        {
+            columnWidthChangedEvent.Fire(args);
+        }
+        protected override void SetCursor()
+        {
+            Point pt;
+            GetCursorPos(pt.x, pt.y);
+            Point cursorPos = ScreenToClient(pt);
+            bool cursorSet = false;
+            for (const UniquePtr<ListViewColumnDivider>& columnDivider : columnDividers)
+            {
+                Rect r(columnDivider->Location(), columnDivider->GetSize());
+                if (r.Contains(cursorPos))
+                {
+                    System.Windows.SetCursor(columnSizeCursor);
+                    cursorSet = true;
+                    break;
+                }
+            }
+            if (!cursorSet)
+            {
+                System.Windows.SetCursor(arrowCursor);
+            }
+        }
+        private void Measure(Graphics& graphics)
+        {
+            RectF charRect = graphics.MeasureStringChecked("This is test string", GetFont(), PointF(0, 0), stringFormat);
+            charHeight = charRect.size.h;
+            charWidth = charRect.size.w;
+            SetScrollUnits(cast<int>(charHeight + 0.5), cast<int>(2 * (charWidth + 0.5)));
+            RectF ellipsisRect = graphics.MeasureStringChecked("...", GetFont(), PointF(0, 0), stringFormat);
+            ellipsisWidth = ellipsisRect.size.w;
+        }
+        private void MeasureItems(Graphics& graphics, Size& contentSize)
+        {
+            int maxWidth = 0;
+            Point loc(itemPadding.left, cast<int>(charHeight + 0.5 + columnHeaderPadding.Vertical()));
+            for (const UniquePtr<ListViewItem>& item : items)
+            {
+                item->SetLocation(loc);
+                item->Measure(graphics);
+                Size itemSize = item->GetSize();
+                loc.y = loc.y + itemSize.h;
+                maxWidth = Max(maxWidth, itemSize.w);
+            }
+            contentSize.w = Max(contentSize.w, maxWidth);
+            contentSize.h = Max(contentSize.h, loc.y);
+        }
+        private void DrawColumnHeader(Graphics& graphics, PointF& origin)
+        {
+            PointF headerOrigin = origin;
+            headerOrigin.x = headerOrigin.x + columnHeaderPadding.left;
+            headerOrigin.y = headerOrigin.y + columnHeaderPadding.top;
+            long n = columns.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                ListViewColumn* column = columns[i].Get();
+                column->Draw(graphics, headerOrigin);
+                headerOrigin.x = headerOrigin.x + column->Width() + columnHeaderPadding.Horizontal();
+                ListViewColumnDivider* divider = columnDividers[i].Get();
+                headerOrigin.x = headerOrigin.x + columnDividerPadding.left;
+                divider->Draw(graphics, headerOrigin);
+                headerOrigin.x = headerOrigin.x + columnDividerWidth + columnDividerPadding.right;
+            }
+            origin.y = origin.y + charHeight + columnHeaderPadding.Vertical();
+        }
+        private void DrawItems(Graphics& graphics, PointF& origin)
+        {
+            for (const UniquePtr<ListViewItem>& item : items)
+            {
+                PointF itemOrigin = origin;
+                itemOrigin.y = itemOrigin.y + itemPadding.top;
+                itemOrigin.x = itemOrigin.x + itemPadding.left;
+                item->Draw(graphics, itemOrigin);
+                Size sz = item->GetSize();
+                origin.y = origin.y + sz.h;
+            }
+        }
+        private Flags flags;
+        private ImageList* imageList;
+        private SolidBrush columnHeaderTextBrush;
+        private SolidBrush itemTextBrush;
+        private SolidBrush disabledItemTextBrush;
+        private SolidBrush itemSelectedBrush;
+        private Pen columnDividerPen;
+        private StringFormat stringFormat;
+        private Padding columnHeaderPadding;
+        private Padding itemPadding;
+        private Padding itemColumnPadding;
+        private Padding columnDividerPadding;
+        private Padding imagePadding;
+        private float charWidth;
+        private float charHeight;
+        private float columnDividerWidth;
+        private float ellipsisWidth;
+        private ListViewItem* mouseDownItem;
+        private ListViewItem* mouseEnterItem;
+        private ListViewItem* selectedItem;
+        private ListViewColumnDivider* mouseDownColumnDivider;
+        private void* data;
+        private Cursor arrowCursor;
+        private Cursor& columnSizeCursor;
+        private List<UniquePtr<ListViewColumn>> columns;
+        private List<UniquePtr<ListViewColumnDivider>> columnDividers;
+        private List<UniquePtr<ListViewItem>> items;
+        private Event<ListViewItemEventHandler, ListViewItemEventArgs> itemClickEvent;
+        private Event<ListViewItemEventHandler, ListViewItemEventArgs> itemRightClickEvent;
+        private Event<ListViewItemEventHandler, ListViewItemEventArgs> itemDoubleClickEvent;
+        private Event<ListViewItemEventHandler, ListViewItemEventArgs> itemEnterEvent;
+        private Event<ListViewItemEventHandler, ListViewItemEventArgs> itemLeaveEvent;
+        private Event<ListViewColumnEventHandler, ListViewColumnEventArgs> columnWidthChangedEvent;
+    }
+
+    public class ListViewColumn
+    {
+        public nothrow ListViewColumn(ListView* view_, const string& name_, int width_) :
+            view(view_), name(name_), width(width_), minWidth(0)
+        {
+        }
+        public nothrow inline const string& Name() const
+        {
+            return name;
+        }
+        public nothrow inline int Width() const
+        {
+            return width;
+        }
+        public nothrow void SetWidth(int width_)
+        {
+            if (width != width_)
+            {
+                width = width_;
+                view->FireColumnWidthChanged(this);
+                view->Invalidate();
+            }
+        }
+        public nothrow inline int MinWidth() const
+        {
+            return minWidth;
+        }
+        public nothrow void SetMinWidth(int minWidth_)
+        {
+            minWidth = minWidth_;
+        }
+        public void Draw(Graphics& graphics, const PointF& origin)
+        {
+            graphics.DrawStringChecked(name, view->GetFont(), origin, view->ColumnHeaderTextBrush());
+        }
+        private ListView* view;
+        private string name;
+        private int width;
+        private int minWidth;
+    }
+
+    public class ListViewColumnDivider
+    {
+        public nothrow ListViewColumnDivider(ListView* view_, ListViewColumn* column_) :
+            view(view_), column(column_), location(), startCapturePos(), startColumnWidth(0), hasMouseCapture(false)
+        {
+        }
+        public nothrow inline const Point& Location() const
+        {
+            return location;
+        }
+        public nothrow Size GetSize() const
+        {
+            return Size(cast<int>(view->ColumnDividerWidth() + 4 * view->ColumnDividerPadding().Horizontal() + 0.5f), cast<int>(view->TextHeight() + 0.5f));
+        }
+        public nothrow inline bool HasMouseCapture() const
+        {
+            return hasMouseCapture;
+        }
+        public void OnLButtonDown(const Point& pos)
+        {
+            WinSetCapture(view->Handle());
+            startCapturePos = pos;
+            startColumnWidth = column->Width();
+            hasMouseCapture = true;
+        }
+        public void OnMouseMove(const Point& pos)
+        {
+            column->SetWidth(Max(column->MinWidth(), startColumnWidth + pos.x - startCapturePos.x));
+        }
+        public void OnLButtonUp()
+        {
+            WinReleaseCapture();
+            hasMouseCapture = false;
+        }
+        public void Draw(Graphics& graphics, const PointF& origin)
+        {
+            const Pen& pen = view->ColumnDividerPen();
+            Size sz = GetSize();
+            location = Point(cast<int>(origin.x - sz.w / 2), cast<int>(origin.y));
+            PointF end = origin;
+            end.y = end.y + view->TextHeight();
+            graphics.DrawLine(pen, origin, end);
+        }
+        private ListView* view;
+        private ListViewColumn* column;
+        private Point location;
+        private Point startCapturePos;
+        private int startColumnWidth;
+        private bool hasMouseCapture;
+    }
+
+    public class ListViewItem
+    {
+        public enum Flags : int
+        {
+            none = 0, disabled = 1 << 0, selected = 1 << 1
+        }
+        public enum State : int
+        {
+            enabled, disabled
+        }
+        public nothrow ListViewItem(ListView* view_) : view(view_), flags(Flags.none), imageIndex(-1), disabledImageIndex(-1), data(null)
+        {
+        }
+        public void SetColumnValue(int columnIndex, const string& columnValue)
+        {
+            if (columnIndex < 0)
+            {
+                throw Exception("invalid column index");
+            }
+            while (columnIndex >= columnValues.Count())
+            {
+                columnValues.Add(string());
+            }
+            columnValues[columnIndex] = columnValue;
+        }
+        public string GetColumnValue(int columnIndex) const
+        {
+            if (columnIndex < 0)
+            {
+                throw Exception("invalid column index");
+            }
+            if (columnIndex >= columnValues.Count())
+            {
+                return string();
+            }
+            return columnValues[columnIndex];
+        }
+        public void Draw(Graphics& graphics, PointF& origin)
+        {
+            if (IsSelected())
+            {
+                const Brush& selectedBrush = view->ItemSelectedBrush();
+                Rect rect(location, size);
+                graphics.FillRectangleChecked(selectedBrush, rect);
+            }
+            PointF itemOrigin = origin;
+            int imageSpace = 0;
+            DrawImage(graphics, itemOrigin, imageSpace);
+            for (int index = 0; index < view->ColumnCount(); ++index)
+            {
+                int imgSpc = 0;
+                if (index == 0)
+                {
+                    imgSpc = imageSpace;
+                }
+                imgSpc = imageSpace;
+                bool clipped = false;
+                Region prevClip;
+                if (index < textWidths.Count() && textWidths[index] > view->GetColumn(index).Width())
+                {
+                    prevClip = graphics.GetClipChecked();
+                    clipped = true;
+                    Size itemSize(Size(cast<int>(view->GetColumn(index).Width() - view->EllipsisWidth() - imgSpc), cast<int>(view->TextHeight())));
+                    Rect clip(Point(cast<int>(itemOrigin.x), cast<int>(itemOrigin.y)), itemSize);
+                    graphics.SetClipChecked(clip);
+                }
+                const Brush* brush = view->ItemTextBrush();
+                if (GetState() == State.disabled)
+                {
+                    brush = view->DisabledItemTextBrush();
+                }
+                graphics.DrawStringChecked(GetColumnValue(index), view->GetFont(), itemOrigin, *brush);
+                itemOrigin.x = itemOrigin.x + view->GetColumn(index).Width();
+                if (clipped)
+                {
+                    graphics.SetClipChecked(prevClip);
+                    PointF ellipsisOrigin(itemOrigin.x - view->EllipsisWidth() - imgSpc, itemOrigin.y);
+                    graphics.DrawStringChecked("...", view->GetFont(), ellipsisOrigin, *brush);
+                }
+                itemOrigin.x = itemOrigin.x + view->ColumnDividerPadding().Horizontal() + view->ColumnDividerWidth() - imgSpc;
+                itemOrigin.x = itemOrigin.x + view->ItemColumnPadding().Horizontal();
+            }
+        }
+        public void Measure(Graphics& graphics)
+        {
+            float width = 0;
+            float height = 0;
+            Bitmap* image = null;
+            ImageList* imageList = view->GetImageList();
+            if (imageList != null)
+            {
+                if (GetState() == State.enabled)
+                {
+                    image = imageList->GetImage(imageIndex);
+                }
+                else
+                {
+                    image = imageList->GetImage(disabledImageIndex);
+                }
+            }
+            if (image != null)
+            {
+                int imageWidth = cast<int>(image->GetWidth());
+                int imageHeight = cast<int>(image->GetHeight());
+                Padding padding = view->ImagePadding();
+                if (view->ColumnCount() > 0)
+                {
+                    ListViewColumn& firstColumn = view->GetColumn(0);
+                    firstColumn.SetMinWidth(Max(firstColumn.MinWidth(), cast<int>(imageWidth + padding.Horizontal() + view->EllipsisWidth() + 0.5f)));
+                }
+                height = imageHeight + padding.Vertical();
+            }
+            for (int index = 0; index < view->ColumnCount(); ++index)
+            {
+                ListViewColumn& column = view->GetColumn(index);
+                width = width + column.Width();
+                width = width + view->ColumnDividerWidth() + view->ColumnDividerPadding().Horizontal();
+                height = Max(height, view->TextHeight());
+                column.SetMinWidth(Max(column.MinWidth(), cast<int>(view->EllipsisWidth() + 0.5f)));
+            }
+            width = width + view->ItemPadding().Horizontal();
+            size = Size(cast<int>(width + 0.5f), cast<int>(height + 0.5f));
+            textWidths.Clear();
+            for (const string& columnValue : columnValues)
+            {
+                RectF r = graphics.MeasureStringChecked(columnValue, view->GetFont(), PointF(0, 0), view->GetStringFormat());
+                textWidths.Add(r.size.w);
+            }
+        }
+        public nothrow inline const Point& Location() const
+        {
+            return location;
+        }
+        public nothrow void SetLocation(const Point& location_)
+        {
+            location = location_;
+        }
+        public nothrow inline const Size& GetSize() const
+        {
+            return size;
+        }
+        public nothrow inline bool GetFlag(Flags flag) const
+        {
+            return (flags & flag) != Flags.none;
+        }
+        public nothrow inline void SetFlag(Flags flag)
+        {
+            flags = cast<Flags>(flags | flag);
+        }
+        public nothrow inline void ResetFlag(Flags flag)
+        {
+            flags = cast<Flags>(flags & ~flag);
+        }
+        public nothrow inline bool IsSelected() const
+        {
+            return GetFlag(Flags.selected);
+        }
+        public nothrow void SetSelected()
+        {
+            if (!IsSelected())
+            {
+                SetFlag(Flags.selected);
+                view->Invalidate();
+            }
+        }
+        public nothrow void ResetSelected()
+        {
+            if (IsSelected())
+            {
+                ResetFlag(Flags.selected);
+                view->Invalidate();
+            }
+        }
+        public nothrow State GetState() const
+        {
+            if (GetFlag(Flags.disabled))
+            {
+                return State.disabled;
+            }
+            else
+            {
+                return State.enabled;
+            }
+        }
+        public nothrow void SetState(State state)
+        {
+            if (state != GetState())
+            {
+                if (state == State.disabled)
+                {
+                    SetFlag(Flags.disabled);
+                }
+                else
+                {
+                    ResetFlag(Flags.disabled);
+                }
+                view->Invalidate();
+            }
+        }
+        public nothrow inline ListView* View() const
+        {
+            return view;
+        }
+        public nothrow inline void* Data() const
+        {
+            return data;
+        }
+        public nothrow void SetData(void* data_)
+        {
+            data = data_;
+        }
+        public nothrow inline int ImageIndex() const
+        {
+            return imageIndex;
+        }
+        public nothrow void SetImageIndex(int imageIndex_)
+        {
+            imageIndex = imageIndex_;
+        }
+        public nothrow inline int DisabledImageIndex() const
+        {
+            return disabledImageIndex;
+        }
+        public nothrow void SetDisabledImageIndex(int disabledImageIndex_)
+        {
+            disabledImageIndex = disabledImageIndex_;
+        }
+        private void DrawImage(Graphics& graphics, PointF& origin, int& imageSpace)
+        {
+            imageSpace = 0;
+            Bitmap* image = null;
+            ImageList* imageList = view->GetImageList();
+            if (imageList != null)
+            {
+                if (GetState() == State.enabled)
+                {
+                    image = imageList->GetImage(imageIndex);
+                }
+                else
+                {
+                    image = imageList->GetImage(disabledImageIndex);
+                }
+            }
+            if (image != null)
+            {
+                int imageWidth = cast<int>(image->GetWidth());
+                int imageHeight = cast<int>(image->GetHeight());
+                Padding padding = view->ImagePadding();
+                Point imageLoc = Point(cast<int>(origin.x), cast<int>(origin.y));
+                imageLoc.x = imageLoc.x + padding.left;
+                imageLoc.y = imageLoc.y + padding.top;
+                Rect r(imageLoc, Size(imageWidth + padding.Horizontal(), imageHeight + padding.Vertical()));
+                ImageAttributes attributes;
+                attributes.SetColorKey(Color.DefaultBitmapTransparent(), Color.DefaultBitmapTransparent(), ColorAdjustType.default_);
+                graphics.DrawImageChecked(*image, r, 0, 0, imageWidth + padding.Horizontal(), imageHeight + padding.Vertical(), Unit.pixel, attributes);
+                imageSpace = imageWidth + padding.Horizontal();
+                origin.x = origin.x + imageSpace;
+            }
+        }
+        private Flags flags;
+        private Point location;
+        private Size size;
+        private ListView* view;
+        private int imageIndex;
+        private int disabledImageIndex;
+        private void* data;
+        private List<string> columnValues;
+        private List<float> textWidths;
+    }
+}

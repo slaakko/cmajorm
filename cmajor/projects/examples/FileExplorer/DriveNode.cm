@@ -1,0 +1,55 @@
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace FileExplorer
+{
+    public class DriveNode : Node
+    {
+        public nothrow DriveNode(const string& name_) : base(name_)
+        {
+        }
+        public nothrow void SetRootDirectory(DirectoryNode* rootDirectory_)
+        {
+            rootDirectory.Reset(rootDirectory_);
+            rootDirectory->SetParent(this);
+            rootDirectory->SetRootDirectory();
+        }
+        public inline nothrow DirectoryNode* RootDirectory() const
+        {
+            return rootDirectory.Get();
+        }
+        public nothrow override string ImageName() const
+        {
+            return "hard_drive.bitmap";
+        }
+        public override nothrow TreeViewNode* ToTreeViewNode(bool createChildren, ImageList* imageList)
+        {
+            UniquePtr<TreeViewNode> treeViewNodePtr(new TreeViewNode(Name()));
+            TreeViewNode* treeViewNode = treeViewNodePtr.Get();
+            SetTreeViewNode(treeViewNode);
+            if (imageList != null)
+            {
+                int imageIndex = imageList->GetImageIndex(ImageName());
+                if (imageIndex != -1)
+                {
+                    treeViewNode->SetImageIndex(imageIndex);
+                }
+            }
+            return treeViewNodePtr.Release();
+        }
+        public override Control* CreateView(ImageList* imageList)
+        {
+            if (!rootDirectory.IsNull())
+            {
+                return rootDirectory->CreateView(imageList);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        private UniquePtr<DirectoryNode> rootDirectory;
+    }
+}
+

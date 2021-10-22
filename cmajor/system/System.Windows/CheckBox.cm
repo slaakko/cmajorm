@@ -9,6 +9,37 @@ namespace System.Windows
 {
     public class delegate void CheckedChangedEventHandler();
 
+    public nothrow ControlCreateParams& CheckBoxControlCreateParams(ControlCreateParams& controlCreateParams, ButtonStyle buttonStyle)
+    {
+        controlCreateParams.SetWindowClassName("BUTTON");
+        controlCreateParams.SetWindowStyle(cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | buttonStyle));
+        controlCreateParams.SetBackgroundColor(DefaultControlBackgroundColor());
+        return controlCreateParams;
+    }
+
+    public nothrow ControlCreateParams& CheckBoxControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return CheckBoxControlCreateParams(controlCreateParams, cast<ButtonStyle>(ButtonStyle.BS_CHECKBOX | ButtonStyle.BS_NOTIFY));
+    }
+
+    public class CheckBoxCreateParams
+    {
+        public nothrow CheckBoxCreateParams(ControlCreateParams& controlCreateParams_) : controlCreateParams(controlCreateParams_), autoSize(true)
+        {
+        }
+        public nothrow CheckBoxCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public CheckBoxCreateParams& SetAutoSize(bool autoSize_)
+        {
+            autoSize = autoSize_;
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public bool autoSize;
+    }
+
     public class CheckBox : ButtonBase
     {
         private enum Flags : sbyte
@@ -16,8 +47,9 @@ namespace System.Windows
             none = 0, checked = 1 << 0, autoSize = 1 << 1, autoSized = 1 << 2
         }
         public CheckBox(const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, bool autoSize) :
-            base("BUTTON", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | ButtonStyle.BS_CHECKBOX | ButtonStyle.BS_NOTIFY), DefaultExtendedWindowStyle(),
-            backgroundColor, text, location, size, dock, anchors), flags(Flags.none)
+            base("BUTTON", DefaultWindowClassStyle(),
+            cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | ButtonStyle.BS_CHECKBOX | ButtonStyle.BS_NOTIFY),
+            DefaultExtendedWindowStyle(), backgroundColor, text, location, size, dock, anchors), flags(Flags.none)
         {
             if (autoSize)
             {
@@ -31,6 +63,17 @@ namespace System.Windows
         public CheckBox(const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, bool autoSize) :
             this(DefaultControlBackgroundColor(), text, location, size, dock, anchors, autoSize)
         {
+        }
+        public CheckBox(CheckBoxCreateParams& createParams) : base(createParams.controlCreateParams)
+        {
+            if (createParams.autoSize)
+            {
+                SetAutoSizeFlag();
+            }
+            else
+            {
+                ResetAutoSizeFlag();
+            }
         }
         public bool Checked()
         {

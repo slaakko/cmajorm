@@ -1,0 +1,163 @@
+using System;
+using System.Windows;
+
+namespace FileExplorer
+{
+    public nothrow System.Windows.Color DefaultPathBarBackgroundColor()
+    {
+        return System.Windows.Color.White();
+    }
+
+    public nothrow System.Windows.Color DefaultPathBarFrameColor()
+    {
+        return System.Windows.Color(204u, 206u, 219u);
+    }
+
+    public nothrow ControlCreateParams& PathBarControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return controlCreateParams.SetWindowClassName("FileExplorer.PathBar").
+            SetWindowClassBackgroundColor(SystemColor.COLOR_WINDOW).
+            SetBackgroundColor(DefaultPathBarBackgroundColor());
+    }
+
+    public class PathBarCreateParams
+    {
+        public nothrow PathBarCreateParams(ControlCreateParams& controlCreateParams_) :
+            controlCreateParams(controlCreateParams_),
+            frameColor(DefaultPathBarFrameColor())
+        {
+        }
+        public nothrow PathBarCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public nothrow PathBarCreateParams& SetFrameColor(const System.Windows.Color& frameColor_)
+        {
+            frameColor = frameColor_;
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public System.Windows.Color frameColor;
+    }
+
+    public class PathBar : ContainerControl
+    {
+        public PathBar(PathBarCreateParams& createParams,
+            ControlCreateParams& emptyViewCreateParams,
+            ParentPathSelectorCreateParams& parentPathSelectorCreateParams,
+            PathDividerCreateParams& pathDividerCreateParams,
+            PathViewCreateParams& pathViewCreateParams) :
+            base(createParams.controlCreateParams)
+        {
+            UniquePtr<EmptyView> emptyViewPtr(new EmptyView(emptyViewCreateParams));
+            emptyView = emptyViewPtr.Get();
+            AddChild(emptyViewPtr.Release());
+            UniquePtr<PathDivider> pathDivider1Ptr(new PathDivider(pathDividerCreateParams));
+            pathDivider1 = pathDivider1Ptr.Get();
+            AddChild(pathDivider1Ptr.Release());
+            UniquePtr<ParentPathSelector> parentPathSelectorPtr(new ParentPathSelector(parentPathSelectorCreateParams));
+            parentPathSelector = parentPathSelectorPtr.Get();
+            parentPathSelector->SetDoubleBuffered();
+            AddChild(parentPathSelectorPtr.Release());
+            UniquePtr<PathDivider> pathDivider2Ptr(new PathDivider(pathDividerCreateParams));
+            pathDivider2 = pathDivider2Ptr.Get();
+            AddChild(pathDivider2Ptr.Release());
+            UniquePtr<PathView> pathViewPtr(new PathView(pathViewCreateParams));
+            pathView = pathViewPtr.Get();
+            pathView->SetDoubleBuffered();
+            AddChild(pathViewPtr.Release());
+        }
+        public nothrow void SetEmptyViewWidth(int width)
+        {
+            Size sz = emptyView->GetSize();
+            sz.w = width + 4;
+            emptyView->SetSize(sz);
+            Size pathDivider1Size = pathDivider1->GetSize();
+            sz.w = sz.w + pathDivider1Size.w;
+            sz.w = sz.w + 32;
+            Size pathDivider2Size = pathDivider2->GetSize();
+            sz.w = sz.w + pathDivider2Size.w;
+            Size pvSize = pathView->GetSize();
+            sz.w = sz.w + pvSize.w;
+            sz.h = Max(sz.h, pvSize.h);
+            SetSize(sz);
+        }
+        public nothrow void SetPathViewMaxWidth(int width)
+        {
+            Size sz = emptyView->GetSize();
+            pathView->SetMaxWidth(width);
+            Size pathDivider1Size = pathDivider1->GetSize();
+            sz.w = sz.w + pathDivider1Size.w;
+            sz.w = sz.w + 32;
+            Size pathDivider2Size = pathDivider2->GetSize();
+            sz.w = sz.w + pathDivider2Size.w;
+            Size pvSize = pathView->GetSize();
+            sz.w = sz.w + pvSize.w;
+            sz.h = Max(sz.h, pvSize.h);
+            SetSize(sz);
+        }
+        public nothrow void SetCurrentNode(Node* currentNode_)
+        {
+            pathView->Clear();
+            currentNode = currentNode_;
+            Node* node = currentNode;
+            while (node != null)
+            {
+                if (!node->IsRootDirectory())
+                {
+                    pathView->PushPathComponent(node->Name(), node);
+                }
+                node = node->Parent();
+            }
+            Invalidate();
+        }
+        public nothrow inline Node* CurrentNode() const
+        {
+            return currentNode;
+        }
+        public nothrow ParentPathSelector* GetParentPathSelector() const
+        {
+            return parentPathSelector;
+        }
+        public nothrow PathView* GetPathView() const
+        {
+            return pathView;
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            if (emptyView != null)
+            {
+                emptyView->Invalidate();
+            }
+            if (pathDivider1 != null)
+            {
+                pathDivider1->Invalidate();
+            }
+            if (parentPathSelector != null)
+            {
+                parentPathSelector->Invalidate();
+            }
+            if (pathDivider2 != null)
+            {
+                pathDivider2->Invalidate();
+            }
+            if (pathView != null)
+            {
+                pathView->Invalidate();
+            }
+            base->OnPaint(args);
+        }
+        protected override void OnSizeChanged(uint windowState)
+        {
+            base->OnSizeChanged(windowState);
+            DockChildren();
+        }
+        private EmptyView* emptyView;
+        private PathDivider* pathDivider1;
+        private ParentPathSelector* parentPathSelector;
+        private PathDivider* pathDivider2;
+        private PathView* pathView;
+        private Node* currentNode;
+    }
+}
+

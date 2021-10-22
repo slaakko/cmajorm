@@ -94,8 +94,17 @@ void DisposeError(int32_t errorId)
 
 #ifdef _WIN32
 
+#if defined(__MINGW32__)
+
+void* currentException = nullptr;
+uint64_t currentExceptionClassId[2];
+
+#else
+
 __declspec(thread) void* currentException = nullptr;
 __declspec(thread) uint64_t currentExceptionClassId[2];
+
+#endif
 
 #else
 

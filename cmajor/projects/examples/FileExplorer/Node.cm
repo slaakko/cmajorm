@@ -1,0 +1,176 @@
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace FileExplorer
+{
+    public abstract class Node
+    {
+        public nothrow Node(const string& name_) :
+            name(name_), parent(null), treeViewNode(null), listViewItem(null)
+        {
+        }
+        public default virtual ~Node();
+        public nothrow inline const string& Name() const
+        {
+            return name;
+        }
+        public nothrow inline Node* Parent() const
+        {
+            return parent;
+        }
+        public nothrow void SetParent(Node* parent_)
+        {
+            parent = parent_;
+        }
+        public nothrow virtual bool IsRootDirectory() const
+        {
+            return false;
+        }
+        public virtual nothrow MainWindow* GetMainWindow() const
+        {
+            if (parent != null)
+            {
+                return parent->GetMainWindow();
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public nothrow inline TreeViewNode* GetTreeViewNode() const
+        {
+            return treeViewNode;
+        }
+        public nothrow void SetTreeViewNode(TreeViewNode* treeViewNode_)
+        {
+            treeViewNode = treeViewNode_;
+            treeViewNode->SetData(this);
+            TreeView* treeView = treeViewNode->GetTreeView();
+            if (treeView != null)
+            {
+                ImageList* imageList = treeView->GetImageList();
+                if (imageList != null)
+                {
+                    int imageIndex = imageList->GetImageIndex(ImageName());
+                    if (imageIndex != -1)
+                    {
+                        treeViewNode->SetImageIndex(imageIndex);
+                    }
+                }
+            }
+        }
+        public nothrow virtual TreeViewNode* ToTreeViewNode(bool createChildren, ImageList* imageList)
+        {
+            return null;
+        }
+        public nothrow abstract string ImageName() const;
+        public nothrow virtual string ExpandedImageName() const
+        {
+            return ImageName();
+        }
+        public virtual Control* CreateView(ImageList* imageList)
+        {
+            return null;
+        }
+        public virtual nothrow string DirectoryPath()
+        {
+            return string();
+        }
+        public virtual nothrow bool CanOpen() const
+        {
+            return true;
+        }
+        public void AddMenuItems(ContextMenu* contextMenu, bool treeView)
+        {
+            if (CanOpen())
+            {
+                ClickAction* action = null;
+                UniquePtr<MenuItem> openMenuItem(new MenuItem("Open"));
+                if (treeView)
+                {
+                    action = new OpenAndExpandAction(this);
+                }
+                else
+                {
+                    action = new OpenAction(this);
+                }
+                contextMenu->AddMenuItemAction(openMenuItem.Release(), action);
+            }
+        }
+        public virtual nothrow void SetData(ListViewItem* item, ImageList* imageList)
+        {
+            listViewItem = item;
+            item->SetData(this);
+            item->SetColumnValue(0, Name());
+            string imageName = ImageName();
+            if (!imageName.IsEmpty())
+            {
+                item->SetImageIndex(imageList->GetImageIndex(imageName));
+            }
+        }
+        public void Open()
+        {
+            Explore();
+            ViewContent();
+            SetCurrentPathNode();
+        }
+        public void OpenAndExpand()
+        {
+            Open();
+            TreeViewNode* treeViewNode = GetTreeViewNode();
+            if (treeViewNode != null && !treeViewNode->Children().IsEmpty())
+            {
+                treeViewNode->Expand();
+            }
+        }
+        public void ExecuteDefaultAction()
+        {
+            if (CanOpen())
+            {
+                Open();
+            }
+        }
+        private void Explore()
+        {
+            MainWindow* mainWindow = GetMainWindow();
+            if (mainWindow != null)
+            {
+                DirectoryTreeView* directoryTreeView = mainWindow->GetDirectoryTreeView();
+                if (directoryTreeView != null)
+                {
+                    directoryTreeView->Open(this);
+                }
+            }
+        }
+        private void ViewContent()
+        {
+            MainWindow* mainWindow = GetMainWindow();
+            if (mainWindow != null)
+            {
+                ContentView* contentView = mainWindow->GetContentView();
+                if (contentView != null)
+                {
+                    contentView->ViewContent(this);
+                }
+            }
+        }
+        public void SetCurrentPathNode()
+        {
+            MainWindow* mainWindow = GetMainWindow();
+            if (mainWindow != null)
+            {
+                PathBar* pathBar = mainWindow->GetPathBar();
+                if (pathBar != null)
+                {
+                    pathBar->SetCurrentNode(this);
+                }
+            }
+        }
+        private string name;
+        private Node* parent;
+        private TreeViewNode* treeViewNode;
+        private ListViewItem* listViewItem;
+    }
+}
+

@@ -292,45 +292,52 @@ std::unique_ptr<sngxml::dom::Element> GetDetails(Input* input, const std::u32str
     sngxml::dom::Document* moduleXmlDoc, const std::vector<sngxml::dom::Document*>& otherModuleXmlDocs, const std::u32string& prefix)
 {
     if (!docs) return std::unique_ptr<sngxml::dom::Element>();
-    std::lock_guard<std::mutex> lock(GetInputMutex());
-    std::unique_ptr<sngxml::dom::Element> detailParagraphs;
-    sngxml::dom::Element* docElement = docs->GetElementById(docId);
-    if (docElement)
+    try
     {
-        std::unique_ptr<sngxml::xpath::XPathObject> detailsObject = sngxml::xpath::Evaluate(U"details", docElement);
-        if (detailsObject->Type() == sngxml::xpath::XPathObjectType::nodeSet)
+        std::lock_guard<std::mutex> lock(GetInputMutex());
+        std::unique_ptr<sngxml::dom::Element> detailParagraphs;
+        sngxml::dom::Element* docElement = docs->GetElementById(docId);
+        if (docElement)
         {
-            sngxml::xpath::XPathNodeSet* detailsNodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(detailsObject.get());
-            int n = detailsNodeSet->Length();
-            if (n > 0)
+            std::unique_ptr<sngxml::xpath::XPathObject> detailsObject = sngxml::xpath::Evaluate(U"details", docElement);
+            if (detailsObject->Type() == sngxml::xpath::XPathObjectType::nodeSet)
             {
-                detailParagraphs.reset(new sngxml::dom::Element(U"span"));
-                detailParagraphs->SetAttribute(U"xml:space", U"preserve");
-                for (int i = 0; i < n; ++i)
+                sngxml::xpath::XPathNodeSet* detailsNodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(detailsObject.get());
+                int n = detailsNodeSet->Length();
+                if (n > 0)
                 {
-                    sngxml::dom::Node* detailNode = (*detailsNodeSet)[i];
-                    if (detailNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
+                    detailParagraphs.reset(new sngxml::dom::Element(U"span"));
+                    detailParagraphs->SetAttribute(U"xml:space", U"preserve");
+                    for (int i = 0; i < n; ++i)
                     {
-                        sngxml::dom::Element* detailElement = static_cast<sngxml::dom::Element*>(detailNode);
-                        std::u32string title = detailElement->GetAttribute(U"title");
-                        if (!title.empty())
+                        sngxml::dom::Node* detailNode = (*detailsNodeSet)[i];
+                        if (detailNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
                         {
-                            std::unique_ptr<sngxml::dom::Element> h2Element(new sngxml::dom::Element(U"h2"));
-                            h2Element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(title)));
-                            detailParagraphs->AppendChild(std::unique_ptr<sngxml::dom::Node>(h2Element.release()));
+                            sngxml::dom::Element* detailElement = static_cast<sngxml::dom::Element*>(detailNode);
+                            std::u32string title = detailElement->GetAttribute(U"title");
+                            if (!title.empty())
+                            {
+                                std::unique_ptr<sngxml::dom::Element> h2Element(new sngxml::dom::Element(U"h2"));
+                                h2Element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(title)));
+                                detailParagraphs->AppendChild(std::unique_ptr<sngxml::dom::Node>(h2Element.release()));
+                            }
+                            std::unique_ptr<sngxml::dom::Element> detailParagraph(new sngxml::dom::Element(U"p"));
+                            detailParagraph->SetAttribute(U"xml:space", U"preserve");
+                            detailParagraph->SetAttribute(U"class", U"description");
+                            ContentVisitor visitor(input, detailParagraph.get(), moduleXmlDoc, otherModuleXmlDocs, prefix);
+                            detailElement->Accept(visitor);
+                            detailParagraphs->AppendChild(std::unique_ptr<sngxml::dom::Node>(detailParagraph.release()));
                         }
-                        std::unique_ptr<sngxml::dom::Element> detailParagraph(new sngxml::dom::Element(U"p"));
-                        detailParagraph->SetAttribute(U"xml:space", U"preserve");
-                        detailParagraph->SetAttribute(U"class", U"description");
-                        ContentVisitor visitor(input, detailParagraph.get(), moduleXmlDoc, otherModuleXmlDocs, prefix);
-                        detailElement->Accept(visitor);
-                        detailParagraphs->AppendChild(std::unique_ptr<sngxml::dom::Node>(detailParagraph.release()));
                     }
                 }
             }
         }
+        return detailParagraphs;
     }
-    return detailParagraphs;
+    catch (...)
+    {
+    }
+    return std::unique_ptr<sngxml::dom::Element>();
 }
 
 std::unique_ptr<sngxml::dom::Element> GetDescriptionAndDetails(Input* input, const std::u32string& docId, sngxml::dom::Document* docs,

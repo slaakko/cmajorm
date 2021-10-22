@@ -11,6 +11,180 @@ namespace System.Windows
     public class delegate void TreeViewNodeMouseClickEventHandler(TreeViewNodeMouseClickEventArgs& args);
     public class delegate void TreeViewNodeEventHandler(TreeViewNodeEventArgs& args);
 
+    public nothrow string DefaultTreeViewNormalNodeFontFamilyName()
+    {
+        return "Segoe UI";
+    }
+
+    public nothrow float DefaultTreeViewNormalNodeFontSize()
+    {
+        return 9.0f;
+    }
+
+    public nothrow FontStyle DefaultTreeViewNormalNodeFontStyle()
+    {
+        return FontStyle.regular;
+    }
+
+    public nothrow string DefaultTreeViewActiveNodeFontFamilyName()
+    {
+        return "Segoe UI";
+    }
+
+    public nothrow float DefaultTreeViewActiveNodeFontSize()
+    {
+        return 9.0f;
+    }
+
+    public nothrow FontStyle DefaultTreeViewActiveNodeFontStyle()
+    {
+        return FontStyle.bold;
+    }
+
+    public nothrow Color DefaultTreeViewBackgroundColor()
+    {
+        return Color.White();
+    }
+
+    public nothrow Color DefaultTreeViewStateIndicatorColor()
+    {
+        return Color.Red();
+    }
+
+    public nothrow Color DefaultTreeViewNodeSelectedColor()
+    {
+        return Color(201u, 222u, 245u);
+    }
+
+    public nothrow float DefaultTreeViewStateIndicatorPercentage()
+    {
+        return 50.0f;
+    }
+
+    public nothrow float DefaultTreeViewNodeIndentPercent()
+    {
+        return 200.0f;
+    }
+
+    public nothrow float DefaultTreeViewNodeTextIndentPercent()
+    {
+        return 100.0f;
+    }
+
+    public nothrow Padding DefaultTreeViewNodeImagePadding()
+    {
+        return Padding(0, 0, 0, 0);
+    }
+
+    public nothrow ControlCreateParams& TreeViewControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return controlCreateParams.SetWindowClassName("System.Windows.TreeView").SetWindowClassStyle(DoubleClickWindowClassStyle()).
+            SetWindowClassBackgroundColor(SystemColor.COLOR_WINDOW).SetBackgroundColor(DefaultTreeViewBackgroundColor());
+    }
+
+    public class TreeViewCreateParams
+    {
+        public nothrow TreeViewCreateParams(ControlCreateParams& controlCreateParams_) :
+            controlCreateParams(controlCreateParams_),
+            normalNodeFontFamilyName(DefaultTreeViewNormalNodeFontFamilyName()),
+            normalNodeFontSize(DefaultTreeViewNormalNodeFontSize()),
+            normalNodeFontStyle(DefaultTreeViewNormalNodeFontStyle()),
+            activeNodeFontFamilyName(DefaultTreeViewActiveNodeFontFamilyName()),
+            activeNodeFontSize(DefaultTreeViewActiveNodeFontSize()),
+            activeNodeFontStyle(DefaultTreeViewActiveNodeFontStyle()),
+            stateIndicatorColor(DefaultTreeViewStateIndicatorColor()),
+            nodeSelectedColor(DefaultTreeViewNodeSelectedColor()),
+            stateIndicatorPercentage(DefaultTreeViewStateIndicatorPercentage()),
+            nodeIndentPercent(DefaultTreeViewNodeIndentPercent()),
+            nodeTextIndentPercent(DefaultTreeViewNodeTextIndentPercent()),
+            nodeImagePadding(DefaultTreeViewNodeImagePadding())
+        {
+        }
+        public nothrow TreeViewCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public nothrow TreeViewCreateParams& SetNormalNodeFontFamilyName(const string& normalNodeFontFamilyName_)
+        {
+            normalNodeFontFamilyName = normalNodeFontFamilyName_;
+            return *this;
+        }
+        public nothrow TreeViewCreateParams& SetNormalNodeFontSize(float normalNodeFontSize_)
+        {
+            normalNodeFontSize = normalNodeFontSize_;
+            return *this;
+        }
+        public nothrow TreeViewCreateParams& SetNormalNodeFontStyle(FontStyle normalNodeFontStyle_)
+        {
+            normalNodeFontStyle = normalNodeFontStyle_;
+            return *this;
+        }
+        public nothrow TreeViewCreateParams& SetActiveNodeFontFamilyName(const string& activeNodeFontFamilyName_)
+        {
+            activeNodeFontFamilyName = activeNodeFontFamilyName_;
+            return *this;
+        }
+        public nothrow TreeViewCreateParams& SetActiveNodeFontSize(float activeNodeFontSize_)
+        {
+            activeNodeFontSize = activeNodeFontSize_;
+            return *this;
+        }
+        public nothrow TreeViewCreateParams& SetActiveNodeFontStyle(FontStyle activeNodeFontStyle_)
+        {
+            activeNodeFontStyle = activeNodeFontStyle_;
+            return *this;
+        }
+        public nothrow TreeViewCreateParams& SetStateIndicatorColor(const Color& stateIndicatorColor_)
+        {
+            stateIndicatorColor = stateIndicatorColor_;
+            return *this;
+        }
+        public nothrow TreeViewCreateParams& SetNodeSelectedColor(const Color& nodeSelectedColor_)
+        {
+            nodeSelectedColor = nodeSelectedColor_;
+            return *this;
+        }
+        public nothrow TreeViewCreateParams& SetTextColor(const Color& textColor_)
+        {
+            textColor = textColor_;
+            return *this;
+        }
+        public nothrow TreeViewCreateParams& SetStateIndicatorPercentage(float stateIndicatorPercentage_)
+        {
+            stateIndicatorPercentage = stateIndicatorPercentage_;
+            return *this;
+        }
+        public nothrow TreeViewCreateParams& SetNodeIndentPercent(float nodeIndentPercent_)
+        {
+            nodeIndentPercent = nodeIndentPercent_;
+            return *this;
+        }
+        public nothrow TreeViewCreateParams& SetNodeTextIndentPercent(float nodeTextIndentPercent_)
+        {
+            nodeTextIndentPercent = nodeTextIndentPercent_;
+            return *this;
+        }
+        public nothrow TreeViewCreateParams& SetNodeImagePadding(const Padding& nodeImagePadding_)
+        {
+            nodeImagePadding = nodeImagePadding_;
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public string normalNodeFontFamilyName;
+        public float normalNodeFontSize;
+        public FontStyle normalNodeFontStyle;
+        public string activeNodeFontFamilyName;
+        public float activeNodeFontSize;
+        public FontStyle activeNodeFontStyle;
+        public Color stateIndicatorColor;
+        public Color nodeSelectedColor;
+        public Color textColor;
+        public float stateIndicatorPercentage;
+        public float nodeIndentPercent;
+        public float nodeTextIndentPercent;
+        public Padding nodeImagePadding;
+    }
+
     public class TreeView : Control
     {
         private enum Flags : sbyte
@@ -20,11 +194,16 @@ namespace System.Windows
         public TreeView(const Font& normalNodeFont_, const Font& activeNodeFont_,
             const Color& backgroundColor, const Color& stateIndicatorColor_, const Color& nodeSelectedColor_, const Color& textColor_,
             const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            base("System.Windows.TreeView", DoubleClickWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), backgroundColor, "treeView",
+            base("System.Windows.TreeView", DoubleClickWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
+                backgroundColor, "treeView",
                 location, size, dock, anchors), flags(Flags.none), root(), normalNodeFont(normalNodeFont_), activeNodeFont(activeNodeFont_),
                 textHeight(0), stateIndicatorPercentage(50.0f),
-                stateIndicatorColor(stateIndicatorColor_), nodeSelectedColor(nodeSelectedColor_), nodeSelectedBrush(nodeSelectedColor), textColor(textColor_), textBrush(textColor),
-                format(StringAlignment.near, StringAlignment.near), bitmapIndex(-1), animationMs(5), selectedNode(null), trackedNode(null), toolTipWindow(new ToolTip())
+                stateIndicatorColor(stateIndicatorColor_), nodeSelectedColor(nodeSelectedColor_), nodeSelectedBrush(nodeSelectedColor),
+                textColor(textColor_), textBrush(textColor),
+                nodeIndentPercent(DefaultTreeViewNodeIndentPercent()),
+                nodeTextIndentPercent(DefaultTreeViewNodeTextIndentPercent()),
+                format(StringAlignment.near, StringAlignment.near), bitmapIndex(-1), animationMs(5), selectedNode(null), trackedNode(null),
+                toolTipWindow(new ToolTip())
         {
             SetChanged();
             SetMouseHoverMs(DefaultMouseHoverMs());
@@ -33,6 +212,32 @@ namespace System.Windows
             this(Font(FontFamily("Segoe UI"), 9.0f), Font(FontFamily("Segoe UI"), 9.0f, FontStyle.bold, Unit.point),
             Color.White(), Color.Red(), Color(201u, 222u, 245u), Color.Black(), location, size, dock, anchors)
         {
+        }
+        public TreeView(TreeViewCreateParams& createParams) :
+            base(createParams.controlCreateParams),
+            flags(Flags.none), root(),
+            normalNodeFont(
+                Font(FontFamily(createParams.normalNodeFontFamilyName),
+                    createParams.normalNodeFontSize,
+                    createParams.normalNodeFontStyle,
+                    Unit.point)),
+            activeNodeFont(
+                Font(FontFamily(createParams.activeNodeFontFamilyName),
+                    createParams.activeNodeFontSize,
+                    createParams.activeNodeFontStyle,
+                    Unit.point)),
+            textHeight(0), stateIndicatorPercentage(createParams.stateIndicatorPercentage),
+            stateIndicatorColor(createParams.stateIndicatorColor),
+            nodeSelectedColor(createParams.nodeSelectedColor), nodeSelectedBrush(nodeSelectedColor),
+            textColor(createParams.textColor), textBrush(textColor),
+            nodeIndentPercent(createParams.nodeIndentPercent),
+            nodeTextIndentPercent(createParams.nodeTextIndentPercent),
+            nodeImagePadding(createParams.nodeImagePadding),
+            format(StringAlignment.near, StringAlignment.near), bitmapIndex(-1), animationMs(5),
+            selectedNode(null), trackedNode(null), toolTipWindow(new ToolTip())
+        {
+            SetChanged();
+            SetMouseHoverMs(DefaultMouseHoverMs());
         }
         public ~TreeView()
         {
@@ -282,6 +487,14 @@ namespace System.Windows
                 textBrush = SolidBrush(textColor);
                 SetChanged();
             }
+        }
+        public nothrow inline float NodeIndentPercent() const
+        {
+            return nodeIndentPercent;
+        }
+        public nothrow inline float NodeTextIndentPercent() const
+        {
+            return nodeTextIndentPercent;
         }
         public nothrow inline int AnimationMs() const
         {
@@ -644,6 +857,10 @@ namespace System.Windows
         {
             trackedNode = trackedNode_;
         }
+        public nothrow inline const Padding& NodeImagePadding() const
+        {
+            return nodeImagePadding;
+        }
         protected virtual void OnNodeClick(TreeViewNodeMouseClickEventArgs& args)
         {
             nodeClickEvent.Fire(args);
@@ -716,6 +933,14 @@ namespace System.Windows
             TreeViewNodeEventArgs args(node);
             OnNodeHovered(args);
         }
+        public nothrow inline ImageList* GetImageList() const
+        {
+            return imageList;
+        }
+        public nothrow void SetImageList(ImageList* imageList_)
+        {
+            imageList = imageList_;
+        }
         private Flags flags;
         private UniquePtr<TreeViewNode> root;
         private Font normalNodeFont;
@@ -726,6 +951,9 @@ namespace System.Windows
         private Color stateIndicatorColor;
         private Color nodeSelectedColor;
         private Color textColor;
+        private float nodeIndentPercent;
+        private float nodeTextIndentPercent;
+        private Padding nodeImagePadding;
         private SolidBrush nodeSelectedBrush;
         private SolidBrush textBrush;
         private List<Bitmap> stateIndicatorBitmaps;
@@ -735,6 +963,7 @@ namespace System.Windows
         private TreeViewNode* selectedNode;
         private TreeViewNode* trackedNode;
         private ToolTip* toolTipWindow;
+        private ImageList* imageList;
         private Event<TreeViewNodeMouseClickEventHandler, TreeViewNodeMouseClickEventArgs> nodeClickEvent;
         private Event<TreeViewNodeMouseClickEventHandler, TreeViewNodeMouseClickEventArgs> nodeDoubleClickEvent;
         private Event<TreeViewNodeEventHandler, TreeViewNodeEventArgs> nodeEnterEvent;
@@ -755,7 +984,8 @@ namespace System.Windows
         {
             none = 0, mouseEntered = 1 << 0, selected = 1 << 1, active = 1 << 2
         }
-        public explicit nothrow TreeViewNode(const string& text_) : treeView(null), text(text_), children(this), state(State.collapsed), flags(Flags.none), index(-1)
+        public explicit nothrow TreeViewNode(const string& text_) :
+            treeView(null), text(text_), children(this), state(State.collapsed), flags(Flags.none), index(-1), imageIndex(-1), expandedImageIndex(-1)
         {
         }
         public nothrow void SetTreeView(TreeView* treeView_)
@@ -840,7 +1070,19 @@ namespace System.Windows
         public nothrow void MeasureSize(Graphics& graphics, TreeView* treeView)
         {
             RectF textRect = graphics.MeasureStringChecked(text, treeView->GetNormalNodeFont(), PointF(0, 0), treeView->Format());
-            size = Size(cast<int>(treeView->TextHeight() + textRect.size.w), cast<int>(textRect.size.h));
+            SizeF imageSize(0, 0);
+            if (imageIndex != -1)
+            {
+                Padding padding = treeView->NodeImagePadding();
+                ImageList* imageList = treeView->GetImageList();
+                if (imageList != null)
+                {
+                    Bitmap* bitmap = imageList->GetImage(imageIndex);
+                    imageSize.w = bitmap->GetWidth() + padding.Horizontal();
+                    imageSize.h = bitmap->GetHeight() + padding.Vertical();
+                }
+            }
+            size = Size(cast<int>(treeView->TextHeight() + textRect.size.w + imageSize.w), cast<int>(Max(textRect.size.h, imageSize.h)));
             Component* child = children.FirstChild();
             while (child != null)
             {
@@ -854,7 +1096,20 @@ namespace System.Windows
         }
         internal nothrow void Measure(Graphics& graphics, const Point& loc, TreeView* treeView, int level, int& idx, Rect& parentRect)
         {
-            location = Point(cast<int>(loc.x + level * 2 * treeView->TextHeight()), cast<int>(loc.y + idx * treeView->TextHeight()));
+            //location = Point(cast<int>(loc.x + level * 2 * treeView->TextHeight()), cast<int>(loc.y + idx * treeView->TextHeight()));
+            float imageHeight = 0;
+            if (imageIndex != -1)
+            {
+                Padding padding = treeView->NodeImagePadding();
+                ImageList* imageList = treeView->GetImageList();
+                if (imageList != null)
+                {
+                    Bitmap* image = imageList->GetImage(imageIndex);
+                    imageHeight = image->GetHeight() + padding.Vertical();
+                }
+            }
+            location = Point(cast<int>(loc.x + level * treeView->NodeIndentPercent() * treeView->TextHeight() / 100.0f),
+                cast<int>(loc.y + idx * Max(treeView->TextHeight(), imageHeight)));
             Rect rect(location, size);
             childRect = rect;
             parentRect = Rect.Union(parentRect, childRect);
@@ -1282,6 +1537,10 @@ namespace System.Windows
                 if (view != null)
                 {
                     view->SetTreeViewNodeStateChanged();
+                    if (state == State.collapsed)
+                    {
+                        view->SetContentLocation(Point(0, 0));
+                    }
                 }
             }
         }
@@ -1346,7 +1605,14 @@ namespace System.Windows
                         }
                     }
                 }
-                loc.x = cast<int>(loc.x + treeView->TextHeight());
+                loc.x = cast<int>(loc.x + treeView->NodeTextIndentPercent() * treeView->TextHeight() / 100.0f);
+            }
+            if (isVisible)
+            {
+                if (imageIndex != -1)
+                {
+                    DrawImage(treeView, graphics, loc);
+                }
             }
             if (isVisible)
             {
@@ -1433,6 +1699,66 @@ namespace System.Windows
         {
             index = index_;
         }
+        public nothrow inline int ImageIndex() const
+        {
+            return imageIndex;
+        }
+        public nothrow void SetImageIndex(int imageIndex_)
+        {
+            if (imageIndex != imageIndex_)
+            {
+                imageIndex = imageIndex_;
+                TreeView* view = GetTreeView();
+                if (view != null)
+                {
+                    view->SetTreeViewNodeStateChanged();
+                    view->SetChanged();
+                    view->Invalidate();
+                }
+            }
+        }
+        public nothrow void SetExpandedImageIndex(int expandedImageIndex_)
+        {
+            if (expandedImageIndex != expandedImageIndex_)
+            {
+                expandedImageIndex = expandedImageIndex_;
+                TreeView* view = GetTreeView();
+                if (view != null)
+                {
+                    view->SetTreeViewNodeStateChanged();
+                    view->SetChanged();
+                    view->Invalidate();
+                }
+            }
+        }
+        public nothrow void DrawImage(TreeView* view, Graphics& graphics, Point& loc)
+        {
+            ImageList* imageList = view->GetImageList();
+            if (imageList != null)
+            {
+                int imgIndex = imageIndex;
+                if (state == State.expanded)
+                {
+                    if (expandedImageIndex != -1)
+                    {
+                        imgIndex = expandedImageIndex;
+                    }
+                }
+                Bitmap* image = imageList->GetImage(imgIndex);
+                if (image != null)
+                {
+                    int imageWidth = cast<int>(image->GetWidth());
+                    int imageHeight = cast<int>(image->GetHeight());
+                    Padding padding = view->NodeImagePadding();
+                    Rect r(loc, Size(imageWidth + padding.Horizontal(), imageHeight + padding.Vertical()));
+                    ImageAttributes attributes;
+                    Color transparentColor = System.Windows.Color.DefaultBitmapTransparent();
+                    attributes.SetColorKeyChecked(transparentColor, transparentColor, ColorAdjustType.default_);
+                    graphics.DrawImageChecked(*image, r, 0, 0, imageWidth + padding.Horizontal(), imageHeight + padding.Vertical(), Unit.pixel, attributes);
+                    loc.x = loc.x + imageWidth + padding.Horizontal();
+                }
+            }
+        }
         private TreeView* treeView;
         private string text;
         private Container children;
@@ -1443,5 +1769,7 @@ namespace System.Windows
         private Size size;
         private Rect childRect;
         private int index;
+        private int imageIndex;
+        private int expandedImageIndex;
     }
 }

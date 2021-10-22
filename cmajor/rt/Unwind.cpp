@@ -4,13 +4,18 @@
 // =================================
 
 #include <cmajor/rt/Unwind.hpp>
+#include <signal.h>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 #ifdef _WIN32
-__declspec(thread) void* unwindList = nullptr;
+    #if defined(__MINGW32__)
+        void* unwindList = nullptr;
+    #else
+        __declspec(thread) void* unwindList = nullptr;
+    #endif
 #else
 __thread void* unwindList = nullptr;
 #endif

@@ -20,14 +20,16 @@ namespace spring
     public class EditDiagramElementListDialog : Window
     {
         public EditDiagramElementListDialog(const EditDiagramElementListDialogParams& dialogParams_) :
-            base("spring.editDiagramElementListDialog", DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(), DefaultControlBackgroundColor(), dialogParams_.dialogCaption,
-                Point.Default(), dialogParams_.dialogSize, Dock.none, Anchors.none, WindowState.normal), dialogParams(dialogParams_)
+            base("spring.editDiagramElementListDialog", DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(),
+                DefaultControlBackgroundColor(), dialogParams_.dialogCaption,Point.Default(), dialogParams_.dialogSize, Dock.none, Anchors.none,
+                WindowState.normal), dialogParams(dialogParams_)
         {
             Size s = GetSize();
             Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize();
             Size defaultListBoxSize = ScreenMetrics.Get().DefaultListBoxSize();
             Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
-            UniquePtr<GroupBox> groupBoxPtr(new GroupBox(dialogParams.groupBoxCaption, Point(defaultControlSpacing.w, defaultControlSpacing.h), dialogParams.groupBoxSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            UniquePtr<GroupBox> groupBoxPtr(new GroupBox(dialogParams.groupBoxCaption, Point(defaultControlSpacing.w, defaultControlSpacing.h),
+                dialogParams.groupBoxSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
             groupBox = groupBoxPtr.Get();
             Point groupBoxLocation = groupBox->Location();
             Size groupBoxSize = groupBox->GetSize();
@@ -65,9 +67,12 @@ namespace spring
             Size listBoxSize = dialogParams.listBoxSize;
             Rect listBoxRect(listBoxLocation, listBoxSize);
             listBoxRect.Inflate(-1, -1);
-            UniquePtr<ListBox> listBoxPtr(new ListBox(listBoxRect.location, listBoxRect.size, Dock.none, Anchors.none));
+
+            UniquePtr<ListBox> listBoxPtr(new ListBox(ListBoxCreateParams(ListBoxControlCreateParams(
+                ControlCreateParams().SetLocation(listBoxRect.location).SetSize(listBoxRect.size))).Defaults()));
             listBox = listBoxPtr.Get();
-            UniquePtr<Control> borderedListBoxPtr(new BorderedControl(listBoxPtr.Release(), listBoxLocation, listBoxSize, Dock.none, cast <Anchors>(Anchors.top  | Anchors.left)));
+            UniquePtr<Control> borderedListBoxPtr(new BorderedControl(listBoxPtr.Release(), listBoxLocation, listBoxSize, Dock.none,
+                cast <Anchors>(Anchors.top  | Anchors.left)));
             Control* borderedListBox = borderedListBoxPtr.Get();
             AddChild(borderedListBoxPtr.Release());
             Point realListBoxLocation = listBox->Location();
@@ -77,12 +82,13 @@ namespace spring
             borderedListBox->SetSize(realListBoxRect.size);
             int x = s.w - defaultButtonSize.w - defaultControlSpacing.w;
             int y = s.h - defaultButtonSize.h - defaultControlSpacing.h;
-            UniquePtr<Button> cancelButtonPtr(new Button("Cancel", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            UniquePtr<Button> cancelButtonPtr(new Button("Cancel", Point(x, y), defaultButtonSize, Dock.none,
+                cast<Anchors>(Anchors.bottom | Anchors.right)));
             cancelButton = cancelButtonPtr.Get();
             cancelButton->SetDialogResult(DialogResult.cancel);
             x = x - defaultButtonSize.w - defaultControlSpacing.w;
-            UniquePtr<Button> okButtonPtr(new Button(ButtonStyle.BS_DEFPUSHBUTTON, GetSystemColor(SystemColor.COLOR_BTNFACE), "OK", Point(x, y), defaultButtonSize,
-                Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            UniquePtr<Button> okButtonPtr(new Button(ButtonStyle.BS_DEFPUSHBUTTON, GetSystemColor(SystemColor.COLOR_BTNFACE), "OK", Point(x, y),
+                defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
             okButton = okButtonPtr.Get();
             okButton->SetDialogResult(DialogResult.ok);
             AddChild(okButtonPtr.Release());

@@ -269,8 +269,7 @@ function drawDiagram(diagramNodes) {
 function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "System.Xml.Serialization.XmlContainer", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../System.Xml.Serialization/doc/class_XmlContainer_3A675CCAF06087583804E6C45EE63670AAC7C2B4.html" },
-        { name: "System.Xml.Serialization.OwningXmlContainer", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Xml.Serialization/doc/class_OwningXmlContainer_86B788E236B130F2BC444693F9FBF156C982E04E.html" },
-        { name: "System.Xml.Serialization.XmlBundle", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Xml.Serialization/doc/class_XmlBundle_09EF3A12BD430DECAEEE5D0E67BDE0151E1D654A.html" }];
+        { name: "System.Xml.Serialization.XmlBundle", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Xml.Serialization/doc/class_XmlBundle_09EF3A12BD430DECAEEE5D0E67BDE0151E1D654A.html" }];
     drawDiagram(diagramNodes);
 }
 

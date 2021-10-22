@@ -47,43 +47,92 @@ namespace System.Windows
         private Window* window;
     }
 
+    public nothrow ControlCreateParams& WindowControlCreateParams(ControlCreateParams& controlCreateParams,
+        const string& windowClassName, const string& caption, const Point& location, const Size& size)
+    {
+        return controlCreateParams.SetWindowClassName(windowClassName).
+            SetWindowClassStyle(cast<WindowClassStyle>(WindowClassStyle.CS_VREDRAW | WindowClassStyle.CS_HREDRAW)).
+            SetWindowStyle(WindowStyle.WS_OVERLAPPEDWINDOW).SetText(caption).SetLocation(location).SetSize(size);
+    }
+
+    public nothrow ControlCreateParams& WindowControlCreateParams(ControlCreateParams& controlCreateParams, const string& caption)
+    {
+        return WindowControlCreateParams(controlCreateParams, "System.Windows.Window", caption, Point.Default(), Size.Default());
+    }
+    
+    public class WindowCreateParams
+    {
+        public nothrow WindowCreateParams(ControlCreateParams& controlCreateParams_) :
+            controlCreateParams(controlCreateParams_),
+            fontFamilyName(DefaultWindowFontFamilyName()),
+            fontSize(DefaultWindowFontSize()),
+            fontStyle(FontStyle.regular),
+            state(WindowState.normal)
+        {
+        }
+        public nothrow WindowCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public nothrow WindowCreateParams& SetFontFamilyName(const string& fontFamilyName_)
+        {
+            fontFamilyName = fontFamilyName_;
+            return *this;
+        }
+        public nothrow WindowCreateParams& SetFontSize(float fontSize_)
+        {
+            fontSize = fontSize_;
+            return *this;
+        }
+        public nothrow WindowCreateParams& SetFontStyle(FontStyle fontStyle_)
+        {
+            fontStyle = fontStyle_;
+            return *this;
+        }
+        public nothrow WindowCreateParams& SetWindowState(WindowState state_)
+        {
+            state = state_;
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public string fontFamilyName;
+        public float fontSize;
+        public FontStyle fontStyle;
+        public WindowState state;
+    }
+
     public class Window : ContainerControl
     {
         private enum Flags : sbyte
         {
             none = 0, mainWindow = 1 << 0, showingDialog = 1 << 1
         }
-        public Window(const char* windowClassName, WindowClassStyle classStyle, WindowStyle style, ExtendedWindowStyle exStyle,
+        public Window(const string& windowClassName, WindowClassStyle classStyle, WindowStyle style, ExtendedWindowStyle exStyle,
             const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors,
             const string& fontFamilyName_, float fontSize_, FontStyle fontStyle_, WindowState state_) :
             base(windowClassName, classStyle, style, exStyle, backgroundColor, text, location, size, dock, anchors), flags(Flags.none), state(state_),
-            menuBar(null), contextMenu(null), defaultButton(null), cancelButton(null), focusedControl(null), dialogResult(DialogResult.none), keyPreviewMethod(),
-            fontFamilyName(fontFamilyName_), fontSize(fontSize_), fontStyle(fontStyle_)
+            menuBar(null), contextMenu(null), defaultButton(null), cancelButton(null), focusedControl(null), dialogResult(DialogResult.none),
+            keyPreviewMethod(), fontFamilyName(fontFamilyName_), fontSize(fontSize_), fontStyle(fontStyle_)
         {
-            SetKeyPreviewMethod(DefaultKeyPreview);
-            if (Handle() != null)
-            {
-                OnCreated();
-            }
-            if (!fontFamilyName.IsEmpty())
-            {
-                SetFont(Font(FontFamily(fontFamilyName), fontSize, fontStyle, Unit.point));
-            }
+            Init();
         }
-        public Window(const char* windowClassName, WindowClassStyle classStyle, WindowStyle style, ExtendedWindowStyle exStyle,
+        public Window(const string& windowClassName, WindowClassStyle classStyle, WindowStyle style, ExtendedWindowStyle exStyle,
             const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, WindowState state) :
             this(windowClassName, classStyle, style, exStyle, backgroundColor, text, location, size, dock, anchors,
                 DefaultWindowFontFamilyName(), DefaultWindowFontSize(), FontStyle.regular, state)
         {
         }
-        public Window(const char* windowClassName, WindowStyle style, ExtendedWindowStyle exStyle, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors,
+        public Window(const string& windowClassName, WindowStyle style, ExtendedWindowStyle exStyle, const string& text, const Point& location,
+            const Size& size, Dock dock, Anchors anchors,
             const string& fontFamilyName_, float fontSize_, FontStyle fontStyle_, WindowState state) :
-            this(windowClassName, cast<WindowClassStyle>(WindowClassStyle.CS_VREDRAW | WindowClassStyle.CS_HREDRAW), style, exStyle, DefaultWindowBackgroundColor(),
-            text, location, size, dock, anchors, fontFamilyName_, fontSize_, fontStyle_, state)
+            this(windowClassName, cast<WindowClassStyle>(WindowClassStyle.CS_VREDRAW | WindowClassStyle.CS_HREDRAW), style, exStyle,
+            DefaultWindowBackgroundColor(), text, location, size, dock, anchors, fontFamilyName_, fontSize_, fontStyle_, state)
         {
         }
-        public Window(const char* windowClassName, WindowStyle style, ExtendedWindowStyle exStyle, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, WindowState state) :
-            this(windowClassName, style, exStyle, text, location, size, dock, anchors, DefaultWindowFontFamilyName(), DefaultWindowFontSize(), FontStyle.regular, state)
+        public Window(const string& windowClassName, WindowStyle style, ExtendedWindowStyle exStyle, const string& text, const Point& location,
+            const Size& size, Dock dock, Anchors anchors, WindowState state) :
+            this(windowClassName, style, exStyle, text, location, size, dock, anchors, DefaultWindowFontFamilyName(), DefaultWindowFontSize(),
+            FontStyle.regular, state)
         {
         }
         public Window(const string& caption, const string& fontFamilyName_, float fontSize_, FontStyle fontStyle_) :
@@ -94,6 +143,26 @@ namespace System.Windows
         public Window(const string& caption) :
             this(caption, DefaultWindowFontFamilyName(), DefaultWindowFontSize(), FontStyle.regular)
         {
+        }
+        public Window(WindowCreateParams& createParams) :
+            base(createParams.controlCreateParams),
+            flags(Flags.none), state(createParams.state),
+            menuBar(null), contextMenu(null), defaultButton(null), cancelButton(null), focusedControl(null), dialogResult(DialogResult.none),
+            keyPreviewMethod(), fontFamilyName(createParams.fontFamilyName), fontSize(createParams.fontSize), fontStyle(createParams.fontStyle)
+        {
+            Init();
+        }
+        private void Init()
+        {
+            SetKeyPreviewMethod(DefaultKeyPreview);
+            if (Handle() != null)
+            {
+                OnCreated();
+            }
+            if (!fontFamilyName.IsEmpty())
+            {
+                SetFont(Font(FontFamily(fontFamilyName), fontSize, fontStyle, Unit.point));
+            }
         }
         public DialogResult ShowDialog(Window& parentWindow)
         {
@@ -165,8 +234,10 @@ namespace System.Windows
                     }
                     break;
                 }
-                case WM_COMMAND: case WM_MOVE: case WM_SIZE: case WM_PAINT: case WM_MOUSEMOVE: case WM_MOUSELEAVE: case WM_LBUTTONDOWN: case WM_LBUTTONUP: case WM_LBUTTONDBLCLK: case WM_RBUTTONDOWN: case WM_RBUTTONUP:
-                case WM_CHAR: case WM_KEYDOWN: case WM_KEYUP: case WM_SYSCOMMAND: case WM_HSCROLL: case WM_VSCROLL: case WM_MOUSEWHEEL: case WM_TIMER: case WM_SETFOCUS: case WM_KILLFOCUS:
+                case WM_COMMAND: case WM_MOVE: case WM_SIZE: case WM_PAINT: case WM_MOUSEMOVE: case WM_MOUSELEAVE: case WM_LBUTTONDOWN:
+                case WM_LBUTTONUP: case WM_LBUTTONDBLCLK: case WM_RBUTTONDOWN: case WM_RBUTTONUP:
+                case WM_CHAR: case WM_KEYDOWN: case WM_KEYUP: case WM_SYSCOMMAND: case WM_HSCROLL: case WM_VSCROLL: case WM_MOUSEWHEEL:
+                case WM_TIMER: case WM_SETFOCUS: case WM_KILLFOCUS:
                 case WM_SHOWWINDOW: case WM_CLIPBOARDUPDATE:
                 {
                     return base->ProcessMessage(message);

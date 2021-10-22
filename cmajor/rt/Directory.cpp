@@ -5,6 +5,8 @@
 
 #include <cmajor/rt/Directory.hpp>
 #include <soulng/util/Path.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <memory>
 #include <mutex>
 #include <unordered_map>
@@ -13,6 +15,7 @@
 namespace cmajor { namespace rt {
 
 using namespace soulng::util;
+using namespace soulng::unicode;
 
 struct Iteration
 {
@@ -61,7 +64,7 @@ int32_t DirectoryIterationTable::BeginIterate(const char* directoryPath)
     int32_t handle = nextIterationHandle++;
     Iteration iteration;
     iteration.directoryName = GetFullPath(Path::MakeCanonical(directoryPath));
-    iteration.directoryIterator = boost::filesystem::directory_iterator(iteration.directoryName);
+    iteration.directoryIterator = boost::filesystem::directory_iterator(soulng::util::MakeNativeBoostPath(iteration.directoryName));
     iterationMap[handle] = iteration;
     return handle;
 }
@@ -85,7 +88,9 @@ const char* DirectoryIterationTable::IterateFiles(int32_t handle)
         }
         if (iteration.directoryIterator != boost::filesystem::directory_iterator())
         {
-            iteration.path = GetFullPath(Path::Combine(iteration.directoryName, boost::filesystem::path(*iteration.directoryIterator).generic_string()));
+            iteration.path = soulng::util::PlatformStringToUtf8(GetFullPath(Path::Combine(
+                soulng::util::Utf8StringToPlatformString(iteration.directoryName),
+                boost::filesystem::path(*iteration.directoryIterator).generic_string())));
             ++iteration.directoryIterator;
             return iteration.path.c_str();
         }
@@ -105,13 +110,15 @@ const char* DirectoryIterationTable::IterateDirectories(int32_t handle)
     {
         Iteration& iteration = it->second;
         while (iteration.directoryIterator != boost::filesystem::directory_iterator() &&
-            (!boost::filesystem::is_directory(*iteration.directoryIterator) || iteration.directoryIterator->path() == "." || iteration.directoryIterator->path() == ".."))
+            (!boost::filesystem::is_directory(*iteration.directoryIterator) || iteration.directoryIterator->path().filename_is_dot() || iteration.directoryIterator->path().filename_is_dot_dot()))
         {
             ++iteration.directoryIterator;
         }
         if (iteration.directoryIterator != boost::filesystem::directory_iterator())
         {
-            iteration.path = GetFullPath(Path::Combine(iteration.directoryName, boost::filesystem::path(*iteration.directoryIterator).generic_string()));
+            iteration.path = soulng::util::PlatformStringToUtf8(GetFullPath(Path::Combine(
+                soulng::util::Utf8StringToPlatformString(iteration.directoryName),
+                boost::filesystem::path(*iteration.directoryIterator).generic_string())));
             ++iteration.directoryIterator;
             return iteration.path.c_str();
         }

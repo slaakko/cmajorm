@@ -8,23 +8,102 @@ using System.Collections;
 
 namespace System.Windows
 {
+    public nothrow Color DefaultToolTipTextColor()
+    {
+        return Color.Black();
+    }
+    
+    public nothrow Color DefaultToolTipFrameColor()
+    {
+        return Color.Black();
+    }
+
+    public nothrow string DefaultToolTipFontFamilyName()
+    {
+        return "Segoe UI";
+    }
+
+    public nothrow float DefaultToolTipFontSize()
+    {
+        return 9.0f;
+    }
+    
+    public nothrow ControlCreateParams& ToolTipControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return controlCreateParams.SetWindowClassName("System.Windows.ToolTip").SetWindowStyle(HiddenChildWindowStyle()).
+            SetWindowClassBackgroundColor(SystemColor.COLOR_WINDOW).SetBackgroundColor(Color.FloralWhite()).SetSize(Size(0, 0));
+    }
+    
+    public class ToolTipCreateParams
+    {
+        public nothrow ToolTipCreateParams(ControlCreateParams& controlCreateParams_) :
+            controlCreateParams(controlCreateParams_),
+            textColor(DefaultToolTipTextColor()),
+            frameColor(DefaultToolTipFrameColor()),
+            fontFamilyName(DefaultToolTipFontFamilyName()),
+            fontSize(DefaultToolTipFontSize())
+        {
+        }
+        public nothrow ToolTipCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public nothrow ToolTipCreateParams& SetTextColor(const Color& textColor_)
+        {
+            textColor = textColor_;
+            return *this;
+        }
+        public nothrow ToolTipCreateParams& SetFrameColor(const Color& frameColor_)
+        {
+            frameColor = frameColor_;
+            return *this;
+        }
+        public nothrow ToolTipCreateParams& SetFontFamilyName(const string& fontFamilyName_)
+        {
+            fontFamilyName = fontFamilyName_;
+            return *this;
+        }
+        public nothrow ToolTipCreateParams& SetFontSize(float fontSize_)
+        {
+            fontSize = fontSize_;
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public Color textColor;
+        public Color frameColor;
+        public string fontFamilyName;
+        public float fontSize;
+    }
+    
     public class ToolTip : Control
     {
         private enum Flags : sbyte
         {
             none = 0, changed = 1 << 0
         }
-        public ToolTip(const Color& backgroundColor, const Color& textColor, const Color& frameColor, const string& text_, const Point& location_, const Font& font_) :
-            base("System.Windows.ToolTip", DefaultWindowClassStyle(), HiddenChildWindowStyle(), DefaultExtendedWindowStyle(), backgroundColor, text_, location_, Size(0, 0), Dock.none, Anchors.none),
-            framePen(frameColor), font(font_), textBrush(textColor), format(StringAlignment.near, StringAlignment.near), textHeight(0)
+        public ToolTip(const Color& backgroundColor, const Color& textColor, const Color& frameColor, const string& text_, const Point& location_,
+            const Font& font_) :
+            base("System.Windows.ToolTip", DefaultWindowClassStyle(), HiddenChildWindowStyle(), DefaultExtendedWindowStyle(), backgroundColor,
+            text_, location_, Size(0, 0), Dock.none, Anchors.none), framePen(frameColor), font(font_), textBrush(textColor),
+            format(StringAlignment.near, StringAlignment.near), textHeight(0)
         {
             SetChanged();
         }
-        public ToolTip(const Color& backgroundColor) : this(backgroundColor, Color.Black(), Color.Black(), "", Point(0, 0), Font(FontFamily("Segoe UI"), 9.0f))
+        public ToolTip(const Color& backgroundColor) :
+            this(backgroundColor, Color.Black(), Color.Black(), "", Point(0, 0), Font(FontFamily("Segoe UI"), 9.0f))
         {
         }
         public ToolTip() : this(Color.FloralWhite())
         {
+        }
+        public ToolTip(ToolTipCreateParams& createParams) :
+            base(createParams.controlCreateParams),
+            framePen(createParams.frameColor),
+            font(FontFamily(createParams.fontFamilyName), createParams.fontSize),
+            textBrush(createParams.textColor),
+            format(StringAlignment.near, StringAlignment.near), textHeight(0)
+        {
+            SetChanged();
         }
         public void SetTextColor(const Color& textColor)
         {

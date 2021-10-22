@@ -28,7 +28,8 @@ public class MainWindow : Window
         noteCornerBitmap(new Bitmap(Bitmap.FromResource("note.corner.spring.bitmap"))),
         debug(debug_)
     {
-        UniquePtr<MenuBar> menuBar(new MenuBar());
+        UniquePtr<MenuBar> menuBar(new MenuBar(MenuBarCreateParams(MenuControlCreateParams(
+            MenuBarControlCreateParams(ControlCreateParams().Defaults()))).Defaults()));
         UniquePtr<MenuItem> fileMenuItem(new MenuItem("&File"));
         UniquePtr<MenuItem> newMenuItem(new MenuItem("&New"));
         newMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.n));
@@ -91,7 +92,8 @@ public class MainWindow : Window
         editMenuItem->AddMenuItem(selectAllMenuItemPtr.Release());
         menuBar->AddMenuItem(editMenuItem.Release());
         AddChild(menuBar.Release());
-        UniquePtr<ToolBar> toolBar(new ToolBar(ToolBar.Style.radioButtonGroup));
+        UniquePtr<ToolBar> toolBar(new ToolBar(ToolBarCreateParams(ToolBarControlCreateParams(ControlCreateParams().Defaults())).
+            SetStyle(ToolBar.Style.radioButtonGroup)));
         ToolButton* selectToolButton = new ToolButton("arrow.system.windows.bitmap", ToolButton.Style.manual);
         selectToolButton->SetToolTip("Select");
         Tools.GetSelectTool()->SetToolButton(selectToolButton);

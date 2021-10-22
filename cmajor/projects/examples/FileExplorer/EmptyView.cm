@@ -1,0 +1,23 @@
+using System;
+using System.Windows;
+
+namespace FileExplorer
+{
+    public nothrow ControlCreateParams& EmptyViewControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return controlCreateParams.SetWindowClassName("FileExplorer.EmptyView").SetWindowClassBackgroundColor(SystemColor.COLOR_WINDOW).
+            SetBackgroundColor(System.Windows.Color.White());
+    }
+
+    public class EmptyView : Control
+    {
+        public EmptyView(ControlCreateParams& createParams) : base(createParams)
+        {
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            args.graphics.Clear(BackgroundColor());
+            base->OnPaint(args);
+        }
+    }
+}

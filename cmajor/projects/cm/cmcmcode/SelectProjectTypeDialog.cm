@@ -19,7 +19,9 @@ namespace cmcode
             Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize();
             Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
             Point iconListViewLocation(defaultControlSpacing.w, defaultControlSpacing.h);
-            UniquePtr<IconListView> iconListViewPtr(new IconListView(Point(0, 0), Size(80, 80), Dock.none, Anchors.none));
+
+            UniquePtr<IconListView> iconListViewPtr(new IconListView(IconListViewCreateParams(IconListViewControlCreateParams(
+                ControlCreateParams().SetSize(Size(80, 80))))));
             iconListView = iconListViewPtr.Get();
             iconListView->AddItem("console.app.bitmap", "Console Application");
             iconListView->AddItem("win.gui.app.bitmap", "Windows GUI Application");

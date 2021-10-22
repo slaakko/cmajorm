@@ -10,9 +10,12 @@ namespace System.Windows
 {
     public abstract class ContainerControl : Control
     {
-        public ContainerControl(const char* windowClassName, WindowClassStyle windowClassStyle, WindowStyle style, ExtendedWindowStyle exStyle,
+        public ContainerControl(const string& windowClassName, WindowClassStyle windowClassStyle, WindowStyle style, ExtendedWindowStyle exStyle,
             const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base(windowClassName, windowClassStyle, style, exStyle, backgroundColor, text, location, size, dock, anchors), children(this)
+        {
+        }
+        public ContainerControl(ControlCreateParams& createParams) : base(createParams), children(this)
         {
         }
         public void AddChild(Control* child)
@@ -194,7 +197,7 @@ namespace System.Windows
             }
             return false;
         }
-        internal void MoveChildren(int dx, int dy)
+        public void MoveChildren(int dx, int dy)
         {
             Component* child = children.FirstChild();
             while (child != null)
@@ -210,12 +213,12 @@ namespace System.Windows
                 child = child->NextSibling();
             }
         }
-        internal void DockChildren()
+        public void DockChildren()
         {
             Rect parentRect(Point(), GetSize());
             DockChildren(parentRect);
         }
-        internal void DockChildren(Rect& parentRect)
+        public void DockChildren(Rect& parentRect)
         {
             List<Control*> filledControls;
             List<ContainerControl*> containers;

@@ -27,6 +27,7 @@ public extern cdecl nothrow int WinDialogWindowMessageLoop(void* windowHandle, v
 public extern cdecl nothrow ushort WinRegisterWindowClass(const char* windowClassName, uint style, int backgroundColor);
 public extern cdecl nothrow void* WinCreateWindowByClassAtom(ushort windowClass, const char* windowName, long style, long exStyle, int x, int y, int w, int h, void* parentHandle);
 public extern cdecl nothrow void* WinCreateWindowByClassName(const char* windowClass, const char* windowName, long style, long exStyle, int x, int y, int w, int h, void* parentHandle);
+public extern cdecl nothrow void WinDestroyWindow(void* windowHandle);
 public extern cdecl nothrow void* WinSubClassCommandWndProc(void* windowHandle);
 public extern cdecl nothrow void WinRestoreOriginalWndProc(void* windowHandle, void* originalWndProc);
 public extern cdecl nothrow int WinShowMessageBox(const char* text, const char* caption);
@@ -282,3 +283,5 @@ public extern cdecl nothrow bool WinKeyPressed(int keyCode);
 public extern cdecl nothrow int WinGetCurrentProcessId();
 public extern cdecl nothrow void WinBeginTest();
 public extern cdecl nothrow void WinEndTest();
+public extern cdecl nothrow int WinGetLogicalDrives();
+

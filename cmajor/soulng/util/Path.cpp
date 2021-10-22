@@ -5,6 +5,7 @@
 
 #include <soulng/util/Path.hpp>
 #include <soulng/util/TextUtils.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdlib.h>
@@ -524,6 +525,16 @@ std::string MakeNativePath(const std::string& path)
 #else
     return path;
 #endif
+}
+
+boost::filesystem::path MakeNativeBoostPath(const std::string& path)
+{
+#ifdef _WIN32
+    std::u16string p = soulng::unicode::ToUtf16(MakeNativePath(path));
+    return boost::filesystem::path((const wchar_t*)p.c_str());
+#else
+    return boost::filesystem::path(path);
+#endif 
 }
 
 } }

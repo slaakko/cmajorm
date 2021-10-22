@@ -42,6 +42,38 @@ namespace System.Windows
 
     public const int defaultSplitterWidth = 5;
 
+    public nothrow ControlCreateParams& SplitterControlCreateParams(ControlCreateParams& controlCreateParams, Orientation orientation, int width)
+    {
+        return controlCreateParams.SetWindowClassName("System.Windows.Splitter").SetSize(SplitSize(orientation, width)).SetDock(SplitDock(orientation));
+    }
+    
+    public class SplitterCreateParams
+    {
+        public nothrow SplitterCreateParams(ControlCreateParams& controlCreateParams_) :
+            controlCreateParams(controlCreateParams_),
+            orientation(Orientation.horizontal),
+            edgeColor(DefaultSplitterEdgeColor())
+        {
+        }
+        public nothrow SplitterCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public nothrow SplitterCreateParams& SetOrientation(Orientation orientation_)
+        {
+            orientation = orientation_;
+            return *this;
+        }
+        public nothrow SplitterCreateParams& SetEdgeColor(const Color& edgeColor_)
+        {
+            edgeColor = edgeColor_;
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public Orientation orientation;
+        public Color edgeColor;
+    }
+    
     public class Splitter : Control
     {
         private enum Flags : sbyte
@@ -50,7 +82,8 @@ namespace System.Windows
         }
         public Splitter(Orientation orientation_, const Color& backgroundColor, const Color& edgeColor_, const Point& location, int width) :
             base("System.Windows.Splitter", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
-            backgroundColor, "splitter", location, SplitSize(orientation_, width), SplitDock(orientation_), Anchors.none), orientation(orientation_),
+            backgroundColor, "splitter", location, SplitSize(orientation_, width), SplitDock(orientation_), Anchors.none),
+            orientation(orientation_),
             horizontalSplitterCursor(Application.GetResourceManager().GetCursor("horizontal.splitter.system.windows.cursor")),
             verticalSplitterCursor(Application.GetResourceManager().GetCursor("vertical.splitter.system.windows.cursor")), flags(), container(null),
             edgeColor(edgeColor_), edgePen(edgeColor)
@@ -58,6 +91,14 @@ namespace System.Windows
         }
         public Splitter(Orientation orientation, const Point& location) :
             this(orientation, DefaultControlBackgroundColor(), DefaultSplitterEdgeColor(), location, defaultSplitterWidth)
+        {
+        }
+        public Splitter(SplitterCreateParams& createParams) :
+            base(createParams.controlCreateParams),
+            orientation(createParams.orientation),
+            horizontalSplitterCursor(Application.GetResourceManager().GetCursor("horizontal.splitter.system.windows.cursor")),
+            verticalSplitterCursor(Application.GetResourceManager().GetCursor("vertical.splitter.system.windows.cursor")), flags(), container(null),
+            edgeColor(createParams.edgeColor), edgePen(edgeColor)
         {
         }
         public nothrow void SetContainer(SplitContainer* container_)
@@ -229,6 +270,42 @@ namespace System.Windows
         private Pen edgePen;
     }
 
+    public nothrow ControlCreateParams& SplitContainerControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return controlCreateParams.SetWindowClassName("System.Windows.SplitContainer");
+    }
+    
+    public class SplitContainerCreateParams
+    {
+        public nothrow SplitContainerCreateParams(ControlCreateParams& controlCreateParams_,
+            Orientation orientation_, Control* pane1_, Splitter* splitter_, Control* pane2_, int splitterDistance_) :
+            controlCreateParams(controlCreateParams_), orientation(orientation_), pane1(pane1_), splitter(splitter_), pane2(pane2_),
+            splitterWidth(defaultSplitterWidth), splitterDistance(splitterDistance_)
+        {
+        }
+        public nothrow SplitContainerCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public nothrow SplitContainerCreateParams& SetSplitterWidth(int splitterWidth_)
+        {
+            splitterWidth = splitterWidth_;
+            return *this;
+        }
+        public nothrow SplitContainerCreateParams& SetSplitterDistance(int splitterDistance_)
+        {
+            splitterDistance = splitterDistance_;
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public Orientation orientation;
+        public Control* pane1;
+        public Splitter* splitter;
+        public Control* pane2;
+        public int splitterWidth;
+        public int splitterDistance;
+    }
+    
     public class SplitContainer : ContainerControl
     {
         public SplitContainer(Orientation orientation_, Control* pane1_, Splitter* splitter_, Control* pane2_, int splitterWidth, int splitterDistance_,
@@ -237,14 +314,7 @@ namespace System.Windows
                 DefaultControlBackgroundColor(), "splitContainer", location, size, dock, anchors),
                 orientation(orientation_), pane1(pane1_), splitter(splitter_), pane2(pane2_), splitterDistance(splitterDistance_)
         {
-            pane1->SetSize(SplitSize(orientation, splitterDistance));
-            pane1->SetDock(SplitDock(orientation));
-            AddChild(pane1);
-            splitter->SetContainer(this);
-            AddChild(splitter);
-            pane2->SetLocation(location);
-            pane2->SetDock(Dock.fill);
-            AddChild(pane2);
+            Init();
         }
         public SplitContainer(Orientation orientation, int splitterDistance, const Point& location, const Size& size, Dock dock, Anchors anchors) :
             this(orientation,
@@ -253,6 +323,24 @@ namespace System.Windows
                 new Panel(location, SplitSize(orientation, splitterDistance), SplitDock(orientation), Anchors.none),
                 defaultSplitterWidth, splitterDistance, location, size, dock, anchors)
         {
+        }
+        public SplitContainer(SplitContainerCreateParams& createParams) :
+            base(createParams.controlCreateParams),
+            orientation(createParams.orientation),
+            pane1(createParams.pane1), splitter(createParams.splitter), pane2(createParams.pane2), splitterDistance(createParams.splitterDistance)
+        {
+            Init();
+        }
+        private void Init()
+        {
+            pane1->SetSize(SplitSize(orientation, splitterDistance));
+            pane1->SetDock(SplitDock(orientation));
+            AddChild(pane1);
+            splitter->SetContainer(this);
+            AddChild(splitter);
+            pane2->SetLocation(Location());
+            pane2->SetDock(Dock.fill);
+            AddChild(pane2);
         }
         public override void OnPaint(PaintEventArgs& args)
         {

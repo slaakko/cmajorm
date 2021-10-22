@@ -42,6 +42,34 @@ namespace System.Windows
         SS_WORDELLIPSIS = 0xC000
     }
 
+    public nothrow ControlCreateParams& LabelControlCreateParams(ControlCreateParams& controlCreateParams, LabelStyle labelStyle)
+    {
+        return controlCreateParams.SetWindowClassName("STATIC").SetWindowStyle(cast<WindowStyle>(DefaultChildWindowStyle() | labelStyle));
+    }
+
+    public nothrow ControlCreateParams& LabelControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return LabelControlCreateParams(controlCreateParams, LabelStyle.SS_LEFT);
+    }
+
+    public class LabelCreateParams
+    {
+        public nothrow LabelCreateParams(ControlCreateParams& controlCreateParams_) : controlCreateParams(controlCreateParams_), autoSize(true)
+        {
+        }
+        public nothrow LabelCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public nothrow LabelCreateParams& SetAutoSize(bool autoSize_)
+        {
+            autoSize = autoSize_;
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public bool autoSize;
+    }
+
     public class Label : Control
     {
         private enum Flags : sbyte
@@ -49,9 +77,10 @@ namespace System.Windows
             none = 0, autoSize = 1 << 0, autoSized = 1 << 1
         }
 
-        public Label(LabelStyle labelStyle, const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, bool autoSize) :
-            base("STATIC", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | labelStyle), DefaultExtendedWindowStyle(), backgroundColor,
-            text, location, size, dock, anchors), flags(Flags.none)
+        public Label(LabelStyle labelStyle, const Color& backgroundColor, const string& text, const Point& location, const Size& size,
+            Dock dock, Anchors anchors, bool autoSize) :
+            base("STATIC", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | labelStyle), DefaultExtendedWindowStyle(),
+            backgroundColor, text, location, size, dock, anchors), flags(Flags.none)
         {
             if (autoSize)
             {
@@ -62,6 +91,14 @@ namespace System.Windows
         public Label(const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, bool autoSize) :
             this(LabelStyle.SS_LEFT, DefaultControlBackgroundColor(), text, location, size, dock, anchors, autoSize)
         {
+        }
+        public Label(LabelCreateParams& createParams) : base(createParams.controlCreateParams), flags(Flags.none)
+        {
+            if (createParams.autoSize)
+            {
+                SetAutoSizeFlag();
+                DoAutoSize();
+            }
         }
         protected override void OnCreated()
         {

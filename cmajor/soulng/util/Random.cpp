@@ -124,7 +124,17 @@ MT::MT() : initialized(false), mti(0), mt(), mag()
 }
 
 #ifdef _WIN32
-    __declspec(thread) MT* mt = nullptr;
+
+#if defined(__MINGW32__)
+
+MT* mt = nullptr;
+
+#else
+
+__declspec(thread) MT* mt = nullptr;
+
+#endif
+
 #else
     __thread MT* mt = nullptr;
 #endif

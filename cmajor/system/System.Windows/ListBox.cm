@@ -30,15 +30,44 @@ namespace System.Windows
         LBS_WANTKEYBOARDINPUT = 0x0400
     }
 
+    public nothrow ControlCreateParams& ListBoxControlCreateParams(ControlCreateParams& controlCreateParams, ListBoxStyle listBoxStyle)
+    {
+        return controlCreateParams.SetWindowClassName("LISTBOX").
+            SetWindowClassBackgroundColor(SystemColor.COLOR_WINDOW).SetBackgroundColor(Color.White()).
+            SetWindowStyle(cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | WindowStyle.WS_VSCROLL | listBoxStyle));
+    }
+
+    public nothrow ControlCreateParams& ListBoxControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return ListBoxControlCreateParams(controlCreateParams, cast<ListBoxStyle>(ListBoxStyle.LBS_NOTIFY | ListBoxStyle.LBS_HASSTRINGS));
+    }
+
+    public class ListBoxCreateParams
+    {
+        public nothrow ListBoxCreateParams(ControlCreateParams& controlCreateParams_) : controlCreateParams(controlCreateParams_)
+        {
+        }
+        public nothrow ListBoxCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+    }
+
     public class ListBox : Control
     {
-        public ListBox(ListBoxStyle listBoxStyle, const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            base("LISTBOX", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | listBoxStyle), DefaultExtendedWindowStyle(),
-            backgroundColor, text, location, size, dock, anchors)
+        public ListBox(ListBoxStyle listBoxStyle, const Color& backgroundColor, const string& text, const Point& location, const Size& size,
+            Dock dock, Anchors anchors) :
+            base("LISTBOX", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | listBoxStyle),
+                DefaultExtendedWindowStyle(), backgroundColor, text, location, size, dock, anchors)
         {
         }
         public ListBox(const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            this(cast<ListBoxStyle>(ListBoxStyle.LBS_NOTIFY | ListBoxStyle.LBS_HASSTRINGS | WindowStyle.WS_VSCROLL), Color.White(), string(), location, size, dock, anchors)
+            this(cast<ListBoxStyle>(ListBoxStyle.LBS_NOTIFY | ListBoxStyle.LBS_HASSTRINGS | WindowStyle.WS_VSCROLL), Color.White(),
+            string(), location, size, dock, anchors)
+        {
+        }
+        public ListBox(ListBoxCreateParams& createParams) : base(createParams.controlCreateParams)
         {
         }
         public void AddItem(const string& item)
@@ -64,7 +93,7 @@ namespace System.Windows
                 WinSendMessage(Handle(), LB_INSERTSTRING, cast<uint>(index), cast<long>(cast<ulong>(cast<void*>(wstr.Chars()))));
             }
         }
-        public string GetItem(int index) 
+        public string GetItem(int index)
         {
             if (Handle() != null)
             {

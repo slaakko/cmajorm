@@ -8,18 +8,40 @@ using System.Collections;
 
 namespace System.Windows
 {
+    public nothrow ControlCreateParams& PanelControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return controlCreateParams.SetWindowClassName("System.Windows.Panel");
+    }
+    
+    public class PanelCreateParams
+    {
+        public nothrow PanelCreateParams(ControlCreateParams& controlCreateParams_) : controlCreateParams(controlCreateParams_)
+        {
+        }
+        public nothrow PanelCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+    }
+    
     public class Panel : ContainerControl
     {
         private enum Flags : sbyte
         {
             none = 0, dontPaint = 1 << 0
         }
-        public Panel(const char* windowClassName, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, const Color& backgroundColor) :
-            base(windowClassName, DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), backgroundColor, text, location, size, dock, anchors)
+        public Panel(const string& windowClassName, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors,
+            const Color& backgroundColor) :
+            base(windowClassName, DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
+            backgroundColor, text, location, size, dock, anchors)
         {
         }
         public Panel(const Point& location, const Size& size, Dock dock, Anchors anchors) :
             this("System.Windows.Panel", "panel", location, size, dock, anchors, DefaultControlBackgroundColor())
+        {
+        }
+        public Panel(PanelCreateParams& createParams) : base(createParams.controlCreateParams)
         {
         }
         public override void PrintWindowTree(int level)

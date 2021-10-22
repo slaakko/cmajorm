@@ -38,9 +38,12 @@ namespace System.Windows
 
     public abstract class ButtonBase : Control
     {
-        public ButtonBase(const char* windowClassName, WindowClassStyle windowClassStyle, WindowStyle style, ExtendedWindowStyle exStyle,
+        public ButtonBase(const string& windowClassName, WindowClassStyle windowClassStyle, WindowStyle style, ExtendedWindowStyle exStyle,
             const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base(windowClassName, windowClassStyle, style, exStyle, backgroundColor, text, location, size, dock, anchors)
+        {
+        }
+        public ButtonBase(ControlCreateParams& controlCreateParams) : base(controlCreateParams)
         {
         }
         internal void OnClickInternal()
@@ -53,14 +56,56 @@ namespace System.Windows
         }
     }
 
+    public nothrow ControlCreateParams& ButtonControlCreateParams(ControlCreateParams& controlCreateParams, ButtonStyle buttonStyle)
+    {
+        controlCreateParams.SetWindowClassName("BUTTON");
+        controlCreateParams.SetWindowStyle(cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | buttonStyle));
+        controlCreateParams.SetWindowClassBackgroundColor(SystemColor.COLOR_BTNFACE);
+        controlCreateParams.SetBackgroundColor(GetSystemColor(SystemColor.COLOR_BTNFACE));
+        return controlCreateParams;
+    }
+
+    public nothrow ControlCreateParams& ButtonControlCreateParams(ControlCreateParams& controlCreateParams, bool setDefault)
+    {
+        ButtonStyle buttonStyle = ButtonStyle();
+        if (setDefault)
+        {
+            buttonStyle = cast<ButtonStyle>(buttonStyle | ButtonStyle.BS_DEFPUSHBUTTON | ButtonStyle.BS_NOTIFY);
+        }
+        else
+        {
+            buttonStyle = cast<ButtonStyle>(buttonStyle | ButtonStyle.BS_PUSHBUTTON | ButtonStyle.BS_NOTIFY);
+        }
+        return ButtonControlCreateParams(controlCreateParams, buttonStyle);
+    }
+
+    public nothrow ControlCreateParams& ButtonControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return ButtonControlCreateParams(controlCreateParams, false);
+    }
+
+    public class ButtonCreateParams
+    {
+        public ButtonCreateParams(ControlCreateParams& controlCreateParams_) : controlCreateParams(controlCreateParams_)
+        {
+        }
+        public nothrow ButtonCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+    }
+
     public class Button : ButtonBase
     {
         private enum Flags : sbyte
         {
             none = 0, defaultButton = 1 << 0
         }
-        public Button(ButtonStyle buttonStyle, const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            base("BUTTON", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | buttonStyle), DefaultExtendedWindowStyle(),
+        public Button(ButtonStyle buttonStyle, const Color& backgroundColor, const string& text, const Point& location, const Size& size,
+            Dock dock, Anchors anchors) :
+            base("BUTTON", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | buttonStyle),
+            DefaultExtendedWindowStyle(),
             backgroundColor, text, location, size, dock, anchors), flags(Flags.none), dialogResult(DialogResult.none)
         {
             SetFlagsFromButtonStyle(buttonStyle);
@@ -76,6 +121,11 @@ namespace System.Windows
         public Button(const string& text, const Point& location, const Size& size) :
             this(cast<ButtonStyle>(ButtonStyle.BS_PUSHBUTTON | ButtonStyle.BS_NOTIFY), text, location, size)
         {
+        }
+        public Button(ButtonCreateParams& createParams) :
+            base(createParams.controlCreateParams), flags(Flags.none), dialogResult(DialogResult.none)
+        {
+            SetFlagsFromButtonStyle(cast<ButtonStyle>(cast<long>(createParams.controlCreateParams.windowStyle)));
         }
         protected override void OnCreated()
         {

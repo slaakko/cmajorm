@@ -32,9 +32,10 @@ namespace spring
             margins.right = layout.GetDiagramPaddingElement().right;
             margins.bottom = layout.GetDiagramPaddingElement().bottom;
             int labelColumnWidth = ScreenMetrics.Get().MMToHorizontalPixels(15);
-
-            UniquePtr<GroupBox> formatGroupBoxPtr(new GroupBox("Format", Point(defaultControlSpacing.w, defaultControlSpacing.h),
-                Size(ScreenMetrics.Get().MMToHorizontalPixels(30), ScreenMetrics.Get().MMToVerticalPixels(30)), Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            UniquePtr<GroupBox> formatGroupBoxPtr(new GroupBox(GroupBoxCreateParams(
+                GroupBoxControlCreateParams(ControlCreateParams().SetText("Format").
+                SetLocation(Point(defaultControlSpacing.w, defaultControlSpacing.h)).
+                SetSize(Size(ScreenMetrics.Get().MMToHorizontalPixels(30), ScreenMetrics.Get().MMToVerticalPixels(30)))))));
             formatGroupBox = formatGroupBoxPtr.Get();
             AddChild(formatGroupBoxPtr.Release());
             Point formatGroupBoxLoc = formatGroupBox->Location();
@@ -63,9 +64,10 @@ namespace spring
             bmpRadioButton = bmpRadioButtonPtr.Get();
             bmpRadioButton->CheckedChangedEvent().AddHandler(FormatRadioButtonStateChanged);
             formatGroupBox->AddChild(bmpRadioButtonPtr.Release());
-
-            UniquePtr<GroupBox> marginsGroupBoxPtr(new GroupBox("Margins", Point(formatGroupBoxLoc.x + formatGroupBox->GetSize().w + defaultControlSpacing.w, defaultControlSpacing.h),
-                Size(ScreenMetrics.Get().MMToHorizontalPixels(50), ScreenMetrics.Get().MMToVerticalPixels(40)), Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            UniquePtr<GroupBox> marginsGroupBoxPtr(new GroupBox(GroupBoxCreateParams(GroupBoxControlCreateParams(
+                ControlCreateParams().SetText("Margins").
+                SetLocation(Point(formatGroupBoxLoc.x + formatGroupBox->GetSize().w + defaultControlSpacing.w, defaultControlSpacing.h)).
+                SetSize(Size(ScreenMetrics.Get().MMToHorizontalPixels(50), ScreenMetrics.Get().MMToVerticalPixels(40)))))));
             marginsGroupBox = marginsGroupBoxPtr.Get();
             AddChild(marginsGroupBoxPtr.Release());
             Point leftLabelLoc = Point(defaultControlSpacing.w, marginsGroupBox->Location().y + defaultControlSpacing.h);
@@ -151,12 +153,17 @@ namespace spring
 
             int x = s.w - defaultButtonSize.w - defaultControlSpacing.w;
             int y = s.h - defaultButtonSize.h - defaultControlSpacing.h;
-            UniquePtr<Button> cancelButtonPtr(new Button("Cancel", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+
+            UniquePtr<Button> cancelButtonPtr(new Button(ButtonCreateParams(ButtonControlCreateParams(
+                ControlCreateParams().SetText("Cancel").SetLocation(Point(x, y)).SetSize(defaultButtonSize).
+                SetAnchors(cast<Anchors>(Anchors.bottom | Anchors.right))))));
             cancelButton = cancelButtonPtr.Get();
             cancelButton->SetDialogResult(DialogResult.cancel);
             x = x - defaultButtonSize.w - defaultControlSpacing.w;
-            UniquePtr<Button> okButtonPtr(new Button(ButtonStyle.BS_DEFPUSHBUTTON, GetSystemColor(SystemColor.COLOR_BTNFACE), "OK", Point(x, y), defaultButtonSize,
-                Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+
+            UniquePtr<Button> okButtonPtr(new Button(ButtonCreateParams(ButtonControlCreateParams(
+                ControlCreateParams().SetText("OK").SetLocation(Point(x, y)).SetSize(defaultButtonSize).
+                SetAnchors(cast<Anchors>(Anchors.bottom | Anchors.right)), true))));
             okButton = okButtonPtr.Get();
             okButton->SetDialogResult(DialogResult.ok);
             AddChild(okButtonPtr.Release());

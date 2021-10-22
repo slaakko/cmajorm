@@ -9,10 +9,34 @@ using System.Windows.API;
 
 namespace System.Windows
 {
+    public nothrow ControlCreateParams& LogViewControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return controlCreateParams.SetWindowClassName("System.Windows.LogView").SetWindowClassStyle(DoubleClickWindowClassStyle()).
+            SetWindowStyle(cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP)).
+            SetWindowClassBackgroundColor(SystemColor.COLOR_WINDOW).SetBackgroundColor(Color.White());
+    }
+
+    public nothrow TextViewCreateParams& LogViewTextViewCreateParams(TextViewCreateParams& textViewCreateParams)
+    {
+        return textViewCreateParams.SetFontSize(9.0f);
+    }
+
+    public class LogViewCreateParams
+    {
+        public nothrow LogViewCreateParams(TextViewCreateParams& textViewCreateParams_) : textViewCreateParams(textViewCreateParams_)
+        {
+        }
+        public nothrow LogViewCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public TextViewCreateParams& textViewCreateParams;
+    }
+
     public class LogView : TextView
     {
-        public LogView(const FontFamily& fontFamily, float fontSize, const Color& backgroundColor, const Color& textColor, const Point& location, const Size& size,
-            Dock dock, Anchors anchors) :
+        public LogView(const FontFamily& fontFamily, float fontSize, const Color& backgroundColor, const Color& textColor, const Point& location,
+            const Size& size, Dock dock, Anchors anchors) :
             base(fontFamily, fontSize, backgroundColor, textColor, location, size, dock, anchors)
         {
             SetReadOnly();
@@ -23,6 +47,10 @@ namespace System.Windows
         }
         public LogView() : this(Point(0, 0), Size(0, 0), Dock.bottom, Anchors.none)
         {
+        }
+        public LogView(LogViewCreateParams& createParams) : base(createParams.textViewCreateParams)
+        {
+            SetReadOnly();
         }
         public virtual void WriteLine(const string& text)
         {

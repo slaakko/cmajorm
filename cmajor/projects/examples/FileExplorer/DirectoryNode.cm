@@ -1,0 +1,149 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Windows;
+
+namespace FileExplorer
+{
+    public class DirectoryNode : Node
+    {
+        public nothrow DirectoryNode(const string& name_) : base(name_), isRootDirectory(false)
+        {
+        }
+        public nothrow override bool IsRootDirectory() const
+        {
+            return isRootDirectory;
+        }
+        public nothrow void SetRootDirectory()
+        {
+            isRootDirectory = true;
+        }
+        public nothrow void AddDirectory(DirectoryNode* directory)
+        {
+            directory->SetParent(this);
+            directories.Add(UniquePtr<DirectoryNode>(directory));
+        }
+        public nothrow void AddFile(FileNode* file)
+        {
+            file->SetParent(this);
+            files.Add(UniquePtr<FileNode>(file));
+        }
+        public nothrow override string ImageName() const
+        {
+            return "folder_closed.bitmap";
+        }
+        public nothrow override string ExpandedImageName() const
+        {
+            return "folder_opened.bitmap";
+        }
+        public nothrow override TreeViewNode* ToTreeViewNode(bool createChilren, ImageList* imageList)
+        {
+            UniquePtr<TreeViewNode> treeViewNodePtr(new TreeViewNode(Name()));
+            TreeViewNode* node = treeViewNodePtr.Get();
+            SetTreeViewNode(node);
+            if (imageList != null)
+            {
+                int imageIndex = imageList->GetImageIndex(ImageName());
+                if (imageIndex != -1)
+                {
+                    node->SetImageIndex(imageIndex);
+                }
+                int expandedImageIndex = imageList->GetImageIndex(ExpandedImageName());
+                if (expandedImageIndex != -1)
+                {
+                    node->SetExpandedImageIndex(expandedImageIndex);
+                }
+            }
+            return treeViewNodePtr.Release();
+        }
+        public override Control* CreateView(ImageList* imageList)
+        {
+            Clear();
+            string directoryPath = DirectoryPath();
+            List<string> directoryNames = Directory.GetDirectories(directoryPath);
+            Sort(directoryNames.Begin(), directoryNames.End());
+            for (const string& directoryName : directoryNames)
+            {
+                AddDirectory(new DirectoryNode(Path.GetFileName(directoryName)));
+            }
+            List<string> fileNames = Directory.GetFiles(directoryPath);
+            Sort(fileNames.Begin(), fileNames.End());
+            for (const string& fileName : fileNames)
+            {
+                AddFile(new FileNode(Path.GetFileName(fileName)));
+            }
+            ListView* listView = new ListView(ListViewCreateParams(ListViewControlCreateParams(ControlCreateParams().Defaults())).Defaults());
+            MainWindow* mainWindow = GetMainWindow();
+            if (mainWindow != null)
+            {
+                mainWindow->AddListViewEventHandlers(listView);
+            }
+            listView->SetData(this);
+            listView->SetDoubleBuffered();
+            listView->SetImageList(imageList);
+            listView->AddColumn("Name", 400);
+            TreeViewNode* treeViewNode = GetTreeViewNode();
+            if (treeViewNode == null)
+            {
+                Node* parent = Parent();
+                if (parent != null)
+                {
+                    treeViewNode = parent->GetTreeViewNode();
+                }
+            }
+            if (treeViewNode != null)
+            {
+                treeViewNode->RemoveChildren();
+            }
+            for (const UniquePtr<DirectoryNode>& directory : directories)
+            {
+                ListViewItem* directoryItem = listView->AddItem();
+                directory->SetData(directoryItem, imageList);
+                if (treeViewNode != null)
+                {
+                    treeViewNode->AddChild(directory->ToTreeViewNode(false, imageList));
+                }
+            }
+            for (const UniquePtr<FileNode>& file : files)
+            {
+                ListViewItem* fileItem = listView->AddItem();
+                file->SetData(fileItem, imageList);
+            }
+            if (treeViewNode != null)
+            {
+                treeViewNode->Select();
+                TreeView* treeView = treeViewNode->GetTreeView();
+                if (treeView != null)
+                {
+                    treeView->Invalidate();
+                }
+            }
+            return listView;
+        }
+        protected override nothrow string DirectoryPath()
+        {
+            string parentDirectoryPath;
+            Node* p = Parent();
+            if (p != null)
+            {
+                parentDirectoryPath = p->DirectoryPath();
+            }
+            if (!parentDirectoryPath.IsEmpty())
+            {
+                return Path.Combine(parentDirectoryPath, Name());
+            }
+            else
+            {
+                return Name();
+            }
+        }
+        private void Clear()
+        {
+            directories.Clear();
+            files.Clear();
+        }
+        private bool isRootDirectory;
+        private List<UniquePtr<DirectoryNode>> directories;
+        private List<UniquePtr<FileNode>> files;
+    }
+}

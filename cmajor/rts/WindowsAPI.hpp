@@ -34,6 +34,7 @@ extern "C" RT_API int WinDialogWindowMessageLoop(void* windowHandle, void* paren
 extern "C" RT_API uint16_t WinRegisterWindowClass(const char* windowClassName, uint32_t style, int backgroundColor);
 extern "C" RT_API void* WinCreateWindowByClassAtom(uint16_t windowClass, const char* windowName, int64_t style, int64_t exStyle, int x, int y, int w, int h, void* parentHandle);
 extern "C" RT_API void* WinCreateWindowByClassName(const char* windowClass, const char* windowName, int64_t style, int64_t exStyle, int x, int y, int w, int h, void* parentHandle);
+extern "C" RT_API void WinDestroyWindow(void* windowHandle);
 extern "C" RT_API int WinShowMessageBox(const char* text, const char* caption);
 extern "C" RT_API int WinShowMessageBoxWithType(const char* text, const char* caption, void* ownerWindowHandle, uint32_t type);
 extern "C" RT_API bool WinMessageBeep(uint32_t messageBeepType);
@@ -284,5 +285,6 @@ extern "C" RT_API bool WinGetCursorPos(int& x, int& y);
 extern "C" RT_API bool WinGetFolder(void* windowHandle, const char16_t* defaultDirectory, char16_t* folderNameBuffer, uint32_t folderNameBufferSize);
 extern "C" RT_API bool WinKeyPressed(int keyCode);
 extern "C" RT_API int WinGetCurrentProcessId();
+extern "C" RT_API int WinGetLogicalDrives();
 
 #endif // CMAJOR_RTS_WINDOWS_API_INCLUDED

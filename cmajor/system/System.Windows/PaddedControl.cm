@@ -10,7 +10,34 @@ namespace System.Windows
 {
     public nothrow inline int DefaultControlPadding()
     {
-        return 3;
+        return 4;
+    }
+
+    public nothrow ControlCreateParams& PaddedControlControlCreateParams(ControlCreateParams& controlCreateParams, Control* child)
+    {
+        return controlCreateParams.SetWindowClassName("System.Windows.PaddedControl").SetBackgroundColor(child->BackgroundColor());
+    }
+
+    public class PaddedControlCreateParams
+    {
+        public nothrow PaddedControlCreateParams(ControlCreateParams& controlCreateParams_, Control* child_) :
+            controlCreateParams(controlCreateParams_),
+            child(child_),
+            padding(Padding(DefaultControlPadding(), DefaultControlPadding(), DefaultControlPadding(), DefaultControlPadding()))
+        {
+        }
+        public nothrow PaddedControlCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public nothrow PaddedControlCreateParams& SetPadding(const Padding& padding_)
+        {
+            padding = padding_;
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public Control* child;
+        public Padding padding;
     }
 
     public class PaddedControl : Control
@@ -25,6 +52,15 @@ namespace System.Windows
         public PaddedControl(Control* child) : this(child, Padding(DefaultControlPadding(), DefaultControlPadding(), DefaultControlPadding(), DefaultControlPadding()),
             Point(), Size(), Dock.none, Anchors.none)
         {
+        }
+        public PaddedControl(PaddedControlCreateParams& createParams) :
+            base(createParams.controlCreateParams),
+            container(this),
+            child(createParams.child),
+            padding(createParams.padding)
+        {
+            container.AddChild(child);
+            SetChildPos();
         }
         protected nothrow override bool IsDecoratorControl() const
         {

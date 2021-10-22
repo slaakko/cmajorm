@@ -94,6 +94,129 @@ namespace System.Windows
         public Rect closeRect;
     }
 
+    public nothrow ControlCreateParams& TabControlControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        return controlCreateParams.SetWindowClassName("System.Windows.TabControl");
+    }
+    
+    public class TabControlCreateParams
+    {
+        public nothrow TabControlCreateParams(ControlCreateParams& controlCreateParams_) :
+            controlCreateParams(controlCreateParams_),
+            fontFamilyName("Segoe UI"),
+            fontSize(9.0f),
+            frameColor(DefaultTabControlFrameColor()),
+            textColor(DefaultTabTextColor()),
+            leadingWidth(DefaultTabLeadingWidth()),
+            topMarginHeight(DefaultTabControlTopMarginHeight()),
+            headerHeight(0),
+            tabPadding(DefaultTabPadding()),
+            tabCloseBoxPadding(DefaultTabCloseBoxPadding()),
+            overlapWidth(DefaultTabOverlapWidth()),
+            tabNormalBackgroundColor(DefaultTabNormalBackgroundColor()),
+            tabSelectedBackgroundColor(DefaultTabSelectedBackgroundColor()),
+            roundingRadius(DefaultTabRoundingRadius()),
+            closeBoxPenWidth(DefaultTabCloseBoxPenWidth()),
+            closeBoxSelectedColor(DefaultTabCloseBoxSelectedColor())
+        {
+        }
+        public nothrow TabControlCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public nothrow TabControlCreateParams& SetFontFamilyName(const string& fontFamilyName_)
+        {
+            fontFamilyName = fontFamilyName_;
+            return *this;
+        }
+        public nothrow TabControlCreateParams& SetFontSize(float fontSize_)
+        {
+            fontSize = fontSize_;
+            return *this;
+        }
+        public nothrow TabControlCreateParams& SetFrameColor(const Color& frameColor_)
+        {
+            frameColor = frameColor_;
+            return *this;
+        }
+        public nothrow TabControlCreateParams& SetTextColor(const Color& textColor_)
+        {
+            textColor = textColor_;
+            return *this;
+        }
+        public nothrow TabControlCreateParams& SetLeadingWidth(int leadingWidth_)
+        {
+            leadingWidth = leadingWidth_;
+            return *this;
+        }
+        public nothrow TabControlCreateParams& SetTopMarginHeight(int topMarginHeight_)
+        {
+            topMarginHeight = topMarginHeight_;
+            return *this;
+        }
+        public nothrow TabControlCreateParams& SetHeaderHeight(int headerHeight_)
+        {
+            headerHeight = headerHeight_;
+            return *this;
+        }
+        public nothrow TabControlCreateParams& SetTabPadding(const Padding& tabPadding_)
+        {
+            tabPadding = tabPadding_;
+            return *this;
+        }
+        public nothrow TabControlCreateParams& SetTabCloseBoxPadding(const Padding& tabCloseBoxPadding_)
+        {
+            tabCloseBoxPadding = tabCloseBoxPadding_;
+            return *this;
+        }
+        public nothrow TabControlCreateParams& SetOverlapWidth(int overlapWidth_)
+        {
+            overlapWidth = overlapWidth_;
+            return *this;
+        }
+        public nothrow TabControlCreateParams& SetRoundingRadius(float roundingRadius_)
+        {
+            roundingRadius = roundingRadius_;
+            return *this;
+        }
+        public nothrow TabControlCreateParams& SetTabNormalBackgroundColor(const Color& tabNormalBackgroundColor_)
+        {
+            tabNormalBackgroundColor = tabNormalBackgroundColor_;
+            return *this;
+        }
+        public nothrow TabControlCreateParams& SetTabSelectedBackgroundColor(const Color& tabSelectedBackgroundColor_)
+        {
+            tabSelectedBackgroundColor = tabSelectedBackgroundColor_;
+            return *this;
+        }
+        public nothrow TabControlCreateParams& SetCloseBoxPenWidth(float closeBoxPenWidth_)
+        {
+            closeBoxPenWidth = closeBoxPenWidth_;
+            return *this;
+        }
+        public nothrow TabControlCreateParams& SetCloseBoxSelectedColor(const Color& closeBoxSelectedColor_)
+        {
+            closeBoxSelectedColor = closeBoxSelectedColor_;
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public string fontFamilyName;
+        public float fontSize;
+        public Color frameColor;
+        public Color textColor;
+        public int leadingWidth;
+        public int topMarginHeight;
+        public int headerHeight;
+        public Padding tabPadding;
+        public Padding tabCloseBoxPadding;
+        public int overlapWidth;
+        public float roundingRadius;
+        public Color tabNormalBackgroundColor;
+        public Color tabSelectedBackgroundColor;
+        public float closeBoxPenWidth;
+        public Color closeBoxSelectedColor;
+    }
+
     public class TabControl : Control
     {
         private enum Flags : sbyte
@@ -104,7 +227,8 @@ namespace System.Windows
             base("System.Windows.TabControl", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
             DefaultControlBackgroundColor(), "tabControl", location, size, dock, anchors), flags(Flags.none), font(font_), frameColor(frameColor_),
             textColor(DefaultTabTextColor()), tabPages(this), selectedTabPage(null), leadingWidth(DefaultTabLeadingWidth()),
-            topMarginHeight(DefaultTabControlTopMarginHeight()), headerHeight(0), tabPadding(DefaultTabPadding()), tabCloseBoxPadding(DefaultTabCloseBoxPadding()),
+            topMarginHeight(DefaultTabControlTopMarginHeight()), headerHeight(0), tabPadding(DefaultTabPadding()),
+            tabCloseBoxPadding(DefaultTabCloseBoxPadding()),
             overlapWidth(DefaultTabOverlapWidth()), roundingRadius(DefaultTabRoundingRadius()), stringFormat(),
             centerFormat(StringAlignment.center, StringAlignment.center), framePen(frameColor), textBrush(textColor),
             tabNormalBackgroundColor(DefaultTabNormalBackgroundColor()), tabNormalBackgroundBrush(tabNormalBackgroundColor),
@@ -117,6 +241,28 @@ namespace System.Windows
         public TabControl(const Point& location, const Size& size, Dock dock, Anchors anchors) :
             this(Font(FontFamily("Segoe UI"), 9.0f), DefaultTabControlFrameColor(), location, size, dock, anchors)
         {
+        }
+        public TabControl(TabControlCreateParams& createParams) :
+            base(createParams.controlCreateParams),
+            flags(Flags.none), font(FontFamily(createParams.fontFamilyName), createParams.fontSize),
+            frameColor(createParams.frameColor),
+            textColor(createParams.textColor),
+            tabPages(this), selectedTabPage(null),
+            leadingWidth(createParams.leadingWidth),
+            topMarginHeight(createParams.topMarginHeight),
+            headerHeight(createParams.headerHeight),
+            tabPadding(createParams.tabPadding),
+            tabCloseBoxPadding(createParams.tabCloseBoxPadding),
+            overlapWidth(createParams.overlapWidth),
+            roundingRadius(createParams.roundingRadius),
+            stringFormat(),
+            centerFormat(StringAlignment.center, StringAlignment.center), framePen(frameColor), textBrush(textColor),
+            tabNormalBackgroundColor(createParams.tabNormalBackgroundColor), tabNormalBackgroundBrush(tabNormalBackgroundColor),
+            tabSelectedBackgroundColor(createParams.tabSelectedBackgroundColor), tabSelectedBackgroundBrush(tabSelectedBackgroundColor),
+            closeBoxPenWidth(createParams.closeBoxPenWidth), closeBoxPen(textColor, closeBoxPenWidth), closeStateTabPage(null),
+            closeBoxSelectedColor(createParams.closeBoxSelectedColor), closeBoxSelectedBrush(closeBoxSelectedColor)
+        {
+            SetChanged();
         }
         public void SetTextColor(const Color& textColor_)
         {

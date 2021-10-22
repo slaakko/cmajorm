@@ -1,0 +1,20 @@
+using System;
+using System.Windows;
+using FileExplorer;
+
+int main()
+{
+    try
+    {
+        MainWindow mainWindow("File Explorer");
+        mainWindow.SetSmallIcon(Application.GetResourceManager().GetIcon("file_explorer.icon"));
+        return Application.Run(mainWindow);
+    }
+    catch (const Exception& ex)
+    {
+        MessageBox.Show(ex.ToString(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+        return 1;
+    }
+    return 0;
+}
+

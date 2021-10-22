@@ -1,0 +1,155 @@
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace FileExplorer
+{
+    public nothrow System.Windows.Color DefaultDirectoryTreeViewFrameColor()
+    {
+        return System.Windows.Color(204u, 206u, 219u);
+    }
+
+    public nothrow Padding DefaultDirectoryTreeViewNodeImagePadding()
+    {
+        return Padding(2, 2, 2, 2);
+    }
+
+    public nothrow float DefaultDirectoryTreeViewNodeIndentPercent()
+    {
+        return 100.0f;
+    }
+
+    public class DirectoryTreeView : ContainerControl
+    {
+        public DirectoryTreeView(ImageList* imageList, ComputerNode* computer_) :
+            base(ControlCreateParams().SetWindowClassName("FileExplorer.DirectoryTreeView").
+            SetWindowClassBackgroundColor(SystemColor.COLOR_WINDOW).SetBackgroundColor(Color.White()).SetDock(Dock.fill)),
+            computer(computer_)
+        {
+            UniquePtr<TreeView> treeViewPtr(new TreeView(TreeViewCreateParams(TreeViewControlCreateParams(ControlCreateParams().Defaults())).
+                SetNodeImagePadding(DefaultDirectoryTreeViewNodeImagePadding()).SetNodeIndentPercent(DefaultDirectoryTreeViewNodeIndentPercent())));
+            treeView = treeViewPtr.Get();
+            treeView->SetDoubleBuffered();
+            treeView->SetScrollSubject();
+            treeView->SetImageList(imageList);
+            treeView->NodeClickEvent().AddHandler(TreeViewNodeClick);
+            treeView->NodeDoubleClickEvent().AddHandler(TreeViewNodeDoubleClick);
+            UniquePtr<PaddedControl> paddedTreeViewPtr(new PaddedControl(
+                PaddedControlCreateParams(
+                    PaddedControlControlCreateParams(
+                        ControlCreateParams().Defaults(), treeView),
+                    treeViewPtr.Release()).Defaults()));
+            PaddedControl* paddedTreeView = paddedTreeViewPtr.Get();
+            UniquePtr<BorderedControl> borderedTreeViewPtr(new BorderedControl(
+                BorderedControlCreateParams(
+                    BorderedControlControlCreateParams(
+                        ControlCreateParams().Defaults(), paddedTreeView),
+                    paddedTreeViewPtr.Release()).SetNormalBorderColor(DefaultDirectoryTreeViewFrameColor())));
+            BorderedControl* borderedTreeView = borderedTreeViewPtr.Get();
+            UniquePtr<ScrollableControl> scrollableTreeViewPtr(new ScrollableControl(
+                ScrollableControlCreateParams(
+                    ScrollableControlControlCreateParams(
+                        ControlCreateParams().SetDock(Dock.fill), borderedTreeView),
+                    borderedTreeViewPtr.Release()).Defaults()));
+            child = scrollableTreeViewPtr.Get();
+            AddChild(scrollableTreeViewPtr.Release());
+            PopulateTreeView(imageList);
+        }
+        public nothrow void SetMainWindow(MainWindow* mainWindow_)
+        {
+            mainWindow = mainWindow_;
+        }
+        public void Open(Node* node)
+        {
+            TreeViewNode* treeViewNode = node->GetTreeViewNode();
+            if (treeViewNode != null)
+            {
+                TreeView* treeView = treeViewNode->GetTreeView();
+                treeView->SetContentLocation(Point(0, 0));
+                TreeViewNode* parentNode = treeViewNode->Parent();
+                while (parentNode != null)
+                {
+                    parentNode->Expand();
+                    parentNode = parentNode->Parent();
+                }
+                treeViewNode->Select();
+            }
+        }
+        public nothrow Node* SelectedNode() const
+        {
+            if (treeView != null)
+            {
+                TreeViewNode* selectedNode = treeView->SelectedNode();
+                if (selectedNode != null)
+                {
+                    void* data = selectedNode->Data();
+                    if (data != null)
+                    {
+                        Node* node = cast<Node*>(data);
+                        return node;
+                    }
+                }
+            }
+            return null;
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            treeView->Invalidate();
+            child->Invalidate();
+            base->OnPaint(args);
+        }
+        private void PopulateTreeView(ImageList* imageList)
+        {
+            UniquePtr<TreeViewNode> rootPtr(computer->ToTreeViewNode(true, imageList));
+            TreeViewNode* root = rootPtr.Get();
+            treeView->SetRoot(rootPtr.Release());
+            root->Expand();
+        }
+        private void TreeViewNodeClick(TreeViewNodeMouseClickEventArgs& args)
+        {
+            if (mainWindow != null)
+            {
+                TreeViewNode* treeViewNode = args.node;
+                if (treeViewNode != null)
+                {
+                    void* data = treeViewNode->Data();
+                    if (data != null)
+                    {
+                        Node* node = cast<Node*>(data);
+                        ContentView* contentView = mainWindow->GetContentView();
+                        if (contentView != null)
+                        {
+                            contentView->ViewContent(node);
+                            node->SetCurrentPathNode();
+                        }
+                    }
+                }
+            }
+        }
+        private void TreeViewNodeDoubleClick(TreeViewNodeMouseClickEventArgs& args)
+        {
+            TreeViewNode* treeViewNode = args.node;
+            if (treeViewNode != null)
+            {
+                Node* node = null;
+                if (treeViewNode->Data() != null)
+                {
+                    node = cast<Node*>(treeViewNode->Data());
+                }
+                if (treeViewNode->GetState() == TreeViewNode.State.collapsed)
+                {
+                    treeViewNode->ExpandAll();
+                }
+                else if (treeViewNode->GetState() == TreeViewNode.State.expanded)
+                {
+                    treeViewNode->CollapseAll();
+                }
+            }
+        }
+        private MainWindow* mainWindow;
+        private TreeView* treeView;
+        private Control* child;
+        private ComputerNode* computer;
+    }
+}
+

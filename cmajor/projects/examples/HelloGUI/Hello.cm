@@ -10,7 +10,10 @@ class HelloWindow : Window
         Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
         int x = s.w - defaultButtonSize.w - defaultControlSpacing.w;
         int y = s.h - defaultButtonSize.h - defaultControlSpacing.h;
-        UniquePtr<Button> helloButton(new Button("Hello", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+
+        UniquePtr<Button> helloButton(new Button(ButtonCreateParams(ButtonControlCreateParams(
+            ControlCreateParams().SetText("Hello").SetLocation(Point(x, y)).SetSize(defaultButtonSize).
+            SetAnchors(cast<Anchors>(Anchors.bottom | Anchors.right))))));
         helloButton->ClickEvent().AddHandler(HelloButtonClick);
         AddChild(helloButton.Release());
         PaintEvent().AddHandler(Paint);

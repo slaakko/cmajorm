@@ -69,7 +69,8 @@ FileStream::FileStream(const std::string& filePath_, OpenMode openMode) : filePa
     {
         mode += "b";
     }
-    file = std::fopen(filePath.c_str(), mode.c_str());
+    std::string nativeFilePath = soulng::util::Utf8StringToPlatformString(filePath);
+    file = std::fopen(nativeFilePath.c_str(), mode.c_str());
     if (!file)
     {
         throw std::runtime_error("could not open file '" + std::string(filePath) + "': " + PlatformStringToUtf8(std::strerror(errno)));

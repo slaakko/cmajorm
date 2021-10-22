@@ -294,7 +294,17 @@ void EndTracing()
 }
 
 #ifdef _WIN32
+
+#if defined(__MINGW32__)
+
+char threadId = '0';
+
+#else
+
 __declspec(thread) char threadId = '0';
+
+#endif
+
 #else
 __thread char threadId = '0';
 #endif

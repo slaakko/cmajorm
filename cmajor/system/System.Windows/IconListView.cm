@@ -10,22 +10,27 @@ using System.Windows.API;
 
 namespace System.Windows
 {
-    public System.Windows.Color DefaultIconSelectedColor()
+    public nothrow System.Windows.Color DefaultIconListViewTextColor()
+    {
+        return System.Windows.Color.Black();
+    }
+    
+    public nothrow System.Windows.Color DefaultIconListViewIconSelectedColor()
     {
         return System.Windows.Color(64u, 96u, 156u, 210u);
     }
 
-    public nothrow Padding DefaultIconPadding()
+    public nothrow Padding DefaultIconListViewIconPadding()
     {
         return Padding(8, 8, 8, 8);
     }
 
-    public nothrow Padding DefaultTextPadding()
+    public nothrow Padding DefaultIconListViewTextPadding()
     {
         return Padding(4, 4, 4, 4);
     }
 
-    public nothrow Padding DefaultInternalPadding()
+    public nothrow Padding DefaultIconListViewInternalPadding()
     {
         return Padding(4, 4, 4, 4);
     }
@@ -114,6 +119,75 @@ namespace System.Windows
         public Bitmap* bitmap;
     }
 
+    public nothrow ControlCreateParams& IconListViewControlCreateParams(ControlCreateParams& controlCreateParams)
+    {
+        controlCreateParams.SetWindowClassName("System.Windows.IconListView");
+        controlCreateParams.SetWindowClassStyle(DoubleClickWindowClassStyle());
+        controlCreateParams.SetWindowClassBackgroundColor(SystemColor.COLOR_WINDOW);
+        controlCreateParams.SetBackgroundColor(Color.White());
+        return controlCreateParams;
+    }
+    
+    public class IconListViewCreateParams
+    {
+        public nothrow IconListViewCreateParams(ControlCreateParams& controlCreateParams_) :
+            controlCreateParams(controlCreateParams_),
+            fontFamilyName(DefaultIconListViewFontFamilyName()),
+            fontSize(DefaultIconListViewFontSize()),
+            textColor(DefaultIconListViewTextColor()),
+            iconSelectedColor(DefaultIconListViewIconSelectedColor()),
+            bitmapTransparentColor(System.Windows.Color.DefaultBitmapTransparent()),
+            iconPadding(DefaultIconListViewIconPadding()),
+            textPadding(DefaultIconListViewTextPadding()),
+            internalPadding(DefaultIconListViewInternalPadding())
+        {
+        }
+        public IconListViewCreateParams& SetFontFamilyName(const string& fontFamilyName_)
+        {
+            fontFamilyName = fontFamilyName_;
+            return *this;
+        }
+        public IconListViewCreateParams& SetFontSize(float fontSize_)
+        {
+            fontSize = fontSize_;
+            return *this;
+        }
+        public IconListViewCreateParams& SetTextColor(const Color& textColor_)
+        {
+            textColor = textColor_;
+            return *this;
+        }
+        public IconListViewCreateParams& SetIconSelectedColor(const Color& iconSelectedColor_)
+        {
+            iconSelectedColor = iconSelectedColor_;
+            return *this;
+        }
+        public IconListViewCreateParams& SetIconPadding(const Padding& iconPadding_)
+        {
+            iconPadding = iconPadding_;
+            return *this;
+        }
+        public IconListViewCreateParams& SetTextPadding(const Padding& textPadding_)
+        {
+            textPadding = textPadding_;
+            return *this;
+        }
+        public IconListViewCreateParams& SetInternalPadding(const Padding& internalPadding_)
+        {
+            internalPadding = internalPadding_;
+            return *this;
+        }
+        public ControlCreateParams& controlCreateParams;
+        public string fontFamilyName;
+        public float fontSize;
+        public Color textColor;
+        public Color iconSelectedColor;
+        public Color bitmapTransparentColor;
+        public Padding iconPadding;
+        public Padding textPadding;
+        public Padding internalPadding;
+    }
+    
     public class IconListView : Control
     {
         private enum Flags : sbyte
@@ -123,17 +197,40 @@ namespace System.Windows
 
         public IconListView(const System.Windows.Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base("System.Windows.IconListView", DoubleClickWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
-            backgroundColor, "iconListView", location, size, dock, anchors), items(this), numberOfItems(0), fontFamily(DefaultIconListViewFontFamilyName()), fontSize(DefaultIconListViewFontSize()),
+            backgroundColor, "iconListView", location, size, dock, anchors), items(this), numberOfItems(0),
+            fontFamily(DefaultIconListViewFontFamilyName()),
+            fontSize(DefaultIconListViewFontSize()),
             font(fontFamily, fontSize),
-            bitmapTransparentColor(System.Windows.Color.DefaultBitmapTransparent()), iconSelectedColor(DefaultIconSelectedColor()), textColor(System.Windows.Color.Black()),
-            iconPadding(DefaultIconPadding()), textPadding(DefaultTextPadding()), internalPadding(DefaultInternalPadding()),
+            bitmapTransparentColor(System.Windows.Color.DefaultBitmapTransparent()),
+            iconSelectedColor(DefaultIconListViewIconSelectedColor()),
+            textColor(DefaultIconListViewTextColor()),
+            iconPadding(DefaultIconListViewIconPadding()),
+            textPadding(DefaultIconListViewTextPadding()),
+            internalPadding(DefaultIconListViewInternalPadding()),
             imageAttributes(), stringFormat(StringAlignment.center, StringAlignment.center), selectedItem(null)
         {
             imageAttributes.SetColorKeyChecked(bitmapTransparentColor, bitmapTransparentColor, ColorAdjustType.default_);
+            SetChanged();
         }
         public IconListView(const Point& location, const Size& size, Dock dock, Anchors anchors) :
             this(System.Windows.Color.White(), location, size, dock, anchors)
         {
+        }
+        public IconListView(IconListViewCreateParams& createParams) :
+            base(createParams.controlCreateParams),
+            items(this), numberOfItems(0),
+            fontFamily(createParams.fontFamilyName),
+            fontSize(createParams.fontSize),
+            font(fontFamily, fontSize),
+            bitmapTransparentColor(createParams.bitmapTransparentColor),
+            iconSelectedColor(createParams.iconSelectedColor),
+            textColor(createParams.textColor),
+            iconPadding(createParams.iconPadding),
+            textPadding(createParams.textPadding),
+            internalPadding(createParams.internalPadding),
+            imageAttributes(), stringFormat(StringAlignment.center, StringAlignment.center), selectedItem(null)
+        {
+            imageAttributes.SetColorKeyChecked(bitmapTransparentColor, bitmapTransparentColor, ColorAdjustType.default_);
             SetChanged();
         }
         public void AddItem(const string& iconName, const string& itemName)

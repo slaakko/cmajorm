@@ -26,6 +26,7 @@
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Json.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <iostream>

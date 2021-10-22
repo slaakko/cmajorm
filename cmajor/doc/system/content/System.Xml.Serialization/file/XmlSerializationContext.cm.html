@@ -1,0 +1,81 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>System.Xml.Serialization/XmlSerializationContext.cm</title>
+  <link href="../../../style/code.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko
+</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license
+</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="keyword">namespace</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Xml</span><span class="other">.</span><span class="identifier">Serialization</span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">enum</span>&nbsp;<a href="../doc/enumerated_type_XmlSerializationFlags_05CEB9BB12F8653502745E6D82C59E7C51AC5325.html">XmlSerializationFlags</a><span class="other">&nbsp;:&nbsp;</span><span class="keyword">int</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">none</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0</span><span class="other">,&nbsp;</span><span class="identifier">suppressMetadata</span><span class="other">&nbsp;=&nbsp;</span><span class="number">1</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="number">0</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_XmlSerializationContext_75809AC49EFFC7F109100D2E29F2A4A15E371663.html">XmlSerializationContext</a></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<a href="../doc/class_XmlSerializationContext_75809AC49EFFC7F109100D2E29F2A4A15E371663.html#default_constructor_XmlSerializationContext_9D6319ED3D8849B568DD7663070CDBF394FD93C8">XmlSerializationContext</a><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">flags</span><span class="other">(</span><a href="../doc/enumerated_type_XmlSerializationFlags_05CEB9BB12F8653502745E6D82C59E7C51AC5325.html">XmlSerializationFlags</a><span class="other">.</span><a href="../doc/enumerated_type_XmlSerializationFlags_05CEB9BB12F8653502745E6D82C59E7C51AC5325.html#enumeration_constant_none_3D081B1D84B7CD70D829A7CB944553F447868CF0">none</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">bool</span>&nbsp;<a href="../doc/class_XmlSerializationContext_75809AC49EFFC7F109100D2E29F2A4A15E371663.html#member_function_GetFlag_XmlSerializationContext_CA4F6C8BD5DCA87FC36701DB2454C8554583843D">GetFlag</a><span class="other">(</span><a href="../doc/enumerated_type_XmlSerializationFlags_05CEB9BB12F8653502745E6D82C59E7C51AC5325.html">XmlSerializationFlags</a>&nbsp;<span class="identifier">flag</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="other">(</span><a href="../doc/class_XmlSerializationContext_75809AC49EFFC7F109100D2E29F2A4A15E371663.html#member_variable_flags_8574B2B082300541B9E87542AA45516ED2E43501">flags</a><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">flag</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><a href="../doc/enumerated_type_XmlSerializationFlags_05CEB9BB12F8653502745E6D82C59E7C51AC5325.html">XmlSerializationFlags</a><span class="other">.</span><a href="../doc/enumerated_type_XmlSerializationFlags_05CEB9BB12F8653502745E6D82C59E7C51AC5325.html#enumeration_constant_none_3D081B1D84B7CD70D829A7CB944553F447868CF0">none</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">void</span>&nbsp;<a href="../doc/class_XmlSerializationContext_75809AC49EFFC7F109100D2E29F2A4A15E371663.html#member_function_SetFlag_XmlSerializationContext_BF6A0E6424A1793422F84ABDBF8ADFB944C32473">SetFlag</a><span class="other">(</span><a href="../doc/enumerated_type_XmlSerializationFlags_05CEB9BB12F8653502745E6D82C59E7C51AC5325.html">XmlSerializationFlags</a>&nbsp;<span class="identifier">flag</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_XmlSerializationContext_75809AC49EFFC7F109100D2E29F2A4A15E371663.html#member_variable_flags_8574B2B082300541B9E87542AA45516ED2E43501">flags</a><span class="other">&nbsp;=&nbsp;</span><span class="keyword">cast</span><span class="other">&lt;</span><a href="../doc/enumerated_type_XmlSerializationFlags_05CEB9BB12F8653502745E6D82C59E7C51AC5325.html">XmlSerializationFlags</a><span class="other">></span><span class="other">(</span><a href="../doc/class_XmlSerializationContext_75809AC49EFFC7F109100D2E29F2A4A15E371663.html#member_variable_flags_8574B2B082300541B9E87542AA45516ED2E43501">flags</a><span class="other">&nbsp;|&nbsp;</span><span class="identifier">flag</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">void</span>&nbsp;<a href="../doc/class_XmlSerializationContext_75809AC49EFFC7F109100D2E29F2A4A15E371663.html#member_function_ResetFlag_XmlSerializationContext_7DCE31B2C14B2A7574D31684F5C63BA48553870B">ResetFlag</a><span class="other">(</span><a href="../doc/enumerated_type_XmlSerializationFlags_05CEB9BB12F8653502745E6D82C59E7C51AC5325.html">XmlSerializationFlags</a>&nbsp;<span class="identifier">flag</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_XmlSerializationContext_75809AC49EFFC7F109100D2E29F2A4A15E371663.html#member_variable_flags_8574B2B082300541B9E87542AA45516ED2E43501">flags</a><span class="other">&nbsp;=&nbsp;</span><span class="keyword">cast</span><span class="other">&lt;</span><a href="../doc/enumerated_type_XmlSerializationFlags_05CEB9BB12F8653502745E6D82C59E7C51AC5325.html">XmlSerializationFlags</a><span class="other">></span><span class="other">(</span><a href="../doc/class_XmlSerializationContext_75809AC49EFFC7F109100D2E29F2A4A15E371663.html#member_variable_flags_8574B2B082300541B9E87542AA45516ED2E43501">flags</a><span class="other">&nbsp;&amp;&nbsp;</span><span class="other">~</span><span class="identifier">flag</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">private</span>&nbsp;<a href="../doc/enumerated_type_XmlSerializationFlags_05CEB9BB12F8653502745E6D82C59E7C51AC5325.html">XmlSerializationFlags</a>&nbsp;<span class="identifier">flags</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

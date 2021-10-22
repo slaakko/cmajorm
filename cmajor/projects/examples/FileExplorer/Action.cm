@@ -1,0 +1,54 @@
+using System;
+using System.Windows;
+
+namespace FileExplorer
+{
+    public class OpenAndExpandAction : ClickAction
+    {
+        public nothrow OpenAndExpandAction(Node* node_) : base(), node(node_)
+        {
+        }
+        public override void Execute()
+        {
+            MainWindow* mainWindow = node->GetMainWindow();
+            if (mainWindow != null)
+            {
+                try
+                {
+                    mainWindow->HideContextMenu();
+                    node->OpenAndExpand();
+                }
+                catch (const Exception& ex)
+                {
+                    MessageBox.Show(ex.ToString(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                }
+            }
+        }
+        private Node* node;
+    }
+
+    public class OpenAction : ClickAction
+    {
+        public nothrow OpenAction(Node* node_) : base(), node(node_)
+        {
+        }
+        public override void Execute()
+        {
+            MainWindow* mainWindow = node->GetMainWindow();
+            if (mainWindow != null)
+            {
+                try
+                {
+                    mainWindow->HideContextMenu();
+                    node->Open();
+                }
+                catch (const Exception& ex)
+                {
+                    MessageBox.Show(ex.ToString(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                }
+            }
+        }
+        private Node* node;
+    }
+}
+

@@ -41,7 +41,8 @@ class MainWindow : Window
             verticalSplitContainer->Pane2Container()->AddChild(scrollableLogView.Release());
         }
         UniquePtr<SplitContainer> horizontalSplitContainer(new SplitContainer(Orientation.horizontal, 600, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
-        treeView = new TreeView(Point(0, 0), Size(0, 0), Dock.none, Anchors.none);
+        treeView = new TreeView(TreeViewCreateParams(TreeViewControlCreateParams(ControlCreateParams().Defaults())).Defaults());
+        //treeView = new TreeView(Point(0, 0), Size(0, 0), Dock.none, Anchors.none);
         treeView->NodeDoubleClickEvent().AddHandler(TreeViewNodeDoubleClick);
         treeView->SetScrollSubject();
         treeView->NodeEnterEvent().AddHandler(TreeViewNodeEnter);
