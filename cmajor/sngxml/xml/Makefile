@@ -1,6 +1,6 @@
 include ../Makefile.common
 
-OBJECTS = XmlApi.o XmlContentHandler.o XmlParser.o XmlParserInterface.o XmlProcessor.o
+OBJECTS = Rules.o XmlApi.o XmlContentHandler.o XmlParser.o XmlParserInterface.o XmlProcessor.o
 
 %.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
