@@ -1,7 +1,10 @@
 include Makefile.common
 
-OBJECTS = InitDone.o XmlClassRegistry.o XmlExport.o XmlImport.o XmlSerApi.o XmlSerAst.o XmlSerClassMap.o XmlSerGen.o \
-XmlSerKeywords.o XmlSerLexer.o XmlSerParser.o XmlSerTokens.o XmlSerVisitor.o
+OBJECTS = InitDone.o \
+XmlBundle.o XmlClassRegistry.o XmlContainer.o \
+XmlExport.o XmlImport.o XmlPtr.o XmlSerApi.o XmlSerAst.o XmlSerClassMap.o XmlSerGen.o \
+XmlSerializable.o XmlSerializationContext.o \
+XmlSerKeywords.o XmlSerLexer.o XmlSerParser.o XmlSerRules.o XmlSerScan.o XmlSerTokens.o XmlSerVisitor.o
 
 %.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
