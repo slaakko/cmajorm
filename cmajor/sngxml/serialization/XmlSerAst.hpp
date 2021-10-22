@@ -265,7 +265,7 @@ class SNGXML_SERIALIZATION_API TemplateIdNode : public TypeNode
 public:
     TemplateIdNode(const std::string& typeId_, const std::string& typeParamId_);
     bool IsTemplateIdNode() const override { return true; }
-    void Accept(Visitor& visitor);
+    void Accept(Visitor& visitor) override;
     const std::string& TypeId() const { return typeId; }
     const std::string& TypeParamId() const { return typeParamId; }
 private:
