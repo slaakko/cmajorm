@@ -229,7 +229,7 @@ std::unique_ptr<sngxml::dom::Element> ToXml(const std::shared_ptr<T>& objectPtr,
             if (XmlSerializable* intf = dynamic_cast<XmlSerializable*>(p))
             {
                 element->SetAttribute(U"classId", ToUtf32(std::to_string(intf->ClassId())));
-                element->SetAttribute(U"className", intf->ClassName());
+                element->SetAttribute(U"className", ToUtf32(intf->ClassName()));
             }
         }
         return element;
