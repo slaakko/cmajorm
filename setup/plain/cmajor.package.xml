@@ -1,8 +1,4 @@
 <package appName="Cmajor" compression="none" iconFilePath="$TARGET_ROOT_DIR$/bin/cmcodesmall.ico" id="0b6afac5-782c-434a-8dcc-d8cf30922fd3" includeUninstaller="true" name="cmajor" publisher="Seppo Laakko" sourceRootDir="../../cmajor" targetRootDir="C:/cmajor" version="4.2.0">
- <preinstall>
-  <include filePath="installation\x64\Release\checkcmajor.exe"/>
-  <run command="$PREINSTALL_DIR$\checkcmajor"/>
- </preinstall>
  <component name="binaries">
   <directory name="bin"/>
  </component>
@@ -31,6 +27,7 @@
    <exclude dir="*"/>
    <exclude cascade="true" dir="lib"/>
    <exclude cascade="true" dir="bin"/>
+   <exclude cascade="true" file="*.settings.xml"/>
    <include dir="cm"/>
    <include dir="cmsx">
     <exclude dir="config"/>
@@ -39,7 +36,11 @@
    </include>
    <include dir="examples"/>
    <include dir="sirius"/>
-   <include dir="tools"/>
+   <include dir="tools">
+    <include dir="soulcm">
+     <exclude file="soulcm.cms.settings.xml"/>
+    </include>
+   </include>
    <include dir="xmlSerializationTests"/>
   </directory>
  </component>
