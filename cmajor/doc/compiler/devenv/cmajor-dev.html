@@ -9,6 +9,10 @@
 <body>
     <h1>Setting up Cmajor compiler development environment</h1>
 
+	<p>
+		This document contains instructions how to build the Cmajor compiler, tools and libraries from sources.
+	</p>
+
 	<h2>
 		Requirements
 	</h2>
@@ -30,7 +34,7 @@
     </p>
     
     <h3>
-        Location:
+        Default location:
     </h3>
     
     <p>
@@ -73,12 +77,12 @@
         C:\work\boost_1_74_0> b2 toolset=msvc address-model=64 --build-dir=C:\boost-build-dir --prefix=C:\boost install
     </pre>
     </li>
-    
+	
     <li>
         After compiling <strong>C:\boost-build-dir</strong> ja <strong>C:\work\boost_1_74_0</strong> can be removed.
     </li>
     
-    </ol>
+	</ol>
     
     <h2>
         2. Mingw-w64
@@ -132,7 +136,7 @@
     </p>
     
     <h3>
-        Location:
+        Default location:
     </h3>
     
     <p>
@@ -198,7 +202,7 @@
     </p>
     
     <h3>
-        Location:
+        Default location:
     </h3>
     
     <p>
@@ -238,7 +242,7 @@
     </p>
     
     <h3>
-        Location:
+        Default location:
     </h3>
     
     <p>
@@ -285,7 +289,7 @@
 	</p>
 	
 	<h3>
-		Location
+		Default location
 	</h3>
 	
 	<p>
@@ -323,7 +327,7 @@
     </p>
     
     <h3>
-        Location:
+        Default location:
     </h3>
     
     <p>
@@ -417,7 +421,7 @@
     </h2>
     
     <h3>
-        Location
+        Default location
     </h3>
     
     <p>
@@ -447,19 +451,101 @@
 		Clones repository to cmajorm directory.
 	</li>
     </ol>
+	
+	<h3>
+		Configuration
+	</h3>
+	
+	<h4>
+		MS Visual C++ configuration
+	</h4>
+	
+	<p>
+		Open the <strong>C:\work\cmajorm\cmajor\config\build.props</strong> file with a text editor and set the value of the following Visual Studio user macros:
+	</p>
+
+	<ol>
+		<li><strong>BOOST_INCLUDE_DIR</strong>. The default value is <strong>C:\boost\include\boost-1_74</strong>.</li>
+		<li><strong>BOOST_LIB_DIR</strong>. The default value is <strong>C:\boost\lib</strong>.</li>
+		<li><strong>LLVM_SRC_INCLUDE_DIR</strong>. The default value is <strong>C:\llvm-11.0.0.src\include</strong>.</li>
+		<li><strong>LLVM_BUILD_INCLUDE_DIR</strong>. The default value is <strong>C:\llvm-11.0.0.src\build\include</strong>.</li>
+		<li><strong>LLVM_RELEASE_LIB_DIR</strong>. The default value is <strong>C:\llvm-11.0.0.src\build\Release\lib</strong>.</li>
+		<li><strong>LLVM_DEBUG_LIB_DIR</strong>. The default value is <strong>C:\llvm-11.0.0.src\build\Debug\lib</strong>.</li>
+	</ol>
+
+	<h4>
+		Mingw-w64 configuration
+	</h4>
+	
+	<p>
+		Open the <strong>C:\work\cmajorm\cmajor\rts\build\gcc\Makefile.common</strong> file with a text editor and set the following paths:
+	</p>
+	
+	<ol>
+		<li><strong>BOOST_INCLUDE_DIR</strong>.	The default value is <strong>C:/mingw-boost/include/boost-1_74</strong>.</li>
+		<li><strong>BOOST_LIB_DIR</strong>.	The default value is <strong>C:/mingw-boost/lib</strong>.</li>
+		<li><strong>BOOST_DEBUG_FILESYSTEM_LIB</strong>. The default value is <strong>boost_filesystem-mgw8-mt-d-x64-1_74</strong>.</li>
+		<li><strong>BOOST_DEBUG_IOSTREAMS_LIB</strong>. The default value is <strong>boost_iostreams-mgw8-mt-d-x64-1_74</strong>.</li>
+		<li><strong>BOOST_DEBUG_SYSTEM_LIB</strong>. The default value is <strong>boost_system-mgw8-mt-d-x64-1_74</strong>.</li>
+		<li><strong>BOOST_RELEASE_FILESYSTEM_LIB</strong>. The default value is <strong>boost_filesystem-mgw8-mt-x64-1_74</strong>.</li>
+		<li><strong>BOOST_RELEASE_IOSTREAMS_LIB</strong>. The default value is <strong>boost_iostreams-mgw8-mt-x64-1_74</strong>.</li>
+		<li><strong>BOOST_RELEASE_SYSTEM_LIB</strong>. The default value is <strong>boost_system-mgw8-mt-x64-1_74</strong>.</li>
+	</ol>
+
+	<h4>
+		Static Boost library gcc tool chain configuration
+	</h4>
+	
+	<p>
+		Optional.
+	</p>
+	
+	<p>
+		Open the <strong>C:\work\cmajorm\cmajor\config\tool-chains.json</strong> file with a text editor and set Boost library version numbers in the following 
+		lines:
+	</p>
+	
+	<ol>
+		<li><strong>line 302</strong>. The default libraries are <strong>boost_filesystem-mgw8-mt-d-x64-1_74</strong>,
+		<strong>boost_iostreams-mgw8-mt-d-x64-1_74</strong> and <strong>boost_system-mgw8-mt-d-x64-1_74</strong>.</li>
+		<li><strong>line 323</strong>. The default libraries are <strong>boost_filesystem-mgw8-mt-x64-1_74</strong>,
+		<strong>boost_iostreams-mgw8-mt-x64-1_74</strong> and <strong>boost_system-mgw8-mt-x64-1_74</strong>.
+	</ol>
 
     <h3>
-        Installation
+        Compilation
     </h3>
     
+	<p>
+		There's a makefile that builds the system using nmake (Option 1), but it may not always succeed due to file locking issues (bugs in the compiler).
+		If the nmake does not succeed, it's possible to build the system the elaborate way (Option 2 and 10. onward) in stages.
+	</p>
+	
+	<h4>
+		Option 1: with makefile
+	</h4>
+
+	<ol>
+        <li>Add environment variable CMAJOR_ROOT with value <strong>C:\work\cmajorm\cmajor</strong>.</li>
+		<li>Create directory <strong>C:\work\cmajorm\cmajor\bin</strong>.</li>
+		<li>Add <strong>C:\work\cmajorm\cmajor\bin</strong> directory to PATH.
+		<li>Open x64 Native Tools Command Prompt for VS 2019</li>
+		<li>Change to <strong>C:\work\cmajorm\cmajor\bat</strong> directory</li>
+		<li>Run <strong>nmake</strong>
+	</ol>
+	
+	<h4>
+		Option 2: elaborate way
+	</h4>
+	
     <ol>
-        <li>Make subdirectory <strong>C:\work\cmajorm\cmajor\lib</strong></li>
+        <li>Add environment variable CMAJOR_ROOT with value <strong>C:\work\cmajorm\cmajor</strong>.</li>
+		<li>Make subdirectory <strong>C:\work\cmajorm\cmajor\lib</strong></li>
         <li>Make subdirectory <strong>C:\work\cmajorm\cmajor\lib\gcc</strong></li>
         <li>Make subdirectory <strong>C:\work\cmajorm\cmajor\lib\vs</strong></li>
         <li>Make subdirectory <strong>C:\work\cmajorm\cmajor\bin</strong></li>
         <li>Make subdirectory <strong>C:\work\cmajorm\cmajor\rts\build\gcc\lib</strong></li>
-        <li>Make subdirectory <strong>C:\work\cmajorm\cmajor\rts\build\gcc\bin</strong></li>
-        <li>Add environment variable CMAJOR_ROOT with value <strong>C:\work\cmajorm\cmajor</strong>.</li>
+        <li>Make subdirectory <strong>C:\work\cmajorm\cmajor\rts\build\gcc\bin</strong></li>		
 		<li>Add <strong>C:\work\cmajorm\cmajor\bin</strong> directory to PATH.
         <li>Open x64 Native Tools Command Prompt for VS 2019</li>
         <li>Change to <strong>C:\work\cmajorm\cmajor\system\ext\pdcurs36\build</strong> directory.</li>
@@ -472,7 +558,7 @@
         <li>Select <strong>Release/x64</strong> configuration.</li>
         <li>Build solution.</li>
         <li>Open Windows Terminal to <strong>C:\work\cmajorm\cmajor\bat</strong> directory.</li>
-        <li>Run <strong>install.bat</strong>. Does not find all the files, but does not matter for now.</li>
+        <li>Run <strong>inst.bat</strong>. Does not find all the files, but does not matter for now.</li>
         <li>Open Windows Terminal to <strong>C:\work\cmajorm\cmajor\rts\build\gcc</strong> directory.</li>
         <li>Run mingw32-make (assumed that can be found from PATH):
         <pre>
@@ -489,6 +575,10 @@
     <h2>
         10. Unicode
     </h2>
+
+	<p>
+		Not required if 9. Option 1 succeeded.
+	</p>
 
     <h3>
         Download
@@ -516,6 +606,10 @@
         11. Cmajor system libraries
     </h2>
 
+	<p>
+		Not required if 9. Option 1 succeeded.
+	</p>
+	
     <h3>
         Installation
     </h3>
@@ -548,6 +642,10 @@
 		12. Cmajor Visual Studio extension
 	</h2>
 	
+	<p>
+		Optional.
+	</p>
+	
 	<ol>
 		<li>Open <strong>C:\work\cmajorm\cmajor\task\task.sln</strong> in Visual Studio 2019</li>
 		<li>Select Debug|Any CPU -konfiguraaatio</li>
@@ -555,7 +653,7 @@
 		<li>Select Release|Any CPU -konfiguraaatio</li>
 		<li>Build solution</li>
 		<li>Open Windows Terminal to <strong>C:\work\cmajorm\cmajor\bat</strong> directory.
-		<li>Run <strong>install.bat</strong>: copies C:\work\cmajorm\cmajor\task\bin\Release\CmajorTasks.dll to bin directory.
+		<li>Run <strong>inst.bat</strong>: copies C:\work\cmajorm\cmajor\task\bin\Release\CmajorTasks.dll to bin directory.
 		<li>Change to <strong>C:\work\cmajorm\cmajor\vs\2019</strong> directory.
 		<li>Run CreateCmajorCPS.exe:
 		<pre>
@@ -568,6 +666,10 @@
 	<h2>
 		13. Cmajor tools
 	</h2>
+
+	<p>
+		Optional and not required if 9. Option 1 succeeded.
+	</p>
 	
 	<ol>
 		<li>Open Windows Terminal to <strong>C:\work\cmajorm\cmajor\projects\cm</strong> directory.</li>
@@ -622,6 +724,10 @@
 		14. Cmajor examples
 	</h2>
 	
+	<p>
+		Optional and not required if 9. Option 1 succeeded.
+	</p>
+
 	<ol>
 		<li>Open  Windows Terminal to <strong>C:\work\cmajorm\cmajor\projects\examples</strong> directory.</li>
 		<li>Compile examples.cms solution using debug config:
@@ -639,6 +745,10 @@
 	<h2>
 		15. System X
 	</h2>
+
+	<p>
+		Optional and not required if 9. Option 1 succeeded. 
+	</p>
 
 	<ol>
 		<li>Open Windows Terminal to <strong>C:\work\cmajorm\cmajor\projects\cmsx</strong> directory.</li>
@@ -660,7 +770,7 @@
 	
 	<ol>
 		<li>Open Windows Terminal to <strong>C:\work\cmajorm\cmajor\bat</strong> directory.</li>
-		<li>Run <strong>install.bat</strong>. Changed files are copied to <strong>C:\work\cmajorm\cmajor\bin</strong> and <strong>C:\work\cmajorm\cmajor\lib</strong> directories. 
-		All except cmajor.vsix and cmsxpg.exe should now be found.</li>
+		<li>Run <strong>inst.bat</strong>. 
+		Changed files are copied to <strong>C:\work\cmajorm\cmajor\bin</strong> and <strong>C:\work\cmajorm\cmajor\lib</strong> directories.</li>
 	</ol>
 </body>

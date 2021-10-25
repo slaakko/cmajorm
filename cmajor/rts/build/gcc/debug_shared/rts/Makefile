@@ -10,7 +10,7 @@ Error.o Fiber.o InitDone.o Io.o Math.o Memory.o Multiprecision.o Mutex.o Process
 Statics.o String.o Thread.o Time.o Trace.o UnitTest.o Unwind.o 
 endif
 
-LIBRARY_NAME=libcmrt420cppd.dll
+LIBRARY_NAME=libcmrt430cppd.dll
 
 SOURCE_PREFIX=../../../..
 
@@ -30,12 +30,14 @@ CFLAGS += -I$(SOURCE_PREFIX)/../.. -g -O0 -DSHARED -DRT_EXPORTS
 	
 $(BINARY_PREFIX)/$(LIBRARY_NAME): $(OBJECTS)
 	$(CXX) -shared -o $@ $(OBJECTS) -mwindows -municode \
-		-L$(LIBRARY_PREFIX) -LC:/mingw-boost/lib \
+		-L$(LIBRARY_PREFIX) -L$(BOOST_LIB_DIR) \
 		-lcmsngcmparserd -lcmsngcmlexerd \
 		-lcmsngparserd -lcmsngcmastd -lcmsngxmldomd -lcmsngxmlxmld \
 		-lcmsngxmlxpathd -lcmsnglexerd -lcmehd -lcmcommond -lcmsngutild -lpdcursesd \
-		-lbz2d -lzd -lwsock32 -lws2_32 -lboost_filesystem-mgw8-mt-d-x64-1_74 \
-		-lboost_iostreams-mgw8-mt-d-x64-1_74 -lboost_system-mgw8-mt-d-x64-1_74 \
+		-lbz2d -lzd -lwsock32 -lws2_32 \
+		-l$(BOOST_DEBUG_FILESYSTEM_LIB) \
+		-l$(BOOST_DEBUG_IOSTREAMS_LIB) \
+		-l$(BOOST_DEBUG_SYSTEM_LIB) \
 		-lgdiplus 
 
 clean:

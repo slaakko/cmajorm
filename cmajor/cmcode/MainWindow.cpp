@@ -52,7 +52,7 @@
 
 namespace cmcode {
 
-const char* cmajorCodeVersion = "4.2.0";
+const char* cmajorCodeVersion = "4.3.0";
 
 bool CmCodeLogFlagExists()
 {

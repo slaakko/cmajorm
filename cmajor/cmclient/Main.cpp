@@ -16,7 +16,7 @@
 #include <iostream>
 #include <stdexcept>
 
-const char* version = "4.2.0";
+const char* version = "4.3.0";
 
 // global options:
 // --verbose: be verbose

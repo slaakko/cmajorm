@@ -79,21 +79,27 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\config\build.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Trace|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\config\build.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\config\build.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\config\build.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Trace|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\config\build.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\config\build.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -124,13 +130,13 @@
       <PreprocessorDefinitions>_DEBUG;CMLLVM_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..;../..;C:\boost\include\boost-1_74;C:\llvm-11.0.0.src\include;C:\llvm-11.0.0.src\build\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;../..;$(BOOST_INCLUDE_DIR);$(LLVM_SRC_INCLUDE_DIR);$(LLVM_BUILD_INCLUDE_DIR)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996;4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(OutDir);C:\boost\lib;..\..\lib;C:\llvm-11.0.0.src\build\Debug\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);$(BOOST_LIB_DIR);$(LLVM_DEBUG_LIB_DIR);..\..\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;
 LLVMXRay.lib;LLVMWindowsManifest.lib;LLVMTestingSupport.lib;LLVMTableGen.lib;LLVMSymbolize.lib;LLVMDebugInfoPDB.lib;LLVMOrcJIT.lib;LLVMOrcError.lib;LLVMJITLink.lib;LLVMObjectYAML.lib;LLVMMIRParser.lib;LLVMMCA.lib;LLVMLTO.lib;LLVMPasses.lib;LLVMCoroutines.lib;LLVMObjCARCOpts.lib;LLVMipo.lib;LLVMInstrumentation.lib;LLVMVectorize.lib;LLVMLinker.lib;LLVMIRReader.lib;LLVMAsmParser.lib;LLVMFrontendOpenMP.lib;LLVMExtensions.lib;LLVMLineEditor.lib;LLVMLibDriver.lib;LLVMInterpreter.lib;gtest_main.lib;gtest.lib;LLVMFuzzMutate.lib;LLVMMCJIT.lib;LLVMExecutionEngine.lib;LLVMRuntimeDyld.lib;LLVMDWARFLinker.lib;LLVMDlltoolDriver.lib;LLVMOption.lib;LLVMDebugInfoGSYM.lib;LLVMCoverage.lib;LLVMX86Disassembler.lib;LLVMX86AsmParser.lib;LLVMX86CodeGen.lib;LLVMCFGuard.lib;LLVMGlobalISel.lib;LLVMSelectionDAG.lib;LLVMAsmPrinter.lib;LLVMDebugInfoDWARF.lib;LLVMCodeGen.lib;LLVMTarget.lib;LLVMScalarOpts.lib;LLVMInstCombine.lib;LLVMAggressiveInstCombine.lib;LLVMTransformUtils.lib;LLVMBitWriter.lib;LLVMAnalysis.lib;LLVMProfileData.lib;LLVMObject.lib;LLVMTextAPI.lib;LLVMMCParser.lib;LLVMBitReader.lib;LLVMCore.lib;LLVMRemarks.lib;LLVMBitstreamReader.lib;LLVMX86Desc.lib;LLVMMCDisassembler.lib;LLVMMC.lib;LLVMDebugInfoCodeView.lib;LLVMDebugInfoMSF.lib;LLVMBinaryFormat.lib;LLVMX86Info.lib;LLVMSupport.lib;LLVMDemangle.lib
 </AdditionalDependencies>
@@ -143,13 +149,13 @@ LLVMXRay.lib;LLVMWindowsManifest.lib;LLVMTestingSupport.lib;LLVMTableGen.lib;LLV
       <PreprocessorDefinitions>TRACE;_DEBUG;CMLLVM_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..;../..;C:\boost\include\boost-1_74;C:\llvm-11.0.0.src\include;C:\llvm-11.0.0.src\build\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;../..;$(BOOST_INCLUDE_DIR);$(LLVM_SRC_INCLUDE_DIR);$(LLVM_BUILD_INCLUDE_DIR)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996;4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(OutDir);C:\boost\lib;..\..\lib;C:\llvm-11.0.0.src\build\Debug\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);$(BOOST_LIB_DIR);$(LLVM_RELEASE_LIB_DIR);..\..\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;
 LLVMXRay.lib;LLVMWindowsManifest.lib;LLVMTestingSupport.lib;LLVMTableGen.lib;LLVMSymbolize.lib;LLVMDebugInfoPDB.lib;LLVMOrcJIT.lib;LLVMOrcError.lib;LLVMJITLink.lib;LLVMObjectYAML.lib;LLVMMIRParser.lib;LLVMMCA.lib;LLVMLTO.lib;LLVMPasses.lib;LLVMCoroutines.lib;LLVMObjCARCOpts.lib;LLVMipo.lib;LLVMInstrumentation.lib;LLVMVectorize.lib;LLVMLinker.lib;LLVMIRReader.lib;LLVMAsmParser.lib;LLVMFrontendOpenMP.lib;LLVMExtensions.lib;LLVMLineEditor.lib;LLVMLibDriver.lib;LLVMInterpreter.lib;gtest_main.lib;gtest.lib;LLVMFuzzMutate.lib;LLVMMCJIT.lib;LLVMExecutionEngine.lib;LLVMRuntimeDyld.lib;LLVMDWARFLinker.lib;LLVMDlltoolDriver.lib;LLVMOption.lib;LLVMDebugInfoGSYM.lib;LLVMCoverage.lib;LLVMX86Disassembler.lib;LLVMX86AsmParser.lib;LLVMX86CodeGen.lib;LLVMCFGuard.lib;LLVMGlobalISel.lib;LLVMSelectionDAG.lib;LLVMAsmPrinter.lib;LLVMDebugInfoDWARF.lib;LLVMCodeGen.lib;LLVMTarget.lib;LLVMScalarOpts.lib;LLVMInstCombine.lib;LLVMAggressiveInstCombine.lib;LLVMTransformUtils.lib;LLVMBitWriter.lib;LLVMAnalysis.lib;LLVMProfileData.lib;LLVMObject.lib;LLVMTextAPI.lib;LLVMMCParser.lib;LLVMBitReader.lib;LLVMCore.lib;LLVMRemarks.lib;LLVMBitstreamReader.lib;LLVMX86Desc.lib;LLVMMCDisassembler.lib;LLVMMC.lib;LLVMDebugInfoCodeView.lib;LLVMDebugInfoMSF.lib;LLVMBinaryFormat.lib;LLVMX86Info.lib;LLVMSupport.lib;LLVMDemangle.lib
 </AdditionalDependencies>
@@ -203,7 +209,7 @@ LLVMXRay.lib;LLVMWindowsManifest.lib;LLVMTestingSupport.lib;LLVMTableGen.lib;LLV
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;CMLLVM_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..;../..;C:\boost\include\boost-1_74;C:\llvm-11.0.0.src\include;C:\llvm-11.0.0.src\build\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;../..;$(BOOST_INCLUDE_DIR);$(LLVM_SRC_INCLUDE_DIR);$(LLVM_BUILD_INCLUDE_DIR)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996;4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -211,7 +217,7 @@ LLVMXRay.lib;LLVMWindowsManifest.lib;LLVMTestingSupport.lib;LLVMTableGen.lib;LLV
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(OutDir);C:\boost\lib;..\..\lib;C:\llvm-11.0.0.src\build\Release\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);$(BOOST_LIB_DIR);$(LLVM_RELEASE_LIB_DIR);..\..\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;
 LLVMXRay.lib;LLVMWindowsManifest.lib;LLVMTestingSupport.lib;LLVMTableGen.lib;LLVMSymbolize.lib;LLVMDebugInfoPDB.lib;LLVMOrcJIT.lib;LLVMOrcError.lib;LLVMJITLink.lib;LLVMObjectYAML.lib;LLVMMIRParser.lib;LLVMMCA.lib;LLVMLTO.lib;LLVMPasses.lib;LLVMCoroutines.lib;LLVMObjCARCOpts.lib;LLVMipo.lib;LLVMInstrumentation.lib;LLVMVectorize.lib;LLVMLinker.lib;LLVMIRReader.lib;LLVMAsmParser.lib;LLVMFrontendOpenMP.lib;LLVMExtensions.lib;LLVMLineEditor.lib;LLVMLibDriver.lib;LLVMInterpreter.lib;gtest_main.lib;gtest.lib;LLVMFuzzMutate.lib;LLVMMCJIT.lib;LLVMExecutionEngine.lib;LLVMRuntimeDyld.lib;LLVMDWARFLinker.lib;LLVMDlltoolDriver.lib;LLVMOption.lib;LLVMDebugInfoGSYM.lib;LLVMCoverage.lib;LLVMX86Disassembler.lib;LLVMX86AsmParser.lib;LLVMX86CodeGen.lib;LLVMCFGuard.lib;LLVMGlobalISel.lib;LLVMSelectionDAG.lib;LLVMAsmPrinter.lib;LLVMDebugInfoDWARF.lib;LLVMCodeGen.lib;LLVMTarget.lib;LLVMScalarOpts.lib;LLVMInstCombine.lib;LLVMAggressiveInstCombine.lib;LLVMTransformUtils.lib;LLVMBitWriter.lib;LLVMAnalysis.lib;LLVMProfileData.lib;LLVMObject.lib;LLVMTextAPI.lib;LLVMMCParser.lib;LLVMBitReader.lib;LLVMCore.lib;LLVMRemarks.lib;LLVMBitstreamReader.lib;LLVMX86Desc.lib;LLVMMCDisassembler.lib;LLVMMC.lib;LLVMDebugInfoCodeView.lib;LLVMDebugInfoMSF.lib;LLVMBinaryFormat.lib;LLVMX86Info.lib;LLVMSupport.lib;LLVMDemangle.lib
       </AdditionalDependencies>

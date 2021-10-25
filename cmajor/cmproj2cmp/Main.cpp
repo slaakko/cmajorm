@@ -18,7 +18,7 @@ void InitApplication()
 using namespace soulng::util;
 using namespace cmajor::cmproj;
 
-const char* version = "4.2.0";
+const char* version = "4.3.0";
 
 void PrintHelp()
 {

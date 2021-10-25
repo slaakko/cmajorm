@@ -62,7 +62,7 @@ struct BackendInit
     }
 };
 
-const char* version = "4.2.0";
+const char* version = "4.3.0";
 
 void PrintHelp()
 {
@@ -101,7 +101,7 @@ void PrintHelp()
         "--debug-parse (-p)\n" <<
         "   debug parsing to stdout\n" <<
         "--link-with-debug-runtime (-d)\n" <<
-        "   link with the debug version of the runtime library cmrt420(d).dll\n" <<
+        "   link with the debug version of the runtime library cmrt430(d).dll\n" <<
         "--define SYMBOL (-D SYMBOL)\n" <<
         "   define a conditional compilation symbol SYMBOL.\n" <<
         "--gen-debug-info (-g)\n" <<

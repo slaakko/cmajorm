@@ -21,7 +21,7 @@ void InitApplication()
     cmajor::symbols::Init();
 }
 
-const char* version = "4.2.0";
+const char* version = "4.3.0";
 
 void PrintHelp()
 {
