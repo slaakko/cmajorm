@@ -1,8 +1,11 @@
 #	Makefile for Cmajor compiler & tools, system library, tool programs and examples.
 #	Run with nmake from Visual Studio 2019 x64 Native Tools Command Prompt
 
-all: pdcurses zlibasm compiler cppbert unicode sys cmlean tools examples xmlSerializationTests olddevenv
+all: makedirs pdcurses zlibasm compiler cppbert unicode sys cmlean tools examples xmlSerializationTests olddevenv
 	inst.bat
+
+makedirs:
+	makedirs.bat
 
 pdcurses:
 	cd ..\system\ext\pdcurs36\build && build.bat
