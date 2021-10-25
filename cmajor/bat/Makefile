@@ -1,7 +1,7 @@
 #	Makefile for Cmajor compiler & tools, system library, tool programs and examples.
 #	Run with nmake from Visual Studio 2019 x64 Native Tools Command Prompt
 
-all: makedirs pdcurses zlibasm compiler cppbert unicode sys cmlean tools examples xmlSerializationTests olddevenv
+all: makedirs pdcurses zlibasm compiler cppbert vstask unicode sys cmlean tools examples xmlSerializationTests olddevenv
 	inst.bat
 
 makedirs:
@@ -13,16 +13,20 @@ pdcurses:
 zlibasm:
 	cd ..\system\ext\zlib-1.2.11\contrib\masmx64 && bld_ml64.bat
 
-compiler: buildcomp install
-
-buildcomp:
+compiler: 
 	MSBuild -m -verbosity:minimal ..\cmajor.sln -p:Configuration="Debug"
 	MSBuild -m -verbosity:minimal ..\cmajor.sln -p:Configuration="Release"
-	
+	install_compiler.bat
+
 cppbert:
 	cd ../rts/build/gcc && mingw32-make
 	cd ../rts/build/gcc && mingw32-make install
 
+vstask:	
+	MSBuild -m -verbosity:minimal ..\task\task.sln -p:Configuration="Debug"
+	MSBuild -m -verbosity:minimal ..\task\task.sln -p:Configuration="Release"
+	install_vstask.bat
+	
 unicode:
 	cd ..\unicode && build.bat
 	
