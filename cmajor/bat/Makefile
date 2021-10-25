@@ -17,14 +17,15 @@ compiler:
 	MSBuild -m -verbosity:minimal ..\cmajor.sln -p:Configuration="Debug"
 	MSBuild -m -verbosity:minimal ..\cmajor.sln -p:Configuration="Release"
 	install_compiler.bat
+	install_llvm_tools.bat
 
 cppbert:
 	cd ../rts/build/gcc && mingw32-make
 	cd ../rts/build/gcc && mingw32-make install
 
 vstask:	
-	MSBuild -m -verbosity:minimal ..\task\task.sln -p:Configuration="Debug"
-	MSBuild -m -verbosity:minimal ..\task\task.sln -p:Configuration="Release"
+	MSBuild -m -verbosity:minimal ..\task\task.sln -p:Configuration="Debug" -p:Platform="Any CPU"
+	MSBuild -m -verbosity:minimal ..\task\task.sln -p:Configuration="Release" -p:Platform="Any CPU"
 	install_vstask.bat
 	
 unicode:
@@ -65,8 +66,8 @@ cmsx:
 	cmc -u -v -c=release -st -bt=1 ../projects/cmsx/cmsx.cms
 
 xmlSerializationTests:
-	cmc -u -v ../projects/xmlSerializationTests/xmlSerializationTests.cms
-	cmc -u -v -c=release ../projects/xmlSerializationTests/xmlSerializationTests.cms
+	cmc -u -v -bt=1 ../projects/xmlSerializationTests/xmlSerializationTests.cms
+	cmc -u -v -bt=1 -c=release ../projects/xmlSerializationTests/xmlSerializationTests.cms
 
 preinstallation_check:
 	MSBuild -m -verbosity:minimal ..\installation\checkcmajor\checkcmajor.vcxproj -p:Configuration="Debug"
