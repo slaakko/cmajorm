@@ -21,6 +21,7 @@
 #include <fstream>
 #include <iostream>
 #include <stack>
+#include <algorithm>
 
 namespace cmajor { namespace cmdoclib {
 

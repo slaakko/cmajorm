@@ -5,6 +5,7 @@
 
 #ifndef SOULNG_UTIL_PROCESS_IMPL_INCLUDED
 #define SOULNG_UTIL_PROCESS_IMPL_INCLUDED
+#include <algorithm>
 #include <soulng/util/Process.hpp>
 #if defined(_WIN32) && defined(__MINGW32__)
 #ifndef __kernel_entry

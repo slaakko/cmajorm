@@ -16,6 +16,7 @@
 #include <vector>
 #include <stdexcept>
 #include <mutex>
+#include <map>
 
 namespace soulng { namespace util {
 

@@ -12,6 +12,7 @@
 #include <vector>
 #include <memory>
 #include <set>
+#include <mutex>
 
 namespace sngcm { namespace ast {
 

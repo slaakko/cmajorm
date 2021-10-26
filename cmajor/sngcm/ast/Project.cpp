@@ -12,6 +12,7 @@
 #include <soulng/util/CodeFormatter.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <boost/filesystem.hpp>
+#include <algorithm>
 #include <iostream>
 
 namespace sngcm { namespace ast {

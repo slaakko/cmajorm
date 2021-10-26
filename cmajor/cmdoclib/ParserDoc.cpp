@@ -13,6 +13,7 @@
 #include <soulng/util/System.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <algorithm>
 
 namespace cmajor { namespace cmdoclib {
 

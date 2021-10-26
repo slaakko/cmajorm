@@ -16,6 +16,7 @@
 #include <sngcm/ast/Expression.hpp>
 #include <sngcm/ast/Identifier.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <functional>
 
 namespace cmajor { namespace binder {
 
@@ -400,7 +401,7 @@ BinaryOperatorFun greaterEqual[uint8_t(ValueType::maxValue)] =
 };
 
 template<typename T>
-struct shiftLeftFun : std::binary_function<T, T, T>
+struct shiftLeftFun 
 {
     T operator()(const T& left, const T& right) const
     {
@@ -422,7 +423,7 @@ BinaryOperatorFun shiftLeft[uint8_t(ValueType::maxValue)] =
 };
 
 template<typename T>
-struct shiftRightFun : std::binary_function<T, T, T>
+struct shiftRightFun 
 {
     T operator()(const T& left, const T& right) const
     {

@@ -10,7 +10,7 @@
     <h1>Setting up Cmajor compiler development environment</h1>
 
 	<p>
-		This document contains instructions how to build the Cmajor compiler, tools and libraries from sources.
+		This document contains instructions for building the Cmajor compiler, tools and libraries from sources.
 	</p>
 
 	<h2>
@@ -18,7 +18,8 @@
 	</h2>
 	
 	<ul>
-		<li>Microsoft Visual Studio Community Edition 2019</li>
+		<li>Microsoft Visual Studio Community Edition 2019 with 'Desktop development with C++' workload installed.
+			The C++ compiler version (cl /?) should be 19.29.30136 or later.</li> 
 	</ul>
 
     <h2>
@@ -30,7 +31,7 @@
     </h3>
     
     <p>
-        <strong>1.74</strong>
+        <strong>1.77</strong>
     </p>
     
     <h3>
@@ -50,8 +51,8 @@
     </p>
     
     <p>
-        Extract sources to <strong>C:\work\boost_1_74_0</strong> directory.
-		(For example place boost_1_74_0.7z package in C:\work directory and choose 7-Zip | Extract here)
+        Extract sources to <strong>C:\work\boost_1_77_0</strong> directory.
+		(For example place boost_1_77_0.7z package in C:\work directory and choose 7-Zip | Extract here)
     </p>
     
     <h3>
@@ -62,24 +63,24 @@
     
     <li>Open x64 Native Tools Command Prompt for VS 2019 (can be found from the start menu in Visual Studio 2019 folder)</li>
     
-    <li>Change to C:\work\boost_1_74_0 directory.</li>
+    <li>Change to C:\work\boost_1_77_0 directory.</li>
     
     <li>
         Bootstrap:
     <pre>
-        C:\work\boost_1_74_0> bootstrap
+        C:\work\boost_1_77_0> bootstrap
     </pre>
     </li>
     
     <li>
         Compilation:
     <pre>
-        C:\work\boost_1_74_0> b2 toolset=msvc address-model=64 --build-dir=C:\boost-build-dir --prefix=C:\boost install
+        C:\work\boost_1_77_0> b2 toolset=msvc address-model=64 --build-dir=C:\boost-build-dir --prefix=C:\boost install
     </pre>
     </li>
 	
     <li>
-        After compiling <strong>C:\boost-build-dir</strong> ja <strong>C:\work\boost_1_74_0</strong> can be removed.
+        After compiling <strong>C:\boost-build-dir</strong> ja <strong>C:\work\boost_1_77_0</strong> can be removed.
     </li>
     
 	</ol>
@@ -132,7 +133,7 @@
     </h3>
     
     <p>
-        <strong>1.74</strong>
+        <strong>1.77</strong>
     </p>
     
     <h3>
@@ -152,7 +153,7 @@
     </p>
     
     <p>
-         Extract sources to <strong>C:\work\boost_1_74_0</strong> directory.
+         Extract sources to <strong>C:\work\boost_1_77_0</strong> directory.
     </p>
     
     <h3>
@@ -161,7 +162,7 @@
 
     <ol>
     
-    <li>Open Windows Terminal (wt.exe) to <strong>C:\work\boost_1_74_0</strong> directory:
+    <li>Open Windows Terminal (wt.exe) to <strong>C:\work\boost_1_77_0</strong> directory:
     
     <li>
         It's assumed that mingw-w64's gcc can be found from PATH: gcc --version
@@ -171,7 +172,7 @@
         Bootstrap:
         
     <pre>
-        C:\work\boost_1_74_0> bootstrap gcc
+        C:\work\boost_1_77_0> bootstrap gcc
     </pre>
         
     </li>
@@ -179,12 +180,12 @@
     <li>
         Compilation:
     <pre>
-        C:\work\boost_1_74_0> b2 toolset=gcc address-model=64 --build-dir=C:\mingw-boost-build-dir --prefix=C:\mingw-boost install
+        C:\work\boost_1_77_0> b2 toolset=gcc address-model=64 --build-dir=C:\mingw-boost-build-dir --prefix=C:\mingw-boost install
     </pre>
     </li>
     
     <li>
-        After compiling <strong>C:\mingw-boost-build-dir</strong> ja <strong>C:\work\boost_1_74_0</strong> can be removed.
+        After compiling <strong>C:\mingw-boost-build-dir</strong> ja <strong>C:\work\boost_1_77_0</strong> can be removed.
     </li>
     
     </ol>
@@ -465,7 +466,7 @@
 	</p>
 
 	<ol>
-		<li><strong>BOOST_INCLUDE_DIR</strong>. The default value is <strong>C:\boost\include\boost-1_74</strong>.</li>
+		<li><strong>BOOST_INCLUDE_DIR</strong>. The default value is <strong>C:\boost\include\boost-1_77</strong>.</li>
 		<li><strong>BOOST_LIB_DIR</strong>. The default value is <strong>C:\boost\lib</strong>.</li>
 		<li><strong>LLVM_SRC_INCLUDE_DIR</strong>. The default value is <strong>C:\llvm-11.0.0.src\include</strong>.</li>
 		<li><strong>LLVM_BUILD_INCLUDE_DIR</strong>. The default value is <strong>C:\llvm-11.0.0.src\build\include</strong>.</li>
@@ -482,14 +483,14 @@
 	</p>
 	
 	<ol>
-		<li><strong>BOOST_INCLUDE_DIR</strong>.	The default value is <strong>C:/mingw-boost/include/boost-1_74</strong>.</li>
+		<li><strong>BOOST_INCLUDE_DIR</strong>.	The default value is <strong>C:/mingw-boost/include/boost-1_77</strong>.</li>
 		<li><strong>BOOST_LIB_DIR</strong>.	The default value is <strong>C:/mingw-boost/lib</strong>.</li>
-		<li><strong>BOOST_DEBUG_FILESYSTEM_LIB</strong>. The default value is <strong>boost_filesystem-mgw8-mt-d-x64-1_74</strong>.</li>
-		<li><strong>BOOST_DEBUG_IOSTREAMS_LIB</strong>. The default value is <strong>boost_iostreams-mgw8-mt-d-x64-1_74</strong>.</li>
-		<li><strong>BOOST_DEBUG_SYSTEM_LIB</strong>. The default value is <strong>boost_system-mgw8-mt-d-x64-1_74</strong>.</li>
-		<li><strong>BOOST_RELEASE_FILESYSTEM_LIB</strong>. The default value is <strong>boost_filesystem-mgw8-mt-x64-1_74</strong>.</li>
-		<li><strong>BOOST_RELEASE_IOSTREAMS_LIB</strong>. The default value is <strong>boost_iostreams-mgw8-mt-x64-1_74</strong>.</li>
-		<li><strong>BOOST_RELEASE_SYSTEM_LIB</strong>. The default value is <strong>boost_system-mgw8-mt-x64-1_74</strong>.</li>
+		<li><strong>BOOST_DEBUG_FILESYSTEM_LIB</strong>. The default value is <strong>boost_filesystem-mgw8-mt-d-x64-1_77</strong>.</li>
+		<li><strong>BOOST_DEBUG_IOSTREAMS_LIB</strong>. The default value is <strong>boost_iostreams-mgw8-mt-d-x64-1_77</strong>.</li>
+		<li><strong>BOOST_DEBUG_SYSTEM_LIB</strong>. The default value is <strong>boost_system-mgw8-mt-d-x64-1_77</strong>.</li>
+		<li><strong>BOOST_RELEASE_FILESYSTEM_LIB</strong>. The default value is <strong>boost_filesystem-mgw8-mt-x64-1_77</strong>.</li>
+		<li><strong>BOOST_RELEASE_IOSTREAMS_LIB</strong>. The default value is <strong>boost_iostreams-mgw8-mt-x64-1_77</strong>.</li>
+		<li><strong>BOOST_RELEASE_SYSTEM_LIB</strong>. The default value is <strong>boost_system-mgw8-mt-x64-1_77</strong>.</li>
 	</ol>
 
 	<h4>
@@ -506,10 +507,10 @@
 	</p>
 	
 	<ol>
-		<li><strong>line 302</strong>. The default libraries are <strong>boost_filesystem-mgw8-mt-d-x64-1_74</strong>,
-		<strong>boost_iostreams-mgw8-mt-d-x64-1_74</strong> and <strong>boost_system-mgw8-mt-d-x64-1_74</strong>.</li>
-		<li><strong>line 323</strong>. The default libraries are <strong>boost_filesystem-mgw8-mt-x64-1_74</strong>,
-		<strong>boost_iostreams-mgw8-mt-x64-1_74</strong> and <strong>boost_system-mgw8-mt-x64-1_74</strong>.
+		<li><strong>line 302</strong>. The default libraries are <strong>boost_filesystem-mgw8-mt-d-x64-1_77</strong>,
+		<strong>boost_iostreams-mgw8-mt-d-x64-1_77</strong> and <strong>boost_system-mgw8-mt-d-x64-1_77</strong>.</li>
+		<li><strong>line 323</strong>. The default libraries are <strong>boost_filesystem-mgw8-mt-x64-1_77</strong>,
+		<strong>boost_iostreams-mgw8-mt-x64-1_77</strong> and <strong>boost_system-mgw8-mt-x64-1_77</strong>.
 	</ol>
 
     <h3>
