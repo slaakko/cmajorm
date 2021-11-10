@@ -11,6 +11,7 @@
 #include <wing/Application.hpp>
 #include <wing/Container.hpp>
 #include <wing/Buffer.hpp>
+#include <wing/Theme.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <windowsx.h>
 
@@ -125,6 +126,7 @@ Control::Control(ControlCreateParams& createParams) :
     mouseHoverLocation(),
     mouseHoverRectSize(DefaultMouseHoverSize())
 {
+    RegisterUpdateColorsListener(this);
     if ((windowStyle & WS_DISABLED) != 0)
     {
         SetDisabled();
@@ -146,6 +148,7 @@ Control::Control(ControlCreateParams& createParams) :
 
 Control::~Control()
 {
+    UnregisterUpdateColorsListener(this);
     Application::GetWindowManager().RemoveWindow(this);
     if (handle)
     {
@@ -247,7 +250,8 @@ void Control::Create()
     }
     else
     {
-        uint16_t windowClass = windowManager.Register(windowClassName, windowClassStyle, windowClassBackgroundColor);
+        //uint16_t windowClass = windowManager.Register(windowClassName, windowClassStyle, windowClassBackgroundColor);
+        uint16_t windowClass = windowManager.Register(windowClassName, windowClassStyle, backgroundColor);
         uint64_t wc = windowClass;
         LPCWSTR wcs = *reinterpret_cast<LPCWSTR*>(&wc);
         handle = CreateWindowExW(0, wcs, LPCWSTR(windowName.c_str()), windowStyle, location.X, location.Y, size.Width, size.Height, parentHandle, nullptr, Instance(), nullptr);
@@ -504,6 +508,15 @@ void Control::SetLocationInternal(const Point& newLocation)
     }
 }
 
+void Control::SetBackgroundColor(const Color& backgroundColor_)
+{
+    if (backgroundColor != backgroundColor_)
+    {
+        backgroundColor = backgroundColor_;
+        Invalidate();
+    }
+}
+
 void Control::SetSize(const Size& newSize)
 {
     if (size != newSize)
@@ -737,6 +750,64 @@ void Control::SetContentChanged()
     {
         ControlEventArgs args(this);
         parentControl->OnChildContentChanged(args);
+    }
+}
+
+void Control::UpdateColors()
+{
+    UpdateBackgroundColor();
+    Invalidate();
+}
+
+std::string Control::BackgroundItemName() const
+{
+    return backgroundItemName;
+}
+
+void Control::SetBackgroundItemName(const std::string& backgroundItemName_)
+{
+    backgroundItemName = backgroundItemName_;
+}
+
+std::string Control::TextItemName() const
+{
+    return textItemName;
+}
+
+void Control::SetTextItemName(const std::string& textItemName_)
+{
+    textItemName = textItemName_;
+}
+
+std::string Control::FrameItemName() const
+{
+    return frameItemName;
+}
+
+void Control::SetFrameItemName(const std::string& frameItemName_)
+{
+    frameItemName = frameItemName_;
+}
+
+std::string Control::FocusedFrameItemName() const
+{
+    return focusedFrameItemName;
+}
+
+void Control::SetFocusedFrameItemName(const std::string& focusedFrameItemName_)
+{
+    focusedFrameItemName = focusedFrameItemName_;
+}
+
+void Control::UpdateBackgroundColor()
+{
+    std::string bgItemName = BackgroundItemName();
+    if (!bgItemName.empty())
+    {
+        Color bgColor = GetColor(bgItemName);
+        SetBackgroundColor(bgColor);
+        HBRUSH brush = CreateSolidBrush(bgColor.ToCOLORREF());
+        SetClassLongPtr(Handle(), GCLP_HBRBACKGROUND, (LONG_PTR)brush);
     }
 }
 

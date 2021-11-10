@@ -139,6 +139,7 @@ public:
     ToolBar(ToolBarCreateParams& createParams);
     bool IsToolBar() const override { return true; }
     ~ToolBar();
+    void ClearToolButtons();
     void AddToolButton(ToolButtonBase* toolButton);
     ToolBarStyle Style() const { return toolBarStyle; }
     int ToolButtonHeight() const { return toolButtonHeight; }
@@ -152,7 +153,7 @@ public:
     const Color& DisabledColor() const { return disabledColor; }
     const Color& SeparatorColor1() const { return separatorColor1; }
     const Color& SeparatorColor2() const { return separatorColor2; }
-    ToolBarPens& Pens() { return pens; }
+    ToolBarPens& Pens() { return *pens; }
     SolidBrush* NormalTextBrush() { return &normalTextBrush; }
     SolidBrush* DisabledTextBrush() { return &disabledTextBrush; }
     ToolButton* PressedToolButton() const { return pressedToolButton; }
@@ -168,6 +169,7 @@ public:
     bool ToolTipWindowVisible() const { return (flags & ToolBarFlags::toolTipWindowVisible) != ToolBarFlags::none; }
     void SetToolTipWindowVisible() { flags = flags | ToolBarFlags::toolTipWindowVisible; }
     void ResetToolTipWindowVisible() { flags = flags & ~ToolBarFlags::toolTipWindowVisible; }
+    void UpdateColors() override;
 protected:
     void OnPaint(PaintEventArgs& args) override;
     void OnMouseEnter() override;
@@ -195,7 +197,7 @@ private:
     Padding toolButtonPadding;
     StringFormat centerFormat;
     Container toolButtons;
-    ToolBarPens pens;
+    std::unique_ptr<ToolBarPens> pens;
     SolidBrush normalTextBrush;
     SolidBrush disabledTextBrush;
     ToolButton* pressedToolButton;

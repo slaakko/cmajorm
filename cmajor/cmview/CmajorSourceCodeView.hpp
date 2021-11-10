@@ -73,6 +73,7 @@ public:
     void SetEditor(CmajorEditor* editor_) { editor = editor_; }
     void ToggleBreakpoint();
     ExpressionHoverEvent& ExpressionHover() { return expressionHover; }
+    void UpdateColors() override;
 protected:
     TokenLine TokenizeLine(const std::u32string& line, int lineNumber, int startState) override;
     SourceCodeTokenKind GetTokenKind(const Token& token) const override;

@@ -6,6 +6,7 @@
 #include <wing/SplitContainer.hpp>
 #include <wing/Application.hpp>
 #include <wing/Panel.hpp>
+#include <wing/Theme.hpp>
 
 namespace cmajor { namespace wing {
 
@@ -142,6 +143,13 @@ void Splitter::SetEdgeColor(const Color& edgeColor_)
         edgePen.reset(new Pen(edgeColor));
         Invalidate();
     }
+}
+
+void Splitter::UpdateColors()
+{
+    Control::UpdateColors();
+    SetBackgroundColor(GetColor("splitter.background"));
+    SetEdgeColor(GetColor("splitter.edge"));
 }
 
 void Splitter::SetCursor()

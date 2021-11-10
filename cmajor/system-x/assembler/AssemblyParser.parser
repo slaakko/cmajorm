@@ -1,0 +1,144 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <system-x/assembler/Api.hpp>
+[cpp]#include <system-x/assembler/AssemblyLexer.hpp>
+[cpp]#include <system-x/assembler/AssemblyTokens.hpp>
+
+using namespace AssemblyTokens;
+
+parser api(CMSX_ASSEMBLER_API) AssemblyParser
+{
+    uselexer AssemblyLexer;
+    farthest_error;
+    state;
+    main;
+
+    AssemblyFile
+        ::= AssemblyLine:assemblyLine*
+        ;
+
+    AssemblyLine
+        ::= CommentLine:commentLine
+        |   EmptyLine:emptyLine
+        |   ModeLine:modeLine
+        |   InstructionLine:instructionLine
+        ;
+
+    CommentLine
+        ::= Comment:cmt NEWLINE
+        ;
+
+    Comment
+        ::= SPACE? (any - (NEWLINE | SYMBOL | LOCAL_SYMBOL | DOT | SEMICOLON | AT)) (any - NEWLINE)*
+        ;
+
+    EmptyLine
+        ::= SPACE? NEWLINE
+        ;
+
+    ModeLine
+        ::= SPACE?
+            DOT
+            SYMBOL
+            SPACE?
+            NEWLINE
+        ;
+
+    InstructionLine
+        ::= Instruction:left
+            (SPACE? SEMICOLON Instruction:right)* Comment:cmt? NEWLINE
+        ;
+
+    Instruction
+        ::= Label:lbl
+            SplitLine(false):splitLine
+            OpCode:opcode
+            Operands:operands
+        ;
+
+    Label
+        ::= LOCAL_SYMBOL
+        |   SYMBOL
+        ;
+
+    SplitLine(bool hasLabel)
+        ::= SPACE (NEWLINE SPACE)?
+        |   empty{ pass = hasLabel; } NEWLINE SPACE
+        ;
+
+    OpCode
+        ::= DECIMAL_CONSTANT? SYMBOL
+        ;
+
+    Operands
+        ::= 
+        (   SPACE? Expression:left (COMMA Expression:right)*
+        |   SPACE? empty
+        )
+        ;
+
+    Expression
+        ::= Term:left (WeakOperator:op Term:right)*
+        ;
+
+    WeakOperator
+        ::= PLUS
+        |   MINUS
+        |   BAR
+        |   CARET
+        ;
+
+    Term
+        ::= PrimaryExpression:left (StrongOperator:op PrimaryExpression:right)*
+        ;
+
+    StrongOperator
+        ::= AST
+        |   SLASH
+        |   SLASHSLASH
+        |   PERCENT
+        |   SHIFT_LEFT
+        |   SHIFT_RIGHT
+        |   AMP
+        ;
+
+    PrimaryExpression
+        ::= LocalSymbol:localSymbol
+        |   Constant:constant
+        |   Symbol:symbol
+        |   At:at
+        |   LPAREN Expression:expr RPAREN
+        |   UnaryOperator:op PrimaryExpression:primaryExpr
+        ;
+
+    UnaryOperator
+        ::= PLUS
+        |   MINUS
+        |   TILDE
+        |   DOLLAR
+        |   AMP
+        ;
+
+    LocalSymbol
+        ::= LOCAL_SYMBOL
+        ;
+
+    Constant
+        ::= DECIMAL_CONSTANT
+        |   HEX_CONSTANT
+        |   CHAR_CONSTANT
+        |   STRING_CONSTANT
+        |   CLSID_CONSTANT
+        ;
+
+    Symbol
+        ::= SYMBOL
+        ;
+
+    At
+        ::= AT
+        ;
+}

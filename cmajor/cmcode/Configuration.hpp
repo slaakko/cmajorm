@@ -115,6 +115,8 @@ public:
     int32_t numberOfRecentSolutions;
     bool codeCompletion;
     int32_t parsingFrequency;
+    bool themeDefined;
+    std::string theme;
     void* dataPtr;
 private:
     static int classId;

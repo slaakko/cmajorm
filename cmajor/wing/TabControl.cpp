@@ -4,6 +4,7 @@
 // =================================
 
 #include <wing/TabControl.hpp>
+#include <wing/Theme.hpp>
 #include <soulng/util/Unicode.hpp>
 
 #undef min
@@ -185,6 +186,12 @@ TabControlCreateParams& TabControlCreateParams::FrameColor(const Color& frameCol
 TabControlCreateParams& TabControlCreateParams::TextColor(const Color& textColor_)
 {
     textColor = textColor_;
+    return *this;
+}
+
+TabControlCreateParams& TabControlCreateParams::NormalBackgroundColor(const Color& color)
+{
+    normalBackgroundColor = color;
     return *this;
 }
 
@@ -473,6 +480,32 @@ void TabControl::RemoveTabPageFromTabPageMap(TabPage* tabPage)
     {
         tabPageMap.erase(tabPage->Key());
     }
+}
+
+void TabControl::UpdateColors()
+{
+    Control::UpdateColors();
+    normalBackgroundBrush.SetColor(GetColor(tabNormalBackgroundItemName)); 
+    selectedBackgroundBrush.SetColor(GetColor(tabSelectedBackgroundItemName));
+    textBrush.SetColor(GetColor(TextItemName()));
+    framePen.SetColor(GetColor(FrameItemName()));
+    closeBoxPen.SetColor(GetColor(TextItemName()));
+    closeBoxSelectedBrush.SetColor(GetColor(closeBoxBackgroundItemName));
+}
+
+void TabControl::SetTabNormalBackgroundItemName(const std::string& tabNormalBackgroundItemName_)
+{
+    tabNormalBackgroundItemName = tabNormalBackgroundItemName_;
+}
+
+void TabControl::SetTabSelectedBackgroundItemName(const std::string& tabSelectedBackgroundItemName_)
+{
+    tabSelectedBackgroundItemName = tabSelectedBackgroundItemName_;
+}
+
+void TabControl::SetCloseBoxSelectedBackgroundItemName(const std::string& closeBoxBackgroundItemName_)
+{
+    closeBoxBackgroundItemName = closeBoxBackgroundItemName_;
 }
 
 void TabControl::OnPaint(PaintEventArgs& args)

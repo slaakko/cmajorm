@@ -85,6 +85,10 @@ void Config::Load()
             configuration.options.codeCompletion = true;
             configuration.options.parsingFrequency = 1000;
         }
+        if (!configuration.options.themeDefined)
+        {
+            configuration.options.theme = "light";
+        }
     }
 }
 
@@ -93,6 +97,7 @@ void Config::Save()
     std::string configXmlFilePath = Path::Combine(CmajorConfigDir(), "cmcode.config.xml");
     configuration.options.defined = true;
     configuration.options.codeCompletionDefined = true;
+    configuration.options.themeDefined = true;
     std::unique_ptr<sngxml::dom::Element> configurationElement = configuration.ToXml("configuration");
     sngxml::dom::Document configDoc;
     configDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(configurationElement.release()));
@@ -126,6 +131,11 @@ const Options& GetOptions()
         Config::Instance().GetConfiguration().options.codeCompletionDefined = true;
         Config::Instance().GetConfiguration().options.codeCompletion = true;
         Config::Instance().GetConfiguration().options.parsingFrequency = 1000;
+    }
+    if (!Config::Instance().GetConfiguration().options.themeDefined)
+    {
+        Config::Instance().GetConfiguration().options.themeDefined = true;
+        Config::Instance().GetConfiguration().options.theme = "light";
     }
     return Config::Instance().GetConfiguration().options;
 }

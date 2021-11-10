@@ -6,6 +6,7 @@
 #include <wing/TextView.hpp>
 #include <wing/Application.hpp>
 #include <wing/EditCommand.hpp>
+#include <wing/Theme.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <fstream>
@@ -199,7 +200,7 @@ TextViewCreateParams::TextViewCreateParams()
     controlCreateParams.WindowClassBackgroundColor(COLOR_WINDOW);
     controlCreateParams.BackgroundColor(Color::White);
     textColor = Color::Black;
-    selectionBackgroundColor = DefaultSelectionBackgroundColor();
+    selectionBackgroundColor = GetColor("selection.background");
     fontFamilyName = "Consolas";
     fontSize = 10.0f;
 }
@@ -2554,7 +2555,8 @@ void TextView::DrawLine(Graphics& graphics, int lineIndex, const PointF& origin)
     PointF pt(origin);
     const std::u32string& line = *lines[lineIndex];
     std::string s(ToUtf8(line));
-    Brush* brush = GetOrInsertBrush(textColor);
+    Color color = GetColor("text");
+    Brush* brush = GetOrInsertBrush(color);
     DrawString(graphics, s, font, pt, *brush);
 }
 
@@ -2919,6 +2921,12 @@ void TextView::AddRemoveSelectionCommand()
         }
     }
     editCommandList.AddCommand(new RemoveSelectionCommand(selection, selectionData, wholeLine));
+}
+
+void TextView::UpdateColors()
+{
+    Control::UpdateColors();
+    selectionBackgroundColor = GetColor("selection.background");
 }
 
 void TextView::AddIndentSelectionCommand()

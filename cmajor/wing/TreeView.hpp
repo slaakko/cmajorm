@@ -80,6 +80,7 @@ struct WING_API TreeViewCreateParams
     TreeViewCreateParams& StateIndicatorColor(const Color& color);
     TreeViewCreateParams& SelectedNodeColor(const Color& color);
     TreeViewCreateParams& TextColor(const Color& color);
+    TreeViewCreateParams& ActiveNodeTextColor(const Color& color);
     TreeViewCreateParams& StateIndicatorPercentage(float percentage);
     TreeViewCreateParams& AddToolTip(bool addToolTip_);
     TreeViewCreateParams& NodeIndentPercent(float percent);
@@ -95,6 +96,7 @@ struct WING_API TreeViewCreateParams
     Color stateIndicatorColor;
     Color selectedNodeColor;
     Color textColor;
+    Color activeNodeTextColor;
     float stateIndicatorPercentage;
     bool addToolTip;
     float nodeIndentPercent;
@@ -146,6 +148,9 @@ public:
     float TextHeight() const { return textHeight; }
     float NodeIndentPercent() const { return nodeIndentPercent; }
     float NodeTextIndentPercent() const { return nodeTextIndentPercent; }
+    void SetStateIndicatorItemName(const std::string& stateIndicatorItemName_);
+    void SetNodeSelectedItemName(const std::string& nodeSelectedItemName_);
+    void UpdateColors() override;
     NodeClickEvent& NodeClick() { return nodeClick; }
     NodeDoubleClickEvent& NodeDoubleClick() { return nodeDoubleClick; }
     NodeEnterEvent& NodeEnter() { return nodeEnter; }
@@ -205,11 +210,14 @@ private:
     Color stateIndicatorColor;
     Color selectedNodeColor;
     Color textColor;
+    Color activeNodeTextColor;
     float textHeight;
     float stateIndicatorHeight;
     float stateIndicatorPercentage;
     float nodeIndentPercent;
     float nodeTextIndentPercent;
+    std::string stateIndicatorItemName;
+    std::string nodeSelectedItemName;
     Padding nodeImagePadding;
     ImageList* imageList;
     std::unique_ptr<Bitmap> nodeCollapsedBitmap;
@@ -302,7 +310,7 @@ public:
     void FireMouseLeave();
     void MeasureSize(Graphics& graphics);
     void Measure(Graphics& graphics, const Point& loc, int level, int& idx, Rect& parentRect);
-    void Draw(Graphics& graphics, SolidBrush& selectedBrush, SolidBrush& textBrush);
+    void Draw(Graphics& graphics, SolidBrush& selectedBrush, SolidBrush& textBrush, SolidBrush& activeNodeTextBrush);
     const std::string& ToolTip() const { return toolTip; }
     void SetToolTip(const std::string& toolTip_);
     void SetImageIndex(int imageIndex_);
@@ -334,3 +342,4 @@ private:
 } } // cmajor::wing
 
 #endif // CMAJOR_WING_TREE_VIEW_INCLUDED
+

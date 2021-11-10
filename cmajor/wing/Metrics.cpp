@@ -75,6 +75,7 @@ Metrics::Metrics() :
     defaultLabelSize(71, 19), defaultLabelSizeElement("label"),
     defaultTextBoxSize(94, 14), defaultTextBoxSizeElement("textBox"),
     defaultListBoxSize(120, 96), defaultListBoxSizeElement("listBox"),
+    defaultComboBoxSize(121, 21), defaultComboBoxSizeElement("comboBox"),
     defaultCheckBoxSize(80, 17), defaultCheckBoxSizeElement("checkBox"),
     defaultControlSpacing(10, 10), defaultControlSpacingElement("controlSpacing")
 {
@@ -87,6 +88,7 @@ void Metrics::SetElementValues()
     defaultLabelSizeElement.Set(SizeF(HorizontalPixelsToMM(defaultLabelSize.Width), VerticalPixelsToMM(defaultLabelSize.Height)));
     defaultTextBoxSizeElement.Set(SizeF(HorizontalPixelsToMM(defaultTextBoxSize.Width), VerticalPixelsToMM(defaultTextBoxSize.Height)));
     defaultListBoxSizeElement.Set(SizeF(HorizontalPixelsToMM(defaultListBoxSize.Width), VerticalPixelsToMM(defaultListBoxSize.Height)));
+    defaultComboBoxSizeElement.Set(SizeF(HorizontalPixelsToMM(defaultComboBoxSize.Width), VerticalPixelsToMM(defaultComboBoxSize.Height)));
     defaultCheckBoxSizeElement.Set(SizeF(HorizontalPixelsToMM(defaultCheckBoxSize.Width), VerticalPixelsToMM(defaultCheckBoxSize.Height)));
     defaultControlSpacingElement.Set(SizeF(HorizontalPixelsToMM(defaultControlSpacing.Width), VerticalPixelsToMM(defaultControlSpacing.Height)));
 }
@@ -129,6 +131,8 @@ void Metrics::Calculate(Graphics& graphics)
     defaultTextBoxSize.Height = MMToVerticalPixels(defaultTextBoxSizeElement.Get().Height);
     defaultListBoxSize.Width = MMToHorizontalPixels(defaultListBoxSizeElement.Get().Width);
     defaultListBoxSize.Height = MMToVerticalPixels(defaultListBoxSizeElement.Get().Height);
+    defaultComboBoxSize.Width = MMToHorizontalPixels(defaultComboBoxSizeElement.Get().Width);
+    defaultComboBoxSize.Height = MMToHorizontalPixels(defaultComboBoxSizeElement.Get().Height);
     defaultCheckBoxSize.Width = MMToHorizontalPixels(defaultCheckBoxSizeElement.Get().Width);
     defaultCheckBoxSize.Height = MMToVerticalPixels(defaultCheckBoxSizeElement.Get().Height);
     defaultControlSpacing.Width = MMToHorizontalPixels(defaultControlSpacingElement.Get().Width);
@@ -141,6 +145,7 @@ void Metrics::Read(sngxml::dom::Element* parentElement)
     defaultLabelSizeElement.Read(parentElement);
     defaultTextBoxSizeElement.Read(parentElement);
     defaultListBoxSizeElement.Read(parentElement);
+    defaultComboBoxSizeElement.Read(parentElement);
     defaultCheckBoxSizeElement.Read(parentElement);
     defaultControlSpacingElement.Read(parentElement);
 }
@@ -151,6 +156,7 @@ void Metrics::Write(sngxml::dom::Element* parentElement)
     defaultLabelSizeElement.Write(parentElement);
     defaultTextBoxSizeElement.Write(parentElement);
     defaultListBoxSizeElement.Write(parentElement);
+    defaultComboBoxSizeElement.Write(parentElement);
     defaultCheckBoxSizeElement.Write(parentElement);
     defaultControlSpacingElement.Write(parentElement);
 }

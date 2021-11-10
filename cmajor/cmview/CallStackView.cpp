@@ -6,6 +6,7 @@
 #include <cmajor/cmview/CallStackView.hpp>
 #include <cmajor/wing/PaddedControl.hpp>
 #include <cmajor/wing/ScrollableControl.hpp>
+#include <wing/Theme.hpp>
 
 #undef min
 #undef max
@@ -17,11 +18,16 @@ FrameSelectedEventArgs::FrameSelectedEventArgs(Location* frame_) : frame(frame_)
 }
 
 CallStackView::CallStackView() : 
-    Control(ControlCreateParams().WindowClassName("cmajor.view.CallStackView").WindowClassBackgroundColor(COLOR_WINDOW).BackgroundColor(Color::White).SetDock(Dock::fill)),
+    Control(ControlCreateParams().WindowClassName("cmajor.view.CallStackView").WindowClassBackgroundColor(COLOR_WINDOW).BackgroundColor(GetColor("call.stack.background")).SetDock(Dock::fill)),
     container(this), treeView(nullptr), child(nullptr), depth(-1)
 {
-    std::unique_ptr<TreeView> treeViewPtr(new TreeView(TreeViewCreateParams().Defaults()));
+    std::unique_ptr<TreeView> treeViewPtr(new TreeView(TreeViewCreateParams().BackgroundColor(GetColor("call.stack.background")).TextColor(GetColor("call.stack.text")).
+        SelectedNodeColor(GetColor("call.stack.node.selected")).StateIndicatorColor(GetColor("call.stack.state.indicator"))));
     treeView = treeViewPtr.get();
+    treeView->SetBackgroundItemName("call.stack.background");
+    treeView->SetTextItemName("call.stack.text");
+    treeView->SetStateIndicatorItemName("call.stack.state.indicator");
+    treeView->SetNodeSelectedItemName("call.stack.node.selected");
     treeView->SetFlag(ControlFlags::scrollSubject);
     treeView->SetDoubleBuffered();
     treeView->NodeDoubleClick().AddHandler(this, &CallStackView::TreeViewNodeDoubleClick);

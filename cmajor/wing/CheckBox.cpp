@@ -10,6 +10,11 @@
 
 namespace cmajor { namespace wing {
 
+Color DefaultCheckBoxBackgroundColor()
+{
+    return Color::Red;
+}
+
 CheckBoxCreateParams::CheckBoxCreateParams() : controlCreateParams(), autoSize(false)
 {
     controlCreateParams.WindowClassName("BUTTON");

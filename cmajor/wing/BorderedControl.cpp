@@ -5,6 +5,7 @@
 
 #include <wing/BorderedControl.hpp>
 #include <wing/ContainerControl.hpp>
+#include <wing/Theme.hpp>
 
 namespace cmajor { namespace wing {
 
@@ -209,6 +210,26 @@ Control* BorderedControl::GetFirstEnabledTabStopControl() const
 Control* BorderedControl::GetLastEnabledTabStopControl() const
 {
     return child->GetLastEnabledTabStopControl();
+}
+
+std::string BorderedControl::BackgroundItemName() const
+{
+    return child->BackgroundItemName();
+}
+
+void BorderedControl::UpdateColors()
+{
+    Control::UpdateColors();
+    std::string frameItemName = FrameItemName();
+    if (!frameItemName.empty())
+    {
+        normalSingleBorderColor = GetColor(frameItemName);
+    }
+    std::string focusedFrameItemName = FocusedFrameItemName();
+    if (!focusedFrameItemName.empty())
+    {
+        focusedSingleBorderColor = GetColor(focusedFrameItemName);
+    }
 }
 
 ContainerControl* BorderedControl::GetContainerControl() const

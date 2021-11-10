@@ -11,6 +11,8 @@ namespace cmajor { namespace wing {
 
 using CheckedChangedEvent = Event;
 
+WING_API Color DefaultCheckBoxBackgroundColor();
+
 struct WING_API CheckBoxCreateParams
 {
     CheckBoxCreateParams();

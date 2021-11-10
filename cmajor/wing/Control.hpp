@@ -334,6 +334,7 @@ public:
     virtual bool IsRadioButton() const { return false; }
     virtual bool IsTextBox() const { return false; }
     virtual bool IsListBox() const { return false; }
+    virtual bool IsComboBox() const { return false; }
     virtual bool IsTextView() const { return false; }
     virtual ContainerControl* GetContainerControl() const;
     Window* GetWindow() const;
@@ -390,6 +391,7 @@ public:
     KeyUpEvent& KeyUp() { return keyUp; }
     KeyPressEvent& KeyPress() { return keyPress; }
     const Color& BackgroundColor() const { return backgroundColor; }
+    void SetBackgroundColor(const Color& backgroundColor_);
     const Point& Location() const { return location; }
     void SetLocation(const Point& newLocation);
     void SetLocationInternal(const Point& newLocation);
@@ -486,6 +488,16 @@ public:
     void FireChildContentLocationChanged(ControlEventArgs& args) { OnChildContentLocationChanged(args); }
     void FireChildSizeChanged(ControlEventArgs& args) { OnChildSizeChanged(args); }
     void FireChildContentSizeChanged(ControlEventArgs& args) { OnChildContentSizeChanged(args); }
+    virtual void UpdateColors();
+    virtual void UpdateBackgroundColor();
+    virtual std::string BackgroundItemName() const;
+    void SetBackgroundItemName(const std::string& backgroundItemName_);
+    virtual std::string TextItemName() const;
+    void SetTextItemName(const std::string& textItemName_);
+    virtual std::string FrameItemName() const;
+    void SetFrameItemName(const std::string& frameItemName_);
+    virtual std::string FocusedFrameItemName() const;
+    void SetFocusedFrameItemName(const std::string& focusedFrameItemName_);
     virtual void ScrollLineDown();
     virtual void ScrollLineUp();
     virtual Control* GetFirstEnabledTabStopControl() const;
@@ -637,6 +649,10 @@ private:
     Point mouseHoverLocation;
     Size mouseHoverRectSize;
     ScrollUnits scrollUnits;
+    std::string backgroundItemName;
+    std::string textItemName;
+    std::string frameItemName;
+    std::string focusedFrameItemName;
 };
 
 WING_API HWND LParamHandle(Message& msg);

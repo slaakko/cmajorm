@@ -6,6 +6,7 @@
 #include <cmajor/cmcode/Solution.hpp>
 #include <cmajor/cmcode/SolutionSettings.hpp>
 #include <cmajor/cmcode/SolutionExplorer.hpp>
+#include <cmajor/wing/Theme.hpp>
 #include <sngxml/dom/Document.hpp>
 #include <sngxml/dom/Element.hpp>
 #include <sngxml/dom/Parser.hpp>
@@ -89,7 +90,7 @@ SolutionData::SolutionData(std::unique_ptr<sngcm::ast::Solution>&& solution_, So
     std::unique_ptr<TreeViewNode> solutionNode(new TreeViewNode(ToUtf8(solution->Name())));
     std::unique_ptr<SolutionTreeViewNodeData> solutionData(new SolutionTreeViewNodeData(SolutionTreeViewNodeDataKind::solution, solution.get(), nullptr, std::string(), std::string()));
     solutionNode->SetData(solutionData.get());
-    solutionNode->SetImageIndex(solutionExplorer->GetImageList()->GetImageIndex("cmsolution.bitmap"));
+    solutionNode->SetImageIndex(solutionExplorer->GetImageList()->GetImageIndex(GetBitmapName("solution"))); 
     treeViewData.push_back(std::move(solutionData));
     std::string solutionSettingsFilePath = solution->FilePath();
     solutionSettingsFilePath.append(".settings.xml");
@@ -107,7 +108,7 @@ SolutionData::SolutionData(std::unique_ptr<sngcm::ast::Solution>&& solution_, So
         projectNodeMap[projectName] = projectNode.get();
         std::unique_ptr<SolutionTreeViewNodeData> projectTreeViewData(new SolutionTreeViewNodeData(SolutionTreeViewNodeDataKind::project, nullptr, project.get(), std::string(), std::string()));
         projectNode->SetData(projectTreeViewData.get());
-        projectNode->SetImageIndex(solutionExplorer->GetImageList()->GetImageIndex("cmproject.bitmap"));
+        projectNode->SetImageIndex(solutionExplorer->GetImageList()->GetImageIndex(GetBitmapName("project")));
         if (project.get() == solution->ActiveProject())
         {
             activeProjectNode = projectNode.get();
@@ -140,11 +141,11 @@ SolutionData::SolutionData(std::unique_ptr<sngcm::ast::Solution>&& solution_, So
             fileNode->SetData(file.get());
             if (Path::GetExtension(file->fileName) == ".xml")
             {
-                fileNode->SetImageIndex(solutionExplorer->GetImageList()->GetImageIndex("xmlfile.bitmap"));
+                fileNode->SetImageIndex(solutionExplorer->GetImageList()->GetImageIndex(GetBitmapName("xmlfile")));
             }
             else
             {
-                fileNode->SetImageIndex(solutionExplorer->GetImageList()->GetImageIndex("file.bitmap"));
+                fileNode->SetImageIndex(solutionExplorer->GetImageList()->GetImageIndex(GetBitmapName("file")));
             }
             projectNode->AddChild(fileNode.release());
         }

@@ -102,6 +102,7 @@ public:
     void TreeViewNodeClick(TreeViewNodeClickEventArgs& args);
     void TreeViewNodeExpanded(TreeViewNodeEventArgs& args);
     void TreeViewNodeCollapsed(TreeViewNodeEventArgs& args);
+    void UpdateColors() override;
 protected:
     bool ProcessMessage(Message& msg) override;
     void OnWindowStateChanged() override;
@@ -113,6 +114,7 @@ protected:
     void OnGotFocus() override;
     void OnClipboardUpdate() override;
 private:
+    void AddToolButtons();
     void SaveConfigurationSettings();
     void LoadConfigurationSettings();
     void ShowStartupDialog();
@@ -335,6 +337,8 @@ private:
     MenuItem* homepageMenuItem;
     MenuItem* localDocumentationMenuItem;
     MenuItem* aboutMenuItem;
+    ToolBar* toolBar;
+    Control* borderedToolbar;
     ToolButton* prevToolButton;
     ToolButton* nextToolButton;
     ToolButton* saveToolButton;

@@ -254,6 +254,7 @@ public:
     void FireCCStop();
     void FireParamHelpClose();
     void AddRemoveSelectionCommand();
+    void UpdateColors() override;
     SelectionChangedEvent& SelectionChanged() { return selectionChanged; }
     DirtyChangedEvent& DirtyChanged() { return dirtyChanged; }
     ReadOnlyChangedEvent& ReadOnlyChanged() { return readOnlyChanged; }

@@ -7,6 +7,7 @@
 #include <cmajor/wing/TextView.hpp>
 #include <cmajor/wing/PaddedControl.hpp>
 #include <cmajor/wing/ScrollableControl.hpp>
+#include <wing/Theme.hpp>
 #include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace view {
@@ -23,8 +24,10 @@ ErrorViewCreateParams::ErrorViewCreateParams() : controlCreateParams(), treeView
 {
     controlCreateParams.WindowClassName("cmajor.view.ErrorView");
     controlCreateParams.WindowClassBackgroundColor(COLOR_WINDOW);
-    controlCreateParams.BackgroundColor(Color::White);
+    controlCreateParams.BackgroundColor(GetColor("error.view.background"));
     controlCreateParams.SetDock(Dock::fill);
+    treeViewCreateParams.BackgroundColor(GetColor("error.view.background")).TextColor(GetColor("error.view.text")).
+        SelectedNodeColor(GetColor("error.view.node.selected")).StateIndicatorColor(GetColor("error.view.state.indicator"));
     treeViewCreateParams.NormalNodeFontFamilyName("Consolas");
 }
 
@@ -97,6 +100,10 @@ ErrorView::ErrorView(ErrorViewCreateParams& createParams) : Control(createParams
 {
     std::unique_ptr<TreeView> treeViewPtr(new TreeView(createParams.treeViewCreateParams));
     treeView = treeViewPtr.get();
+    treeView->SetBackgroundItemName("error.view.background");
+    treeView->SetTextItemName("error.view.text");
+    treeView->SetStateIndicatorItemName("error.view.state.indicator");
+    treeView->SetNodeSelectedItemName("error.view.node.selected");
     treeView->SetFlag(ControlFlags::scrollSubject);
     treeView->SetDoubleBuffered();
     treeView->NodeDoubleClick().AddHandler(this, &ErrorView::TreeViewNodeDoubleClick);

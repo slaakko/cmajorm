@@ -5,6 +5,7 @@
 
 #include <wing/ToolBar.hpp>
 #include <wing/Window.hpp>
+#include <wing/Theme.hpp>
 #include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace wing {
@@ -322,7 +323,7 @@ ToolBar::ToolBar(ToolBarCreateParams& createParams) :
     toolButtonPadding(createParams.toolButtonPadding),
     centerFormat(),
     toolButtons(this),
-    pens(this),
+    pens(new ToolBarPens(this)),
     normalTextBrush(textColor),
     disabledTextBrush(disabledColor),
     pressedToolButton(nullptr),
@@ -350,6 +351,17 @@ ToolBar::~ToolBar()
             window->RemoveChild(toolTipWindow);
             toolTipWindow = nullptr;
         }
+    }
+}
+
+void ToolBar::ClearToolButtons()
+{
+    Component* child = toolButtons.FirstChild();
+    while (child)
+    {
+        Component* next = child->NextSibling();
+        toolButtons.RemoveChild(child);
+        child = next;
     }
 }
 
@@ -482,6 +494,29 @@ void ToolBar::HideToolTipWindow()
     if (!toolTipWindow || !ToolTipWindowAdded() || !ToolTipWindowVisible()) return;
     toolTipWindow->Hide();
     ResetToolTipWindowVisible();
+}
+
+void ToolBar::UpdateColors()
+{
+    Control::UpdateColors();
+    toolTipWindowColor = GetColor("tool.bar.tool.tip"); 
+    if (toolTipWindow)
+    {
+        toolTipWindow->SetBackgroundColor(toolTipWindowColor);
+    }
+    textColor = GetColor("tool.bar.tool.button.text");
+    normalTextBrush.SetColor(textColor);
+    disabledColor = GetColor("tool.bar.tool.button.disabled");
+    disabledTextBrush.SetColor(disabledColor);
+    darkColor = GetColor("tool.bar.tool.button.dark");
+    lightColor = GetColor("tool.bar.tool.button.light");
+    mediumLightColor = GetColor("tool.bar.tool.button.medium.light");
+    mediumDarkColor = GetColor("tool.bar.tool.button.medium.dark");
+    textColor = GetColor("tool.bar.tool.button.text");
+    disabledColor = GetColor("tool.bar.tool.button.disabled");
+    separatorColor1 = GetColor("tool.bar.tool.button.separator1");
+    separatorColor2 = GetColor("tool.bar.tool.button.separator2");
+    pens.reset(new ToolBarPens(this));
 }
 
 void ToolBar::OnPaint(PaintEventArgs& args)

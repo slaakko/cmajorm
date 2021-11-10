@@ -5,6 +5,7 @@
 
 #include <cmajor/cmcode/MainWindow.hpp>
 #include <cmajor/cmcode/Config.hpp>
+#include <cmajor/cmcode/Themes.hpp>
 #include <cmajor/cmsvc/InitDone.hpp>
 #include <cmajor/cmview/InitDone.hpp>
 #include <cmmsg/Register.hpp>
@@ -30,6 +31,8 @@ void InitApplication(HINSTANCE instance)
     cmcode::ConfigInit();
     cmpm::Register();
     cmmsg::Register();
+    cmcode::LoadConfiguration();
+    cmcode::InitThemes();
 }
 
 void FinalizeApplication()

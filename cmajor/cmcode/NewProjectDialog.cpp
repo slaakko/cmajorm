@@ -8,6 +8,7 @@
 #include <cmajor/wing/BorderedControl.hpp>
 #include <cmajor/wing/Metrics.hpp>
 #include <cmajor/wing/PaddedControl.hpp>
+#include <wing/Theme.hpp>
 #include <soulng/util/Unicode.hpp>
 
 namespace cmcode {
@@ -126,7 +127,8 @@ NewProjectDialog::NewProjectDialog() : Window(WindowCreateParams().WindowClassNa
 
     Point placeSolutionInSameDirectoryCheckBoxLocation(32, solutionNameTextBoxLocation.Y + BorderedSize(PaddedSize(solutionNameTextBoxSize, DefaultPadding()), BorderStyle::single).Height + 
         24 + 24);
-    std::unique_ptr<CheckBox> placeSolutionInSameDirectoryCheckBoxPtr(new CheckBox(CheckBoxCreateParams().Text("Place solution and project in the same directory").
+    std::unique_ptr<CheckBox> placeSolutionInSameDirectoryCheckBoxPtr(new CheckBox(CheckBoxCreateParams().BackgroundColor(GetColor("check.box")).
+        Text("Place solution and project in the same directory").
         Location(placeSolutionInSameDirectoryCheckBoxLocation).SetSize(defaultCheckBoxSize)));
     placeSolutionInSameDirectoryCheckBox = placeSolutionInSameDirectoryCheckBoxPtr.get();
     placeSolutionInSameDirectoryCheckBox->CheckedChanged().AddHandler(this, &NewProjectDialog::PlaceSolutionInSameDirectoryCheckBoxCheckedChanged);

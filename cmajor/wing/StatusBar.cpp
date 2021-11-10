@@ -4,6 +4,7 @@
 // =================================
 
 #include <wing/StatusBar.hpp>
+#include <wing/Theme.hpp>
 #include <soulng/util/Unicode.hpp>
 
 #undef max
@@ -116,6 +117,12 @@ StatusBarCreateParams& StatusBarCreateParams::WindowClassBackgroundColor(int win
 StatusBarCreateParams& StatusBarCreateParams::BackgroundColor(const Color& backgroundColor_)
 {
     controlCreateParams.BackgroundColor(backgroundColor_);
+    return *this;
+}
+
+StatusBarCreateParams& StatusBarCreateParams::TextColor(const Color& textColor_)
+{
+    textColor = textColor_;
     return *this;
 }
 
@@ -323,7 +330,7 @@ StatusBar::StatusBar(StatusBarCreateParams& createParams) :
     Control(createParams.controlCreateParams), 
     items(this),
     flags(StatusBarFlags::none), 
-    pens(this), 
+    pens(new StatusBarPens(this)), 
     textBrush(createParams.textColor), 
     padding(createParams.padding),
     itemPadding(createParams.statusBarItemPadding),
@@ -359,6 +366,67 @@ void StatusBar::AddItem(StatusBarItem* item)
     items.AddChild(item);
     SetChanged();
     Invalidate();
+}
+
+void StatusBar::SetTopLineItemName(const std::string& topLineItemName_)
+{
+    topLineItemName = topLineItemName_;
+}
+
+void StatusBar::SetSunkenBorderOuterTopLeftItemName(const std::string& sunkenBorderOuterTopLeftItemName_)
+{
+    sunkenBorderOuterTopLeftItemName = sunkenBorderOuterTopLeftItemName_;
+}
+
+void StatusBar::SetSunkenBorderInnerTopLeftItemName(const std::string& sunkenBorderInnerTopLeftItemName_)
+{
+    sunkenBorderInnerTopLeftItemName = sunkenBorderInnerTopLeftItemName_;
+}
+
+void StatusBar::SetSunkenBorderOuterRightBottomItemName(const std::string& sunkenBorderOuterRightBottomItemName_)
+{
+    sunkenBorderOuterRightBottomItemName = sunkenBorderOuterRightBottomItemName_;
+}
+
+void StatusBar::SetSunkenBorderInnerRightBottomItemName(const std::string& sunkenBorderInnerRightBottomItemName_)
+{
+    sunkenBorderInnerRightBottomItemName = sunkenBorderInnerRightBottomItemName_;
+}
+
+void StatusBar::SetRaisedBorderOuterTopLeftItemName(const std::string& raisedBorderOuterTopLeftItemName_)
+{
+    raisedBorderOuterTopLeftItemName = raisedBorderOuterTopLeftItemName_;
+}
+
+void StatusBar::SetRaisedBorderOuterRightBottomItemName(const std::string& raisedBorderOuterRightBottomItemName_)
+{
+    raisedBorderOuterRightBottomItemName = raisedBorderOuterRightBottomItemName_;
+}
+
+void StatusBar::SetRaisedBorderInnerTopLeftItemName(const std::string& raisedBorderInnerTopLeftItemName_)
+{
+    raisedBorderInnerTopLeftItemName = raisedBorderInnerTopLeftItemName_;
+}
+
+void StatusBar::SetRaisedBorderInnerRightBottomItemName(const std::string& raisedBorderInnerRightBottomItemName_)
+{
+    raisedBorderInnerRightBottomItemName = raisedBorderInnerRightBottomItemName_;
+}
+
+void StatusBar::UpdateColors()
+{
+    Control::UpdateColors();
+    textColor = GetColor(TextItemName());
+    topLineColor = GetColor(topLineItemName);
+    sunkenBorderOuterTopLeftColor = GetColor(sunkenBorderOuterTopLeftItemName);
+    sunkenBorderInnerTopLeftColor = GetColor(sunkenBorderInnerTopLeftItemName);
+    sunkenBorderOuterRightBottomColor = GetColor(sunkenBorderOuterRightBottomItemName);
+    sunkenBorderInnerRightBottomColor = GetColor(sunkenBorderInnerRightBottomItemName);
+    raisedBorderOuterTopLeftColor = GetColor(raisedBorderOuterTopLeftItemName);
+    raisedBorderOuterRightBottomColor = GetColor(raisedBorderOuterRightBottomItemName);
+    raisedBorderInnerTopLeftColor = GetColor(raisedBorderInnerTopLeftItemName);
+    raisedBorderInnerRightBottomColor = GetColor(raisedBorderInnerRightBottomItemName);
+    pens.reset(new StatusBarPens(this));
 }
 
 void StatusBar::OnPaint(PaintEventArgs& args)
@@ -486,7 +554,7 @@ void StatusBar::DrawTopLine(Graphics& graphics)
     Size size = GetSize();
     Point start;
     Point end(size.Width - 1, 0);
-    CheckGraphicsStatus(graphics.DrawLine(pens.TopLinePen(), start, end));
+    CheckGraphicsStatus(graphics.DrawLine(pens->TopLinePen(), start, end));
 }
 
 void StatusBar::DrawItems(Graphics& graphics)

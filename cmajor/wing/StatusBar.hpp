@@ -53,6 +53,7 @@ struct WING_API StatusBarCreateParams
     StatusBarCreateParams& WindowStyle(int windowStyle_);
     StatusBarCreateParams& WindowClassBackgroundColor(int windowClassBackgroundColor_);
     StatusBarCreateParams& BackgroundColor(const Color& backgroundColor_);
+    StatusBarCreateParams& TextColor(const Color& textColor_);
     StatusBarCreateParams& Text(const std::string& text_);
     StatusBarCreateParams& Location(Point location_);
     StatusBarCreateParams& SetSize(Size size_);
@@ -140,7 +141,7 @@ public:
     const Color& RaisedBorderOuterRightBottomColor() const { return raisedBorderOuterRightBottomColor; }
     const Color& RaisedBorderInnerTopLeftColor() const { return raisedBorderInnerTopLeftColor; }
     const Color& RaisedBorderInnerRightBottomColor() const { return raisedBorderInnerRightBottomColor; }
-    StatusBarPens& Pens() { return pens; }
+    StatusBarPens& Pens() { return *pens; }
     const SolidBrush& TextBrush() { return textBrush; }
     const Padding& GetPadding() const { return padding; }
     const Padding& StatusBarItemPadding() const { return itemPadding; }
@@ -152,6 +153,16 @@ public:
     bool Changed() const { return (flags & StatusBarFlags::changed) != StatusBarFlags::none; }
     void SetChanged() { flags = flags | StatusBarFlags::changed; }
     void ResetChanged() { flags = flags & ~StatusBarFlags::changed; }
+    void SetTopLineItemName(const std::string& topLineItemName_);
+    void SetSunkenBorderOuterTopLeftItemName(const std::string& sunkenBorderOuterTopLeftItemName_);
+    void SetSunkenBorderInnerTopLeftItemName(const std::string& sunkenBorderInnerTopLeftItemName_);
+    void SetSunkenBorderOuterRightBottomItemName(const std::string& sunkenBorderOuterRightBottomItemName_);
+    void SetSunkenBorderInnerRightBottomItemName(const std::string& sunkenBorderInnerRightBottomItemName_);
+    void SetRaisedBorderOuterTopLeftItemName(const std::string& raisedBorderOuterTopLeftItemName_);
+    void SetRaisedBorderOuterRightBottomItemName(const std::string& raisedBorderOuterRightBottomItemName_);
+    void SetRaisedBorderInnerTopLeftItemName(const std::string& raisedBorderInnerTopLeftItemName_);
+    void SetRaisedBorderInnerRightBottomItemName(const std::string& raisedBorderInnerRightBottomItemName_);
+    void UpdateColors() override;
 protected:
     void OnPaint(PaintEventArgs& args) override;
 private:
@@ -172,7 +183,7 @@ private:
     Color raisedBorderOuterRightBottomColor;
     Color raisedBorderInnerTopLeftColor;
     Color raisedBorderInnerRightBottomColor;
-    StatusBarPens pens;
+    std::unique_ptr<StatusBarPens> pens;
     SolidBrush textBrush;
     Padding padding;
     Padding itemPadding;
@@ -181,6 +192,15 @@ private:
     StringFormat centerFormat;
     float charWidth;
     float charHeight;
+    std::string topLineItemName;
+    std::string sunkenBorderOuterTopLeftItemName;
+    std::string sunkenBorderInnerTopLeftItemName;
+    std::string sunkenBorderOuterRightBottomItemName;
+    std::string sunkenBorderInnerRightBottomItemName;
+    std::string raisedBorderOuterTopLeftItemName;
+    std::string raisedBorderOuterRightBottomItemName;
+    std::string raisedBorderInnerTopLeftItemName;
+    std::string raisedBorderInnerRightBottomItemName;
 };
 
 class WING_API StatusBarItem : public Component

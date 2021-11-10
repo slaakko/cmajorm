@@ -92,6 +92,7 @@ class WING_API SourceCodeView : public TextView
 {
 public:
     SourceCodeView(SourceCodeViewCreateParams& createParams);
+    void UpdateColors() override;
 protected:
     virtual TokenLine TokenizeLine(const std::u32string& line, int lineNumber, int startState);
     virtual SourceCodeTokenKind GetTokenKind(const Token& token) const;

@@ -7,6 +7,7 @@
 #define CMAJOR_WING_WINDOW_MANAGER_INCLUDED
 #include <wing/WingApi.hpp>
 #include <Windows.h>
+#include <gdiplus.h>
 #include <map>
 #include <set>
 #include <string>
@@ -15,6 +16,8 @@
 
 namespace cmajor { namespace wing {
 
+using Color = Gdiplus::Color;
+
 class Control;
 
 class WING_API WindowManager
@@ -22,7 +25,8 @@ class WING_API WindowManager
 public:
     WindowManager();
     bool IsSystemClassName(const std::string& windowClassName) const;
-    uint16_t Register(const std::string& windowClassName, uint32_t windowClassStyle, int windowClassBackgroundColor);
+    //uint16_t Register(const std::string& windowClassName, uint32_t windowClassStyle, int windowClassBackgroundColor);
+    uint16_t Register(const std::string& windowClassName, uint32_t windowClassStyle, const Color& bgColor);
     void AddWindow(Control* window);
     void RemoveWindow(Control* window);
     Control* GetWindow(HWND handle) const;

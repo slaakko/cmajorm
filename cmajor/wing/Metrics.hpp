@@ -81,6 +81,8 @@ public:
     void SetDefaultTextBoxSize(const Size& defaultTextBoxSize_) { defaultTextBoxSize = defaultTextBoxSize_; }
     const Size& DefaultListBoxSize() const { return defaultListBoxSize; }
     void SetDefaultListBoxSize(const Size& defaultListBoxSize_) { defaultListBoxSize = defaultListBoxSize_; }
+    const Size& DefaultComboBoxSize() const { return defaultComboBoxSize; }
+    void SetDefaultComboBoxSize(const Size& defaultComboBoxSize_) { defaultComboBoxSize = defaultComboBoxSize_; }
     const Size& DefaultCheckBoxSize() const { return defaultCheckBoxSize; }
     void SetDefaultCheckBoxSize(const Size& defaultCheckBoxSize_) { defaultCheckBoxSize = defaultCheckBoxSize_; }
     const Size& DefaultControlSpacing() const { return defaultControlSpacing; }
@@ -98,6 +100,8 @@ private:
     SizeElement defaultTextBoxSizeElement;
     Size defaultListBoxSize;
     SizeElement defaultListBoxSizeElement;
+    Size defaultComboBoxSize;
+    SizeElement defaultComboBoxSizeElement;
     Size defaultCheckBoxSize;
     SizeElement defaultCheckBoxSizeElement;
     Size defaultControlSpacing;

@@ -6,6 +6,7 @@
 #include <cmajor/cmview/SearchResultsView.hpp>
 #include <cmajor/wing/PaddedControl.hpp>
 #include <cmajor/wing/ScrollableControl.hpp>
+#include <wing/Theme.hpp>
 
 namespace cmajor { namespace view {
 
@@ -18,11 +19,17 @@ ViewSearchResultEventArgs::ViewSearchResultEventArgs(SearchResult* searchResult_
 }
 
 SearchResultsView::SearchResultsView() : 
-    Control(ControlCreateParams().WindowClassName("cmajor.view.SearchResultsView").WindowClassBackgroundColor(COLOR_WINDOW).BackgroundColor(Color::White).SetDock(Dock::fill)),
+    Control(ControlCreateParams().WindowClassName("cmajor.view.SearchResultsView").WindowClassBackgroundColor(COLOR_WINDOW).
+    BackgroundColor(GetColor("search.results.background")).SetDock(Dock::fill)),
     container(this), treeView(nullptr), child(nullptr)
 {
-    std::unique_ptr<TreeView> treeViewPtr(new TreeView(TreeViewCreateParams().Defaults()));
+    std::unique_ptr<TreeView> treeViewPtr(new TreeView(TreeViewCreateParams().BackgroundColor(GetColor("search.results.background")).TextColor(GetColor("search.results.text")).
+        SelectedNodeColor(GetColor("search.results.node.selected")).StateIndicatorColor(GetColor("search.results.state.indicator"))));
     treeView = treeViewPtr.get();
+    treeView->SetBackgroundItemName("search.results.background");
+    treeView->SetTextItemName("search.results.text");
+    treeView->SetStateIndicatorItemName("search.results.state.indicator");
+    treeView->SetNodeSelectedItemName("search.results.node.selected");
     treeView->SetFlag(ControlFlags::scrollSubject);
     treeView->SetDoubleBuffered();
     treeView->NodeDoubleClick().AddHandler(this, &SearchResultsView::TreeViewNodeDoubleClick);

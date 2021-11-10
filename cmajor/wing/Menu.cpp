@@ -5,6 +5,7 @@
 
 #include <wing/Menu.hpp>
 #include <wing/ContainerControl.hpp>
+#include <wing/Theme.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <algorithm>
 
@@ -30,7 +31,7 @@ Color DefaultDisabledMenuTextColor()
     return GetSystemColor(COLOR_GRAYTEXT);
 }
 
-Color DefaultMenuMouseOverColor()
+Color DefaultMenuMouseOverColor()   
 {
     return Color(201, 222, 245);
 }
@@ -49,30 +50,50 @@ Color DefaultMenuShadowColor()
 
 MenuControl::MenuControl(ControlCreateParams& createParams) :
     Control(createParams),
-    textColor(DefaultMenuTextColor()),
-    disabledTextColor(DefaultDisabledMenuTextColor()),
-    mouseOverColor(DefaultMenuMouseOverColor()),
-    menuOpenColor(DefaultMenuOpenColor()),
-    shadowColor(DefaultMenuShadowColor()),
+    textColor(GetColor("menu.text")),
+    disabledTextColor(GetColor("menu.disabled.text")),
+    mouseOverColor(GetColor("menu.mouse.over.background")),
+    menuOpenColor(GetColor("menu.open.background")),
+    shadowColor(GetColor("menu.shadow")),
     textBrush(textColor),
     disabledTextBrush(disabledTextColor),
-    backgroundBrush(BackgroundColor()),
+    backgroundBrush(GetColor("menu.background")),
     mouseOverBrush(mouseOverColor),
     menuOpenBrush(menuOpenColor),
     shadowBrush(shadowColor),
-    blackBrush(Color::Black),
-    blackPen(Color::Black),
-    darkPen(Color::DarkGray),
+    blackBrush(GetColor("menu.child.indicator")),
+    blackPen(GetColor("menu.frame")),
+    darkPen(GetColor("menu.item.separator")),
     stringFormat()
 {
+    SetBackgroundItemName("menu.background");
     stringFormat.SetAlignment(StringAlignment::StringAlignmentNear);
     stringFormat.SetLineAlignment(StringAlignment::StringAlignmentNear);
     stringFormat.SetHotkeyPrefix(HotKeyPrefix::HotkeyPrefixShow);
     SetFont(Font(FontFamily(L"Segoe UI"), 9.0f, FontStyle::FontStyleRegular, Unit::UnitPoint));
 }
 
+void MenuControl::UpdateColors()
+{
+    Control::UpdateColors();
+    textColor = GetColor("menu.text");
+    disabledTextColor = GetColor("menu.disabled.text");
+    mouseOverColor = GetColor("menu.mouse.over.background");
+    menuOpenColor = GetColor("menu.open.background");
+    shadowColor = GetColor("menu.shadow");
+    textBrush.SetColor(textColor);
+    disabledTextBrush.SetColor(disabledTextColor);
+    backgroundBrush.SetColor(GetColor("menu.background"));
+    mouseOverBrush.SetColor(mouseOverColor);
+    menuOpenBrush.SetColor(menuOpenColor);
+    shadowBrush.SetColor(shadowColor);
+    blackBrush.SetColor(GetColor("menu.child.indicator"));
+    blackPen.SetColor(GetColor("menu.frame"));
+    darkPen.SetColor(GetColor("menu.item.separator"));
+}
+
 MenuBar::MenuBar() : MenuControl(ControlCreateParams().WindowClassName("wing.MenuBar").WindowClassBackgroundColor(COLOR_MENU).WindowStyle(DefaultChildWindowStyle()).
-    BackgroundColor(DefaultMenuBackgroundColor()).SetDock(Dock::top).SetSize(Size(0, 20))), flags(MenuFlags::none), children(this), latestOpenedMenuItem(nullptr), selectedMenuItem(nullptr), 
+    BackgroundColor(GetColor("menu.background")).SetDock(Dock::top).SetSize(Size(0, 20))), flags(MenuFlags::none), children(this), latestOpenedMenuItem(nullptr), selectedMenuItem(nullptr),
     latestMouseDownMenuItem(nullptr), menuBox(nullptr)
 {
     SetDoubleBuffered();

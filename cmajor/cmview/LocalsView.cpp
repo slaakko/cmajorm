@@ -8,17 +8,24 @@
 #include <cmajor/wing/LogView.hpp>
 #include <cmajor/wing/PaddedControl.hpp>
 #include <cmajor/wing/ScrollableControl.hpp>
+#include <wing/Theme.hpp>
 
 #undef min
 #undef max
 
 namespace cmajor { namespace view {
 
-LocalsView::LocalsView() : Control(ControlCreateParams().WindowClassName("cmajor.view.LocalsView").WindowClassBackgroundColor(COLOR_WINDOW).BackgroundColor(Color::White).SetDock(Dock::fill)),
+LocalsView::LocalsView() : 
+    Control(ControlCreateParams().WindowClassName("cmajor.view.LocalsView").WindowClassBackgroundColor(COLOR_WINDOW).BackgroundColor(GetColor("locals.background")).SetDock(Dock::fill)),
     localCount(-1), localCountRequested(false), childExtentRequested(false), fetchNode(nullptr), container(this), treeView(nullptr), child(nullptr)
 {
-    std::unique_ptr<TreeView> treeViewPtr(new TreeView(TreeViewCreateParams().Defaults()));
+    std::unique_ptr<TreeView> treeViewPtr(new TreeView(TreeViewCreateParams().BackgroundColor(GetColor("locals.background")).TextColor(GetColor("locals.text")).
+        SelectedNodeColor(GetColor("locals.node.selected")).StateIndicatorColor(GetColor("locals.state.indicator"))));
     treeView = treeViewPtr.get();
+    treeView->SetBackgroundItemName("locals.background");
+    treeView->SetTextItemName("locals.text");
+    treeView->SetStateIndicatorItemName("locals.state.indicator");
+    treeView->SetNodeSelectedItemName("locals.node.selected");
     treeView->SetFlag(ControlFlags::scrollSubject);
     treeView->SetDoubleBuffered();
     treeView->NodeExpanded().AddHandler(this, &LocalsView::TreeViewNodeExpanded);

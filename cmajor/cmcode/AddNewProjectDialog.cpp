@@ -9,11 +9,12 @@
 #include <cmajor/wing/Metrics.hpp>
 #include <cmajor/wing/BorderedControl.hpp>
 #include <cmajor/wing/PaddedControl.hpp>
+#include <wing/Theme.hpp>
 
 namespace cmcode {
 
 AddNewProjectDialog::AddNewProjectDialog() : Window(WindowCreateParams().WindowClassName("cmcode.AddNewProjectDialog").WindowStyle(DialogWindowStyle()).Text("Add New Project").
-    WindowClassBackgroundColor(DefaultControlWindowClassBackgroundColor()).BackgroundColor(DefaultControlBackgroundColor()).
+    WindowClassBackgroundColor(DefaultControlWindowClassBackgroundColor()).
     Location(DefaultLocation()).SetSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(160), ScreenMetrics::Get().MMToVerticalPixels(100)))),
     projectNameTextBox(nullptr),
     projectTypeTextLabel(nullptr),

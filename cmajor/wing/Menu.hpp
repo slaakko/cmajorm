@@ -55,6 +55,7 @@ public:
     virtual MenuItem* LatestMouseDownMenuItem() const { return nullptr; }
     virtual void SetLatestMouseDownMenuItem(MenuItem* menuItem) {}
     virtual MenuItem* GetMenuItemByAccessKey(char16_t accessKey) const { return nullptr; }
+    void UpdateColors() override;
 private:
     Color textColor;
     Color disabledTextColor;

@@ -125,6 +125,11 @@ Control* ScrollableControl::GetLastEnabledTabStopControl() const
     return child->GetLastEnabledTabStopControl();
 }
 
+std::string ScrollableControl::BackgroundItemName() const
+{
+    return child->BackgroundItemName();
+}
+
 void ScrollableControl::TranslateChildGraphics(Graphics& graphics)
 {
     int dx = -hpos * scrollUnits.horizontal;

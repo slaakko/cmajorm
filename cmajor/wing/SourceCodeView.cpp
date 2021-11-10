@@ -4,6 +4,7 @@
 // =================================
 
 #include <wing/SourceCodeView.hpp>
+#include <wing/Theme.hpp>
 #include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace wing {
@@ -40,17 +41,18 @@ bool operator<(const SourceCodeFont& left, const SourceCodeFont& right)
 SourceCodeViewCreateParams::SourceCodeViewCreateParams()
 {
     textViewCreateParams.WindowClassName("wing.SourceCodeView");
-    SetSourceCodeTokenStyle(SourceCodeTokenKind::plain, TokenStyle(Color::Black, FontStyle::FontStyleRegular));
-    SetSourceCodeTokenStyle(SourceCodeTokenKind::space, TokenStyle(Color::Black, FontStyle::FontStyleRegular));
-    SetSourceCodeTokenStyle(SourceCodeTokenKind::keyword, TokenStyle(Color::Blue, FontStyle::FontStyleRegular));
-    SetSourceCodeTokenStyle(SourceCodeTokenKind::identifier, TokenStyle(Color::Black, FontStyle::FontStyleRegular));
-    SetSourceCodeTokenStyle(SourceCodeTokenKind::string, TokenStyle(Color(163, 21, 21), FontStyle::FontStyleRegular));
-    SetSourceCodeTokenStyle(SourceCodeTokenKind::character, TokenStyle(Color(163, 21, 21), FontStyle::FontStyleRegular));
-    SetSourceCodeTokenStyle(SourceCodeTokenKind::number, TokenStyle(Color::Black, FontStyle::FontStyleRegular));
-    SetSourceCodeTokenStyle(SourceCodeTokenKind::comment, TokenStyle(Color(0, 128, 0), FontStyle::FontStyleRegular));
-    SetSourceCodeTokenStyle(SourceCodeTokenKind::lineNumber, TokenStyle(Color(43, 145, 175), FontStyle::FontStyleRegular));
-    SetSourceCodeTokenStyle(SourceCodeTokenKind::beginBlock, TokenStyle(Color::Black, FontStyle::FontStyleRegular));
-    SetSourceCodeTokenStyle(SourceCodeTokenKind::endBlock, TokenStyle(Color::Black, FontStyle::FontStyleRegular));
+    
+    SetSourceCodeTokenStyle(SourceCodeTokenKind::plain, TokenStyle(GetColor("plain.text"), FontStyle::FontStyleRegular));
+    SetSourceCodeTokenStyle(SourceCodeTokenKind::space, TokenStyle(GetColor("space.text"), FontStyle::FontStyleRegular));
+    SetSourceCodeTokenStyle(SourceCodeTokenKind::keyword, TokenStyle(GetColor("keyword.text"), FontStyle::FontStyleRegular));
+    SetSourceCodeTokenStyle(SourceCodeTokenKind::identifier, TokenStyle(GetColor("identifier.text"), FontStyle::FontStyleRegular));
+    SetSourceCodeTokenStyle(SourceCodeTokenKind::string, TokenStyle(GetColor("string.text"), FontStyle::FontStyleRegular));
+    SetSourceCodeTokenStyle(SourceCodeTokenKind::character, TokenStyle(GetColor("character.text"), FontStyle::FontStyleRegular));
+    SetSourceCodeTokenStyle(SourceCodeTokenKind::number, TokenStyle(GetColor("number.text"), FontStyle::FontStyleRegular));
+    SetSourceCodeTokenStyle(SourceCodeTokenKind::comment, TokenStyle(GetColor("comment.text"), FontStyle::FontStyleRegular));
+    SetSourceCodeTokenStyle(SourceCodeTokenKind::lineNumber, TokenStyle(GetColor("lineNumber.text"), FontStyle::FontStyleRegular));
+    SetSourceCodeTokenStyle(SourceCodeTokenKind::beginBlock, TokenStyle(GetColor("beginBlock.text"), FontStyle::FontStyleRegular));
+    SetSourceCodeTokenStyle(SourceCodeTokenKind::endBlock, TokenStyle(GetColor("endBlock.text"), FontStyle::FontStyleRegular));
 }
 
 SourceCodeViewCreateParams& SourceCodeViewCreateParams::Defaults()
@@ -151,6 +153,29 @@ SourceCodeViewCreateParams& SourceCodeViewCreateParams::SetSourceCodeTokenStyle(
 SourceCodeView::SourceCodeView(SourceCodeViewCreateParams& createParams) : 
     TextView(createParams.textViewCreateParams), tokenStyleMap(createParams.tokenStyleMap), numLineNumberDigits(0)
 {
+}
+
+void SourceCodeView::UpdateColors()
+{
+    TextView::UpdateColors();
+    for (auto& tokenStyle : tokenStyleMap)
+    {
+        switch (tokenStyle.first)
+        {
+            case SourceCodeTokenKind::plain: tokenStyle.second.color = GetColor("plain.text"); break;
+            case SourceCodeTokenKind::space: tokenStyle.second.color = GetColor("space.text"); break;
+            case SourceCodeTokenKind::keyword: tokenStyle.second.color = GetColor("keyword.text"); break;
+            case SourceCodeTokenKind::identifier: tokenStyle.second.color = GetColor("identifier.text"); break;
+            case SourceCodeTokenKind::string: tokenStyle.second.color = GetColor("string.text"); break;
+            case SourceCodeTokenKind::character: tokenStyle.second.color = GetColor("character.text"); break;
+            case SourceCodeTokenKind::number: tokenStyle.second.color = GetColor("number.text"); break;
+            case SourceCodeTokenKind::comment: tokenStyle.second.color = GetColor("comment.text"); break;
+            case SourceCodeTokenKind::lineNumber: tokenStyle.second.color = GetColor("lineNumber.text"); break;
+            case SourceCodeTokenKind::beginBlock: tokenStyle.second.color = GetColor("beginBlock.text"); break;
+            case SourceCodeTokenKind::endBlock: tokenStyle.second.color = GetColor("endBlock.text"); break;
+        }
+    }
+    textStyleMap.clear();
 }
 
 TokenLine SourceCodeView::TokenizeLine(const std::u32string& line, int lineNumber, int startState)

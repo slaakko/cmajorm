@@ -1,0 +1,85 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+#include <system-x/assembler/api.hpp>
+
+classmap AssemblyClassMap;
+
+prefix "system-x/assembler";
+
+tokens AssemblyTokens
+{
+    (DECIMAL_CONSTANT, "'decimal constant'"), (HEX_CONSTANT, "'hex constant'"), (CHAR_CONSTANT, "'char constant'"), (STRING_CONSTANT, "'string constant'"), (CLSID_CONSTANT, "'clsid constant'"),
+    (LOCAL_SYMBOL, "'local symbol'"), (SYMBOL, "'symbol'"), (AT, "'at'"), (PLUS, "'plus'"), (MINUS, "'minus'"), (TILDE, "'tilde'"), (DOLLAR, "'$'"), (AMP, "'amp'"), (AST, "'ast'"),
+    (SLASHSLASH, "'slashslash'"), (SLASH, "'slash'"), (PERCENT, "'percent'"), (SHIFT_LEFT, "'shift left'"), (SHIFT_RIGHT, "'shift right'"), (BAR, "'bar'"), (CARET, "'caret'"), (DOT, "'dot'"),
+    (SPACE, "'space'"), (NEWLINE, "'newline'"), (LPAREN, "'('"), (RPAREN, "')'"), (SEMICOLON, "';'"), (COMMA, "','"), (CHAR, "'char'")
+}
+
+expressions
+{
+    space = "[ \t]+";
+    newline = "\n\r|\n|\r";
+    digit = "[0-9]";
+    decimal_constant = "{digit}+";
+    hexdigit = "[0-9a-fA-F]";
+    hex_constant = "#{hexdigit}+";
+    char_constant = "'[^'\n\r]'";
+    string_constant = "\"[^\"\n\r]*\"";
+    clsid_constant = "$CLSID\({hexdigit}+\)";
+    local_symbol = "@{digit}+";
+    symbol = "({idstart}|:|_)({idcont}|:|_|@)*";
+    at = "@";
+    plus = "\+";
+    minus = "-";
+    tilde = "~";
+    dollar = "$";
+    amp = "&";
+    ast = "\*";
+    slash_slash = "//";
+    slash = "/";
+    percent = "%";
+    shift_left = "<<";
+    shift_right = ">>";
+    bar = "\|";
+    caret = "^";
+    dot = "\.";
+    lparen = "\(";
+    rparen = "\)";
+    semicolon = ";";
+    comma = ",";
+}
+
+lexer api(CMSX_ASSEMBLER_API) AssemblyLexer
+{
+    "{space}" { return SPACE; }
+    "{newline}" { return NEWLINE; }
+    "{decimal_constant}" { return DECIMAL_CONSTANT; }
+    "{hex_constant}" { return HEX_CONSTANT; }
+    "{char_constant}" { return CHAR_CONSTANT; }
+    "{string_constant}" { return STRING_CONSTANT; }
+    "{clsid_constant}" { return CLSID_CONSTANT; }
+    "{local_symbol}" { return LOCAL_SYMBOL; }
+    "{symbol}" { return SYMBOL; }
+    "{at}" { return AT; }
+    "{plus}" { return PLUS; }
+    "{minus}" { return MINUS; }
+    "{tilde}" { return TILDE; }
+    "{dollar}" { return DOLLAR; }
+    "{amp}" { return AMP; }
+    "{ast}" { return AST; }
+    "{slash_slash}" { return SLASHSLASH; }
+    "{slash}" { return SLASH; }
+    "{percent}" { return PERCENT; }
+    "{shift_left}" { return SHIFT_LEFT; }
+    "{shift_right}" { return SHIFT_RIGHT; }
+    "{bar}" { return BAR; }
+    "{caret}" { return CARET; }
+    "{dot}" { return DOT; }
+    "{lparen}" { return LPAREN; }
+    "{rparen}" { return RPAREN; }
+    "{semicolon}" { return SEMICOLON; }
+    "{comma}" { return COMMA; }
+    "." { return CHAR; }
+}

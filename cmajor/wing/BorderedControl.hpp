@@ -84,6 +84,8 @@ public:
     ContainerControl* GetContainerControl() const override;
     Control* GetFirstEnabledTabStopControl() const override;
     Control* GetLastEnabledTabStopControl() const override;
+    std::string BackgroundItemName() const override;
+    void UpdateColors() override;
 protected:
     void OnPaint(PaintEventArgs& args) override;
     void OnLocationChanged() override;

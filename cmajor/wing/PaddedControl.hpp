@@ -45,6 +45,7 @@ public:
     const Padding& GetPadding() const { return padding; }
     Control* GetFirstEnabledTabStopControl() const override;
     Control* GetLastEnabledTabStopControl() const override;
+    std::string BackgroundItemName() const override;
 protected:
     void OnPaint(PaintEventArgs& args) override;
     void OnLocationChanged() override;

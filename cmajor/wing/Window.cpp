@@ -219,7 +219,7 @@ void Window::SetIcon(const Icon& icon)
 
 void Window::SetSmallIcon(const Icon& icon)
 {
-    ::SetClassLongPtr(Handle(), GCLP_HICONSM, reinterpret_cast<int64_t>(icon.Handle()));;
+    ::SetClassLongPtr(Handle(), GCLP_HICONSM, reinterpret_cast<int64_t>(icon.Handle()));
 }
 
 KeyPreviewMethod Window::GetKeyPreviewMethod() const

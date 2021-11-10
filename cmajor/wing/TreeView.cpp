@@ -5,6 +5,7 @@
 
 #include <wing/TreeView.hpp>
 #include <wing/Window.hpp>
+#include <wing/Theme.hpp>
 #include <soulng/util/Unicode.hpp>
 
 #undef min
@@ -34,6 +35,7 @@ TreeViewCreateParams::TreeViewCreateParams() :
     stateIndicatorColor(Color::Red),
     selectedNodeColor(Color(201, 222, 245)),
     textColor(Color::Black),
+    activeNodeTextColor(GetColor("tree.view.active.node.text")),
     stateIndicatorPercentage(50.0f),
     addToolTip(true),
     nodeIndentPercent(200),
@@ -165,6 +167,12 @@ TreeViewCreateParams& TreeViewCreateParams::TextColor(const Color& color)
     return *this;
 }
 
+TreeViewCreateParams& TreeViewCreateParams::ActiveNodeTextColor(const Color& color)
+{
+    activeNodeTextColor = color;
+    return *this;
+}
+
 TreeViewCreateParams& TreeViewCreateParams::StateIndicatorPercentage(float percentage)
 {
     stateIndicatorPercentage = percentage;
@@ -214,6 +222,7 @@ TreeView::TreeView(TreeViewCreateParams& createParams) :
     stateIndicatorColor(createParams.stateIndicatorColor),
     selectedNodeColor(createParams.selectedNodeColor),
     textColor(createParams.textColor),
+    activeNodeTextColor(createParams.activeNodeTextColor),
     textHeight(0),
     nodeIndentPercent(createParams.nodeIndentPercent),
     nodeTextIndentPercent(createParams.nodeTextIndentPercent),
@@ -433,7 +442,8 @@ void TreeView::OnPaint(PaintEventArgs& args)
         {
             SolidBrush selectedBrush(selectedNodeColor);
             SolidBrush textBrush(textColor);
-            root->Draw(args.graphics, selectedBrush, textBrush);
+            SolidBrush activeNodeTextBrush(activeNodeTextColor);
+            root->Draw(args.graphics, selectedBrush, textBrush, activeNodeTextBrush);
         }
         Control::OnPaint(args);
     }
@@ -696,6 +706,26 @@ void TreeView::HideToolTipWindow()
         ResetToolTipWindowShown();
         toolTipWindow->Hide();
     }
+}
+
+void TreeView::SetStateIndicatorItemName(const std::string& stateIndicatorItemName_)
+{
+    stateIndicatorItemName = stateIndicatorItemName_;
+}
+
+void TreeView::SetNodeSelectedItemName(const std::string& nodeSelectedItemName_)
+{
+    nodeSelectedItemName = nodeSelectedItemName_;
+}
+
+void TreeView::UpdateColors()
+{
+    SetChanged();
+    Control::UpdateColors();
+    textColor = GetColor(TextItemName());
+    activeNodeTextColor = GetColor("tree.view.active.node.text");
+    stateIndicatorColor = GetColor(stateIndicatorItemName); 
+    selectedNodeColor = GetColor(nodeSelectedItemName);
 }
 
 TreeViewNode::TreeViewNode(const std::string& text_) : 
@@ -1224,7 +1254,7 @@ void TreeViewNode::Measure(Graphics& graphics, const Point& loc, int level, int&
     }
 }
 
-void TreeViewNode::Draw(Graphics& graphics, SolidBrush& selectedBrush, SolidBrush& textBrush)
+void TreeViewNode::Draw(Graphics& graphics, SolidBrush& selectedBrush, SolidBrush& textBrush, SolidBrush& activeNodeTextBrush)
 {
     TreeView* view = GetTreeView();
     if (view)
@@ -1267,7 +1297,7 @@ void TreeViewNode::Draw(Graphics& graphics, SolidBrush& selectedBrush, SolidBrus
             }
             if (Active())
             {
-                DrawString(graphics, text, view->ActiveNodeFont(), PointF(loc.X, loc.Y), textBrush);
+                DrawString(graphics, text, view->ActiveNodeFont(), PointF(loc.X, loc.Y), activeNodeTextBrush);
             }
             else
             {
@@ -1282,7 +1312,7 @@ void TreeViewNode::Draw(Graphics& graphics, SolidBrush& selectedBrush, SolidBrus
                 if (child->IsTreeViewNode())
                 {
                     TreeViewNode* childNode = static_cast<TreeViewNode*>(child);
-                    childNode->Draw(graphics, selectedBrush, textBrush);
+                    childNode->Draw(graphics, selectedBrush, textBrush, activeNodeTextBrush);
                 }
                 child = child->NextSibling();
             }

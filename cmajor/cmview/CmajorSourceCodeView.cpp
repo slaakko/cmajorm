@@ -5,6 +5,7 @@
 
 #include <cmajor/cmview/CmajorSourceCodeView.hpp>
 #include <cmajor/cmview/DebugStrip.hpp>
+#include <cmajor/wing/Theme.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Unicode.hpp>
@@ -146,6 +147,7 @@ CmajorSourceCodeView::CmajorSourceCodeView(CmajorSourceCodeViewCreateParams& cre
     debugStrip(nullptr),
     editor(nullptr)
 {
+    SetBackgroundItemName("cmajor.editor.background");
     lexer.SetCommentTokenId(CmajorTokens::COMMENT);
     std::set<int> blockCommentStates;
     blockCommentStates.insert(124);
@@ -176,6 +178,13 @@ void CmajorSourceCodeView::ToggleBreakpoint()
             debugStrip->Invalidate();
         }
     }
+}
+
+void CmajorSourceCodeView::UpdateColors()
+{
+    SourceCodeView::UpdateColors();
+    debugLocationBackgroundColor = GetColor("debug.location.background");
+    debugLocationTextColor = GetColor("debug.location.text");
 }
 
 TokenLine CmajorSourceCodeView::TokenizeLine(const std::u32string& line, int lineNumber, int startState)

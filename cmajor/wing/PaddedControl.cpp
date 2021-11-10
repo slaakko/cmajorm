@@ -116,6 +116,11 @@ Control* PaddedControl::GetLastEnabledTabStopControl() const
     return child->GetLastEnabledTabStopControl();
 }
 
+std::string PaddedControl::BackgroundItemName() const
+{
+    return child->BackgroundItemName();
+}
+
 void PaddedControl::OnPaint(PaintEventArgs& args)
 {
     args.graphics.Clear(BackgroundColor());

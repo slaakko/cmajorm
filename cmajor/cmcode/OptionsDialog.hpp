@@ -10,6 +10,7 @@
 #include <cmajor/wing/Button.hpp>
 #include <cmajor/wing/CheckBox.hpp>
 #include <cmajor/wing/TextBox.hpp>
+#include <cmajor/wing/ComboBox.hpp>
 
 namespace cmcode {
 
@@ -21,6 +22,8 @@ public:
     OptionsDialog();
     void SetOptionsFrom(const Options& options);
     Options GetOptions() const;
+protected:
+    void OnShown() override;
 private:
     void TextBoxTextChanged();
     void ParsingFrequencyTextBoxTextChanged();
@@ -31,6 +34,9 @@ private:
     TextBox* numberOfRecentSolutionsTextBox;
     CheckBox* codeCompletionCheckBox;
     TextBox* parsingFrequencyTextBox;
+    ComboBox* themeComboBox;
+    std::vector<std::string> themes;
+    int selectedThemeIndex;
 };
 
 } // namespace cmcode

@@ -37,6 +37,7 @@ public:
     Control* Child() const { return child; }
     Control* GetFirstEnabledTabStopControl() const override;
     Control* GetLastEnabledTabStopControl() const override;
+    std::string BackgroundItemName() const override;
 protected:
     void TranslateChildGraphics(Graphics& graphics) override;
     void TranslateMousePos(Point& location) override;

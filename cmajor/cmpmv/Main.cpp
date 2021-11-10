@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/cmpmv/MainWindow.hpp>
+#include <cmajor/cmpmv/Themes.hpp>
 #include <cmajor/wing/Application.hpp>
 #include <cmajor/wing/InitDone.hpp>
 #include <cmajor/wing/Graphics.hpp>
@@ -25,6 +26,17 @@ void InitApplication(HINSTANCE instance)
     cmajor::service::Init();
     cmajor::view::Init();
     cmpm::Register();
+    cmajor::pmv::InitThemes();
+}
+
+void DoneApplication()
+{
+    cmajor::view::Done();
+    cmajor::service::Done();
+    cmajor::wing::Done();
+    sngxml::xmlser::Done();
+    sngxml::xpath::Done();
+    soulng::util::Done();
 }
 
 using namespace cmajor::pmv;
@@ -46,5 +58,6 @@ int WinMain(HINSTANCE instance, HINSTANCE prevInstance, LPSTR cmdLine, int cmdSh
         ShowErrorMessageBox(nullptr, ex.what());
         return 1;
     }
+    DoneApplication();
     return 0;
 }

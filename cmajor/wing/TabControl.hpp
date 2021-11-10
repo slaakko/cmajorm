@@ -43,6 +43,7 @@ struct WING_API TabControlCreateParams
     TabControlCreateParams& FontSize(float size);
     TabControlCreateParams& FrameColor(const Color& frameColor_);
     TabControlCreateParams& TextColor(const Color& textColor_);
+    TabControlCreateParams& NormalBackgroundColor(const Color& color);
     TabControlCreateParams& SelectedBackgroundColor(const Color& color);
     TabControlCreateParams& CloseBoxSelectedColor(const Color& color);
     TabControlCreateParams& LeadingWidth(int width);
@@ -129,6 +130,10 @@ public:
     bool Changed() const { return (flags & TabControlFlags::changed) != TabControlFlags::none; }
     void SetChanged() { flags = flags | TabControlFlags::changed; }
     void ResetChanged() { flags = flags & ~TabControlFlags::changed; }
+    void UpdateColors() override;
+    void SetTabNormalBackgroundItemName(const std::string& tabNormalBackgroundItemName_);
+    void SetTabSelectedBackgroundItemName(const std::string& tabSelectedBackgroundItemName_);
+    void SetCloseBoxSelectedBackgroundItemName(const std::string& closeBoxBackgroundItemName_);
 protected:
     void OnPaint(PaintEventArgs& args) override;
     void OnMouseEnter() override;
@@ -176,6 +181,9 @@ private:
     TabPage* closeStateTabPage;
     std::unordered_map<std::string, TabPage*> tabPageMap;
     TabPageSelectedEvent tabPageSelected;
+    std::string tabNormalBackgroundItemName;
+    std::string tabSelectedBackgroundItemName;
+    std::string closeBoxBackgroundItemName;
 };
 
 enum class TabState : int

@@ -71,6 +71,7 @@ public:
     SplitterOrientation Orientation() const { return orientation; }
     const Color& EdgeColor() const { return edgeColor; }
     void SetEdgeColor(const Color& edgeColor_);
+    void UpdateColors() override;
 protected:
     void SetCursor() override;
     void OnPaint(PaintEventArgs& args) override;

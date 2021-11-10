@@ -8,6 +8,7 @@
 #include <cmajor/wing/Label.hpp>
 #include <cmajor/wing/Metrics.hpp>
 #include <cmajor/wing/PaddedControl.hpp>
+#include <cmajor/wing/Theme.hpp>
 #include <boost/lexical_cast.hpp>
 
 namespace cmcode {
@@ -50,7 +51,7 @@ bool IsValidParsingFrequency(const std::string& text)
 
 OptionsDialog::OptionsDialog() : Window(WindowCreateParams().WindowClassName("cmcode.OptionsDialog").WindowStyle(DialogWindowStyle()).Text("Options").
     WindowClassBackgroundColor(DefaultControlWindowClassBackgroundColor()).BackgroundColor(DefaultControlBackgroundColor()).
-    Location(DefaultLocation()).SetSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(160), ScreenMetrics::Get().MMToVerticalPixels(100)))),
+    Location(DefaultLocation()).SetSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(160), ScreenMetrics::Get().MMToVerticalPixels(120)))),
     okButton(nullptr),
     cancelButton(nullptr),
     showStartupDialogCheckBox(nullptr),
@@ -58,12 +59,16 @@ OptionsDialog::OptionsDialog() : Window(WindowCreateParams().WindowClassName("cm
     codeCompletionCheckBox(nullptr),
     parsingFrequencyTextBox(nullptr)
 {
+    themes = GetThemes();
+    selectedThemeIndex = 0;
+
     Size s = GetSize();
     Size defaultControlSpacing = ScreenMetrics::Get().DefaultControlSpacing();
     Size defaultButtonSize = ScreenMetrics::Get().DefaultButtonSize();
     Size defaultTextBoxSize = ScreenMetrics::Get().DefaultTextBoxSize();
     Size defaultLabelSize = ScreenMetrics::Get().DefaultLabelSize();
     Size defaultCheckBoxSize = ScreenMetrics::Get().DefaultCheckBoxSize();
+    Size defaultComboBoxSize = ScreenMetrics::Get().DefaultComboBoxSize();
 
     Point showStartupDialogCheckBoxLocation(16, 16);
     std::unique_ptr<CheckBox> showStartupDialogCheckBoxPtr(new CheckBox(CheckBoxCreateParams().Text("Show startup dialog").
@@ -106,6 +111,17 @@ OptionsDialog::OptionsDialog() : Window(WindowCreateParams().WindowClassName("cm
     std::unique_ptr<Control> borderedPFTextBox(new BorderedControl(BorderedControlCreateParams(paddedPFTextBox.release()).Location(parsingFrequencyTextBoxLocation).
         SetSize(BorderedSize(PaddedSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(10), defaultTextBoxSize.Height + 4), DefaultPadding()), BorderStyle::single)).SetAnchors(Anchors::top | Anchors::left)));
     AddChild(borderedPFTextBox.release());
+
+    Point themeLabelLocation(16, 24 + 24 + 24 + 24 + 24 + 24 + 24 + 24);
+    std::unique_ptr<Label> themeLabel(new Label(LabelCreateParams().Text("Theme:").
+        Location(themeLabelLocation).SetSize(defaultLabelSize).SetAnchors(Anchors::top | Anchors::left)));
+    AddChild(themeLabel.release());
+
+    Point themeComboBoxLocation(16, 24 + 24 + 24 + 24 + 24 + 24 + 24 + 24 + 24);
+    Size comboBoxSize(defaultComboBoxSize.Width, defaultComboBoxSize.Height * 4);
+    std::unique_ptr<ComboBox> themeComboBoxPtr(new ComboBox(ComboBoxCreateParams().SetAnchors(Anchors::top | Anchors::left).Location(themeComboBoxLocation).SetSize(comboBoxSize)));
+    themeComboBox = themeComboBoxPtr.get();
+    AddChild(themeComboBoxPtr.release());
 
     int x = s.Width - defaultButtonSize.Width - defaultControlSpacing.Width;
     int y = s.Height - defaultButtonSize.Height - defaultControlSpacing.Height;
@@ -152,6 +168,15 @@ void OptionsDialog::SetOptionsFrom(const Options& options)
     numberOfRecentSolutionsTextBox->SetText(std::to_string(options.numberOfRecentSolutions));
     codeCompletionCheckBox->SetChecked(options.codeCompletion);
     parsingFrequencyTextBox->SetText(std::to_string(options.parsingFrequency));
+    int n = themes.size();
+    for (int i = 0; i < n; ++i)
+    {
+        if (themes[i] == options.theme)
+        {
+            selectedThemeIndex = i;
+            break;
+        }
+    }
 }
 
 Options OptionsDialog::GetOptions() const
@@ -161,7 +186,19 @@ Options OptionsDialog::GetOptions() const
     options.numberOfRecentSolutions = boost::lexical_cast<int>(numberOfRecentSolutionsTextBox->Text());
     options.codeCompletion = codeCompletionCheckBox->Checked();
     options.parsingFrequency = boost::lexical_cast<int>(parsingFrequencyTextBox->Text());
+    options.theme = themes[themeComboBox->GetSelectedIndex()];
     return options;
+}
+
+void OptionsDialog::OnShown()
+{
+    Window::OnShown();
+    int n = themes.size();
+    for (int i = 0; i < n; ++i)
+    {
+        themeComboBox->AddItem(themes[i]);
+    }
+    themeComboBox->SetSelectedIndex(selectedThemeIndex);
 }
 
 } // namespace cmcode

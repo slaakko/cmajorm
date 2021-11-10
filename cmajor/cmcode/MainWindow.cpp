@@ -31,6 +31,7 @@
 #include <cmajor/wing/ScrollableControl.hpp>
 #include <cmajor/wing/ToolBar.hpp>
 #include <cmajor/wing/MessageBox.hpp>
+#include <cmajor/wing/Theme.hpp>
 #include <cmajor/cmsvc/Config.hpp>
 #include <cmajor/cmsvc/Message.hpp>
 #include <cmajor/cmsvc/RequestDispatcher.hpp>
@@ -87,7 +88,10 @@ ExpressionEvaluateRequest::ExpressionEvaluateRequest(const std::string& expressi
 {
 }
 
-MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams().Text("Cmajor Code").WindowClassName("cmajor.code." + std::to_string(GetPid()))),
+MainWindow::MainWindow(const std::string& filePath) : 
+    Window(
+        WindowCreateParams().BackgroundColor(GetColor("main.window.background")).
+        Text("Cmajor Code").WindowClassName("cmajor.code." + std::to_string(GetPid()))),
     newProjectMenuItem(nullptr),
     openProjectMenuItem(nullptr),
     closeSolutionMenuItem(nullptr),
@@ -201,6 +205,7 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     editModuleLoaded(false),
     ccCanSelect(false)
 {
+    SetBackgroundItemName("main.window.background");
     buildIndicatorTexts.push_back("|");
     buildIndicatorTexts.push_back("/");
     buildIndicatorTexts.push_back(ToUtf8(std::u32string(1, char32_t(0x2015))));
@@ -425,156 +430,51 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     AddChild(menuBar.release());
 
     std::unique_ptr<ToolBar> toolBarPtr(MakeToolBar());
-    ToolBar* toolBar = toolBarPtr.get();
-    std::unique_ptr<Control> borderedToolBar(new BorderedControl(BorderedControlCreateParams(toolBarPtr.release()).SetBorderStyle(BorderStyle::single).
-        NormalSingleBorderColor(DefaultToolBarBorderColor()).FocusedSingleBorderColor(DefaultToolBarBorderColor()).SetSize(toolBar->GetSize()).SetDock(Dock::top)));
+    toolBar = toolBarPtr.get();
 
-    std::unique_ptr<ToolButton> prevToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.prev.bitmap").SetPadding(Padding(8, 8, 8, 8)).SetToolTip("Go To Previous Location")));
-    prevToolButton = prevToolButtonPtr.get();
-    prevToolButton->Click().AddHandler(this, &MainWindow::GotoPreviousLocationClick);
-    prevToolButton->Disable();
-    toolBar->AddToolButton(prevToolButtonPtr.release());
+    std::unique_ptr<BorderedControl> borderedToolBar(new BorderedControl(BorderedControlCreateParams(toolBarPtr.release()).SetBorderStyle(BorderStyle::single).
+        NormalSingleBorderColor(GetColor("tool.bar.frame")).FocusedSingleBorderColor(GetColor("tool.bar.frame")).SetSize(toolBar->GetSize()).SetDock(Dock::top)));
+    borderedToolBar->SetFrameItemName("tool.bar.frame");
 
-    std::unique_ptr<ToolButton> nextToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.next.bitmap").SetPadding(Padding(8, 8, 8, 8)).SetToolTip("Go To Next Location")));
-    nextToolButton = nextToolButtonPtr.get();
-    nextToolButton->Click().AddHandler(this, &MainWindow::GotoNextLocationClick);
-    nextToolButton->Disable();
-    toolBar->AddToolButton(nextToolButtonPtr.release());
-
-    toolBar->AddToolButton(new ToolButtonSeparator());
-
-    std::unique_ptr<ToolButton> saveToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.save.bitmap").SetPadding(Padding(8, 8, 8, 8)).SetToolTip("Save (Ctrl+S)")));
-    saveToolButton = saveToolButtonPtr.get();
-    saveToolButton->Click().AddHandler(this, &MainWindow::SaveClick);
-    saveToolButton->Disable();
-    toolBar->AddToolButton(saveToolButtonPtr.release());
-
-    std::unique_ptr<ToolButton> saveAllToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.save.all.bitmap").SetPadding(Padding(6, 6, 6, 6)).SetToolTip("Save All (Ctrl+Shift+S)")));
-    saveAllToolButton = saveAllToolButtonPtr.get();
-    saveAllToolButton->Click().AddHandler(this, &MainWindow::SaveAllClick);
-    saveAllToolButton->Disable();
-    toolBar->AddToolButton(saveAllToolButtonPtr.release());
-
-    toolBar->AddToolButton(new ToolButtonSeparator());
-
-    Size textButtonSize(36, 12);
-
-    std::unique_ptr<ToolButton> cppToolButtonPtr(new TextToolButton(TextToolButtonCreateParams("C++").Style(ToolButtonStyle::manual).SetSize(textButtonSize).SetPadding(Padding(8, 8, 8, 8)).
-        SetToolTip("Compile using C++ Backend")));
-    cppToolButton = cppToolButtonPtr.get();
-    cppToolButton->Click().AddHandler(this, &MainWindow::CppButtonClick);
-    cppToolButton->Disable();
-    toolBar->AddToolButton(cppToolButtonPtr.release());
-
-    std::unique_ptr<ToolButton> llvmToolButtonPtr(new TextToolButton(TextToolButtonCreateParams("LLVM").Style(ToolButtonStyle::manual).SetSize(textButtonSize).SetPadding(Padding(8, 8, 8, 8)).
-        SetToolTip("Compile using LLVM Backend")));
-    llvmToolButton = llvmToolButtonPtr.get();
-    llvmToolButton->Click().AddHandler(this, &MainWindow::LlvmButtonClick);
-    llvmToolButton->Disable();
-    toolBar->AddToolButton(llvmToolButtonPtr.release());
-
-    toolBar->AddToolButton(new ToolButtonSeparator());
-
-    std::unique_ptr<ToolButton> debugToolButtonPtr(new TextToolButton(TextToolButtonCreateParams("Debug").Style(ToolButtonStyle::manual).SetSize(textButtonSize).SetPadding(Padding(8, 8, 8, 8)).
-        SetToolTip("Compile using Debug Configuration")));
-    debugToolButton = debugToolButtonPtr.get();
-    debugToolButton->Click().AddHandler(this, &MainWindow::DebugButtonClick);
-    debugToolButton->Disable();
-    toolBar->AddToolButton(debugToolButtonPtr.release());
-
-    std::unique_ptr<ToolButton> releaseToolButtonPtr(new TextToolButton(TextToolButtonCreateParams("Release").Style(ToolButtonStyle::manual).SetSize(textButtonSize).SetPadding(Padding(8, 8, 8, 8)).
-        SetToolTip("Compile using Release Configuration")));
-    releaseToolButton = releaseToolButtonPtr.get();
-    releaseToolButton->Click().AddHandler(this, &MainWindow::ReleaseButtonClick);
-    releaseToolButton->Disable();
-    toolBar->AddToolButton(releaseToolButtonPtr.release());
-
-    toolBar->AddToolButton(new ToolButtonSeparator());
-
-    std::unique_ptr<ToolButton> buildSolutionToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.build.solution.bitmap").SetPadding(Padding(8, 8, 8, 8)).
-        SetToolTip("Build Solution (F7)")));
-    buildSolutionToolButton = buildSolutionToolButtonPtr.get();
-    buildSolutionToolButton->Click().AddHandler(this, &MainWindow::BuildSolutionClick);
-    buildSolutionToolButton->Disable();
-    toolBar->AddToolButton(buildSolutionToolButtonPtr.release());
-
-    std::unique_ptr<ToolButton> buildActiveProjectToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.build.project.bitmap").SetPadding(Padding(8, 8, 8, 8)).
-        SetToolTip("Build Active Project (Ctrl+B)")));
-    buildActiveProjectToolButton = buildActiveProjectToolButtonPtr.get();
-    buildActiveProjectToolButton->Click().AddHandler(this, &MainWindow::BuildActiveProjectClick);
-    buildActiveProjectToolButton->Disable();
-    toolBar->AddToolButton(buildActiveProjectToolButtonPtr.release());
-
-    std::unique_ptr<ToolButton> stopBuildServerToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.cancel.build.bitmap").SetPadding(Padding(8, 8, 8, 8)).
-        SetToolTip("Stop Build Server")));
-    stopBuildServerToolButton = stopBuildServerToolButtonPtr.get();
-    stopBuildServerToolButton->Click().AddHandler(this, &MainWindow::StopBuildServerClick);
-    stopBuildServerToolButton->Disable();
-    toolBar->AddToolButton(stopBuildServerToolButtonPtr.release());
-
-    toolBar->AddToolButton(new ToolButtonSeparator());
-
-    std::unique_ptr<ToolButton> startDebuggingToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.debug.start.bitmap").SetPadding(Padding(8, 8, 8, 8)).
-        SetToolTip("Start Debugging (F5)")));
-    startDebuggingToolButton = startDebuggingToolButtonPtr.get();
-    startDebuggingToolButton->Click().AddHandler(this, &MainWindow::StartDebuggingClick);
-    startDebuggingToolButton->Disable();
-    toolBar->AddToolButton(startDebuggingToolButtonPtr.release());
-
-    std::unique_ptr<ToolButton> stopDebuggingToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.debug.stop.bitmap").SetPadding(Padding(8, 8, 8, 8)).
-        SetToolTip("Stop Debugging (Shift+F5)")));
-    stopDebuggingToolButton = stopDebuggingToolButtonPtr.get();
-    stopDebuggingToolButton->Click().AddHandler(this, &MainWindow::StopDebuggingClick);
-    stopDebuggingToolButton->Disable();
-    toolBar->AddToolButton(stopDebuggingToolButtonPtr.release());
-
-    toolBar->AddToolButton(new ToolButtonSeparator());
-
-    std::unique_ptr<ToolButton> showNextStatementToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.debug.show.next.statement.bitmap").SetPadding(Padding(8, 8, 8, 8)).
-        SetToolTip("Show Next Statement (Ctrl+J)")));
-    showNextStatementToolButton = showNextStatementToolButtonPtr.get();
-    showNextStatementToolButton->Click().AddHandler(this, &MainWindow::ShowNextStatementClick);
-    showNextStatementToolButton->Disable();
-    toolBar->AddToolButton(showNextStatementToolButtonPtr.release());
-
-    std::unique_ptr<ToolButton> stepOverToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.debug.step.over.bitmap").SetPadding(Padding(8, 8, 8, 8)).
-        SetToolTip("Step Over (F12)")));
-    stepOverToolButton = stepOverToolButtonPtr.get();
-    stepOverToolButton->Click().AddHandler(this, &MainWindow::StepOverClick);
-    stepOverToolButton->Disable();
-    toolBar->AddToolButton(stepOverToolButtonPtr.release());
-
-    std::unique_ptr<ToolButton> stepIntoToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.debug.step.into.bitmap").SetPadding(Padding(8, 8, 8, 8)).
-        SetToolTip("Step Into (F11)")));
-    stepIntoToolButton = stepIntoToolButtonPtr.get();
-    stepIntoToolButton->Click().AddHandler(this, &MainWindow::StepIntoClick);
-    stepIntoToolButton->Disable();
-    toolBar->AddToolButton(stepIntoToolButtonPtr.release());
-
-    std::unique_ptr<ToolButton> stepOutToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.debug.step.out.bitmap").SetPadding(Padding(8, 8, 8, 8)).
-        SetToolTip("Step Out (Shift+F11)")));
-    stepOutToolButton = stepOutToolButtonPtr.get();
-    stepOutToolButton->Click().AddHandler(this, &MainWindow::StepOutClick);
-    stepOutToolButton->Disable();
-    toolBar->AddToolButton(stepOutToolButtonPtr.release());
+    AddToolButtons();
 
     AddChild(borderedToolBar.release());
 
-    std::unique_ptr<SplitContainer> verticalSplitContainerPtr(
-        new SplitContainer(SplitContainerCreateParams(SplitterOrientation::vertical).SplitterDistance(0).SetDock(Dock::fill)));
+    SplitContainerCreateParams verticalSplitContainerCreateParams(SplitterOrientation::vertical);
+    verticalSplitContainerCreateParams.Pane1BackgroundColor(GetColor("splitContainer.background")).Pane2BackgroundColor(GetColor("splitContainer.background")).
+        BackgroundColor(GetColor("splitContainer.background")).SplitterBackgroundColor(GetColor("splitter.background")).SplitterEdgeColor(GetColor("splitter.edge")).SplitterDistance(0).SetDock(Dock::fill);
+    std::unique_ptr<SplitContainer> verticalSplitContainerPtr(new SplitContainer(verticalSplitContainerCreateParams));
     verticalSplitContainer = verticalSplitContainerPtr.get();
     verticalSplitContainer->SplitterDistanceChanged().AddHandler(this, &MainWindow::VerticalSplitContainerSplitterDistanceChanged);
-    std::unique_ptr<SplitContainer> horizontalSplitContainerPtr(
-        new SplitContainer(SplitContainerCreateParams(SplitterOrientation::horizontal).SplitterDistance(0).SetDock(Dock::fill)));
+
+    SplitContainerCreateParams horizontalSplitContainerCreateParams(SplitterOrientation::horizontal);
+    horizontalSplitContainerCreateParams.Pane1BackgroundColor(GetColor("splitContainer.background")).Pane2BackgroundColor(GetColor("splitContainer.background")).
+        BackgroundColor(GetColor("splitContainer.background")).SplitterBackgroundColor(GetColor("splitter.background")).SplitterEdgeColor(GetColor("splitter.edge")).SplitterDistance(0).SetDock(Dock::fill);
+    std::unique_ptr<SplitContainer> horizontalSplitContainerPtr(new SplitContainer(horizontalSplitContainerCreateParams));
     horizontalSplitContainer = horizontalSplitContainerPtr.get();
     horizontalSplitContainer->SplitterDistanceChanged().AddHandler(this, &MainWindow::HorizontalSplitContainerSplitterDistanceChanged);
-    std::unique_ptr<TabControl> codeTabControlPtr(new TabControl(TabControlCreateParams().SetDock(Dock::fill)));
+    std::unique_ptr<TabControl> codeTabControlPtr(
+        new TabControl(TabControlCreateParams().
+        BackgroundColor(GetColor("code.tab.control.background")).
+        FrameColor(GetColor("code.tab.control.frame")).
+        TextColor(GetColor("code.tab.control.text")).
+        NormalBackgroundColor(GetColor("code.tab.control.tab.normal.background")).
+        SelectedBackgroundColor(GetColor("code.tab.control.tab.selected.background")).
+        CloseBoxSelectedColor(GetColor("code.tab.control.close.box.selected.background")).
+        SetDock(Dock::fill)));
     codeTabControl = codeTabControlPtr.get();
+    codeTabControl->SetBackgroundItemName("code.tab.control.background");
+    codeTabControl->SetFrameItemName("code.tab.control.frame");
+    codeTabControl->SetTextItemName("code.tab.control.text");
+    codeTabControl->SetTabNormalBackgroundItemName("code.tab.control.tab.normal.background");
+    codeTabControl->SetTabSelectedBackgroundItemName("code.tab.control.tab.selected.background");
+    codeTabControl->SetCloseBoxSelectedBackgroundItemName("code.tab.control.close.box.selected.background");
     codeTabControl->TabPageSelected().AddHandler(this, &MainWindow::CodeTabPageSelected);
     codeTabControl->ControlRemoved().AddHandler(this, &MainWindow::CodeTabPageRemoved);
     std::unique_ptr<Control> paddedCodeTabControl(new PaddedControl(PaddedControlCreateParams(codeTabControlPtr.release()).Defaults()));
     std::unique_ptr<Control> borderedCodeTabControl(new BorderedControl(BorderedControlCreateParams(paddedCodeTabControl.release()).SetBorderStyle(BorderStyle::single).
-        NormalSingleBorderColor(DefaultTabControlFrameColor()).FocusedSingleBorderColor(DefaultTabControlFrameColor()).SetDock(Dock::fill)));
+        NormalSingleBorderColor(GetColor("code.tab.control.frame")).FocusedSingleBorderColor(GetColor("code.tab.control.frame")).SetDock(Dock::fill)));
+    borderedCodeTabControl->SetFrameItemName("code.tab.control.frame");
     //std::unique_ptr<TreeView> solutionTreeViewPtr(new TreeView(TreeViewCreateParams().Defaults()));
     //solutionTreeView = solutionTreeViewPtr.get();
     //solutionTreeView->NodeDoubleClick().AddHandler(this, &MainWindow::TreeViewNodeDoubleClick);
@@ -586,24 +486,41 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     //std::unique_ptr<ScrollableControl> scrollableTreeViewPtr(new ScrollableControl(ScrollableControlCreateParams(paddedTreeViewPtr.release()).SetDock(Dock::fill)));
     horizontalSplitContainer->Pane1Container()->AddChild(borderedCodeTabControl.release());
     //horizontalSplitContainer->Pane2Container()->AddChild(scrollableTreeViewPtr.release());
-    std::unique_ptr<SolutionExplorer> solutionExplorerPtr(new SolutionExplorer(SolutionExplorerCreateParams().SetDock(Dock::fill), this));
+    std::unique_ptr<SolutionExplorer> solutionExplorerPtr(new SolutionExplorer(SolutionExplorerCreateParams().BackgroundColor(GetColor("solution.explorer.background")).SetDock(Dock::fill), this));
     solutionExplorer = solutionExplorerPtr.get();
     solutionExplorer->SetImageList(&imageList);
     horizontalSplitContainer->Pane2Container()->AddChild(solutionExplorerPtr.release());
     verticalSplitContainer->Pane1Container()->AddChild(horizontalSplitContainerPtr.release());
-    std::unique_ptr<TabControl> outputTabControlPtr(new TabControl(TabControlCreateParams().Defaults()));
+    std::unique_ptr<TabControl> outputTabControlPtr(new TabControl(TabControlCreateParams().
+        BackgroundColor(GetColor("output.tab.control.background")).
+        FrameColor(GetColor("output.tab.control.frame")).
+        TextColor(GetColor("output.tab.control.text")).
+        NormalBackgroundColor(GetColor("output.tab.control.tab.normal.background")).
+        SelectedBackgroundColor(GetColor("output.tab.control.tab.selected.background")).
+        CloseBoxSelectedColor(GetColor("output.tab.control.close.box.selected.background"))
+    ));
     outputTabControl = outputTabControlPtr.get();
+    outputTabControl->SetBackgroundItemName("output.tab.control.background");
+    outputTabControl->SetFrameItemName("output.tab.control.frame");
+    outputTabControl->SetTextItemName("output.tab.control.text");
+    outputTabControl->SetTabNormalBackgroundItemName("output.tab.control.tab.normal.background");
+    outputTabControl->SetTabSelectedBackgroundItemName("output.tab.control.tab.selected.background");
+    outputTabControl->SetCloseBoxSelectedBackgroundItemName("output.tab.control.close.box.selected.background");
     outputTabControl->ControlRemoved().AddHandler(this, &MainWindow::OutputTabControlTabPageRemoved);
     outputTabControl->TabPageSelected().AddHandler(this, &MainWindow::OutputTabControlTabPageSelected);
     std::unique_ptr<Control> paddedOutputTabControl(new PaddedControl(PaddedControlCreateParams(outputTabControlPtr.release()).Defaults()));
     std::unique_ptr<Control> borderedOutptTabControl(new BorderedControl(BorderedControlCreateParams(paddedOutputTabControl.release()).SetBorderStyle(BorderStyle::single).
-        NormalSingleBorderColor(DefaultTabControlFrameColor()).FocusedSingleBorderColor(DefaultTabControlFrameColor()).SetDock(Dock::fill)));
+        NormalSingleBorderColor(GetColor("output.tab.control.frame")).FocusedSingleBorderColor(GetColor("output.tab.control.frame")).SetDock(Dock::fill)));
+    borderedOutptTabControl->SetFrameItemName("output.tab.control.frame");
     std::unique_ptr<TabPage> outputTabPagePtr(new TabPage("Output", "output"));
     outputTabPage = outputTabPagePtr.get();
-    std::unique_ptr<LogView> outputLogViewPtr(new LogView(TextViewCreateParams().Defaults()));
+    std::unique_ptr<LogView> outputLogViewPtr(
+        new LogView(TextViewCreateParams().SelectionBackgroundColor(GetColor("selection.background")).BackgroundColor(GetColor("output.log.background")).TextColor(GetColor("output.log.text"))));
     outputLogView = outputLogViewPtr.get();
     outputLogView->SetFlag(ControlFlags::scrollSubject);
     outputLogView->SetDoubleBuffered();
+    outputLogView->SetBackgroundItemName("output.log.background");
+    outputLogView->SetTextItemName("output.log.text");
     std::unique_ptr<Control> scrollableOutputLogView(new ScrollableControl(ScrollableControlCreateParams(outputLogViewPtr.release()).SetDock(Dock::fill)));
     outputTabPage->AddChild(scrollableOutputLogView.release());
     outputTabControl->AddTabPage(outputTabPagePtr.release());
@@ -611,7 +528,7 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     {
         std::unique_ptr<TabPage> logTabPagePtr(new TabPage("Log", "log"));
         logTabPage = logTabPagePtr.get();
-        std::unique_ptr<LogView> logViewPtr(new LogView(TextViewCreateParams().Defaults()));
+        std::unique_ptr<LogView> logViewPtr(new LogView(TextViewCreateParams().BackgroundColor(GetColor("log.view.background")).TextColor(GetColor("log.view.text"))));
         log = logViewPtr.get();
         log->SetFlag(ControlFlags::scrollSubject);
         log->SetDoubleBuffered();
@@ -623,8 +540,30 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     verticalSplitContainer->Pane2Container()->AddChild(borderedOutptTabControl.release());
     AddChild(verticalSplitContainerPtr.release());
 
-    std::unique_ptr<StatusBar> statusBarPtr(new StatusBar(StatusBarCreateParams().Defaults()));
+    std::unique_ptr<StatusBar> statusBarPtr(new StatusBar(StatusBarCreateParams().
+        BackgroundColor(GetColor("status.bar.background")).
+        TextColor(GetColor("status.bar.text")).
+        TopLineColor(GetColor("status.bar.top.line")).
+        SunkenBorderOuterTopLeftColor(GetColor("status.bar.sunken.border.outer.top.left")).
+        SunkenBorderInnerTopLeftColor(GetColor("status.bar.sunken.border.inner.top.left")).
+        SunkenBorderOuterRightBottomColor(GetColor("status.bar.sunken.border.outer.right.bottom")).
+        SunkenBorderInnerRightBottomColor(GetColor("status.bar.sunken.border.inner.right.bottom")).
+        RaisedBorderOuterTopLeftColor(GetColor("status.bar.raised.border.outer.top.left")).
+        RaisedBorderOuterRightBottomColor(GetColor("status.bar.raised.border.outer.right.bottom")).
+        RaisedBorderInnerTopLeftColor(GetColor("status.bar.raised.border.inner.top.left")).
+        RaisedBorderInnerRightBottomColor(GetColor("status.bar.raised.border.inner.right.bottom"))));
     statusBar = statusBarPtr.get();
+    statusBar->SetBackgroundItemName("status.bar.background");
+    statusBar->SetTextItemName("status.bar.text");
+    statusBar->SetTopLineItemName("status.bar.top.line");
+    statusBar->SetSunkenBorderOuterTopLeftItemName("status.bar.sunken.border.outer.top.left");
+    statusBar->SetSunkenBorderInnerTopLeftItemName("status.bar.sunken.border.inner.top.left");
+    statusBar->SetSunkenBorderOuterRightBottomItemName("status.bar.sunken.border.outer.right.bottom");
+    statusBar->SetSunkenBorderInnerRightBottomItemName("status.bar.sunken.border.inner.right.bottom");
+    statusBar->SetRaisedBorderOuterTopLeftItemName("status.bar.raised.border.outer.top.left");
+    statusBar->SetRaisedBorderOuterRightBottomItemName("status.bar.raised.border.outer.right.bottom");
+    statusBar->SetRaisedBorderInnerTopLeftItemName("status.bar.raised.border.inner.top.left");
+    statusBar->SetRaisedBorderInnerRightBottomItemName("status.bar.raised.border.inner.right.bottom");
     std::unique_ptr<StatusBarTextItem> buildIndicatorStatusBarItemPtr(new StatusBarTextItem(StatusBarTextItemCreateParams().MaxTextLength(1).BorderStyle(StatusBarItemBorderStyle::sunken)));
     buildIndicatorStatuBarItem = buildIndicatorStatusBarItemPtr.get();
     statusBar->AddItem(buildIndicatorStatusBarItemPtr.release());
@@ -667,11 +606,14 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     paramHelpView->Hide();
     AddChild(paramHelpView);
 
-    imageList.AddImage("cmfile.bitmap");
-    imageList.AddImage("xmlfile.bitmap");
-    imageList.AddImage("file.bitmap");
-    imageList.AddImage("cmproject.bitmap");
-    imageList.AddImage("cmsolution.bitmap");
+    imageList.AddImage("file.light.bitmap");
+    imageList.AddImage("file.dark.bitmap");
+    imageList.AddImage("xml_file.light.bitmap");
+    imageList.AddImage("xml_file.dark.bitmap");
+    imageList.AddImage("cmproject.light.bitmap");
+    imageList.AddImage("cmproject.dark.bitmap");
+    imageList.AddImage("cmsolution.light.bitmap");
+    imageList.AddImage("cmsolution.dark.bitmap");
 
     locations.SetToolButtons(prevToolButton, nextToolButton);
 
@@ -950,7 +892,6 @@ void MainWindow::OnSizeChanged()
 
 void MainWindow::LoadConfigurationSettings()
 {
-    LoadConfiguration();
     const WindowSettings& windowSettings = GetWindowSettings();
     if (windowSettings.defined)
     {
@@ -967,6 +908,140 @@ void MainWindow::LoadConfigurationSettings()
             setMaximizedSplitterDistance = true;
         }
     }
+}
+
+void MainWindow::AddToolButtons()
+{
+    toolBar->ClearToolButtons();
+
+    std::unique_ptr<ToolButton> prevToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName(GetBitmapName("prev")).SetPadding(Padding(8, 8, 8, 8)).SetToolTip("Go To Previous Location")));
+    prevToolButton = prevToolButtonPtr.get();
+    prevToolButton->Click().AddHandler(this, &MainWindow::GotoPreviousLocationClick);
+    prevToolButton->Disable();
+    toolBar->AddToolButton(prevToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> nextToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName(GetBitmapName("next")).SetPadding(Padding(8, 8, 8, 8)).SetToolTip("Go To Next Location")));
+    nextToolButton = nextToolButtonPtr.get();
+    nextToolButton->Click().AddHandler(this, &MainWindow::GotoNextLocationClick);
+    nextToolButton->Disable();
+    toolBar->AddToolButton(nextToolButtonPtr.release());
+
+    toolBar->AddToolButton(new ToolButtonSeparator());
+
+    std::unique_ptr<ToolButton> saveToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName(GetBitmapName("save")).SetPadding(Padding(8, 8, 8, 8)).SetToolTip("Save (Ctrl+S)")));
+    saveToolButton = saveToolButtonPtr.get();
+    saveToolButton->Click().AddHandler(this, &MainWindow::SaveClick);
+    saveToolButton->Disable();
+    toolBar->AddToolButton(saveToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> saveAllToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName(GetBitmapName("save.all")).SetPadding(Padding(6, 6, 6, 6)).SetToolTip("Save All (Ctrl+Shift+S)")));
+    saveAllToolButton = saveAllToolButtonPtr.get();
+    saveAllToolButton->Click().AddHandler(this, &MainWindow::SaveAllClick);
+    saveAllToolButton->Disable();
+    toolBar->AddToolButton(saveAllToolButtonPtr.release());
+
+    toolBar->AddToolButton(new ToolButtonSeparator());
+
+    Size textButtonSize(36, 12);
+
+    std::unique_ptr<ToolButton> cppToolButtonPtr(new TextToolButton(TextToolButtonCreateParams("C++").Style(ToolButtonStyle::manual).SetSize(textButtonSize).SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Compile using C++ Backend")));
+    cppToolButton = cppToolButtonPtr.get();
+    cppToolButton->Click().AddHandler(this, &MainWindow::CppButtonClick);
+    cppToolButton->Disable();
+    toolBar->AddToolButton(cppToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> llvmToolButtonPtr(new TextToolButton(TextToolButtonCreateParams("LLVM").Style(ToolButtonStyle::manual).SetSize(textButtonSize).SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Compile using LLVM Backend")));
+    llvmToolButton = llvmToolButtonPtr.get();
+    llvmToolButton->Click().AddHandler(this, &MainWindow::LlvmButtonClick);
+    llvmToolButton->Disable();
+    toolBar->AddToolButton(llvmToolButtonPtr.release());
+
+    toolBar->AddToolButton(new ToolButtonSeparator());
+
+    std::unique_ptr<ToolButton> debugToolButtonPtr(new TextToolButton(TextToolButtonCreateParams("Debug").Style(ToolButtonStyle::manual).SetSize(textButtonSize).SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Compile using Debug Configuration")));
+    debugToolButton = debugToolButtonPtr.get();
+    debugToolButton->Click().AddHandler(this, &MainWindow::DebugButtonClick);
+    debugToolButton->Disable();
+    toolBar->AddToolButton(debugToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> releaseToolButtonPtr(new TextToolButton(TextToolButtonCreateParams("Release").Style(ToolButtonStyle::manual).SetSize(textButtonSize).SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Compile using Release Configuration")));
+    releaseToolButton = releaseToolButtonPtr.get();
+    releaseToolButton->Click().AddHandler(this, &MainWindow::ReleaseButtonClick);
+    releaseToolButton->Disable();
+    toolBar->AddToolButton(releaseToolButtonPtr.release());
+
+    toolBar->AddToolButton(new ToolButtonSeparator());
+
+    std::unique_ptr<ToolButton> buildSolutionToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName(GetBitmapName("build.solution")).SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Build Solution (F7)")));
+    buildSolutionToolButton = buildSolutionToolButtonPtr.get();
+    buildSolutionToolButton->Click().AddHandler(this, &MainWindow::BuildSolutionClick);
+    buildSolutionToolButton->Disable();
+    toolBar->AddToolButton(buildSolutionToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> buildActiveProjectToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName(GetBitmapName("build.project")).SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Build Active Project (Ctrl+B)")));
+    buildActiveProjectToolButton = buildActiveProjectToolButtonPtr.get();
+    buildActiveProjectToolButton->Click().AddHandler(this, &MainWindow::BuildActiveProjectClick);
+    buildActiveProjectToolButton->Disable();
+    toolBar->AddToolButton(buildActiveProjectToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> stopBuildServerToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName(GetBitmapName("cancel.build")).SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Stop Build Server")));
+    stopBuildServerToolButton = stopBuildServerToolButtonPtr.get();
+    stopBuildServerToolButton->Click().AddHandler(this, &MainWindow::StopBuildServerClick);
+    stopBuildServerToolButton->Disable();
+    toolBar->AddToolButton(stopBuildServerToolButtonPtr.release());
+
+    toolBar->AddToolButton(new ToolButtonSeparator());
+
+    std::unique_ptr<ToolButton> startDebuggingToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName(GetBitmapName("debug.start")).SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Start Debugging (F5)")));
+    startDebuggingToolButton = startDebuggingToolButtonPtr.get();
+    startDebuggingToolButton->Click().AddHandler(this, &MainWindow::StartDebuggingClick);
+    startDebuggingToolButton->Disable();
+    toolBar->AddToolButton(startDebuggingToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> stopDebuggingToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName(GetBitmapName("debug.stop")).SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Stop Debugging (Shift+F5)")));
+    stopDebuggingToolButton = stopDebuggingToolButtonPtr.get();
+    stopDebuggingToolButton->Click().AddHandler(this, &MainWindow::StopDebuggingClick);
+    stopDebuggingToolButton->Disable();
+    toolBar->AddToolButton(stopDebuggingToolButtonPtr.release());
+
+    toolBar->AddToolButton(new ToolButtonSeparator());
+
+    std::unique_ptr<ToolButton> showNextStatementToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName(GetBitmapName("show.next.statement")).SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Show Next Statement (Ctrl+J)")));
+    showNextStatementToolButton = showNextStatementToolButtonPtr.get();
+    showNextStatementToolButton->Click().AddHandler(this, &MainWindow::ShowNextStatementClick);
+    showNextStatementToolButton->Disable();
+    toolBar->AddToolButton(showNextStatementToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> stepOverToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName(GetBitmapName("step.over")).SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Step Over (F12)")));
+    stepOverToolButton = stepOverToolButtonPtr.get();
+    stepOverToolButton->Click().AddHandler(this, &MainWindow::StepOverClick);
+    stepOverToolButton->Disable();
+    toolBar->AddToolButton(stepOverToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> stepIntoToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName(GetBitmapName("step.into")).SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Step Into (F11)")));
+    stepIntoToolButton = stepIntoToolButtonPtr.get();
+    stepIntoToolButton->Click().AddHandler(this, &MainWindow::StepIntoClick);
+    stepIntoToolButton->Disable();
+    toolBar->AddToolButton(stepIntoToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> stepOutToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName(GetBitmapName("step.out")).SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Step Out (Shift+F11)")));
+    stepOutToolButton = stepOutToolButtonPtr.get();
+    stepOutToolButton->Click().AddHandler(this, &MainWindow::StepOutClick);
+    stepOutToolButton->Disable();
+    toolBar->AddToolButton(stepOutToolButtonPtr.release());
 }
 
 void MainWindow::SaveConfigurationSettings()
@@ -3686,6 +3761,7 @@ void MainWindow::OptionsClick()
             const Options& options = dialog.GetOptions();
             SetOptions(options);
             SaveConfiguration();
+            SetTheme(options.theme);
             if (prevCodeCompletion != options.codeCompletion)
             {
                 if (options.codeCompletion)
@@ -5053,6 +5129,20 @@ void MainWindow::TreeViewNodeCollapsed(TreeViewNodeEventArgs& args)
     }
 }
 
+void MainWindow::UpdateColors()
+{
+    Window::UpdateColors();
+    AddToolButtons();
+    if (!solutionData) return;
+    sngcm::ast::Solution* solution = solutionData->GetSolution();
+    if (!solution) return;
+    std::string solutionFilePath = solution->FilePath();
+    if (CloseSolution())
+    {
+        OpenProject(solutionFilePath);
+    }
+}
+
 Editor* MainWindow::GetEditorByTabPage(TabPage* tabPage) const
 {
     auto it = tabPageEditorMap.find(tabPage);
@@ -5082,7 +5172,10 @@ CmajorEditor* MainWindow::AddCmajorEditor(const std::string& fileName, const std
     {
         breakpointList = &solutionData->GetSolutionBreakpointCollection().GetBreakpointList(filePath);
     }
-    std::unique_ptr<CmajorEditor> editorPtr(new CmajorEditor(CmajorEditorCreateParams(filePath, CmajorSourceCodeViewCreateParams().Defaults(), DebugStripCreateParams(breakpointList).Defaults()).Defaults()));
+    std::unique_ptr<CmajorEditor> editorPtr(new CmajorEditor(
+        CmajorEditorCreateParams(filePath, 
+            CmajorSourceCodeViewCreateParams().BackgroundColor(GetColor("cmajor.editor.background")),
+            DebugStripCreateParams(breakpointList).BackgroundColor(GetColor("debug.strip.background")).BreakpointColor(GetColor("debug.strip.break.point"))).Defaults()));
     CmajorEditor* editor = editorPtr.get();
     CmajorSourceCodeView* sourceCodeView = editor->SourceCodeView();
     if (sourceCodeView)
@@ -5204,7 +5297,7 @@ void MainWindow::AddFilePathsToProject(const std::string& newSourceFilePath, con
         {
             std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(data->fileName));
             fileNode->SetData(data);
-            fileNode->SetImageIndex(imageList.GetImageIndex("file.bitmap"));
+            fileNode->SetImageIndex(imageList.GetImageIndex(GetBitmapName("file")));
             projectNode->AddChild(fileNode.release());
         }
         else
@@ -5213,7 +5306,7 @@ void MainWindow::AddFilePathsToProject(const std::string& newSourceFilePath, con
             data = newData.get();
             std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(newData->fileName));
             fileNode->SetData(newData.get());
-            fileNode->SetImageIndex(imageList.GetImageIndex("file.bitmap"));
+            fileNode->SetImageIndex(imageList.GetImageIndex(GetBitmapName("file")));
             projectNode->AddChild(fileNode.release());
             solutionData->AddTreeViewNodeData(newData.release());
         }
@@ -5230,7 +5323,7 @@ void MainWindow::AddFilePathsToProject(const std::string& newSourceFilePath, con
         {
             std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(data->fileName));
             fileNode->SetData(data);
-            fileNode->SetImageIndex(imageList.GetImageIndex("xmlfile.bitmap"));
+            fileNode->SetImageIndex(imageList.GetImageIndex(GetBitmapName("xmlfile")));
             projectNode->AddChild(fileNode.release());
         }
         else
@@ -5239,7 +5332,7 @@ void MainWindow::AddFilePathsToProject(const std::string& newSourceFilePath, con
             data = newData.get();
             std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(newData->fileName));
             fileNode->SetData(newData.get());
-            fileNode->SetImageIndex(imageList.GetImageIndex("xmlfile.bitmap"));
+            fileNode->SetImageIndex(imageList.GetImageIndex(GetBitmapName("xmlfile")));
             projectNode->AddChild(fileNode.release());
             solutionData->AddTreeViewNodeData(newData.release());
         }
@@ -5256,7 +5349,7 @@ void MainWindow::AddFilePathsToProject(const std::string& newSourceFilePath, con
         {
             std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(data->fileName));
             fileNode->SetData(data);
-            fileNode->SetImageIndex(imageList.GetImageIndex("file.bitmap"));
+            fileNode->SetImageIndex(imageList.GetImageIndex(GetBitmapName("file")));
             projectNode->AddChild(fileNode.release());
         }
         else
@@ -5265,7 +5358,7 @@ void MainWindow::AddFilePathsToProject(const std::string& newSourceFilePath, con
             data = newData.get();
             std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(data->fileName));
             fileNode->SetData(data);
-            fileNode->SetImageIndex(imageList.GetImageIndex("file.bitmap"));
+            fileNode->SetImageIndex(imageList.GetImageIndex(GetBitmapName("file")));
             projectNode->AddChild(fileNode.release());
             solutionData->AddTreeViewNodeData(newData.release());
         }
@@ -5383,10 +5476,13 @@ LogView* MainWindow::GetOutputLogView()
     {
         std::unique_ptr<TabPage> outputTabPagePtr(new TabPage("Output", "output"));
         outputTabPage = outputTabPagePtr.get();
-        std::unique_ptr<LogView> outputLogViewPtr(new LogView(TextViewCreateParams().Defaults()));
+        std::unique_ptr<LogView> outputLogViewPtr(
+            new LogView(TextViewCreateParams().SelectionBackgroundColor(GetColor("selection.background")).BackgroundColor(GetColor("output.log.background")).TextColor(GetColor("output.log.text"))));
         outputLogView = outputLogViewPtr.get();
         outputLogView->SetFlag(ControlFlags::scrollSubject);
         outputLogView->SetDoubleBuffered();
+        outputLogView->SetBackgroundItemName("output.log.background");
+        outputLogView->SetTextItemName("output.log.text");
         std::unique_ptr<Control> scrollableOutputLogView(new ScrollableControl(ScrollableControlCreateParams(outputLogViewPtr.release()).SetDock(Dock::fill)));
         outputTabPage->AddChild(scrollableOutputLogView.release());
         outputTabControl->AddTabPage(outputTabPagePtr.release());

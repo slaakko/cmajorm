@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/cmcode/ToolBar.hpp>
+#include <cmajor/wing/Theme.hpp>
 
 namespace cmcode {
 
@@ -39,8 +40,20 @@ Padding DefaultToolBarToolButtonPadding()
 
 ToolBar* MakeToolBar()
 {
-    return new ToolBar(ToolBarCreateParams().SetDock(Dock::none).ToolButtonHeight(DefaultToolBarToolButtonHeight()).
+    ToolBar* toolBar = new ToolBar(ToolBarCreateParams().BackgroundColor(GetColor("tool.bar.background")).
+        DarkColor(GetColor("tool.bar.tool.button.dark")).
+        LightColor(GetColor("tool.bar.tool.button.light")).
+        MediumLightColor(GetColor("tool.bar.tool.button.medium.light")).
+        MediumDarkColor(GetColor("tool.bar.tool.button.medium.dark")).
+        TextColor(GetColor("tool.bar.tool.button.text")).
+        DisabledColor(GetColor("tool.bar.tool.button.disabled")).
+        SeparatorColor1(GetColor("tool.bar.tool.button.separator1")).
+        SeparatorColor2(GetColor("tool.bar.tool.button.separator2")).
+        ToolTipWindowColor(GetColor("tool.bar.tool.tip")).
+        SetDock(Dock::none).ToolButtonHeight(DefaultToolBarToolButtonHeight()).
         ToolBarPadding(DefaultToolBarPadding()).ToolBarToolButtonPadding(DefaultToolBarToolButtonPadding()).ToolTipWindowColor(DefaultToolBarToolTipColor()));
+    toolBar->SetBackgroundItemName("tool.bar.background");
+    return toolBar;
 }
 
 } // namespace cmcode

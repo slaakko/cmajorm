@@ -8,12 +8,12 @@
 #include <cmajor/cmcode/MainWindow.hpp>
 #include <cmajor/wing/PaddedControl.hpp>
 #include <cmajor/wing/ScrollableControl.hpp>
+#include <cmajor/wing/Theme.hpp>
 #include <soulng/util/Path.hpp>
 
 namespace cmcode {
 
 using namespace soulng::util;
-
 
 Color DefaultSolutionExplorerBackgroundColor()
 {
@@ -31,7 +31,9 @@ SolutionExplorerCreateParams::SolutionExplorerCreateParams() : controlCreatePara
     controlCreateParams.WindowClassBackgroundColor(COLOR_WINDOW);
     controlCreateParams.BackgroundColor(DefaultSolutionExplorerBackgroundColor());
     controlCreateParams.WindowStyle(DefaultChildWindowStyle());
-    treeViewCreateParams = TreeViewCreateParams().NodeIndentPercent(100).NodeImagePadding(SolutionExplorerNodeImagePadding());
+    treeViewCreateParams = TreeViewCreateParams().StateIndicatorColor(GetColor("solution.explorer.state.indicator")).SelectedNodeColor(GetColor("solution.explorer.node.selected")).
+        BackgroundColor(GetColor("solution.explorer.background")).TextColor(GetColor("solution.explorer.text")).
+        NodeIndentPercent(100).NodeImagePadding(SolutionExplorerNodeImagePadding());
 }
 
 SolutionExplorerCreateParams& SolutionExplorerCreateParams::Defaults()
@@ -153,6 +155,10 @@ void SolutionExplorer::MakeView()
     solutionTreeView->NodeExpanded().AddHandler(mainWindow, &MainWindow::TreeViewNodeExpanded);
     solutionTreeView->NodeCollapsed().AddHandler(mainWindow, &MainWindow::TreeViewNodeCollapsed);
     solutionTreeView->SetDoubleBuffered();
+    solutionTreeView->SetBackgroundItemName("solution.explorer.background");
+    solutionTreeView->SetTextItemName("solution.explorer.text");
+    solutionTreeView->SetStateIndicatorItemName("solution.explorer.state.indicator");
+    solutionTreeView->SetNodeSelectedItemName("solution.explorer.node.selected");
     std::unique_ptr<PaddedControl> paddedTreeViewPtr(new PaddedControl(PaddedControlCreateParams(solutionTreeViewPtr.release()).Defaults()));
     std::unique_ptr<ScrollableControl> scrollableTreeViewPtr(new ScrollableControl(ScrollableControlCreateParams(paddedTreeViewPtr.release()).SetDock(Dock::fill)));
     child = scrollableTreeViewPtr.get();

@@ -162,7 +162,7 @@ std::unique_ptr<sngxml::dom::Element> BuildSettings::ToXml(const std::string& fi
 int Options::classId = -1;
 
 Options::Options()
-     : objectId(boost::uuids::nil_uuid()), container(nullptr), defined(), codeCompletionDefined(), showStartupDialog(), numberOfRecentSolutions(), codeCompletion(), parsingFrequency(), dataPtr(nullptr), isOwned(false)
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), defined(), codeCompletionDefined(), showStartupDialog(), numberOfRecentSolutions(), codeCompletion(), parsingFrequency(), themeDefined(), theme(), dataPtr(nullptr), isOwned(false)
 {
 }
 
@@ -200,6 +200,8 @@ void Options::FromXml(sngxml::dom::Element* element)
     sngxml::xmlser::FromXml(element, "numberOfRecentSolutions", numberOfRecentSolutions);
     sngxml::xmlser::FromXml(element, "codeCompletion", codeCompletion);
     sngxml::xmlser::FromXml(element, "parsingFrequency", parsingFrequency);
+    sngxml::xmlser::FromXml(element, "themeDefined", themeDefined);
+    sngxml::xmlser::FromXml(element, "theme", theme);
 }
 
 std::vector<sngxml::xmlser::XmlPtrBase*> Options::GetPtrs() const
@@ -238,6 +240,8 @@ std::unique_ptr<sngxml::dom::Element> Options::ToXml(const std::string& fieldNam
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(numberOfRecentSolutions, "numberOfRecentSolutions", ctx).release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(codeCompletion, "codeCompletion", ctx).release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(parsingFrequency, "parsingFrequency", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(themeDefined, "themeDefined", ctx).release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(theme, "theme", ctx).release()));
     return element;
 }
 
