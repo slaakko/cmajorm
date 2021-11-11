@@ -113,7 +113,7 @@ OptionsDialog::OptionsDialog() : Window(WindowCreateParams().WindowClassName("cm
     AddChild(borderedPFTextBox.release());
 
     Point themeLabelLocation(16, 24 + 24 + 24 + 24 + 24 + 24 + 24 + 24);
-    std::unique_ptr<Label> themeLabel(new Label(LabelCreateParams().Text("Theme:").
+    std::unique_ptr<Label> themeLabel(new Label(LabelCreateParams().Text("Color Theme:").
         Location(themeLabelLocation).SetSize(defaultLabelSize).SetAnchors(Anchors::top | Anchors::left)));
     AddChild(themeLabel.release());
 
