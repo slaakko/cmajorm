@@ -106,6 +106,7 @@ public:
 protected:
     bool ProcessMessage(Message& msg) override;
     void OnWindowStateChanged() override;
+    void OnNCPaint(NCPaintEventArgs& args) override;
     void OnSizeChanged() override;
     void OnWindowClosing(CancelArgs& args) override;
     void OnKeyDown(KeyEventArgs& args) override;

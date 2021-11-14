@@ -124,7 +124,8 @@ Control::Control(ControlCreateParams& createParams) :
     arrowCursor(LoadStandardCursor(StandardCursorId::arrow)),
     mouseHoverMs(0),
     mouseHoverLocation(),
-    mouseHoverRectSize(DefaultMouseHoverSize())
+    mouseHoverRectSize(DefaultMouseHoverSize()),
+    backgroundBrushes()
 {
     RegisterUpdateColorsListener(this);
     if ((windowStyle & WS_DISABLED) != 0)
@@ -153,6 +154,10 @@ Control::~Control()
     if (handle)
     {
         bool succeeded = DestroyWindow(handle);
+    }
+    for (HBRUSH backgroundBrush : backgroundBrushes)
+    {
+        DeleteObject(backgroundBrush);
     }
 }
 
@@ -250,8 +255,9 @@ void Control::Create()
     }
     else
     {
-        //uint16_t windowClass = windowManager.Register(windowClassName, windowClassStyle, windowClassBackgroundColor);
-        uint16_t windowClass = windowManager.Register(windowClassName, windowClassStyle, backgroundColor);
+        HBRUSH backgroundBrush = CreateSolidBrush(backgroundColor.ToCOLORREF());
+        backgroundBrushes.push_back(backgroundBrush);
+        uint16_t windowClass = windowManager.Register(windowClassName, windowClassStyle, backgroundBrush);
         uint64_t wc = windowClass;
         LPCWSTR wcs = *reinterpret_cast<LPCWSTR*>(&wc);
         handle = CreateWindowExW(0, wcs, LPCWSTR(windowName.c_str()), windowStyle, location.X, location.Y, size.Width, size.Height, parentHandle, nullptr, Instance(), nullptr);
@@ -807,6 +813,7 @@ void Control::UpdateBackgroundColor()
         Color bgColor = GetColor(bgItemName);
         SetBackgroundColor(bgColor);
         HBRUSH brush = CreateSolidBrush(bgColor.ToCOLORREF());
+        backgroundBrushes.push_back(brush);
         SetClassLongPtr(Handle(), GCLP_HBRBACKGROUND, (LONG_PTR)brush);
     }
 }

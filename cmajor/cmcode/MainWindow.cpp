@@ -90,7 +90,7 @@ ExpressionEvaluateRequest::ExpressionEvaluateRequest(const std::string& expressi
 
 MainWindow::MainWindow(const std::string& filePath) : 
     Window(
-        WindowCreateParams().BackgroundColor(GetColor("main.window.background")).
+        WindowCreateParams().BackgroundColor(GetColor("window.background")).
         Text("Cmajor Code").WindowClassName("cmajor.code." + std::to_string(GetPid()))),
     newProjectMenuItem(nullptr),
     openProjectMenuItem(nullptr),
@@ -205,7 +205,7 @@ MainWindow::MainWindow(const std::string& filePath) :
     editModuleLoaded(false),
     ccCanSelect(false)
 {
-    SetBackgroundItemName("main.window.background");
+    SetBackgroundItemName("window.background");
     buildIndicatorTexts.push_back("|");
     buildIndicatorTexts.push_back("/");
     buildIndicatorTexts.push_back(ToUtf8(std::u32string(1, char32_t(0x2015))));
@@ -441,6 +441,7 @@ MainWindow::MainWindow(const std::string& filePath) :
     AddChild(borderedToolBar.release());
 
     SplitContainerCreateParams verticalSplitContainerCreateParams(SplitterOrientation::vertical);
+    verticalSplitContainerCreateParams.BackgroundColor(GetColor("splitContainer.background"));
     verticalSplitContainerCreateParams.Pane1BackgroundColor(GetColor("splitContainer.background")).Pane2BackgroundColor(GetColor("splitContainer.background")).
         BackgroundColor(GetColor("splitContainer.background")).SplitterBackgroundColor(GetColor("splitter.background")).SplitterEdgeColor(GetColor("splitter.edge")).SplitterDistance(0).SetDock(Dock::fill);
     std::unique_ptr<SplitContainer> verticalSplitContainerPtr(new SplitContainer(verticalSplitContainerCreateParams));
@@ -448,6 +449,7 @@ MainWindow::MainWindow(const std::string& filePath) :
     verticalSplitContainer->SplitterDistanceChanged().AddHandler(this, &MainWindow::VerticalSplitContainerSplitterDistanceChanged);
 
     SplitContainerCreateParams horizontalSplitContainerCreateParams(SplitterOrientation::horizontal);
+    horizontalSplitContainerCreateParams.BackgroundColor(GetColor("splitContainer.background"));
     horizontalSplitContainerCreateParams.Pane1BackgroundColor(GetColor("splitContainer.background")).Pane2BackgroundColor(GetColor("splitContainer.background")).
         BackgroundColor(GetColor("splitContainer.background")).SplitterBackgroundColor(GetColor("splitter.background")).SplitterEdgeColor(GetColor("splitter.edge")).SplitterDistance(0).SetDock(Dock::fill);
     std::unique_ptr<SplitContainer> horizontalSplitContainerPtr(new SplitContainer(horizontalSplitContainerCreateParams));
@@ -486,8 +488,13 @@ MainWindow::MainWindow(const std::string& filePath) :
     //std::unique_ptr<ScrollableControl> scrollableTreeViewPtr(new ScrollableControl(ScrollableControlCreateParams(paddedTreeViewPtr.release()).SetDock(Dock::fill)));
     horizontalSplitContainer->Pane1Container()->AddChild(borderedCodeTabControl.release());
     //horizontalSplitContainer->Pane2Container()->AddChild(scrollableTreeViewPtr.release());
-    std::unique_ptr<SolutionExplorer> solutionExplorerPtr(new SolutionExplorer(SolutionExplorerCreateParams().BackgroundColor(GetColor("solution.explorer.background")).SetDock(Dock::fill), this));
+    SolutionExplorerCreateParams solutionExplorerCreateParams;
+    solutionExplorerCreateParams.BackgroundColor(GetColor("solution.explorer.background"));
+    solutionExplorerCreateParams.treeViewCreateParams.BackgroundColor(GetColor("solution.explorer.background"));
+    solutionExplorerCreateParams.SetDock(Dock::fill);
+    std::unique_ptr<SolutionExplorer> solutionExplorerPtr(new SolutionExplorer(solutionExplorerCreateParams, this));
     solutionExplorer = solutionExplorerPtr.get();
+    solutionExplorer->SetBackgroundItemName("solution.explorer.background");
     solutionExplorer->SetImageList(&imageList);
     horizontalSplitContainer->Pane2Container()->AddChild(solutionExplorerPtr.release());
     verticalSplitContainer->Pane1Container()->AddChild(horizontalSplitContainerPtr.release());
@@ -856,6 +863,15 @@ void MainWindow::OnWindowStateChanged()
             setMaximizedSplitterDistance = true;
         }
     }
+}
+
+void MainWindow::OnNCPaint(NCPaintEventArgs& args)
+{
+    if (GetTheme() == "dark")
+    {
+        Window::HandleNCPaint(args);
+    }
+    Window::OnNCPaint(args);
 }
 
 void MainWindow::OnSizeChanged()
@@ -5172,10 +5188,10 @@ CmajorEditor* MainWindow::AddCmajorEditor(const std::string& fileName, const std
     {
         breakpointList = &solutionData->GetSolutionBreakpointCollection().GetBreakpointList(filePath);
     }
-    std::unique_ptr<CmajorEditor> editorPtr(new CmajorEditor(
-        CmajorEditorCreateParams(filePath, 
-            CmajorSourceCodeViewCreateParams().BackgroundColor(GetColor("cmajor.editor.background")),
-            DebugStripCreateParams(breakpointList).BackgroundColor(GetColor("debug.strip.background")).BreakpointColor(GetColor("debug.strip.break.point"))).Defaults()));
+    CmajorEditorCreateParams cmajorEditorCreateParams(filePath, CmajorSourceCodeViewCreateParams().BackgroundColor(GetColor("cmajor.editor.background")), 
+        DebugStripCreateParams(breakpointList).BackgroundColor(GetColor("debug.strip.background")).BreakpointColor(GetColor("debug.strip.break.point")));
+        cmajorEditorCreateParams.editorCreateParams.BackgroundColor(GetColor("cmajor.editor.background"));
+    std::unique_ptr<CmajorEditor> editorPtr(new CmajorEditor(cmajorEditorCreateParams));
     CmajorEditor* editor = editorPtr.get();
     CmajorSourceCodeView* sourceCodeView = editor->SourceCodeView();
     if (sourceCodeView)
@@ -5229,7 +5245,9 @@ CmajorEditor* MainWindow::AddCmajorEditor(const std::string& fileName, const std
 ResourceFileEditor* MainWindow::AddResourceFileEditor(const std::string& fileName, const std::string& key, const std::string& filePath, sngcm::ast::Project* project)
 {
     std::unique_ptr<TabPage> tabPage(new TabPage(fileName, key));
-    std::unique_ptr<ResourceFileEditor> editorPtr(new ResourceFileEditor(ResourceFileEditorCreateParams(filePath).Defaults()));
+    ResourceFileEditorCreateParams resourceFileEditorCreateParams(filePath);
+    resourceFileEditorCreateParams.textViewCreateParams.TextColor(GetColor("resource.editor.text")).BackgroundColor(GetColor("resource.editor.background"));
+    std::unique_ptr<ResourceFileEditor> editorPtr(new ResourceFileEditor(resourceFileEditorCreateParams));
     ResourceFileEditor* editor = editorPtr.get();
     TextView* textView = editor->GetTextView();
     if (textView)
@@ -5259,7 +5277,9 @@ ResourceFileEditor* MainWindow::AddResourceFileEditor(const std::string& fileNam
 TextFileEditor* MainWindow::AddTextFileEditor(const std::string& fileName, const std::string& key, const std::string& filePath, sngcm::ast::Project* project)
 {
     std::unique_ptr<TabPage> tabPage(new TabPage(fileName, key));
-    std::unique_ptr<TextFileEditor> editorPtr(new TextFileEditor(TextFileEditorCreateParams(filePath).Defaults()));
+    TextFileEditorCreateParams textFileEditorCreateParams(filePath);
+    textFileEditorCreateParams.textViewCreateParams.TextColor(GetColor("text.editor.text")).BackgroundColor(GetColor("text.editor.background"));
+    std::unique_ptr<TextFileEditor> editorPtr(new TextFileEditor(textFileEditorCreateParams));
     TextFileEditor* editor = editorPtr.get();
     TextView* textView = editor->GetTextView();
     if (textView)

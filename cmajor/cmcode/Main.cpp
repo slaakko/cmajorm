@@ -68,7 +68,7 @@ int WinMain(HINSTANCE instance, HINSTANCE prevInstance, LPSTR cmdLine, int cmdSh
             }
         }
         MainWindow mainWindow(filePath);
-        mainWindow.SetIcon(Application::GetResourceManager().GetIcon("cmcode.icon"));
+        mainWindow.SetIcon(Application::GetResourceManager().GetIcon("cmcode.small.icon"));
         mainWindow.SetSmallIcon(Application::GetResourceManager().GetIcon("cmcode.small.icon"));
         Application::Run(mainWindow);
     }

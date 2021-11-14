@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_SCROLLABLE_CONTROL_INCLUDED
 #define CMAJOR_WING_SCROLLABLE_CONTROL_INCLUDED
-#include <wing/Control.hpp>
+#include <wing/ScrollBar.hpp>
 #include <wing/Container.hpp>
 
 namespace cmajor { namespace wing {
@@ -39,6 +39,7 @@ public:
     Control* GetLastEnabledTabStopControl() const override;
     std::string BackgroundItemName() const override;
 protected:
+    void OnPaint(PaintEventArgs& args) override;
     void TranslateChildGraphics(Graphics& graphics) override;
     void TranslateMousePos(Point& location) override;
     void TranslateContentLocation(Point& contentLocation) override;
@@ -64,6 +65,8 @@ private:
     Control* scrolledChild;
     Container container;
     ScrollUnits scrollUnits;
+    ScrollBar* verticalScrollBar;
+    ScrollBar* horizontalScrollBar;
     int hpos;
     int hmin;
     int hmax;

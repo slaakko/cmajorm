@@ -513,7 +513,6 @@ void ToolBar::UpdateColors()
     mediumLightColor = GetColor("tool.bar.tool.button.medium.light");
     mediumDarkColor = GetColor("tool.bar.tool.button.medium.dark");
     textColor = GetColor("tool.bar.tool.button.text");
-    disabledColor = GetColor("tool.bar.tool.button.disabled");
     separatorColor1 = GetColor("tool.bar.tool.button.separator1");
     separatorColor2 = GetColor("tool.bar.tool.button.separator2");
     pens.reset(new ToolBarPens(this));

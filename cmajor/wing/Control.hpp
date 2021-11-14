@@ -301,6 +301,7 @@ enum class ControlFlags : int
     keyDownHandled = 1 << 11,
     menuWantsKeys = 1 << 12,
     scrollSubject = 1 << 13
+
 };
 
 WING_API inline ControlFlags operator&(ControlFlags left, ControlFlags right)
@@ -602,6 +603,7 @@ private:
     void* originalWndProc;
     ControlFlags flags;
     int caretShowCount;
+    std::vector<HBRUSH> backgroundBrushes;
     std::unique_ptr<Buffer> buffer;
     ClickEvent click;
     CreatedEvent created;

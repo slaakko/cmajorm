@@ -79,8 +79,8 @@ protected:
     void OnMouseUp(MouseEventArgs& args) override;
     void OnMouseMove(MouseEventArgs& args) override;
 private:
-    Cursor& horizontalSplitterCursor;
-    Cursor& verticalSplitterCursor;
+    Cursor* horizontalSplitterCursor;
+    Cursor* verticalSplitterCursor;
     SplitterFlags flags;
     SplitterOrientation orientation;
     Color edgeColor;

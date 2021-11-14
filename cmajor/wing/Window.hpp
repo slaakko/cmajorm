@@ -7,8 +7,19 @@
 #define CMAJOR_WING_WINDOW_INCLUDED
 #include <wing/Application.hpp>
 #include <wing/ContainerControl.hpp>
+#include <wing/WindowFrame.hpp>
 
 namespace cmajor { namespace wing {
+
+struct WING_API NCPaintEventArgs
+{
+    NCPaintEventArgs(HWND hwnd_, HRGN hrgn_) : hwnd(hwnd_), hrgn(hrgn_), handled(false) {}
+    HWND hwnd;
+    HRGN hrgn;
+    bool handled;
+};
+
+using NCPaintEvent = EventWithArgs<NCPaintEventArgs>;
 
 enum class WindowState : int
 {
@@ -44,6 +55,8 @@ WING_API inline Color DefaultWindowBackgroundColor()
 WING_API std::string DefaultWindowFontFamilyName();
 WING_API float DefaultWindowFontSize();
 WING_API FontStyle DefaultWindowFontStyle();
+WING_API std::string DefaultWindowCaptionFontFamilyName();
+WING_API float DefaultWindowCaptionFontPercent();
 
 struct WING_API WindowCreateParams
 {
@@ -62,10 +75,14 @@ struct WING_API WindowCreateParams
     WindowCreateParams& FontFamilyName(const std::string& fontFamilyName_);
     WindowCreateParams& FontSize(float fontSize_);
     WindowCreateParams& SetFontStyle(FontStyle fontStyle_);
+    WindowCreateParams& CaptionFontFamilyName(const std::string& captionFontFamilyName_);
+    WindowCreateParams& CaptionFontPercent(float captionFontPercent_);
     ControlCreateParams controlCreateParams;
     std::string fontFamilyName;
     float fontSize;
     FontStyle fontStyle;
+    std::string captionFontFamilyName;
+    float captionFontPercent;
 };
 
 class WING_API Window : public ContainerControl
@@ -109,6 +126,9 @@ public:
     void SetWindowState(WindowState newWindowState);
     WindowStateChangedEvent& WindowStateChanged() { return windowStateChanged; }
     void ShowWindow(int showCommand);
+    void HandleNCPaint(NCPaintEventArgs& args);
+    void UpdateColors() override;
+    bool Active() const { return windowActive; }
 protected:
     virtual void MouseUpNotification(MouseEventArgs& args);
     bool ProcessMessage(Message& msg) override;
@@ -121,16 +141,43 @@ protected:
     void OnMouseMove(MouseEventArgs& args) override;
     void OnGotFocus() override;
     void OnLostFocus() override;
+    void OnLocationChanged() override;
     virtual void OnWindowStateChanged();
     virtual void OnWindowClosing(CancelArgs& args);
     virtual void OnWindowClosed(bool& processed);
+    virtual void OnNCPaint(NCPaintEventArgs& args);
+    virtual void PaintWindowRect(Graphics& graphics);
+    virtual bool OnNCLButtonDown(int hitTestValue);
+    virtual bool OnNCLButtonUp(int hitTestValue);
 private:
     void DoWindowStateChanged(int sizeType);
+    void DrawWindowCaption(Graphics& graphics);
+    void PaintFrame(Graphics& graphics);
+    void MakeCaptionResources();
+    void MakeWindowFrame();
     std::string fontFamilyName;
     float fontSize;
     FontStyle fontStyle;
+    std::string captionFontFamilyName;
+    float captionFontPercent;
+    int captionHeight;
+    int borderWidth;
+    int buttonWidth;
+    int buttonHeight;
+    bool windowActive;
+    std::unique_ptr<Font> captionFont;
+    std::unique_ptr<SolidBrush> captionBrush;
+    std::unique_ptr<SolidBrush> disabledCaptionBrush;
+    std::unique_ptr<Pen> sysButtonPen;
+    std::unique_ptr<Pen> sysButtonSelectedPen;
+    std::unique_ptr<Pen> sysButtonDisabledPen;
+    std::unique_ptr<SolidBrush> titleBarBackgroundBrush;
+    std::unique_ptr<SolidBrush> sysButtonHoverBackgroundBrush;
+    std::unique_ptr<WindowFrame> frame;
+    int ncLButtonDownHitTest;
     bool mainWindow;
     bool showingDialog;
+    bool flatSBInitialized;
     WindowState windowState;
     Button* defaultButton;
     Button* cancelButton;
@@ -141,6 +188,7 @@ private:
     WindowClosingEvent windowClosing;
     WindowClosedEvent windowClosed;
     WindowStateChangedEvent windowStateChanged;
+    NCPaintEvent ncPaint;
     KeyPreviewMethod keyPreviewMethod;
     KeyPreviewMethod dialogKeyPreviewMethod;
 };

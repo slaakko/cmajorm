@@ -22,9 +22,21 @@ void MakeLightTheme()
 {
     std::unique_ptr<Theme> lightTheme(new Theme("light", "light-theme.xml"));
 
-    lightTheme->SetColor("main.window.background", Color(255, 255, 255));
+    lightTheme->SetColor("window.background", Color(238, 238, 242));
+    lightTheme->SetColor("window.title.bar", Color(238, 238, 242));
+    lightTheme->SetColor("window.title.text", Color(0, 0, 0));
+    lightTheme->SetColor("window.title.disabled.text", Color(67, 67, 67));
+    lightTheme->SetColor("window.sys.button", Color(30, 30, 30));
+    lightTheme->SetColor("window.sys.button.selected", Color(0, 0, 0));
+    lightTheme->SetColor("window.sys.button.hover.background", Color(252, 252, 253));
+
+    lightTheme->SetColor("scroll.bar.background", Color(241, 241, 241));
 
     lightTheme->SetColor("cmajor.editor.background", Color(255, 255, 255));
+    lightTheme->SetColor("resource.editor.background", Color(255, 255, 255));
+    lightTheme->SetColor("resource.editor.text", Color::Black);
+    lightTheme->SetColor("text.editor.background", Color(255, 255, 255));
+    lightTheme->SetColor("text.editor.text", Color::Black);
     lightTheme->SetColor("debug.strip.background", DefaultDebugStripBackgroundColor());
     lightTheme->SetColor("debug.strip.break.point", DefaultBreakpointColor()); 
 
@@ -71,6 +83,8 @@ void MakeLightTheme()
     lightTheme->SetColor("tool.bar.tool.button.disabled", DefaultToolButtonDisabledColor());
     lightTheme->SetColor("tool.bar.tool.button.separator1", DefaultToolButtonSeparatorColor1());
     lightTheme->SetColor("tool.bar.tool.button.separator2", DefaultToolButtonSeparatorColor2());
+
+    lightTheme->SetColor("tab.page", DefaultTabNormalBackgroundColor());
 
     lightTheme->SetColor("code.tab.control.background", DefaultTabControlBackgroundColor());
     lightTheme->SetColor("code.tab.control.frame", DefaultTabControlFrameColor());
@@ -155,6 +169,9 @@ void MakeLightTheme()
     lightTheme->SetBitmapName("project", "cmproject.light.bitmap");
     lightTheme->SetBitmapName("solution", "cmsolution.light.bitmap");
 
+    lightTheme->SetCursorName("horizontal.splitter.cursor", "horizontal.splitter.light.wing.cursor");
+    lightTheme->SetCursorName("vertical.splitter.cursor", "vertical.splitter.light.wing.cursor");
+
     AddTheme(lightTheme.release());
 }
 
@@ -162,11 +179,21 @@ void MakeDarkTheme()
 {
     std::unique_ptr<Theme> darkTheme(new Theme("dark", "dark-theme.xml"));
 
-    darkTheme->SetColor("main.window.background", Color(60, 60, 60));
+    darkTheme->SetColor("window.background", Color(37, 37, 38));
+    darkTheme->SetColor("window.title.bar", Color(37, 37, 38));
+    darkTheme->SetColor("window.title.text", Color(220, 220, 220));
+    darkTheme->SetColor("window.title.disabled.text", Color(67, 67, 67));
+    darkTheme->SetColor("window.sys.button", Color(214, 214, 214));
+    darkTheme->SetColor("window.sys.button.selected", Color(255, 255, 255));
+    darkTheme->SetColor("window.sys.button.hover.background", Color(51, 51,51));
 
-    darkTheme->SetColor("dialog.background", Color(60, 60, 60));
+    darkTheme->SetColor("scroll.bar.background", Color(46, 46, 46));
 
     darkTheme->SetColor("cmajor.editor.background", Color(30, 30, 30));
+    darkTheme->SetColor("resource.editor.background", Color(30, 30, 30));
+    darkTheme->SetColor("resource.editor.text", Color(220, 220, 220));
+    darkTheme->SetColor("text.editor.background", Color(30, 30, 30));
+    darkTheme->SetColor("text.editor.text", Color(220, 220, 220));
     darkTheme->SetColor("debug.strip.background", Color(67, 67, 67));
     darkTheme->SetColor("debug.strip.break.point", DefaultBreakpointColor()); 
 
@@ -210,9 +237,11 @@ void MakeDarkTheme()
     darkTheme->SetColor("tool.bar.tool.button.medium.light", Color(53, 53, 55));
     darkTheme->SetColor("tool.bar.tool.button.medium.dark", Color(30, 30, 30)); 
     darkTheme->SetColor("tool.bar.tool.button.text", Color(220, 220, 220));
-    darkTheme->SetColor("tool.bar.tool.button.disabled", Color(46, 46, 48));
+    darkTheme->SetColor("tool.bar.tool.button.disabled", Color(67, 67, 67));
     darkTheme->SetColor("tool.bar.tool.button.separator1", Color(34, 34, 34));
     darkTheme->SetColor("tool.bar.tool.button.separator2", Color(70, 70, 74));
+
+    darkTheme->SetColor("tab.page", Color(45, 45, 45));
 
     darkTheme->SetColor("code.tab.control.background", Color(37, 37, 38));
     darkTheme->SetColor("code.tab.control.frame", Color(60, 60, 60));
@@ -256,7 +285,7 @@ void MakeDarkTheme()
     darkTheme->SetColor("debug.location.text", Color::Black); 
     darkTheme->SetColor("text", Color(241, 241, 241));
 
-    darkTheme->SetColor("menu.background", Color(60, 60, 60));
+    darkTheme->SetColor("menu.background", Color(37, 37, 38));
     darkTheme->SetColor("menu.text", Color(181, 181, 181));
     darkTheme->SetColor("menu.disabled.text", Color(67, 67, 67));
     darkTheme->SetColor("menu.mouse.over.background", Color(80, 80, 80));
@@ -296,6 +325,9 @@ void MakeDarkTheme()
     darkTheme->SetBitmapName("xmlfile", "xml_file.dark.bitmap");
     darkTheme->SetBitmapName("project", "cmproject.dark.bitmap");
     darkTheme->SetBitmapName("solution", "cmsolution.dark.bitmap");
+
+    darkTheme->SetCursorName("horizontal.splitter.cursor", "horizontal.splitter.dark.wing.cursor");
+    darkTheme->SetCursorName("vertical.splitter.cursor", "vertical.splitter.dark.wing.cursor");
 
     AddTheme(darkTheme.release());
 }

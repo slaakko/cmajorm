@@ -78,7 +78,7 @@ ScrollableControlCreateParams& ScrollableControlCreateParams::SetDock(Dock dock_
 ScrollableControl::ScrollableControl(ScrollableControlCreateParams& createParams) : 
     Control(createParams.controlCreateParams), child(createParams.child), scrolledChild(nullptr), container(this), 
     hpos(0), hmin(0), hmax(0), hpage(0), htrackpos(0), vpos(0), vmin(0), vmax(0), vpage(0), vtrackpos(0),
-    verticalScrollBarShown(false), horizontalScrollBarShown(false)
+    verticalScrollBarShown(false), horizontalScrollBarShown(false), verticalScrollBar(nullptr), horizontalScrollBar(nullptr)
 {
     container.AddChild(child);
 }
@@ -128,6 +128,12 @@ Control* ScrollableControl::GetLastEnabledTabStopControl() const
 std::string ScrollableControl::BackgroundItemName() const
 {
     return child->BackgroundItemName();
+}
+
+void ScrollableControl::OnPaint(PaintEventArgs& args)
+{
+    args.graphics.Clear(BackgroundColor());
+    Control::OnPaint(args);
 }
 
 void ScrollableControl::TranslateChildGraphics(Graphics& graphics)

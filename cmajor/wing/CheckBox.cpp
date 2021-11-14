@@ -7,7 +7,7 @@
 
 #undef min
 #undef max
-
+ 
 namespace cmajor { namespace wing {
 
 Color DefaultCheckBoxBackgroundColor()

@@ -128,8 +128,8 @@ SplitterCreateParams& SplitterCreateParams::EdgeColor(const Color& edgeColor_)
 
 Splitter::Splitter(SplitterCreateParams& createParams) : 
     Control(createParams.controlCreateParams), 
-    horizontalSplitterCursor(Application::GetResourceManager().GetCursor("horizontal.splitter.wing.cursor")),
-    verticalSplitterCursor(Application::GetResourceManager().GetCursor("vertical.splitter.wing.cursor")),
+    horizontalSplitterCursor(&Application::GetResourceManager().GetCursor(GetCursorName("horizontal.splitter.cursor"))),
+    verticalSplitterCursor(&Application::GetResourceManager().GetCursor(GetCursorName("vertical.splitter.cursor"))),
     flags(SplitterFlags::none), 
     orientation(createParams.orientation), edgeColor(createParams.edgeColor), edgePen(new Pen(edgeColor)), x(0), y(0), container(nullptr)
 {
@@ -150,6 +150,8 @@ void Splitter::UpdateColors()
     Control::UpdateColors();
     SetBackgroundColor(GetColor("splitter.background"));
     SetEdgeColor(GetColor("splitter.edge"));
+    horizontalSplitterCursor = &Application::GetResourceManager().GetCursor(GetCursorName("horizontal.splitter.cursor"));
+    verticalSplitterCursor = &Application::GetResourceManager().GetCursor(GetCursorName("vertical.splitter.cursor"));
 }
 
 void Splitter::SetCursor()
@@ -158,12 +160,12 @@ void Splitter::SetCursor()
     {
         case SplitterOrientation::horizontal:
         {
-            cmajor::wing::SetCursor(horizontalSplitterCursor);
+            cmajor::wing::SetCursor(*horizontalSplitterCursor);
             break;
         }
         case SplitterOrientation::vertical:
         {
-            cmajor::wing::SetCursor(verticalSplitterCursor);
+            cmajor::wing::SetCursor(*verticalSplitterCursor);
             break;
         }
     }

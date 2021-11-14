@@ -122,6 +122,15 @@ void Theme::Save()
         item->SetAttribute(U"bitmap", ToUtf32(bitmapName));
         root->AppendChild(std::unique_ptr<sngxml::dom::Node>(item));
     }
+    for (const auto& p : itemCursorNameMap)
+    {
+        const std::string& itemName = p.first;
+        const std::string& cursorName = p.second;
+        sngxml::dom::Element* item = new sngxml::dom::Element(U"item");
+        item->SetAttribute(U"name", ToUtf32(itemName));
+        item->SetAttribute(U"cursor", ToUtf32(cursorName));
+        root->AppendChild(std::unique_ptr<sngxml::dom::Node>(item));
+    }
     themeDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(root));
     std::ofstream file(GetFullPath(Path::Combine(GetFullPath(ConfigDir()), filePath)));
     CodeFormatter formatter(file);
@@ -155,9 +164,10 @@ void Theme::Load()
                         std::string itemName = ToUtf8(itemNameAttr);
                         std::u32string colorAttr = element->GetAttribute(U"color");
                         std::u32string bitmapAttr = element->GetAttribute(U"bitmap");
-                        if (colorAttr.empty() && bitmapAttr.empty())
+                        std::u32string cursorAttr = element->GetAttribute(U"cursor");
+                        if (colorAttr.empty() && bitmapAttr.empty() && cursorAttr.empty())
                         {
-                            throw std::runtime_error("item '" + itemName + "' element " + std::to_string(i) + " has no 'color' and no 'bitmap' attribute");
+                            throw std::runtime_error("item '" + itemName + "' element " + std::to_string(i) + " has no 'color', no 'bitmap' and no 'cursor' attribute");
                         }
                         if (!colorAttr.empty())
                         {
@@ -168,6 +178,11 @@ void Theme::Load()
                         {
                             std::string bitmapName = ToUtf8(bitmapAttr);
                             SetBitmapName(itemName, bitmapName);
+                        }
+                        else if (!cursorAttr.empty())
+                        {
+                            std::string cursorName = ToUtf8(cursorAttr);
+                            SetCursorName(itemName, cursorName);
                         }
                     }
                 }
@@ -214,6 +229,24 @@ std::string Theme::GetBitmapName(const std::string& itemName) const
 void Theme::SetBitmapName(const std::string& itemName, const std::string& bitmapName)
 {
     itemBitmapNameMap[itemName] = bitmapName;
+}
+
+std::string Theme::GetCursorName(const std::string& itemName) const
+{
+    auto it = itemCursorNameMap.find(itemName);
+    if (it != itemCursorNameMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return std::string();
+    }
+}
+
+void Theme::SetCursorName(const std::string& itemName, const std::string& cursorName) 
+{
+    itemCursorNameMap[itemName] = cursorName;
 }
 
 class Themes
@@ -380,6 +413,19 @@ std::string GetBitmapName(const std::string& itemName)
     if (currentTheme)
     {
         return currentTheme->GetBitmapName(itemName);
+    }
+    else
+    {
+        return std::string();
+    }
+}
+
+std::string GetCursorName(const std::string& itemName)
+{
+    Theme* currentTheme = Themes::Instance().GetCurrentTheme();
+    if (currentTheme)
+    {
+        return currentTheme->GetCursorName(itemName);
     }
     else
     {

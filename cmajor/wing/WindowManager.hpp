@@ -25,8 +25,7 @@ class WING_API WindowManager
 public:
     WindowManager();
     bool IsSystemClassName(const std::string& windowClassName) const;
-    //uint16_t Register(const std::string& windowClassName, uint32_t windowClassStyle, int windowClassBackgroundColor);
-    uint16_t Register(const std::string& windowClassName, uint32_t windowClassStyle, const Color& bgColor);
+    uint16_t Register(const std::string& windowClassName, uint32_t windowClassStyle, HBRUSH backgroundBrush);
     void AddWindow(Control* window);
     void RemoveWindow(Control* window);
     Control* GetWindow(HWND handle) const;

@@ -787,7 +787,7 @@ Tab::Tab() : state(TabState::normal), visible(false), textHeight(0), textWidth(0
 }
 
 TabPage::TabPage(const std::string& text_, const std::string& key_) : 
-    Panel(ControlCreateParams().WindowClassName("wing.TabPage").WindowClassBackgroundColor(COLOR_WINDOW).BackgroundColor(Color::White).Text(text_)), key(key_)
+    Panel(ControlCreateParams().WindowClassName("wing.TabPage").WindowClassBackgroundColor(COLOR_WINDOW).BackgroundColor(GetColor("tab.page")).Text(text_)), key(key_)
 {
 }
 

@@ -2,7 +2,7 @@
 #include <wing/Window.hpp>
 
 namespace cmajor { namespace wing {
-
+     
 ButtonBase::ButtonBase(ControlCreateParams& createParams) : Control(createParams)
 {
 }

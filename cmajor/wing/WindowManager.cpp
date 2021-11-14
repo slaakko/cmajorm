@@ -20,6 +20,7 @@ WindowManager::WindowManager()
     systemClassNames.insert("EDIT");
     systemClassNames.insert("LISTBOX");
     systemClassNames.insert("COMBOBOX");
+    systemClassNames.insert("SCROLLBAR");
 }
 
 bool WindowManager::IsSystemClassName(const std::string& windowClassName) const
@@ -28,8 +29,7 @@ bool WindowManager::IsSystemClassName(const std::string& windowClassName) const
     return it != systemClassNames.cend();
 }
 
-//uint16_t WindowManager::Register(const std::string& windowClassName, uint32_t windowClassStyle, int windowClassBackgroundColor)
-uint16_t WindowManager::Register(const std::string& windowClassName, uint32_t windowClassStyle, const Color& bgColor)
+uint16_t WindowManager::Register(const std::string& windowClassName, uint32_t windowClassStyle, HBRUSH backgroundBrush)
 {
     auto it = registeredWindowClasses.find(windowClassName);
     if (it != registeredWindowClasses.cend())
@@ -47,10 +47,7 @@ uint16_t WindowManager::Register(const std::string& windowClassName, uint32_t wi
     wc.hInstance = instance;
     wc.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
     wc.hCursor = nullptr;
-    wc.hbrBackground = CreateSolidBrush(bgColor.ToCOLORREF());
-    //int64_t c = windowClassBackgroundColor + 1;
-    //HBRUSH bgc = *reinterpret_cast<HBRUSH*>(&c);
-    //wc.hbrBackground = bgc;
+    wc.hbrBackground = backgroundBrush;
     wc.lpszMenuName = nullptr;
     wc.lpszClassName = (LPWSTR)className.c_str();
     wc.hIconSm = LoadIcon(nullptr, IDI_APPLICATION);

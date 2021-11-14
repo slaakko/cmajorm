@@ -25,11 +25,14 @@ public:
     void SetColor(const std::string& itemName, const Color& color);
     std::string GetBitmapName(const std::string& itemName) const;
     void SetBitmapName(const std::string& itemName, const std::string& bitmapName);
+    std::string GetCursorName(const std::string& itemName) const;
+    void SetCursorName(const std::string& itemName, const std::string& cursorName);
 private:
     std::string name;
     std::string filePath;
     std::map<std::string, Color> itemColorMap;
     std::map<std::string, std::string> itemBitmapNameMap;
+    std::map<std::string, std::string> itemCursorNameMap;
 };
 
 WING_API std::string GetTheme();
@@ -43,6 +46,7 @@ WING_API void RegisterUpdateColorsListener(Control* control);
 WING_API void UnregisterUpdateColorsListener(Control* control);
 WING_API Color GetColor(const std::string& itemName);
 WING_API std::string GetBitmapName(const std::string& itemName);
+WING_API std::string GetCursorName(const std::string& itemName);
 WING_API void ThemeInit();
 WING_API void ThemeDone();
 

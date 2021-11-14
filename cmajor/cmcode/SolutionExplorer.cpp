@@ -102,7 +102,8 @@ SolutionExplorerCreateParams& SolutionExplorerCreateParams::SetDock(Dock dock_)
 }
 
 SolutionExplorer::SolutionExplorer(SolutionExplorerCreateParams& createParams, MainWindow* mainWindow_) : 
-    ContainerControl(createParams.controlCreateParams), mainWindow(mainWindow_), solutionTreeView(nullptr), child(nullptr), imageList(nullptr), treeViewCreateParams(createParams.treeViewCreateParams)
+    ContainerControl(createParams.controlCreateParams), mainWindow(mainWindow_), solutionTreeView(nullptr), child(nullptr), imageList(nullptr), 
+    treeViewCreateParams(createParams.treeViewCreateParams)
 {
     MakeView();
 }

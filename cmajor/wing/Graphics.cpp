@@ -4,6 +4,7 @@
 // =================================
 
 #include <wing/Graphics.hpp>
+#include <wing/Theme.hpp>
 #include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace wing {
@@ -197,9 +198,25 @@ RectF MeasureString(Graphics& graphics, const std::string& text, const Font& fon
 Color ToGray(const Color& color, const Color& transparentColor)
 {
     if (color == transparentColor) return color;
-    int32_t gray = (int32_t(color.GetRed()) + int32_t(color.GetGreen()) + int32_t(color.GetBlue()) + 2 * 255) / 5;
-    uint8_t g = static_cast<uint8_t>(gray);
-    return Color(color.GetAlpha(), g, g, g);
+    std::string theme = GetTheme(); // todo
+    if (theme == "light")
+    {
+        int32_t gray = (int32_t(color.GetRed()) + int32_t(color.GetGreen()) + int32_t(color.GetBlue()) + 2 * 255) / 5;
+        uint8_t g = static_cast<uint8_t>(gray);
+        return Color(color.GetAlpha(), g, g, g);
+    }
+    else if (theme == "dark")
+    {
+        float y = (color.GetRed() * 0.3 + color.GetGreen() * 0.59 + color.GetBlue() * 0.11) / 3.0;
+        uint8_t g = static_cast<uint8_t>(y * 255);
+        return Color(color.GetAlpha(), g, g, g);
+    }
+    else
+    {
+        int32_t gray = (int32_t(color.GetRed()) + int32_t(color.GetGreen()) + int32_t(color.GetBlue()) + 2 * 255) / 5;
+        uint8_t g = static_cast<uint8_t>(gray);
+        return Color(color.GetAlpha(), g, g, g);
+    }
 }
 
 std::unique_ptr<Bitmap> ToGrayBitmap(Bitmap* bm, const Color& transparentColor)

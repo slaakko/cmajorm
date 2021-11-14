@@ -4,6 +4,7 @@
 // =================================
 
 #include <wing/Panel.hpp>
+#include <wing/Theme.hpp>
 
 namespace cmajor { namespace wing {
 
