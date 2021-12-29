@@ -1,0 +1,260 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Concepts;
+
+namespace System.Collections
+{
+    public class ForwardListNode<T> where T is Semiregular
+    {
+        private typedef T ValueType;
+        private typedef ForwardListNode<ValueType> Self;
+        
+        public ForwardListNode(Self* next_, const ValueType& value_) : next(next_), value(value_)
+        {
+        }
+        public inline nothrow Self* Next() const
+        {
+            return next;
+        }
+        public inline nothrow void SetNext(Self* next_)
+        {
+            next = next_;
+        }
+        public inline nothrow const ValueType& Value() const
+        {
+            return value;
+        }
+        public inline nothrow ValueType& Value()
+        {
+            return value;
+        }
+        private ValueType value;
+        private Self* next;
+    }
+
+    public class ForwardListNodeIterator<T, R, P>
+    {
+        public typedef T ValueType;
+        public typedef R ReferenceType;
+        public typedef P PointerType;
+        private typedef ForwardListNodeIterator<ValueType, ReferenceType, PointerType> Self;
+        private typedef ForwardListNode<ValueType> NodeType;
+        private typedef NodeType* NodePtr;
+
+        public nothrow ForwardListNodeIterator() : node(null)
+        {
+        }
+        public nothrow ForwardListNodeIterator(NodePtr node_) : node(node_)
+        {
+        }
+        public inline nothrow ReferenceType operator*()
+        {
+            #assert(node != null);
+            return node->Value();
+        }
+        public inline nothrow PointerType operator->()
+        {
+            #assert(node != null);
+            return &(node->Value());
+        }
+        public inline nothrow Self& operator++()
+        {
+            #assert(node != null);
+            node = node->Next();
+            return *this;
+        }
+        public inline nothrow NodePtr Node() const
+        {
+            return node;
+        }
+        private NodePtr node;
+    }
+
+    public inline nothrow bool operator==<T, R, P>(const ForwardListNodeIterator<T, R, P>& left,  const ForwardListNodeIterator<T, R, P>& right)
+    {
+        return left.Node() == right.Node();
+    }
+
+    public class ForwardList<T> where T is Regular
+    {
+        public typedef T ValueType;
+        private typedef ForwardList<ValueType> Self;
+        public typedef ForwardListNodeIterator<ValueType, const ValueType&, const ValueType*> ConstIterator;
+        public typedef ForwardListNodeIterator<ValueType, ValueType&, ValueType*> Iterator;
+        private typedef ForwardListNode<ValueType> NodeType;
+        private typedef NodeType* NodePtr;
+
+        public nothrow ForwardList() : head(null)
+        {
+        }
+        public ~ForwardList()
+        {
+            Clear();
+        }
+        public ForwardList(const Self& that) : head(null)
+        {
+            CopyFrom(that);
+        }
+        public nothrow ForwardList(Self&& that) : head(that.head)
+        {
+            that.head = null;
+        }
+        public void operator=(const Self& that)
+        {
+            Clear();
+            CopyFrom(that);
+        }
+        public nothrow void operator=(Self&& that)
+        {
+            Clear();
+            Swap(head, that.head);
+        }
+        public inline nothrow bool IsEmpty() const
+        {
+            return head == null;
+        }
+        public nothrow long Count() const
+        {
+            long count = 0;
+            NodePtr node = head;
+            while (node != null)
+            {
+                node = node->Next();
+                ++count;
+            }
+            return count;
+        }
+        public nothrow void Clear()
+        {
+            while (head != null)
+            {
+                NodePtr toRemove = head;
+                head = head->Next();
+                delete toRemove;
+            }
+        }    
+        public inline nothrow Iterator Begin()
+        {
+            return Iterator(head);
+        }
+        public inline nothrow Iterator End()
+        {
+            return Iterator(null);
+        }
+        public inline nothrow ConstIterator Begin() const
+        {
+            return ConstIterator(head);
+        }
+        public inline nothrow ConstIterator End() const
+        {
+            return ConstIterator(null);
+        }
+        public inline nothrow ConstIterator CBegin() const
+        {
+            return ConstIterator(head);
+        }
+        public inline nothrow ConstIterator CEnd() const
+        {
+            return ConstIterator(null);
+        }
+        public inline nothrow const ValueType& Front() const
+        {
+            #assert(head != null);
+            return head->Value();
+        }
+        public inline Iterator InsertFront(const ValueType& value)
+        {
+            head = new NodeType(head, value);
+            return Iterator(head);
+        }    
+        public Iterator InsertAfter(Iterator pos, const ValueType& value)
+        {
+            NodePtr node = pos.Node();
+            if (node == null)
+            {
+                return InsertFront(value);
+            }
+            node->SetNext(new NodeType(node->Next(), value));
+            return Iterator(node->Next());
+        }
+        public nothrow void RemoveFront()
+        {
+            #assert(head != null);
+            NodePtr node = head;
+            head = head->Next();
+            delete node;
+        }
+        public nothrow void RemoveAfter(Iterator pos)
+        {
+            NodePtr node = pos.Node();
+            #assert(node != null);
+            NodePtr toRemove = node->Next();
+            #assert(toRemove != null);
+            node->SetNext(toRemove->Next());
+            delete toRemove;
+        }
+        public nothrow void Remove(const ValueType& value)
+        {
+            NodePtr prev = null;
+            NodePtr node = head;
+            while (node != null)
+            {
+                if (node->Value() == value)
+                {
+                    if (node == head)
+                    {
+                        head = head->Next();
+                        delete node;
+                        node = head;
+                    }                    
+                    else
+                    {
+                        #assert(prev != null);
+                        prev->SetNext(node->Next());
+                        delete node;
+                        node = prev->Next();
+                    }                    
+                }
+                else
+                {
+                    prev = node;
+                    node = node->Next();
+                }
+            }
+        }
+        private void CopyFrom(const Self& that)
+        {
+            NodePtr n = that.head;
+            NodePtr last = null;
+            while (n != null)
+            {
+                if (head == null)
+                {
+                    InsertFront(n->Value());
+                    last = head;
+                }
+                else
+                {
+                    last->SetNext(new NodeType(null, n->Value()));
+                    last = last->Next();
+                }
+                n = n->Next();
+            }
+        }
+        private NodePtr head;
+    }
+
+    public bool operator==<T>(const ForwardList<T>& left, const ForwardList<T>& right) where T is Regular
+    {
+        return Equal(left.CBegin(), left.CEnd(), right.CBegin(), right.CEnd());
+    }
+    
+    public bool operator<<T>(const ForwardList<T>& left, const ForwardList<T>& right) where T is TotallyOrdered
+    {
+        return LexicographicalCompare(left.CBegin(), left.CEnd(), right.CBegin(), right.CEnd());
+    }
+}

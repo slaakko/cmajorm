@@ -1,0 +1,69 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+ 
+namespace System.Ascii
+{
+    public enum CharClass : ushort
+    {
+        none = 0u,
+        lower = 1u << 0u,
+        upper = 1u << 1u,
+        alpha = lower | upper,
+        digit = 1u << 2u,
+        alnum = alpha | digit,
+        xdigit = 1u << 3u,
+        cntrl = 1u << 4u,
+        graph = 1u << 5u,
+        print = 1u << 6u,
+        punct = 1u << 7u,
+        space = 1u << 8u
+    }
+    
+    public class CharClassTable
+    {
+        static nothrow CharClassTable() : instance(new CharClassTable())
+        {
+        }
+        public static nothrow CharClassTable& Instance()
+        {
+            return *instance;
+        }
+        public nothrow inline CharClass GetCharacterClass(char c)
+        {
+            return table[cast<byte>(c)];
+        }
+        private nothrow CharClassTable()
+        {
+            SetCharacterClass(cast<byte>('a'), cast<byte>('z'), CharClass.lower);
+            SetCharacterClass(cast<byte>('A'), cast<byte>('Z'), CharClass.upper);
+            SetCharacterClass(cast<byte>('0'), cast<byte>('9'), CharClass.digit);
+            SetCharacterClass(cast<byte>('0'), cast<byte>('9'), CharClass.xdigit);
+            SetCharacterClass(cast<byte>('a'), cast<byte>('f'), CharClass.xdigit);
+            SetCharacterClass(cast<byte>('A'), cast<byte>('F'), CharClass.xdigit);
+            SetCharacterClass(0u, 31u, CharClass.cntrl);
+            SetCharacterClass(127u, 127u, CharClass.cntrl);
+            SetCharacterClass(33u, 126u, CharClass.graph);
+            SetCharacterClass(32u, 126u, CharClass.print);
+            SetCharacterClass(33u, 47u, CharClass.punct);
+            SetCharacterClass(58u, 64u, CharClass.punct);
+            SetCharacterClass(91u, 96u, CharClass.punct);
+            SetCharacterClass(123u, 126u, CharClass.punct);
+            SetCharacterClass(9u, 13u, CharClass.space);
+            SetCharacterClass(32u, 32u, CharClass.space);
+        }
+        private nothrow void SetCharacterClass(byte first, byte last, CharClass c)
+        {
+            for (byte i = first; i <= last; ++i)
+            {
+                table[i] = cast<CharClass>(table[i] | c);
+            }
+        }
+        private static UniquePtr<CharClassTable> instance;
+        private CharClass[cast<long>(MaxValue<byte>()) + 1] table;
+    }
+}

@@ -1,0 +1,254 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Os;
+
+namespace System.Collections
+{
+    public class Bitset
+    {
+        public nothrow Bitset() : numBits(0), bits()
+        {
+            try
+            {
+                bits.Add(0u);
+            }
+            catch (const Exception& ex)
+            {
+                Exit(1u);
+            }
+        }
+        public Bitset(long numBits_) : numBits(0), bits()
+        {
+            Resize(numBits_);
+        }
+        public Bitset(const string& bits_) : numBits(0), bits()
+        {
+            Resize(bits_.Length());
+            for (long i = 0; i < numBits; ++i)
+            {
+                if (bits_[i] == '1')
+                {
+                    Set(i);
+                }
+            }
+        }
+        public default Bitset(const Bitset&);
+        public default void operator=(const Bitset&);
+        public default nothrow Bitset(Bitset&&);
+        public default nothrow void operator=(Bitset&&);
+        public default ~Bitset();
+        public nothrow void Clear()
+        {
+            numBits = 0;
+            bits.Clear();
+        }
+        public nothrow inline long Count() const
+        {
+            return numBits;
+        }
+        public void Resize(long numBits_)
+        {
+            numBits = numBits_;
+            #assert(numBits >= 0);
+            if (numBits > 0)
+            {
+                bits.Resize(1 + NumFullBlocks());
+            }            
+            else
+            {
+                bits.Resize(1);
+            }
+        }
+        public nothrow void Set()
+        {
+            long n = bits.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                bits[i] = allOne;
+            }
+        }
+        public nothrow void Reset()
+        {
+            long n = bits.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                bits[i] = cast<ulong>(0u);
+            }
+        }       
+        public inline nothrow void Set(long pos)
+        {
+            #assert(pos >= 0 && pos < numBits);
+            ulong& b = bits[pos / blockSize];
+            b = b | (1u << (cast<ulong>(pos) & blockMask));
+        }
+        public inline nothrow void Reset(long pos)
+        {
+            #assert(pos >= 0 && pos < numBits);
+            ulong& b = bits[pos / blockSize];
+            b = b & ~(1u << (cast<ulong>(pos) & blockMask));
+        }
+        public nothrow void Set(long pos, bool bit)
+        {
+            if (bit)
+            {
+                Set(pos);
+            }
+            else
+            {
+                Reset(pos);
+            }
+        }
+        public nothrow void Flip()
+        {
+            long n = bits.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                bits[i] = ~(bits[i]);
+            }
+        }
+        public inline nothrow void Flip(long pos)
+        {
+            #assert(pos >= 0 && pos < numBits);
+            ulong& b = bits[pos / blockSize];
+            b = b ^ (1u << (cast<ulong>(pos) & blockMask));
+        }
+        public inline nothrow bool operator[](long index) const
+        {
+            return Test(index);
+        }
+        public inline nothrow bool Test(long pos) const
+        {
+            #assert(pos >= 0 && pos < numBits);
+            ulong b = bits[pos / blockSize];
+            return (b & (1u << (cast<ulong>(pos) & blockMask))) != 0u;
+        }
+        public nothrow bool All() const
+        {
+            long n = NumFullBlocks();
+            for (long i = 0; i < n; ++i)
+            {
+                if (bits[i] != allOne)
+                {
+                    return false;
+                }
+            }
+            for (long i = LastBlockStartIndex(); i < numBits; ++i)
+            {
+                if (!Test(i))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        public nothrow bool Any() const
+        {
+            long n = NumFullBlocks();
+            for (long i = 0; i < n; ++i)
+            {
+                if (bits[i] != 0u)
+                {
+                    return true;
+                }
+            }
+            for (long i = LastBlockStartIndex(); i < numBits; ++i)
+            {
+                if (Test(i))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public nothrow bool None() const
+        {
+            long n = NumFullBlocks();
+            for (long i = 0; i < n; ++i)
+            {
+                if (bits[i] != 0u)
+                {
+                    return false;
+                }
+            }
+            for (long i = LastBlockStartIndex(); i < numBits; ++i)
+            {
+                if (Test(i))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        public nothrow string ToString() const
+        {
+            string s;
+            s.Reserve(numBits);
+            for (long i = 0; i < numBits; ++i)
+            {
+                if (Test(i))
+                {
+                    s.Append('1');
+                }
+                else
+                {
+                    s.Append('0');
+                }
+            }
+            return s;
+        }
+        public inline nothrow long NumBits() const
+        {
+            return numBits;
+        }
+        public inline nothrow List<ulong>& Bits() const
+        {
+            return bits;
+        }
+        public inline nothrow long NumFullBlocks() const
+        {
+            if (numBits == 0)
+            {
+                return 0;
+            }
+            return (numBits - 1) / blockSize;
+        }
+        public inline nothrow long LastBlockStartIndex() const
+        {
+            return NumFullBlocks() * blockSize;
+        }
+        private const long blockSize = 64;
+        private const ulong blockMask = 63u;
+        private const ulong allOne = cast<ulong>(-1);
+        private long numBits;
+        private List<ulong> bits;
+    }
+
+    public bool operator==(const Bitset& left, const Bitset& right)
+    {
+        long numBits = left.NumBits();
+        if (numBits != right.NumBits())
+        {
+            return false;
+        }
+        long n = left.NumFullBlocks();
+        for (long i = 0; i < n; ++i)
+        {
+            if (left.Bits()[i] != right.Bits()[i])
+            {
+                return false;
+            }
+        }
+        for (long i = left.LastBlockStartIndex(); i < numBits; ++i)
+        {
+            if (left.Test(i) != right.Test(i))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+}

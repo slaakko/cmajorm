@@ -1,0 +1,64 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.Ascii;
+
+namespace System
+{
+    public inline nothrow bool IsLower(char c)
+    {
+        return (CharClassTable.Instance().GetCharacterClass(c) & CharClass.lower) != 0;
+    }
+
+    public inline nothrow bool IsUpper(char c)
+    {
+        return (CharClassTable.Instance().GetCharacterClass(c) & CharClass.upper) != 0;
+    }
+
+    public inline nothrow bool IsAlpha(char c)
+    {
+        return (CharClassTable.Instance().GetCharacterClass(c) & CharClass.alpha) != 0;
+    }
+
+    public inline nothrow bool IsDigit(char c)
+    {
+        return (CharClassTable.Instance().GetCharacterClass(c) & CharClass.digit) != 0;
+    }
+
+    public inline nothrow bool IsAlphanumeric(char c)
+    {
+        return (CharClassTable.Instance().GetCharacterClass(c) & CharClass.alnum) != 0;
+    }
+
+    public inline nothrow bool IsHexDigit(char c)
+    {
+        return (CharClassTable.Instance().GetCharacterClass(c) & CharClass.xdigit) != 0;
+    }
+
+    public inline nothrow bool IsControl(char c)
+    {
+        return (CharClassTable.Instance().GetCharacterClass(c) & CharClass.cntrl) != 0;
+    }
+
+    public inline nothrow bool IsGraphic(char c)
+    {
+        return (CharClassTable.Instance().GetCharacterClass(c) & CharClass.graph) != 0;
+    }
+
+    public inline nothrow bool IsPrintable(char c)
+    {
+        return (CharClassTable.Instance().GetCharacterClass(c) & CharClass.print) != 0;
+    }
+
+    public inline nothrow bool IsPunctuation(char c)
+    {
+        return (CharClassTable.Instance().GetCharacterClass(c) & CharClass.punct) != 0;
+    }
+
+    public inline nothrow bool IsSpace(char c)
+    {
+        return (CharClassTable.Instance().GetCharacterClass(c) & CharClass.space) != 0;
+    }
+}

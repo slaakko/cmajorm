@@ -1,0 +1,49 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Concepts;
+
+namespace System.Collections
+{
+    public class Queue<T> where T is Semiregular
+    {
+        public typedef T ValueType;
+
+        public inline nothrow bool IsEmpty() const
+        {
+            return items.IsEmpty();
+        }
+        public inline nothrow long Count() const
+        {
+            return items.Count();
+        }
+        public inline void Put(const ValueType& item)
+        {
+            items.Add(item);
+        }
+        public inline void Put(ValueType&& item)
+        {
+            items.Add(item);
+        }
+        public inline ValueType Get()
+        {
+            return items.RemoveFirst();
+        }
+        public inline nothrow const ValueType& Front() const 
+        {
+            return items.Front();
+        }
+        public inline nothrow void Clear()
+        {
+            items.Clear();
+        }
+        public inline nothrow List<ValueType>& Rep()
+        {
+            return items;
+        }
+        private List<ValueType> items;
+    }
+}

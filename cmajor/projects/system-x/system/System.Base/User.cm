@@ -1,0 +1,316 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+using System.Collections;
+
+namespace System.Security
+{
+    public class SecurityException : Exception
+    {
+        public nothrow SecurityException(const string& message_) : base(message_)
+        {
+        }
+    }
+
+    public class User
+    {
+        public nothrow User(const string& username_, const string& hash_, int uid_, int gid_, const string& info_, const string& home_, const string& shell_) : 
+            username(username_), hash(hash_), uid(uid_), gid(gid_), info(info_), home(home_), shell(shell_)
+        {
+        }
+        public nothrow inline const string& Name() const
+        {
+            return username;
+        }
+        public nothrow inline const string& Hash() const
+        {
+            return hash;
+        }
+        public nothrow void SetHash(const string& hash_)
+        {
+            hash = hash_;
+        }
+        public nothrow inline int UID() const
+        {
+            return uid;
+        }
+        public nothrow inline int GID() const
+        {
+            return gid;
+        }
+        public nothrow inline const string& Info() const
+        {
+            return info;
+        }
+        public nothrow inline const string& Home() const
+        {
+            return home;
+        }
+        public nothrow inline const string& Shell() const
+        {
+            return shell;
+        }
+        public void Write(StreamWriter& writer)
+        {
+            writer << username << ":" << hash << ":" << uid << ":" << gid << ":" << info << ":" << home << ":" << shell << endl();
+        }
+        private string username;
+        private string hash;
+        private int uid;
+        private int gid;
+        private string info;
+        private string home;
+        private string shell;
+    }
+    
+    public class Users
+    {
+        public nothrow Users() : lastUserId(0)
+        {
+        }
+        public void AddUser(const User& user)
+        {
+            users.Add(user);
+            if (user.UID() > lastUserId)
+            {
+                lastUserId = user.UID();
+            }
+        }
+        public User* GetUser(int uid) const
+        {
+            HashMap<int, User*>.ConstIterator it = uidUserMap.CFind(uid);
+            if (it != uidUserMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public User* GetUser(const string& userName) const
+        {
+            HashMap<string, User*>.ConstIterator it = userNameUserMap.CFind(userName);
+            if (it != userNameUserMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public void Finalize()
+        {
+            for (User& user : users)
+            {
+                uidUserMap[user.UID()] = &user;
+                userNameUserMap[user.Name()] = &user;
+            }
+        }
+        public void Write(StreamWriter& writer)
+        {
+            for (const User& user : users)
+            {
+                user.Write(writer);
+            }
+        }
+        public nothrow int GetFreeUserId() const
+        {
+            return lastUserId + 1;
+        }
+        private List<User> users;
+        private HashMap<int, User*> uidUserMap;
+        private HashMap<string, User*> userNameUserMap;
+        private int lastUserId;
+    }
+    
+    public class Group
+    {
+        public nothrow Group(const string& groupname_, int gid_, const List<string>& users_) : 
+            groupname(groupname_), gid(gid_), users(users_)
+        {
+        }
+        public nothrow inline const string& Name() const
+        {
+            return groupname;
+        }
+        public nothrow inline int GID() const
+        {
+            return gid;
+        }
+        public void Write(StreamWriter& writer)
+        {
+            writer << groupname << ":" << gid << ":" << ToCsv(users) << endl();
+        }
+        public nothrow inline const List<string>& Users() const
+        {
+            return users;
+        }
+        private string groupname;
+        private int gid;
+        private List<string> users;
+    }
+    
+    public class Groups
+    {
+        public nothrow Groups() : lastGroupId(0)
+        {
+        }
+        public void AddGroup(const Group& group)
+        {
+            groups.Add(group);
+            if (group.GID() > lastGroupId)
+            {
+                lastGroupId = group.GID();
+            }
+        }
+        public Group* GetGroup(int gid) const
+        {
+            HashMap<int, Group*>.ConstIterator it = gidGroupMap.CFind(gid);
+            if (it != gidGroupMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public void Finalize()
+        {
+            for (Group& group : groups)
+            {
+                gidGroupMap[group.GID()] = &group;
+            }
+        }
+        public void Write(StreamWriter& writer)
+        {
+            for (const Group& group : groups)
+            {
+                group.Write(writer);
+            }
+        }
+        public nothrow int GetFreeGroupId() const
+        {
+            return lastGroupId + 1;
+        }
+        private List<Group> groups;
+        private HashMap<int, Group*> gidGroupMap;
+        private int lastGroupId;
+    }
+    
+    public User GetUser(int uid)
+    {
+        StreamReader reader = File.OpenRead("/etc/passwd");
+        int lineNumber = 0;
+        while (!reader.Eof())
+        {
+            string line = reader.ReadLine();
+            if (!line.IsEmpty() && !line.StartsWith("#"))
+            {
+                List<string> fields = line.Split(':');
+                if (fields.Count() != 7)
+                {
+                    throw SecurityException("invalid line " + ToString(lineNumber) + " in /etc/passwd: wrong number of fields (" + ToString(fields.Count()) + "), should be 7.");
+                }
+                User user(fields[0], fields[1], ParseInt(fields[2]), ParseInt(fields[3]), fields[4], fields[5], fields[6]);
+                if (user.UID() == uid)
+                {
+                    return user;
+                }
+            }
+            ++lineNumber;
+        }
+        throw SecurityException("no matching user account for UID " + ToString(uid) + " found from /etc/passwd");
+    }
+    
+    public Users GetUsers()
+    {
+        Users users;
+        StreamReader reader = File.OpenRead("/etc/passwd");
+        int lineNumber = 0;
+        while (!reader.Eof())
+        {
+            string line = reader.ReadLine();
+            if (!line.IsEmpty() && !line.StartsWith("#"))
+            {
+                List<string> fields = line.Split(':');
+                if (fields.Count() != 7)
+                {
+                    throw SecurityException("invalid line " + ToString(lineNumber) + " in /etc/passwd: wrong number of fields (" + ToString(fields.Count()) + "), should be 7.");
+                }
+                User user(fields[0], fields[1], ParseInt(fields[2]), ParseInt(fields[3]), fields[4], fields[5], fields[6]);
+                users.AddUser(user);
+            }
+            ++lineNumber;
+        }
+        users.Finalize();
+        return users;
+    }
+    
+    public void WriteUsers(const Users& users)
+    {
+        StreamWriter writer = File.CreateText("/etc/passwd");
+        users.Write(writer);
+    }
+    
+    public Group GetGroup(int gid)
+    {
+        StreamReader reader = File.OpenRead("/etc/group");
+        int lineNumber = 0;
+        while (!reader.Eof())
+        {
+            string line = reader.ReadLine();
+            if (!line.IsEmpty() && !line.StartsWith("#"))
+            {
+                List<string> fields = line.Split(':');
+                if (fields.Count() != 3)
+                {
+                    throw SecurityException("invalid line " + ToString(lineNumber) + " in /etc/group: wrong number of fields (" + ToString(fields.Count()) + "), should be 3.");
+                }
+                Group group(fields[0], ParseInt(fields[1]), ParseCSV(fields[2]));
+                if (group.GID() == gid)
+                {
+                    return group;
+                }
+            }
+            ++lineNumber;
+        }
+        throw SecurityException("no matching group for GID " + ToString(gid) + " found from /etc/group");
+    }
+    
+    public Groups GetGroups()
+    {
+        Groups groups;
+        StreamReader reader = File.OpenRead("/etc/group");
+        int lineNumber = 0;
+        while (!reader.Eof())
+        {
+            string line = reader.ReadLine();
+            if (!line.IsEmpty() && !line.StartsWith("#"))
+            {
+                List<string> fields = line.Split(':');
+                if (fields.Count() != 3)
+                {
+                    throw SecurityException("invalid line " + ToString(lineNumber) + " in /etc/group: wrong number of fields (" + ToString(fields.Count()) + "), should be 3.");
+                }
+                Group group(fields[0], ParseInt(fields[1]), ParseCSV(fields[2]));
+                groups.AddGroup(group);
+            }
+            ++lineNumber;
+        }
+        groups.Finalize();
+        return groups;
+    }
+
+    public void WriteGroups(const Groups& groups)
+    {
+        StreamWriter writer = File.CreateText("/etc/group");
+        groups.Write(writer);
+    }
+}

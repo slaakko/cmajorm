@@ -1,0 +1,203 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+
+namespace System.Security
+{
+    public nothrow inline uint LeftRotate(uint x, uint n)
+    {
+        return (x << n) ^ (x >> (32u - n));
+    }
+    
+    public class Sha1
+    {
+        public nothrow Sha1()
+        {
+            Reset();
+        }
+        public nothrow void Reset()
+        {
+            digest[0] = 0x67452301u;
+            digest[1] = 0xEFCDAB89u;
+            digest[2] = 0x98BADCFEu;
+            digest[3] = 0x10325476u;
+            digest[4] = 0xC3D2E1F0u;
+            byteIndex = 0u;
+            bitCount = 0u;
+        }
+        public nothrow void Process(byte x)
+        {
+            ProcessByte(x);
+            bitCount = bitCount + 8u;
+        }
+        public nothrow void Process(byte* begin, byte* end)
+        {
+            while (begin != end)
+            {
+                Process(*begin);
+                ++begin;
+            }            
+        }
+        public nothrow void Process(byte* buf, long count)
+        {
+            Process(buf, buf + count);
+        }
+        public nothrow string GetDigest()
+        {
+            ProcessByte(0x80u);
+            if (byteIndex > 56u)
+            {
+                while (byteIndex != 0u)
+                {
+                    ProcessByte(0u);
+                }
+                while (byteIndex < 56u)
+                {
+                    ProcessByte(0u);
+                }
+            }
+            else
+            {
+                while (byteIndex < 56u)
+                {
+                    ProcessByte(0u);
+                }
+            }
+            ProcessByte(cast<byte>((bitCount >> 56u) & 0xFFu));
+            ProcessByte(cast<byte>((bitCount >> 48u) & 0xFFu));
+            ProcessByte(cast<byte>((bitCount >> 40u) & 0xFFu));
+            ProcessByte(cast<byte>((bitCount >> 32u) & 0xFFu));
+            ProcessByte(cast<byte>((bitCount >> 24u) & 0xFFu));
+            ProcessByte(cast<byte>((bitCount >> 16u) & 0xFFu));
+            ProcessByte(cast<byte>((bitCount >> 8u) & 0xFFu));
+            ProcessByte(cast<byte>(bitCount & 0xFFu));
+            string s = ToHexString(digest[0]);
+            s.Append(ToHexString(digest[1]));
+            s.Append(ToHexString(digest[2]));
+            s.Append(ToHexString(digest[3]));
+            s.Append(ToHexString(digest[4]));
+            return s;
+        }
+        private nothrow void ProcessByte(byte x)
+        {
+            block[byteIndex++] = x;
+            if (byteIndex == 64u)
+            {
+                byteIndex = 0u;
+                ProcessBlock();
+            }
+        }
+        private nothrow void ProcessBlock()
+        {
+            uint[80] w;
+            for (int i = 0; i < 16; ++i)
+            {
+                w[i] = cast<uint>(block[4 * i]) << 24u;
+                w[i] = w[i] | cast<uint>(block[4 * i + 1]) << 16u;
+                w[i] = w[i] | cast<uint>(block[4 * i + 2]) << 8u;
+                w[i] = w[i] | cast<uint>(block[4 * i + 3]);
+            }
+            for (int i = 16; i < 80; ++i)
+            {
+                w[i] = LeftRotate(w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16], 1u);
+            }
+            uint a = digest[0];
+            uint b = digest[1];
+            uint c = digest[2];
+            uint d = digest[3];
+            uint e = digest[4];
+            for (int i = 0; i < 80; ++i)
+            {
+                uint f;
+                uint k;
+                if (i < 20)
+                {
+                    f = (b & c) | (~b & d);
+                    k = 0x5A827999u;
+                }
+                else if (i < 40)
+                {
+                    f = b ^ c ^ d;
+                    k = 0x6ED9EBA1u;
+                }
+                else if (i < 60)
+                {
+                    f = (b & c) | (b & d) | (c & d);
+                    k = 0x8F1BBCDCu;
+                }
+                else
+                {
+                    f = b ^ c ^ d;
+                    k = 0xCA62C1D6u;
+                }
+                uint temp = LeftRotate(a, 5u) + f + e + k + w[i];
+                e = d;
+                d = c;
+                c = LeftRotate(b, 30u);
+                b = a;
+                a = temp;
+            }
+            digest[0] = digest[0] + a;
+            digest[1] = digest[1] + b;
+            digest[2] = digest[2] + c;
+            digest[3] = digest[3] + d;
+            digest[4] = digest[4] + e;
+        }
+        private uint[5] digest;
+        private byte[64] block;
+        private byte byteIndex;
+        private ulong bitCount;
+    }
+
+    public nothrow string GetSha1MessageDigest(const string& message)
+    {
+        byte* data = cast<byte*>(cast<void*>(message.Chars()));
+        long count = message.Length();
+        return GetSha1MessageDigest(data, count);
+    }
+    
+    public nothrow string GetSha1MessageDigest(byte* data, long count)
+    {
+        Sha1 sha1;
+        sha1.Process(data, count);
+        return sha1.GetDigest();
+    }
+    
+    public string GetSha1FileDigest(const string& filePath)
+    {
+        Sha1 sha1;
+        long n = File.Size(filePath);
+        if (n > 0)
+        {
+            BinaryReader reader = File.OpenBinary(filePath);
+            for (long i = 0u; i < n; ++i)
+            {
+                sha1.Process(reader.ReadByte());
+            }
+        }        
+        return sha1.GetDigest();
+    }
+    
+    public string GetCumulativeSha1FileDigest(const List<string>& filePaths)
+    {
+        Sha1 sha1;
+        for (const string& filePath : filePaths)
+        {
+            long n = File.Size(filePath);
+            if (n > 0)
+            {
+                BinaryReader reader = File.OpenBinary(filePath);
+                for (long i = 0u; i < n; ++i)
+                {
+                    sha1.Process(reader.ReadByte());
+                }
+            }
+        }
+        return sha1.GetDigest();
+    }
+}

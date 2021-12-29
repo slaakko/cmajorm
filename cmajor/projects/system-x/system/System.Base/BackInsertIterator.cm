@@ -1,0 +1,61 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.Concepts;
+
+namespace System
+{
+    public class BackInsertProxy<C> where C is BackInsertionSequence
+    {
+        private typedef BackInsertProxy<C> Self;
+        private typedef C.ValueType ValueType;
+
+        public inline nothrow BackInsertProxy(): c(null)
+        {
+        }
+        public inline nothrow explicit BackInsertProxy(C* c_): c(c_)
+        {
+        }
+        public inline void operator=(const ValueType& value)
+        {
+            c->Add(value);
+        }
+        private C* c;
+    }
+    
+    public class BackInsertIterator<C> where C is BackInsertionSequence
+    {
+        private typedef BackInsertIterator<C> Self;
+        private typedef BackInsertProxy<C> Proxy;
+        public typedef C.ValueType ValueType;
+        public typedef Proxy& ReferenceType;
+        public typedef Proxy* PointerType;
+
+        public inline nothrow BackInsertIterator() : proxy()
+        {
+        }
+        public inline nothrow BackInsertIterator(C& c) : proxy(&c)
+        {
+        }
+        public inline nothrow Proxy& operator*() 
+        {
+            return proxy;
+        }
+        public inline nothrow Proxy* operator->()
+        {
+            return &proxy;
+        }
+        public inline nothrow Self& operator++()
+        {
+            return *this;
+        }
+        private Proxy proxy;
+    }
+
+    public nothrow BackInsertIterator<C> BackInserter<C>(C& c) where C is BackInsertionSequence
+    {
+        return BackInsertIterator<C>(c);
+    }
+}

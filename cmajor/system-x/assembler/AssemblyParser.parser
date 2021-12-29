@@ -3,11 +3,14 @@
 // Distributed under the MIT license
 // =================================
 
-[hpp]#include <system-x/assembler/Api.hpp>
+[hpp]#include <system-x/assembler/Assembler.hpp>
+[hpp]#include <system-x/assembler/Expression.hpp>
 [cpp]#include <system-x/assembler/AssemblyLexer.hpp>
 [cpp]#include <system-x/assembler/AssemblyTokens.hpp>
+[cpp]#include <soulng/util/Unicode.hpp>
 
 using namespace AssemblyTokens;
+using namespace soulng::unicode;
 
 parser api(CMSX_ASSEMBLER_API) AssemblyParser
 {
@@ -16,129 +19,179 @@ parser api(CMSX_ASSEMBLER_API) AssemblyParser
     state;
     main;
 
-    AssemblyFile
-        ::= AssemblyLine:assemblyLine*
+    AssemblyFile(cmsx::assembler::Assembler* assembler)
+        ::= AssemblyLine(assembler):assemblyLine*
         ;
 
-    AssemblyLine
-        ::= CommentLine:commentLine
-        |   EmptyLine:emptyLine
-        |   ModeLine:modeLine
-        |   InstructionLine:instructionLine
+    AssemblyLine(cmsx::assembler::Assembler* assembler)
+        ::= CommentLine(assembler):commentLine
+        |   EmptyLine(assembler):emptyLine
+        |   ModeLine(assembler):modeLine
+        |   InstructionLine(assembler):instructionLine
         ;
 
-    CommentLine
-        ::= Comment:cmt NEWLINE
+    CommentLine(cmsx::assembler::Assembler* assembler)
+        ::= Comment:cmt NEWLINE{ assembler->IncLine(); }
         ;
 
     Comment
         ::= SPACE? (any - (NEWLINE | SYMBOL | LOCAL_SYMBOL | DOT | SEMICOLON | AT)) (any - NEWLINE)*
         ;
 
-    EmptyLine
-        ::= SPACE? NEWLINE
+    EmptyLine(cmsx::assembler::Assembler* assembler)
+        ::= SPACE? NEWLINE{ assembler->EmptyLine(); }
         ;
 
-    ModeLine
-        ::= SPACE?
-            DOT
-            SYMBOL
-            SPACE?
-            NEWLINE
-        ;
-
-    InstructionLine
-        ::= Instruction:left
-            (SPACE? SEMICOLON Instruction:right)* Comment:cmt? NEWLINE
-        ;
-
-    Instruction
-        ::= Label:lbl
-            SplitLine(false):splitLine
-            OpCode:opcode
-            Operands:operands
-        ;
-
-    Label
-        ::= LOCAL_SYMBOL
-        |   SYMBOL
-        ;
-
-    SplitLine(bool hasLabel)
-        ::= SPACE (NEWLINE SPACE)?
-        |   empty{ pass = hasLabel; } NEWLINE SPACE
-        ;
-
-    OpCode
-        ::= DECIMAL_CONSTANT? SYMBOL
-        ;
-
-    Operands
+    ModeLine(cmsx::assembler::Assembler* assembler, var soulng::lexer::SourcePos sp, var std::string mode)
         ::= 
-        (   SPACE? Expression:left (COMMA Expression:right)*
+        (
+            SPACE?
+            DOT{ sp = assembler->GetSourcePos(lexer, pos); }
+            SYMBOL{ mode = lexer.GetString(pos); }
+            SPACE?
+            NEWLINE{ assembler->IncLine(); }
+        )
+        {
+            assembler->AddModeInstruction(mode, sp);
+        }
+        ;
+
+    InstructionLine(cmsx::assembler::Assembler* assembler)
+        ::= Instruction(assembler):left
+            (SPACE? SEMICOLON Instruction(assembler):right)* Comment:cmt? NEWLINE{ assembler->InstructionLine(); }
+        ;
+
+    Instruction(cmsx::assembler::Assembler* assembler, var cmsx::assembler::Instruction* instruction, var std::unique_ptr<cmsx::assembler::OpCode> opc) 
+        ::= 
+        (
+            Label(assembler):lbl
+            SplitLine(assembler, lbl != nullptr):splitLine
+            OpCode(assembler):opcode
+            { 
+                opc.reset(opcode); 
+                soulng::lexer::SourcePos sp = opc->GetSourcePos(); 
+                instruction = new cmsx::assembler::Instruction(sp, lbl, opc.release()); 
+            }
+            Operands(assembler, instruction):operands
+        )
+        {
+            assembler->AddInstruction(instruction);
+        }
+        ;
+
+    Label(cmsx::assembler::Assembler* assembler) : cmsx::assembler::Symbol*
+        ::= LOCAL_SYMBOL{ return new cmsx::assembler::LocalSymbol(assembler->GetSourcePos(lexer, pos), lexer.GetString(pos)); }
+        |   SYMBOL{ return new cmsx::assembler::GlobalSymbol(assembler->GetSourcePos(lexer, pos), lexer.GetString(pos)); }
+        |   empty{ return nullptr; }
+        ;
+
+    SplitLine(cmsx::assembler::Assembler* assembler, bool hasLabel)
+        ::= SPACE (NEWLINE SPACE)?
+        |   empty{ pass = hasLabel; } NEWLINE{ assembler->IncLine(); } SPACE
+        ;
+
+    OpCode(cmsx::assembler::Assembler* assembler, var soulng::lexer::SourcePos sp, var soulng::lexer::Span s) : cmsx::assembler::OpCode*
+        ::= 
+        (
+            (DECIMAL_CONSTANT{ s = span; sp = assembler->GetSourcePos(lexer, pos); })? SYMBOL{ if (!s.Valid()) s = span; s.end = span.end; sp = assembler->GetSourcePos(lexer, pos); }
+        )
+        {
+            return new cmsx::assembler::OpCode(sp, ToUtf8(lexer.GetMatch(s)));
+        }
+        ;
+
+    Operands(cmsx::assembler::Assembler* assembler, cmsx::assembler::Instruction* instruction)
+        ::= 
+        (   SPACE? Expression(assembler):left{ instruction->AddOperand(left); } (COMMA Expression(assembler):right{ instruction->AddOperand(right); })*
         |   SPACE? empty
         )
         ;
 
-    Expression
-        ::= Term:left (WeakOperator:op Term:right)*
+    Expression(cmsx::assembler::Assembler* assembler, var soulng::lexer::SourcePos sourcePos, var std::unique_ptr<cmsx::assembler::Node> expr) : cmsx::assembler::Node*
+        ::= 
+        (
+            Term(assembler):left{ expr.reset(left); sourcePos = lexer.GetSourcePos(pos); } 
+            (
+                WeakOperator:op 
+                Term(assembler):right{ expr.reset(new cmsx::assembler::BinaryExpression(sourcePos, op, expr.release(), right)); }
+            )*
+        )
+        {
+            return expr.release();
+        }
         ;
 
-    WeakOperator
-        ::= PLUS
-        |   MINUS
-        |   BAR
-        |   CARET
+    WeakOperator : cmsx::assembler::Operator 
+        ::= PLUS{ return cmsx::assembler::Operator::add; }
+        |   MINUS{ return cmsx::assembler::Operator::subtract; }
+        |   BAR{ return cmsx::assembler::Operator::bitwise_or; }
+        |   CARET{ return cmsx::assembler::Operator::bitwise_xor; }
         ;
 
-    Term
-        ::= PrimaryExpression:left (StrongOperator:op PrimaryExpression:right)*
+    Term(cmsx::assembler::Assembler* assembler, var soulng::lexer::SourcePos sourcePos, var std::unique_ptr<cmsx::assembler::Node> expr) : cmsx::assembler::Node*
+        ::= 
+        (
+            PrimaryExpression(assembler):left{ expr.reset(left); sourcePos = lexer.GetSourcePos(pos); } 
+            (
+                StrongOperator:op 
+                PrimaryExpression(assembler):right{ expr.reset(new cmsx::assembler::BinaryExpression(sourcePos, op, expr.release(), right)); }
+            )*
+        )
+        {
+            return expr.release();
+        }
         ;
 
-    StrongOperator
-        ::= AST
-        |   SLASH
-        |   SLASHSLASH
-        |   PERCENT
-        |   SHIFT_LEFT
-        |   SHIFT_RIGHT
-        |   AMP
+    StrongOperator : cmsx::assembler::Operator 
+        ::= AST{ return cmsx::assembler::Operator::multiply; }
+        |   SLASH{ return cmsx::assembler::Operator::divide; }
+        |   SLASHSLASH{ return cmsx::assembler::Operator::fractional_divide; }
+        |   PERCENT{ return cmsx::assembler::Operator::modulus; }
+        |   SHIFT_LEFT{ return cmsx::assembler::Operator::shift_left; }
+        |   SHIFT_RIGHT{ return cmsx::assembler::Operator::shift_right; }
+        |   AMP{ return cmsx::assembler::Operator::bitwise_and; }
         ;
 
-    PrimaryExpression
-        ::= LocalSymbol:localSymbol
-        |   Constant:constant
-        |   Symbol:symbol
-        |   At:at
-        |   LPAREN Expression:expr RPAREN
-        |   UnaryOperator:op PrimaryExpression:primaryExpr
+    PrimaryExpression(cmsx::assembler::Assembler* assembler, var soulng::lexer::SourcePos sp, var std::unique_ptr<cmsx::assembler::Node> expr) : cmsx::assembler::Node*
+        ::= 
+        (   LocalSymbol(assembler):localSymbol{ expr.reset(localSymbol); }
+        |   Constant(assembler):constant{ expr.reset(constant); }
+        |   Symbol(assembler):symbol{ expr.reset(symbol); }
+        |   At(assembler):at{ expr.reset(at); }
+        |   LPAREN Expression(assembler):pexpr{ sp = assembler->GetSourcePos(lexer, pos); expr.reset(new cmsx::assembler::ParenthesizedExpression(sp, pexpr)); } RPAREN
+        |   UnaryOperator:op{ sp = assembler->GetSourcePos(lexer, pos); } 
+            PrimaryExpression(assembler):primaryExpr{ expr.reset(new cmsx::assembler::UnaryExpression(sp, op, primaryExpr)); }
+        )
+        {
+            return expr.release();
+        }
         ;
 
-    UnaryOperator
-        ::= PLUS
-        |   MINUS
-        |   TILDE
-        |   DOLLAR
-        |   AMP
+    UnaryOperator : cmsx::assembler::Operator 
+        ::= PLUS{ return cmsx::assembler::Operator::unaryPlus; }
+        |   MINUS{ return cmsx::assembler::Operator::unaryMinus; }
+        |   TILDE{ return cmsx::assembler::Operator::complement; }
+        |   DOLLAR{ return cmsx::assembler::Operator::reg; }
+        |   AMP{ return cmsx::assembler::Operator::serial; }
         ;
 
-    LocalSymbol
-        ::= LOCAL_SYMBOL
+    LocalSymbol(cmsx::assembler::Assembler* assembler) : cmsx::assembler::Node*
+        ::= LOCAL_SYMBOL{ return new cmsx::assembler::LocalSymbol(assembler->GetSourcePos(lexer, pos), lexer.GetString(pos)); }
         ;
 
-    Constant
-        ::= DECIMAL_CONSTANT
-        |   HEX_CONSTANT
-        |   CHAR_CONSTANT
-        |   STRING_CONSTANT
-        |   CLSID_CONSTANT
+    Constant(cmsx::assembler::Assembler* assembler) : cmsx::assembler::Node*
+        ::= DECIMAL_CONSTANT{ return assembler->MakeDecimalConstant(assembler->GetSourcePos(lexer, pos), lexer.GetString(pos)); }
+        |   HEX_CONSTANT{ return assembler->MakeHexConstant(assembler->GetSourcePos(lexer, pos), lexer.GetString(pos)); }
+        |   CHAR_CONSTANT{ return assembler->MakeCharConstant(assembler->GetSourcePos(lexer, pos), lexer.GetMatch(span)); }
+        |   STRING_CONSTANT{ return assembler->MakeStringConstant(assembler->GetSourcePos(lexer, pos), lexer.GetMatch(span)); }
+        |   CLSID_CONSTANT{ return assembler->MakeClsIdConstant(assembler->GetSourcePos(lexer, pos), lexer.GetMatch(span)); }
         ;
 
-    Symbol
-        ::= SYMBOL
+    Symbol(cmsx::assembler::Assembler* assembler) : cmsx::assembler::Node*
+        ::= SYMBOL{ return new cmsx::assembler::GlobalSymbol(assembler->GetSourcePos(lexer, pos), lexer.GetString(pos)); }
         ;
 
-    At
-        ::= AT
+    At(cmsx::assembler::Assembler* assembler) : cmsx::assembler::Node*
+        ::= AT{ return new cmsx::assembler::At(assembler->GetSourcePos(lexer, pos)); }
         ;
 }

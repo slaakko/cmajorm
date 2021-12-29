@@ -6,12 +6,86 @@
 #include <soulng/lexer/Lexer.hpp>
 #include <soulng/lexer/ParsingException.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <boost/lexical_cast.hpp>
 #include <string>
 #include <algorithm>
+#include <limits>
 
 namespace soulng { namespace lexer {
 
 using namespace soulng::unicode;
+
+int8_t ToSByte(int64_t value)
+{
+    if (value < std::numeric_limits<int8_t>::min() || value > std::numeric_limits<int8_t>::max())
+    {
+        throw std::runtime_error("range error: value=" + std::to_string(value));
+    }
+    return static_cast<int8_t>(value);
+}
+
+uint8_t ToByte(int64_t value)
+{
+    if (value < std::numeric_limits<uint8_t>::min() || value > std::numeric_limits<uint8_t>::max())
+    {
+        throw std::runtime_error("range error: value=" + std::to_string(value));
+    }
+    return static_cast<uint8_t>(value);
+}
+
+int16_t ToShort(int64_t value)
+{
+    if (value < std::numeric_limits<int16_t>::min() || value > std::numeric_limits<int16_t>::max())
+    {
+        throw std::runtime_error("range error: value=" + std::to_string(value));
+    }
+    return static_cast<int16_t>(value);
+}
+
+uint16_t ToUShort(int64_t value)
+{
+    if (value < std::numeric_limits<uint16_t>::min() || value > std::numeric_limits<uint16_t>::max())
+    {
+        throw std::runtime_error("range error: value=" + std::to_string(value));
+    }
+    return static_cast<uint16_t>(value);
+}
+
+int32_t ToInt(int64_t value)
+{
+    if (value < std::numeric_limits<int32_t>::min() || value > std::numeric_limits<int32_t>::max())
+    {
+        throw std::runtime_error("range error: value=" + std::to_string(value));
+    }
+    return static_cast<int32_t>(value);
+}
+
+uint32_t ToUInt(int64_t value)
+{
+    if (value < std::numeric_limits<uint32_t>::min() || value > std::numeric_limits<uint32_t>::max())
+    {
+        throw std::runtime_error("range error: value=" + std::to_string(value));
+    }
+    return static_cast<uint32_t>(value);
+}
+
+int64_t ToLong(int64_t value)
+{
+    if (value < std::numeric_limits<int64_t>::min() || value > std::numeric_limits<int64_t>::max())
+    {
+        throw std::runtime_error("range error: value=" + std::to_string(value));
+    }
+    return static_cast<int64_t>(value);
+}
+
+uint64_t ToULong(uint64_t value)
+{
+    if (value < std::numeric_limits<uint64_t>::min() || value > std::numeric_limits<uint64_t>::max())
+    {
+        throw std::runtime_error("range error: value=" + std::to_string(value));
+    }
+    return static_cast<uint64_t>(value);
+}
 
 LexerState::LexerState() : token(), line(0), lexeme(), pos(), tokens(), flags(), recordedPosPair(), farthestPos(), currentPos()
 {
@@ -290,6 +364,131 @@ Token Lexer::GetToken(int64_t pos) const
     }
 }
 
+std::string Lexer::GetString(int64_t pos) const
+{
+    return ToUtf8(GetToken(pos).match.ToString());
+}
+
+int8_t Lexer::GetSByte(int64_t pos) const
+{
+    try
+    {
+        return ToSByte(boost::lexical_cast<int64_t>(GetString(pos)));
+    }
+    catch (const std::exception& ex)
+    {
+        throw std::runtime_error("sbyte expected in '" + fileName + "' at line " + std::to_string(line) + ": " + ex.what());
+    }
+}
+
+uint8_t Lexer::GetByte(int64_t pos) const
+{
+    try
+    {
+        return ToByte(boost::lexical_cast<int64_t>(GetString(pos)));
+    }
+    catch (const std::exception& ex)
+    {
+        throw std::runtime_error("byte expected in '" + fileName + "' at line " + std::to_string(line) + ": " + ex.what());
+    }
+}
+
+int16_t Lexer::GetShort(int64_t pos) const
+{
+    try
+    {
+        return ToShort(boost::lexical_cast<int64_t>(GetString(pos)));
+    }
+    catch (const std::exception& ex)
+    {
+        throw std::runtime_error("short expected in '" + fileName + "' at line " + std::to_string(line) + ": " + ex.what());
+    }
+}
+
+uint16_t Lexer::GetUShort(int64_t pos) const
+{
+    try
+    {
+        return ToUShort(boost::lexical_cast<int64_t>(GetString(pos)));
+    }
+    catch (const std::exception& ex)
+    {
+        throw std::runtime_error("ushort expected in '" + fileName + "' at line " + std::to_string(line) + ": " + ex.what());
+    }
+}
+
+int32_t Lexer::GetInt(int64_t pos) const
+{
+    try
+    {
+        return ToInt(boost::lexical_cast<int64_t>(GetString(pos)));
+    }
+    catch (const std::exception& ex)
+    {
+        throw std::runtime_error("int expected in '" + fileName + "' at line " + std::to_string(line) + ": " + ex.what());
+    }
+}
+
+uint32_t Lexer::GetUInt(int64_t pos) const
+{
+    try
+    {
+        return ToUInt(boost::lexical_cast<int64_t>(GetString(pos)));
+    }
+    catch (const std::exception& ex)
+    {
+        throw std::runtime_error("uint expected in '" + fileName + "' at line " + std::to_string(line) + ": " + ex.what());
+    }
+}
+
+int64_t Lexer::GetLong(int64_t pos) const
+{
+    try
+    {
+        return ToLong(boost::lexical_cast<int64_t>(GetString(pos)));
+    }
+    catch (const std::exception& ex)
+    {
+        throw std::runtime_error("long expected in '" + fileName + "' at line " + std::to_string(line) + ": " + ex.what());
+    }
+}
+
+uint64_t Lexer::GetULong(int64_t pos) const
+{
+    try
+    {
+        return ToULong(boost::lexical_cast<int64_t>(GetString(pos)));
+    }
+    catch (const std::exception& ex)
+    {
+        throw std::runtime_error("ulong expected in '" + fileName + "' at line " + std::to_string(line) + ": " + ex.what());
+    }
+}
+
+float Lexer::GetFloat(int64_t pos) const
+{
+    try
+    {
+        return boost::lexical_cast<float>(GetString(pos));
+    }
+    catch (const std::exception& ex)
+    {
+        throw std::runtime_error("float expected in '" + fileName + "' at line " + std::to_string(line) + ": " + ex.what());
+    }
+}
+
+double Lexer::GetDouble(int64_t pos) const
+{
+    try
+    {
+        return boost::lexical_cast<double>(GetString(pos));
+    }
+    catch (const std::exception& ex)
+    {
+        throw std::runtime_error("float expected in '" + fileName + "' at line " + std::to_string(line) + ": " + ex.what());
+    }
+}
+
 void Lexer::SetTokens(const std::vector<Token>& tokens_)
 {
     if (!tokens_.empty())
@@ -469,6 +668,24 @@ std::u32string Lexer::ErrorLines(const Span& span) const
     lines.append(s - lineStart, ' ');
     lines.append(std::max(static_cast<int64_t>(1), e - s), '^');
     lines.append(lineEnd - e, ' ');
+    lines.append(1, '\n');
+    return lines;
+}
+
+std::u32string Lexer::ErrorLines(const SourcePos& sourcePos) const
+{
+    std::u32string lines;
+    const char32_t* lineStart = lineStarts[sourcePos.line];
+    const char32_t* lineEnd = LineEnd(end, lineStart);
+    lines.append(std::u32string(lineStart, lineEnd));
+    lines.append(1, '\n');
+    std::u32string caretLine;
+    if (sourcePos.col > 1)
+    {
+        caretLine.append(sourcePos.col - 1, ' ');
+    }
+    caretLine.append(1, '^');
+    lines.append(caretLine);
     lines.append(1, '\n');
     return lines;
 }

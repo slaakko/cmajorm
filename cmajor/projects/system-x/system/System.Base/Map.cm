@@ -1,0 +1,105 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Concepts;
+
+namespace System.Collections
+{
+    public class Map<Key, Value, KeyCompare = Less<Key>> 
+        where Key is Semiregular and Value is Semiregular and KeyCompare is Relation and KeyCompare.Domain is Key
+    {
+        public typedef Key KeyType;
+        public typedef Value MappedType;
+        public typedef KeyCompare Compare;
+        public typedef Pair<KeyType, MappedType> ValueType;
+        public typedef TreeType.ConstIterator ConstIterator;
+        public typedef TreeType.Iterator Iterator;
+        private typedef Map<KeyType, MappedType, KeyCompare> Self;
+        private typedef RedBlackTree<KeyType, ValueType, SelectFirst<KeyType, MappedType>, KeyCompare> TreeType;
+
+        public inline nothrow Iterator Begin()
+        {
+            return tree.Begin();
+        }
+        public inline nothrow ConstIterator Begin() const
+        {
+            return tree.CBegin();
+        }
+        public inline nothrow ConstIterator CBegin() const
+        {
+            return tree.CBegin();
+        }
+        public inline nothrow Iterator End()
+        {
+            return tree.End();
+        }
+        public inline nothrow ConstIterator End() const
+        {
+            return tree.CEnd();
+        }
+        public inline nothrow ConstIterator CEnd() const
+        {
+            return tree.CEnd();
+        }
+        public inline nothrow long Count() const
+        {
+            return tree.Count();
+        }
+        public inline nothrow bool IsEmpty() const
+        {
+            return tree.IsEmpty();
+        }
+        public inline nothrow void Clear()
+        {
+            tree.Clear();
+        }
+        public inline nothrow Iterator Find(const KeyType& key)
+        {
+            return tree.Find(key);
+        }
+        public inline nothrow ConstIterator Find(const KeyType& key) const
+        {
+            return tree.CFind(key);
+        }
+        public inline nothrow ConstIterator CFind(const KeyType& key) const
+        {
+            return tree.CFind(key);
+        }
+        public inline MappedType& operator[](const KeyType& key)
+        {
+            ValueType valueType(key, MappedType());
+            Pair<Iterator, bool> ib = Insert(valueType);
+            Iterator i = ib.first;
+            return i->second;
+        }
+        public inline Pair<Iterator, bool> Insert(const ValueType& value) 
+            where ValueType is Copyable
+        {
+            return tree.Insert(value);
+        }
+        public inline nothrow bool Remove(const KeyType& key)
+        {
+            return tree.Remove(key);
+        }
+        public inline nothrow void Remove(Iterator pos)
+        {
+            tree.Remove(pos);
+        }
+        private TreeType tree;
+    }
+
+    public inline nothrow bool operator==<Key, Value, KeyCompare>(const Map<Key, Value, KeyCompare>& left, const Map<Key, Value, KeyCompare>& right) 
+        where Key is Regular and Value is Regular and KeyCompare is Relation and KeyCompare.Domain is Key
+    {
+        return left.Count() == right.Count() && Equal(left.CBegin(), left.CEnd(), right.CBegin(), right.CEnd(), EqualTo<Pair<Key, Value>>());
+    }
+
+    public inline nothrow bool operator<<Key, Value, KeyCompare>(const Map<Key, Value, KeyCompare>& left, const Map<Key, Value, KeyCompare>& right) 
+        where Key is TotallyOrdered and Value is TotallyOrdered and KeyCompare is Relation and KeyCompare.Domain is Key
+    {
+        return LexicographicalCompare(left.CBegin(), left.CEnd(), right.CBegin(), right.CEnd(), Less<Pair<Key, Value>>());
+    }
+}

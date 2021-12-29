@@ -1,0 +1,336 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.IO
+{
+    public class InvalidPathException : Exception
+    {
+        public nothrow InvalidPathException(const string& message_) : base(message_)
+        {
+        }
+    }
+    
+    public string GetFullPath(const string& path)
+    {
+        string cp = Path.MakeCanonical(path);
+        string p = cp;
+        if (Path.IsRelative(cp))
+        {
+            p.Clear();
+            p.Append(GetCurrentWorkingDirectory());
+            p.Append('/');
+            p.Append(cp);
+        }
+        List<string> components = p.Split('/');
+        long w = 0;
+        long n = components.Count();
+        for (long i = 0; i < n; ++i)
+        {
+            string c = components[i];
+            if (i == 0 || (!c.IsEmpty() && c != "."))
+            {
+                if (c == "..")
+                {
+                    --w;
+                    if (w < 0)
+                    {
+                        throw InvalidPathException("path '" + path + "' is invalid");
+                    }
+                }                
+                else
+                {
+                    if (w != i)
+                    {
+                        components[w] = components[i];
+                    }
+                    ++w;
+                }
+            }
+        }
+        if (w == 0)
+        {
+            return "/";
+        }
+        string result;
+        for (long i = 0; i < w; ++i)
+        {
+            if (i != 0)
+            {
+                result.Append('/');
+            }
+            result.Append(components[i]);
+        }
+        if (result.IsEmpty())
+        {
+            return "/";
+        }
+        else
+        {
+            return result;
+        }            
+    }
+    
+    public static class Path
+    {
+        public static bool Exists(const string& path)
+        {
+            byte[System.Os.statBufSize] statBuf;
+            int result = stat(path.Chars(), &statBuf[0]);
+            return result != -1;
+        }
+        public static nothrow string MakeCanonical(const string& path)
+        {
+            string result;
+            char prev = ' ';
+            for (char c : path)
+            {
+                if (c == '/')
+                {
+                    if (prev != '/')
+                    {
+                        result.Append(c);
+                    }
+                }
+                else
+                {
+                    result.Append(c);
+                }
+                prev = c;
+            }
+            if (result == "/")
+            {
+                return result;
+            }
+            if (!result.IsEmpty())
+            {
+                if (result[result.Length() - 1] == '/')
+                {
+                    return result.Substring(0, result.Length() - 1);
+                }
+            }
+            return result;
+        }
+        public static nothrow string ChangeExtension(const string& path, const string& extension)
+        {
+            long lastDotPos = path.RFind('.');
+            long lastSlashPos = path.RFind('/');
+            if (lastSlashPos != -1 && lastDotPos < lastSlashPos)
+            {
+                lastDotPos = -1;
+            }
+            if (extension.IsEmpty())
+            {
+                if (lastDotPos != -1)
+                {
+                    return path.Substring(0, lastDotPos);
+                }
+                else
+                {
+                    return path;
+                }
+            }
+            else
+            {
+                if (lastDotPos == -1)
+                {
+                    if (extension[0] == '.')
+                    {
+                        return path + extension;
+                    }
+                    else
+                    {
+                        return path + "." + extension;
+                    }
+                }
+                else
+                {
+                    if (extension[0] == '.')
+                    {
+                        return path.Substring(0, lastDotPos) + extension;
+                    }
+                    else
+                    {
+                        return path.Substring(0,  lastDotPos + 1) + extension;
+                    }
+                }
+            }
+        }
+        public static nothrow bool HasExtension(const string& path)
+        {
+            string p = MakeCanonical(path);
+            long lastDotPos = p.RFind('.');
+            if (lastDotPos != -1)
+            {
+                long lastDirSep = p.Find('/', lastDotPos + 1);
+                if (lastDirSep > lastDotPos)
+                {
+                    return false;
+                }
+                else if (lastDotPos < p.Length() - 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public static nothrow string GetExtension(const string& path)
+        {
+            string p = MakeCanonical(path);
+            long lastDotPos = p.RFind('.');
+            if (lastDotPos != -1)
+            {
+                if (p.Find('/', lastDotPos + 1) != -1)
+                {
+                    return string();
+                }
+                else
+                {
+                    return p.Substring(lastDotPos);
+                }
+            }
+            else
+            {
+                return string();
+            }
+        }
+        public static nothrow string GetFileName(const string& path)
+        {
+            if (path.IsEmpty())
+            {
+                return string();
+            }
+            else
+            {
+                string p = MakeCanonical(path);
+                char lastChar = p[p.Length() - 1];
+                if (lastChar == '/')
+                {
+                    return string();
+                }
+                else
+                {
+                    long lastDirSepPos = p.RFind('/');
+                    if (lastDirSepPos != -1)
+                    {
+                        return p.Substring(lastDirSepPos + 1);
+                    }
+                    else
+                    {
+                        return p;
+                    }
+                }
+            }
+        }
+        public static nothrow string GetFileNameWithoutExtension(const string& path)
+        {
+            string fileName = GetFileName(path);
+            long lastDotPos = fileName.RFind('.');
+            if (lastDotPos != -1)
+            {
+                return fileName.Substring(0, lastDotPos);
+            }
+            else
+            {
+                return fileName;
+            }
+        }
+        public static nothrow string GetDirectoryName(const string& path)
+        {
+            string p = MakeCanonical(path);
+            if (p.IsEmpty())
+            {
+                return string();
+            }
+            else 
+            {
+                long lastDirSepPos = p.RFind('/');
+                if (lastDirSepPos != -1)
+                {
+                    return p.Substring(0, lastDirSepPos);
+                }
+                else
+                {
+                    return string();
+                }
+            }
+        }
+        public static nothrow string Combine(const string& path1, const string& path2)
+        {
+            string p1 = MakeCanonical(path1);
+            string p2 = MakeCanonical(path2);
+            if (p1.IsEmpty())
+            {
+                return p2;
+            }
+            else if (p2.IsEmpty())
+            {
+                return p1;
+            }
+            else
+            {
+                if (IsAbsolute(p2))
+                {
+                    return p2;
+                }
+                else 
+                {
+                    string result = p1;
+                    if (p1[p1.Length() - 1] != '/')
+                    {
+                        result.Append('/');
+                    }
+                    result.Append(p2);
+                    return result;
+                }
+            }
+        }
+        public static nothrow bool IsAbsolute(const string& path)
+        {
+            if (path.IsEmpty())
+            {
+                return false;
+            }
+            else
+            {
+                string p = MakeCanonical(path);
+                if (p[0] == '/')
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+        public static nothrow bool IsRelative(const string& path)
+        {
+            return !IsAbsolute(path);
+        }
+        public static string GetParent(const string& path)
+        {
+            string fullPath = GetFullPath(path);
+            long lastSlashPos = fullPath.RFind('/');
+            if (lastSlashPos == -1)
+            {
+                return string();
+            }
+            else
+            {
+                return fullPath.Substring(0, lastSlashPos);
+            }
+        }
+    }
+}

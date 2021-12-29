@@ -1,0 +1,41 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace System
+{
+    public class Exception
+    {
+        public nothrow Exception(const string& message_) : message(message_)
+        {
+        }
+        public virtual default ~Exception();
+        public nothrow const string& Message() const
+        {
+            return message;
+        }
+        public nothrow const string& StackTrace() const
+        {
+            return stackTrace;
+        }
+        public void SetStackTrace(const string& stackTrace_)
+        {
+            stackTrace = stackTrace_;
+        }
+        public virtual string ToString() const
+        {
+            string s;
+            s.Append(typename(*this)).Append(": ").Append(message).Append('\n').Append(stackTrace);
+            return s;
+        }
+        private string message;
+        private string stackTrace;
+    }
+    
+    public void Throw(Exception* ex)
+    {
+        ex->SetStackTrace(GetStackTrace());
+        do_throw(ex, typeid(ex));
+    }
+}

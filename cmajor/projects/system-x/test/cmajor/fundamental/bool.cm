@@ -1,0 +1,59 @@
+public bool bool_ret()
+{
+	return true;
+}
+
+public void bool_param(bool p, const bool& q, bool& r, bool* s)
+{
+	bool a = p;
+	bool b = q;
+	bool c = r;
+	bool d = *s;
+	r = a;
+	*s = a;
+}
+
+public void bool_test()
+{
+	bool a;
+	bool b = true;
+	bool c = false;
+	bool d = b;
+	
+	a = b;
+	a = c;
+	
+	const bool& e = true;
+	bool& f = a;
+	f = true;
+	f = c;
+	
+	bool* g = null;
+	bool* h = &a;
+	*h = true;
+	bool* i = &c;
+	*i = *h;
+	bool* k = g;
+	bool* l = h;
+	
+	bool m = bool_ret();
+	
+	bool_param(false, e, f, &m);
+	
+	bool n = true;
+	bool o = false;
+	bool p = false;
+	bool q = false;
+	bool_param(n, o, p, &q);
+	
+	bool r = true == true;
+	bool s = true == false;
+	bool t = a == true;
+	bool u = true == a;
+	bool v = a == b;
+	bool x = a != false;
+	bool y = a != b;
+	
+	byte i1 = 1u;
+	bool z = cast<bool>(i1);
+}

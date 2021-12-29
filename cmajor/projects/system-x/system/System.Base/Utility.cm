@@ -1,0 +1,204 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace System
+{
+    public constexpr nothrow inline long Align(long n, long alignment)
+    {
+        #assert(alignment > 0);
+        return (n + alignment - 1) & -alignment;
+    }
+
+    public constexpr nothrow inline long StrLen(const char* s)
+    {
+        long len = 0;
+        if (s != null)
+        {
+            while (*s != '\0')
+            {
+                ++len;
+                ++s;
+            }
+        }
+        return len;
+    }
+    
+    public constexpr nothrow inline long StrLen(const wchar* s)
+    {
+        long len = 0;
+        if (s != null)
+        {
+            while (*s != '\0')
+            {
+                ++len;
+                ++s;
+            }
+        }
+        return len;
+    }
+    
+    public constexpr nothrow inline long StrLen(const uchar* s)
+    {
+        long len = 0;
+        if (s != null)
+        {
+            while (*s != '\0')
+            {
+                ++len;
+                ++s;
+            }
+        }
+        return len;
+    }
+
+    public nothrow inline void StrCopy(char* buf, const char* from)
+    {
+        #assert(buf != null);
+        if (from != null)
+        {
+            while (*from != '\0')
+            {
+                *buf++ = *from++;
+            }
+        }
+        *buf = '\0';
+    }
+    
+    public nothrow inline void StrCopy(wchar* buf, const wchar* from)
+    {
+        #assert(buf != null);
+        if (from != null)
+        {
+            while (*from != '\0')
+            {
+                *buf++ = *from++;
+            }
+        }
+        *buf = '\0';
+    }
+    
+    public nothrow inline void StrCopy(uchar* buf, const uchar* from)
+    {
+        #assert(buf != null);
+        if (from != null)
+        {
+            while (*from != '\0')
+            {
+                *buf++ = *from++;
+            }
+        }
+        *buf = '\0';
+    }
+
+    public nothrow inline long StrCopy(char* buf, const char* from, long length)
+    {
+        long resultLen = 0;
+        #assert(buf != null);
+        if (from != null)
+        {
+            while (resultLen < length)
+            {
+                if (*from == '\0')
+                {
+                    break;
+                }
+                *buf++ = *from++;
+                ++resultLen;
+            }
+        }
+        *buf = '\0';
+        return resultLen;
+    }
+
+    public nothrow inline long StrCopy(wchar* buf, const wchar* from, long length)
+    {
+        long resultLen = 0;
+        #assert(buf != null);
+        if (from != null)
+        {
+            while (resultLen < length)
+            {
+                if (*from == '\0')
+                {
+                    break;
+                }
+                *buf++ = *from++;
+                ++resultLen;
+            }
+        }
+        *buf = '\0';
+        return resultLen;
+    }
+
+    public nothrow inline long StrCopy(uchar* buf, const uchar* from, long length)
+    {
+        long resultLen = 0;
+        #assert(buf != null);
+        if (from != null)
+        {
+            while (resultLen < length)
+            {
+                if (*from == '\0')
+                {
+                    break;
+                }
+                *buf++ = *from++;
+                ++resultLen;
+            }
+        }
+        *buf = '\0';
+        return resultLen;
+    }
+
+    public nothrow long MemGrow(long size)
+    {
+        if (size < 8)
+        {
+            return 8;
+        }
+        else if (size < 64)
+        {
+            return 64;
+        }
+        else if (size < 512)
+        {
+            return 512;
+        }
+        else if (size < 4096)
+        {
+            return 4096;
+        }
+        else
+        {
+            return 2 * Align(size, 4096);
+        }
+    }
+    
+    public nothrow string GetStackTrace()
+    {
+        UniquePtr<byte> mem(cast<byte*>(MemAlloc(4096)));
+        if (stack_trace(mem.Get(), 4096) == 0)
+        {
+            string stackTrace;
+            byte* p = mem.Get();
+            while (*p != 0u)
+            {
+                stackTrace.Append(cast<char>(*p));
+                ++p;
+            }
+            return stackTrace;
+        }
+        return string();
+    }
+    
+    public nothrow void FailAssertion(const char* assertion, const char* function, const char* sourceFilePath, int lineNumber)
+    {
+        string msg = "assertion '";
+        msg.Append(assertion).Append("' failed in function '").Append(function).Append("' at ").Append(sourceFilePath).Append(':').Append(ToString(lineNumber)).Append('\n');
+        msg.Append(GetStackTrace());
+        write(2, msg.Chars(), msg.Length());
+        exit(1u);
+    }
+}

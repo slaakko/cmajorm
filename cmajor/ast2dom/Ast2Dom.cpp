@@ -122,6 +122,7 @@ public:
 
     void Visit(LabelNode& labelNode) override;
     void Visit(CompoundStatementNode& compoundStatementNode) override;
+    void Visit(LabeledStatementNode& labeledStatementNode) override;
     void Visit(ReturnStatementNode& returnStatementNode) override;
     void Visit(IfStatementNode& ifStatementNode) override;
     void Visit(WhileStatementNode& whileStatementNode) override;
@@ -1154,6 +1155,11 @@ void Ast2DomVisitor::Visit(CompoundStatementNode& compoundStatementNode)
     }
     prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(compoundStatementElement.release()));
     currentElement = prevElement;
+}
+
+void Ast2DomVisitor::Visit(LabeledStatementNode& labeledStatementNode)
+{
+    labeledStatementNode.Stmt()->Accept(*this);
 }
 
 void Ast2DomVisitor::Visit(ReturnStatementNode& returnStatementNode)

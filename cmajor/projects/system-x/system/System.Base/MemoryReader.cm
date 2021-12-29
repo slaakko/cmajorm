@@ -1,0 +1,86 @@
+using System;
+
+namespace System.IO
+{
+    public class MemoryReader
+    {
+        public nothrow MemoryReader(byte* ptr_, long count_) : ptr(ptr_), pos(ptr), count(count_)
+        {
+        }
+        public byte ReadByte()
+        {
+            if (pos - ptr >= count)
+            {
+                throw Exception("memory reader: unexpected end of data");
+            }
+            return *pos++;
+        }
+        public sbyte ReadSByte()
+        {
+            return cast<sbyte>(ReadByte());
+        }
+        public ushort ReadUShort()
+        {
+            byte b0 = ReadByte();
+            byte b1 = ReadByte();
+            return (cast<ushort>(b0) << 8u) | cast<ushort>(b1);
+        }
+        public short ReadShort()
+        {
+            return cast<short>(ReadUShort());
+        }
+        public uint ReadUInt()
+        {
+            byte b0 = ReadByte();
+            byte b1 = ReadByte();
+            byte b2 = ReadByte();
+            byte b3 = ReadByte();
+            return (cast<uint>(b0) << 24u) | (cast<uint>(b1) << 16u) | (cast<uint>(b2) << 8u) | cast<uint>(b3);
+        }
+        public int ReadInt()
+        {
+            return cast<int>(ReadUInt());
+        }
+        public ulong ReadULong()
+        {
+            byte b0 = ReadByte();
+            byte b1 = ReadByte();
+            byte b2 = ReadByte();
+            byte b3 = ReadByte();
+            byte b4 = ReadByte();
+            byte b5 = ReadByte();
+            byte b6 = ReadByte();
+            byte b7 = ReadByte();
+            return (cast<ulong>(b0) << 56u) | (cast<ulong>(b1) << 48u) | (cast<ulong>(b2) << 40u) | (cast<ulong>(b3) << 32u) |
+                (cast<ulong>(b4) << 24u) | (cast<ulong>(b5) << 16u) | (cast<ulong>(b6) << 8u) | cast<ulong>(b7);
+        }
+        public long ReadLong()
+        {
+            return cast<long>(ReadULong());
+        }
+        public DateTime ReadDateTime()
+        {
+            short year = ReadShort();
+            Month month = cast<Month>(ReadSByte());
+            sbyte day = ReadSByte();
+            Date date(year, month, day);
+            int secs = ReadInt();
+            DateTime dt(date, secs);
+            return dt;
+        }
+        public string ReadString()
+        {
+            string result;
+            byte b = ReadByte();
+            while (b != 0u)
+            {
+                result.Append(cast<char>(b));
+                b = ReadByte();
+            }
+            return result;
+        }
+        private byte* ptr;
+        private byte* pos;
+        private long count;
+    }
+}

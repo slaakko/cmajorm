@@ -607,6 +607,7 @@ public:
     void Visit(ClassDelegateNode& classDelegateNode) override;
 
     void Visit(CompoundStatementNode& compoundStatementNode) override;
+    void Visit(LabeledStatementNode& labeledStatementNode) override;
     void Visit(ReturnStatementNode& returnStatementNode) override;
     void Visit(IfStatementNode& ifStatementNode) override;
     void Visit(WhileStatementNode& whileStatementNode) override;
@@ -1694,6 +1695,11 @@ void Evaluator::Visit(CompoundStatementNode& compoundStatementNode)
     }
     containerScope = prevContainerScope;
     currentDeclarationBlock = prevDeclarationBlock;
+}
+
+void Evaluator::Visit(LabeledStatementNode& labeledStatementNode)
+{
+    labeledStatementNode.Stmt()->Accept(*this);
 }
 
 void Evaluator::Visit(ReturnStatementNode& returnStatementNode)

@@ -1,0 +1,51 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.IO
+{
+    public class Buffer
+    {
+        public nothrow Buffer(long size_) : size(size_), mem(cast<byte*>(MemAlloc(size)))
+        {
+        }
+        suppress Buffer(const Buffer&);
+        suppress void operator=(const Buffer&);
+        public nothrow Buffer(Buffer&& that): size(that.size), mem(that.mem)
+        {
+            that.size = 0;
+            that.mem = null;
+        }
+        public nothrow default void operator=(Buffer&& that);
+        public ~Buffer()
+        {
+            if (mem != null)
+            {
+                MemFree(mem);
+            }
+        }
+        public nothrow inline long Size() const 
+        {
+            return size;
+        }
+        public nothrow inline byte* Mem() const
+        {
+            return mem;
+        }
+        public nothrow inline byte operator[](long index) const
+        {
+            #assert(index >= 0 && index < size);
+            return mem[index];
+        }
+        public nothrow inline byte& operator[](long index) 
+        {
+            #assert(index >= 0 && index < size);
+            return mem[index];
+        }
+        private long size;
+        private byte* mem;
+    }
+}

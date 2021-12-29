@@ -1,0 +1,74 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.IO
+{
+    public abstract class Stream
+    {
+        public default virtual ~Stream();
+        suppress Stream(const Stream&);
+        suppress void operator=(const Stream&);
+        public default nothrow Stream(Stream&&);
+        public default nothrow void operator=(Stream&&);
+        public abstract int ReadByte();
+        public abstract long Read(byte* buf, long count);
+        public abstract long Write(byte x);
+        public abstract long Write(byte* buf, long count);
+        public virtual void Flush()
+        {
+        }
+        public virtual long Seek(long pos, Origin origin)
+        {
+            string streamClassName = typename(*this);
+            throw SystemError(ENOTSUPPORTED, streamClassName + " stream does not support seek");
+        }
+        public virtual long Tell()
+        {
+            string streamClassName = typename(*this);
+            throw SystemError(ENOTSUPPORTED, streamClassName + " stream does not support tell");
+        }
+        public virtual bool IsHostTextFile() const
+        {
+            return false;
+        }
+        public virtual bool IsConsole() const
+        {
+            return false;
+        }
+        public void CopyTo(Stream& destination)
+        {
+            this->CopyTo(destination, 4096);
+        }
+        public void CopyTo(Stream& destination, long bufferSize)
+        {
+            #assert(bufferSize > 0);
+            Buffer buffer(bufferSize);
+            long bytesRead = 0;
+            do
+            {
+                bytesRead = Read(buffer.Mem(), bufferSize);
+                if (bytesRead > 0)
+                {
+                    long count = bytesRead;
+                    long offset = 0;
+                    do
+                    {
+                        long bytesWritten = destination.Write(buffer.Mem() + offset, count);
+                        if (bytesWritten <= 0)
+                        {   
+                            throw SystemError(EIO, "stream write failed");
+                        }
+                        count = count - bytesWritten;
+                        offset = offset + bytesWritten;
+                    }
+                    while (count > 0);
+                }
+            }
+            while (bytesRead > 0);
+        }
+    }
+}

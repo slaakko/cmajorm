@@ -1,0 +1,116 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.Collections;
+
+namespace System
+{
+    private char** environment = null;
+
+    public class Environment
+    {
+        static Environment() : instance(new Environment())
+        {
+        }
+        private Environment() : variables()
+        {
+            if (environment != null)
+            {
+                const char** envp = environment;
+                while (*envp != null)
+                {
+                    string envVar = *envp;
+                    long eqPos = envVar.Find('=');
+                    if (eqPos != -1)
+                    {
+                        Set(envVar.Substring(0, eqPos), envVar.Substring(eqPos + 1));
+                    }
+                    ++envp;
+                }
+            }
+        }
+        public static nothrow Environment& Instance()
+        {
+            return *instance;
+        }
+        public nothrow bool Has(const string& envVarName) const
+        {
+            return variables.CFind(envVarName) != variables.CEnd();
+        }
+        public nothrow string Get(const string& envVarName) const
+        {
+            HashMap<string, string>.ConstIterator it = variables.CFind(envVarName);
+            if (it != variables.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return string();
+            }
+        }
+        public void Set(const string& envVarName, const string& envVarValue)
+        {
+            if (envVarName.Find('=') != -1)
+            {
+                throw SystemError(EINVAL, "environment variable name cannot contain '=' character");
+            }
+            variables[envVarName] = envVarValue;
+        }
+        public nothrow void Remove(const string& envVarName)
+        {
+            variables.Remove(envVarName);
+        }
+        public nothrow void Clear()
+        {
+            variables.Clear();
+        }
+        public nothrow long Size() const
+        {
+            long size = 0;
+            for (const Pair<string, string>& v : variables)
+            {
+                size = size + v.first.Length() + 1 + v.second.Length() + 1 + 16;
+            }
+            return size;
+        }
+        public nothrow const HashMap<string, string>& Variables() const
+        {
+            return variables;
+        }
+        private static UniquePtr<Environment> instance;
+        private HashMap<string, string> variables;
+    }
+
+    public nothrow bool HasEnv(const string& envVarName)
+    {
+        return Environment.Instance().Has(envVarName);
+    }
+    
+    public nothrow string GetEnv(const string& envVarName)
+    {
+        return Environment.Instance().Get(envVarName);
+    }
+    
+    public void SetEnv(const string& envVarName, const string& envVarValue)
+    {
+        Environment.Instance().Set(envVarName, envVarValue);
+    }
+    
+    public nothrow void RemoveEnv(const string& envVarName)
+    {
+        Environment.Instance().Remove(envVarName);
+    }
+    
+    public nothrow void ClearEnvironment()
+    {
+        Environment.Instance().Clear();
+    }
+    
+    public nothrow cdecl void StartupSetupEnvironment(const char** envp)
+    {
+        environment = envp;
+    }
+}

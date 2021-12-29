@@ -1,0 +1,238 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.IO;
+
+namespace System
+{
+    public static class Console
+    {
+        static nothrow Console() : 
+            in(SharedPtr<Stream>(new FileStream(stdin))), 
+            out(SharedPtr<Stream>(new FileStream(stdout))), 
+            err(SharedPtr<Stream>(new FileStream(stderr)))
+        {
+            if (!in.GetStream()->IsConsole())
+            {
+                in = StreamReader(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(new FileStream(stdin)))));
+            }
+            if (!out.GetStream()->IsConsole())
+            {
+                out = StreamWriter(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(new FileStream(stdout)))));
+            }
+            if (!err.GetStream()->IsConsole())
+            {
+                err = StreamWriter(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(new FileStream(stderr)))));
+            }
+        }
+        public static void Write(const char* s)
+        {
+            out.Write(s);
+        }
+        public static void Write(const wchar* s)
+        {
+            out.Write(s);
+        }
+        public static void Write(const uchar* s)
+        {
+            out.Write(s);
+        }
+        public static void Write(const string& s)
+        {
+            out.Write(s);
+        }
+        public static void Write(const wstring& s)
+        {
+            out.Write(s);
+        }
+        public static void Write(const ustring& s)
+        {
+            out.Write(s);
+        }
+        public static void Write(bool b)
+        {
+            out.Write(b);
+        }
+        public static void Write(sbyte s)
+        {
+            out.Write(s);
+        }
+        public static void Write(byte b)
+        {
+            out.Write(b);
+        }
+        public static void Write(short s)
+        {
+            out.Write(s);
+        }
+        public static void Write(ushort u)
+        {
+            out.Write(u);
+        }
+        public static void Write(int i)
+        {
+            out.Write(i);
+        }
+        public static void Write(uint u)
+        {
+            out.Write(u);
+        }
+        public static void Write(long l)
+        {
+            out.Write(l);
+        }
+        public static void Write(ulong u)
+        {
+            out.Write(u);
+        }
+        public static void Write(float f)
+        {
+            out.Write(f);
+        }
+        public static void Write(double d)
+        {
+            out.Write(d);
+        }
+        public static void Write(const Date& date)
+        {
+            out.Write(date);
+        }
+        public static void Write(const DateTime& dateTime)
+        {
+            out.Write(dateTime);
+        }
+        public static void WriteLine()
+        {
+            out.WriteLine();
+        }
+        public static void WriteLine(const char* s)
+        {
+            out.WriteLine(s);
+        }
+        public static void WriteLine(const wchar* s)
+        {
+            out.WriteLine(s);
+        }
+        public static void WriteLine(const uchar* s)
+        {
+            out.WriteLine(s);
+        }
+        public static void WriteLine(const string& s)
+        {
+            out.WriteLine(s);
+        }
+        public static void WriteLine(const wstring& s)
+        {
+            out.WriteLine(s);
+        }
+        public static void WriteLine(const ustring& s)
+        {
+            out.WriteLine(s);
+        }
+        public static void WriteLine(bool b)
+        {
+            out.WriteLine(b);
+        }
+        public static void WriteLine(sbyte s)
+        {
+            out.WriteLine(s);
+        }
+        public static void WriteLine(byte b)
+        {
+            out.WriteLine(b);
+        }
+        public static void WriteLine(short s)
+        {
+            out.WriteLine(s);
+        }
+        public static void WriteLine(ushort u)
+        {
+            out.WriteLine(u);
+        }
+        public static void WriteLine(int i)
+        {
+            out.WriteLine(i);
+        }
+        public static void WriteLine(uint u)
+        {
+            out.WriteLine(u);
+        }
+        public static void WriteLine(long l)
+        {
+            out.WriteLine(l);
+        }
+        public static void WriteLine(ulong u)
+        {
+            out.WriteLine(u);
+        }
+        public static void WriteLine(float f)
+        {
+            out.WriteLine(f);
+        }
+        public static void WriteLine(double d)
+        {
+            out.WriteLine(d);
+        }
+        public static void WriteLine(const Date& date)
+        {
+            out.WriteLine(date);
+        }
+        public static void WriteLine(const DateTime& dateTime)
+        {
+            out.WriteLine(dateTime);
+        }
+        public static int Read()
+        {
+            return in.Read();
+        }
+        public static string ReadLine()
+        {
+            return in.ReadLine();
+        }
+        public static string ReadToEnd()
+        {
+            return in.ReadToEnd();
+        }
+        public static nothrow StreamReader& In() 
+        {
+            return in;
+        }
+        public static nothrow StreamWriter& Out()
+        {
+            return out;
+        }
+        public static nothrow StreamWriter& Error()
+        {
+            return err;
+        }
+        public static nothrow void SetIn(StreamReader&& in_)
+        {
+            in = in_;
+        }
+        public static nothrow void SetOut(StreamWriter&& out_)
+        {
+            out = out_;
+        }
+        public static nothrow void SetError(StreamWriter&& err_)
+        {
+            err = err_;
+        }
+        private static StreamReader in;
+        private static StreamWriter out;
+        private static StreamWriter err;
+    }
+
+    public class Endl
+    {
+        public nothrow Endl()
+        {
+        }
+    }
+
+    public nothrow Endl endl()
+    {
+        return Endl();
+    }
+}

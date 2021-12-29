@@ -5,17 +5,20 @@
 
 #include <system-x/machine/InitDone.hpp>
 #include <system-x/machine/OpCode.hpp>
+#include <system-x/machine/Registers.hpp>
 
 namespace cmsx::machine {
 
 void Init()
 {
-    OpCodeInit();
+    InitOpCode();
+    InitReg();
 }
 
 void Done()
 {
-    OpCodeDone();
+    DoneReg();
+    DoneOpCode();
 }
 
 } // cmsx::machine

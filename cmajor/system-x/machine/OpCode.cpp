@@ -669,12 +669,65 @@ const std::string& GetOpCodeName(uint8_t opCode)
     return OpCodes::Instance().GetOpCodeName(opCode);
 }
 
-void OpCodeInit()
+bool IsJumpInst(std::uint8_t opCode)
+{
+    switch (opCode)
+    {
+        case JMP:
+        case JMPB:
+        case GO:
+        case GOI:
+        case CALL:
+        case CALLI:
+        case RET:
+        case BN:
+        case BNB:
+        case BZ:
+        case BZB:
+        case BP:
+        case BPB:
+        case BOD:
+        case BODB:
+        case BNN:
+        case BNNB:
+        case BNZ:
+        case BNZB:
+        case BNP:
+        case BNPB:
+        case BEV:
+        case BEVB:
+        case PBN:
+        case PBNB:
+        case PBZ:
+        case PBZB:
+        case PBP:
+        case PBPB:
+        case PBOD:
+        case PBODB:
+        case PBNN:
+        case PBNNB:
+        case PBNZ:
+        case PBNZB:
+        case PBNP:
+        case PBNPB:
+        case PBEV:
+        case PBEVB:
+        {
+            return true;
+        }
+        default:
+        {
+            return false;
+        }
+    }
+}
+
+void InitOpCode()
 {
     OpCodes::Init();
 }
 
-void OpCodeDone()
+void DoneOpCode()
 {
     OpCodes::Done();
 }

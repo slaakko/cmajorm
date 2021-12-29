@@ -1,0 +1,93 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace System
+{
+    public class RandomAccessIter<T, R, P>
+    {
+        public typedef T ValueType;
+        public typedef R ReferenceType;
+        public typedef P PointerType;
+        private typedef RandomAccessIter<ValueType, ReferenceType, PointerType> Self;
+
+        public nothrow inline RandomAccessIter() : ptr(null) 
+        {
+        }
+        public nothrow inline explicit RandomAccessIter(PointerType ptr_) : ptr(ptr_) 
+        {
+        }
+        public nothrow inline Self& operator++()
+        {
+            #assert(ptr != null);
+            ++ptr;
+            return *this;
+        }
+        public nothrow inline Self& operator--()
+        {
+            #assert(ptr != null);
+            --ptr;
+            return *this;
+        }
+        public nothrow inline ReferenceType operator*()
+        {
+            #assert(ptr != null);
+            return *ptr;
+        }
+        public nothrow inline PointerType operator->()
+        {
+            #assert(ptr != null);
+            return ptr;
+        }
+        public nothrow inline ReferenceType operator[](long index)
+        {
+            #assert(ptr != null);
+            return ptr[index];
+        }
+        public nothrow inline PointerType Ptr() const 
+        { 
+            return ptr; 
+        }
+        private PointerType ptr;
+    }
+
+    public nothrow inline RandomAccessIter<T, R, P> operator+<T, R, P>(const RandomAccessIter<T, R, P>& it, long offset)
+    {
+        #assert(it.Ptr() != null);
+        return RandomAccessIter<T, R, P>(it.Ptr() + offset);
+    }
+
+    public nothrow inline RandomAccessIter<T, R, P> operator+<T, R, P>(long offset, const RandomAccessIter<T, R, P>& it)
+    {
+        #assert(it.Ptr() != null);
+        return RandomAccessIter<T, R, P>(it.Ptr() + offset);
+    }
+
+    public nothrow inline RandomAccessIter<T, R, P> operator-<T, R, P>(const RandomAccessIter<T, R, P>& it, long offset)
+    {
+        #assert(it.Ptr() != null);
+        return RandomAccessIter<T, R, P>(it.Ptr() - offset);
+    }
+
+    public nothrow inline long operator-<T, R, P>(const RandomAccessIter<T, R, P>& left, const RandomAccessIter<T, R, P>& right)
+    {
+        #assert(left.Ptr() == null && right.Ptr() == null || left.Ptr() != null && right.Ptr() != null);
+        if (left.Ptr() == null && right.Ptr() == null) 
+        {
+            return 0;
+        }
+        return left.Ptr() - right.Ptr();
+    }
+    
+    public nothrow inline bool operator==<T, R, P>(const RandomAccessIter<T, R, P>& left, const RandomAccessIter<T, R, P>& right)
+    {
+        return left.Ptr() == right.Ptr();
+    }
+    
+    public nothrow inline bool operator<<T, R, P>(const RandomAccessIter<T, R, P>& left, const RandomAccessIter<T, R, P>& right)
+    {
+        #assert(left.Ptr() == null && right.Ptr() == null || left.Ptr() != null && right.Ptr() != null);
+        return left.Ptr() < right.Ptr();
+    }
+}

@@ -1,0 +1,171 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.IO
+{
+    public const int stdin = 0;
+    public const int stdout = 1;
+    public const int stderr = 2;
+
+    public enum OpenFlags : int
+    {
+        none = 0u,
+        read = 1u << 0u,
+        write = 1u << 1u,
+        create = 1 << 2u,
+        append = 1u << 3u,
+        truncate = 1u << 4u,
+        text = 1u << 5u
+    }
+    
+    public nothrow string OpenFlagStr(OpenFlags flags)
+    {
+        string s;
+        if ((flags & OpenFlags.read) != OpenFlags.none)
+        {
+            s.Append('r');
+        }
+        if ((flags & OpenFlags.write) != OpenFlags.none)
+        {
+            s.Append('w');
+        }
+        if ((flags & OpenFlags.create) != OpenFlags.none)
+        {
+            s.Append('c');
+        }
+        if ((flags & OpenFlags.append) != OpenFlags.none)
+        {
+            s.Append('a');
+        }
+        if ((flags & OpenFlags.truncate) != OpenFlags.none)
+        {
+            s.Append('u');
+        }
+        if ((flags & OpenFlags.text) != OpenFlags.none)
+        {
+            s.Append('t');
+        }
+        return s;
+    }
+    
+    public enum Origin : byte
+    {
+        seekSet, seekCur, seekEnd
+    }
+    
+    public class FileSystemException : Exception
+    {
+        public nothrow FileSystemException(const string& message_) : base(message_)
+        {
+        }
+    }
+    
+    public class FileStream : Stream
+    {
+        public nothrow FileStream(int fd_) : this(fd_, false)
+        {
+        }
+        public nothrow FileStream(int fd_, bool closeOnExit_) : fd(fd_), closeOnExit(closeOnExit_)
+        {
+        }
+        public FileStream(const string& filePath, OpenFlags flags) : this(filePath, flags, 0)
+        {
+        }
+        public FileStream(const string& filePath, OpenFlags flags, int mode) : fd(-1), closeOnExit(false)
+        {
+            Open(filePath, flags, mode);
+        }
+        suppress FileStream(const FileStream&);
+        suppress void operator=(const FileStream&);
+        public nothrow FileStream(FileStream&& that) : fd(that.fd), closeOnExit(that.closeOnExit)
+        {
+            that.fd = -1;
+            that.closeOnExit = false;
+        }
+        public default nothrow void operator=(FileStream&&);
+        public override ~FileStream()
+        {
+            try
+            {
+                Close();
+            }
+            catch (const Exception& ex)
+            {
+            }
+        }
+        public inline nothrow bool IsOpen() const
+        {
+            return fd != -1;
+        }
+        public void Open(const string& filePath, OpenFlags flags, int mode)
+        {
+            Close();
+            try
+            {
+                fd = System.Os.Open(filePath.Chars(), flags, mode); 
+                closeOnExit = true;
+            }
+            catch (const Exception& ex)
+            {
+                throw FileSystemException("error opening file '" + filePath + "' with flags '" + OpenFlagStr(flags) + "' and mode " + AccessModeStr(mode) + ": " + ex.Message());
+            }
+        }
+        public void Close()
+        {
+            if (fd != -1 && closeOnExit)
+            {
+                System.Os.Close(fd);
+                fd = -1;
+                closeOnExit = false;
+            }
+        }
+        public override int ReadByte()
+        {
+            byte x;
+            long retval = Read(&x, 1);
+            if (retval == 0)
+            {
+                return -1;
+            }
+            return x;
+        }
+        public override long Read(byte* buf, long count)
+        {
+            return System.Os.Read(fd, buf, count);
+        }
+        public override long Write(byte x)
+        {
+            return Write(&x, 1);
+        }
+        public override long Write(byte* buf, long count)
+        {
+            return System.Os.Write(fd, buf, count);
+        }
+        public override long Seek(long pos, Origin origin)
+        {
+            return System.Os.Seek(fd, pos, origin);
+        }
+        public override long Tell()
+        {
+            return System.Os.Tell(fd);
+        }
+        public nothrow inline int Descriptor() const
+        {
+            return fd;
+        }
+        public override bool IsHostTextFile() const
+        {
+            return System.Os.IsHostTextFile(fd);
+        }
+        public override bool IsConsole() const
+        {
+            return System.Os.IsConsole(fd);
+        }
+        private int fd;
+        private bool closeOnExit;
+    }
+}

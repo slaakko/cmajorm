@@ -1,0 +1,994 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.Concepts;
+using System.Collections;
+
+namespace System
+{
+    public class ConversionException : Exception
+    {
+        public nothrow ConversionException(const string& message) : base(message)
+        {
+        }
+    }
+
+    public void ThrowConversionException(const string& message)
+    {
+        throw ConversionException(message);
+    }
+
+    public nothrow string ToString<I, U>(I x) where I is SignedInteger and U is UnsignedInteger and ExplicitlyConvertible<I, U> and ExplicitlyConvertible<U, byte>
+    {
+        string s;
+        U u = 0u;
+        bool neg = x < 0;
+        if (neg)
+        {
+            u = -cast<U>(x);
+        }
+        else
+        {
+            u = cast<U>(x);
+        }
+        do
+        {
+            s.Append(cast<char>(cast<byte>('0') + cast<byte>(u % 10u)));
+            u = u / 10u;
+        }
+        while (u != 0u);
+        if (neg)
+        {
+            s.Append('-');
+        }
+        Reverse(s.Begin(), s.End());
+        return s;
+    }
+
+    public nothrow string ToString<U>(U x) where U is UnsignedInteger and ExplicitlyConvertible<U, byte>
+    {
+        string s;
+        do
+        {
+            s.Append(cast<char>(cast<byte>('0') + cast<byte>(x % 10u)));
+            x = x / 10u;
+        }
+        while (x != 0u);
+        Reverse(s.Begin(), s.End());
+        return s;
+    }
+
+    public nothrow string ToString(sbyte x)
+    {
+        return ToString(cast<int>(x));
+    }
+
+    public nothrow string ToString(byte x)
+    {
+        return ToString(cast<uint>(x));
+    }
+
+    public nothrow string ToString(short x)
+    {
+        return ToString(cast<int>(x));
+    }
+
+    public nothrow string ToString(ushort x)
+    {
+        return ToString(cast<uint>(x));
+    }
+
+    public nothrow string ToString(int x)
+    {
+        return ToString<int, uint>(x);
+    }
+
+    public nothrow string ToString(uint x)
+    {
+        return ToString<uint>(x);
+    }
+
+    public nothrow string ToString(long x)
+    {
+        return ToString<long, ulong>(x);
+    }
+
+    public nothrow string ToString(ulong x)
+    {
+        return ToString<ulong>(x);
+    }
+
+    public nothrow string ToString(float f)
+    {
+        return ToString(cast<double>(f));
+    }
+
+    public nothrow string ToString(double x, int maxNumDecimals)
+    {
+        return ToString(x, 0, maxNumDecimals);
+    }    
+
+    public nothrow string ToString(double x)
+    {
+        return ToString(x, 15);
+    }
+
+    public nothrow string ToString(double x, int minNumDecimals, int maxNumDecimals)
+    {
+        string result;
+        if (x < 0)
+        {
+            x = -x;
+            result.Append('-');
+        }
+        result.Append(ToString(cast<int>(x)));
+        double d = x - cast<int>(x);
+        if (d > 0 || minNumDecimals > 0)
+        {
+            result.Append('.');
+            for (int i = 0; (d > 0 || i < minNumDecimals) && i < maxNumDecimals; ++i)
+            {
+                d = 10 * d;
+                int digit = cast<int>(d) % 10;
+                result.Append(cast<char>(cast<int>('0') + digit));
+                d = d - cast<int>(d);
+            }
+        }
+        return result;
+    }
+
+    public nothrow string ToString(char c)
+    {
+        return string(c);
+    }
+
+    public string ToString(wchar c)
+    {
+        wstring s(c);
+        return ToUtf8(s);
+    }
+    
+    public string ToString(uchar c)
+    {
+        ustring s(c);
+        return ToUtf8(s);
+    }
+
+    public nothrow string ToString(bool b)
+    {
+        if (b)
+        {
+            return "true";
+        }
+        return "false";
+    }
+
+    public nothrow inline char HexChar(byte nibble)
+    {
+        #assert((nibble & ~0x0Fu) == 0u);
+        const char* hex = "0123456789ABCDEF";
+        return hex[nibble];
+    }
+
+    public nothrow string ToHexString<U>(U x) where U is UnsignedInteger and ExplicitlyConvertible<U, byte>
+    {
+        string s;
+        long n = sizeof(x);
+        for (long i = 0; i < n; ++i)
+        {
+            byte b = cast<byte>(x & 0xFFu);
+            s.Append(HexChar(b & 0x0Fu)); // note: low order nibble first because of reverse
+            s.Append(HexChar(b >> 4u));
+            x = x >> 8u;
+        }
+        Reverse(s.Begin(), s.End());
+        return s;
+    }
+
+    public nothrow string ToHexString(byte b)
+    {
+        string s;
+        s.Append(HexChar(b >> 4u));
+        s.Append(HexChar(b & 0x0Fu));
+        return s;
+    }
+
+    public nothrow string ToHexString(ushort u)
+    {
+        return ToHexString<ushort>(u);
+    }
+
+    public nothrow string ToHexString(uint u)
+    {
+        return ToHexString<uint>(u);
+    }
+
+    public nothrow string ToHexString(ulong u)
+    {
+        return ToHexString<ulong>(u);
+    }
+    
+    public nothrow string ToOctalString(ulong x)
+    {
+        return ToOctalString(x, 0);
+    }
+
+    public nothrow string ToOctalString(ulong x, int minDigits)
+    {
+        #assert(minDigits >= 0);
+        string s;
+        ++minDigits;
+        do
+        {
+            s.Append(cast<char>(cast<int>(x & 7u) + cast<int>('0')));
+            x = x >> 3u;
+            if (minDigits > 0)
+            {
+                --minDigits;
+            }
+        }
+        while (minDigits != 0 || x != 0u);
+        if (s[s.Length() - 1] != '0')
+        {
+            s.Append('0');
+        }
+        Reverse(s.Begin(), s.End());
+        return s;
+    }
+    
+    public string ToCsv(const List<string>& strings)
+    {
+        string result;
+        bool first = true;
+        for (const string& s : strings)
+        {
+            if (s.Find(',') != -1)
+            {
+                ThrowConversionException("cannot convert string '" + s + "' to CSV: string contains comma");
+            }
+            if (first)
+            {   
+                first = false;
+            }
+            else
+            {
+                result.Append(',');
+            }
+            result.Append(s);
+        }
+        return result;
+    }
+    
+    public nothrow bool ParseSigned<T>(const string& s, T& x) where T is SignedInteger
+    {
+        x = cast<T>(0);
+        if (s.IsEmpty()) return false;
+        bool negative = false;
+        int state = 0;
+        for (char c : s)
+        {
+            switch (state)
+            {
+                case 0: 
+                {
+                    if (c == '+')
+                    {
+                        state = 1;
+                    }
+                    else if (c == '-')
+                    {
+                        negative = true;
+                        state = 1;
+                    }
+                    else if (c >= '0' && c <= '9')
+                    {
+                        x = cast<T>(c) - cast<T>('0');
+                        state = 1;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    if (c >= '0' && c <= '9')
+                    {
+                        x = 10 * x + cast<T>(c) - cast<T>('0');
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    break;
+                }
+            }
+        }
+        if (state != 1)
+        {
+            return false;
+        }
+        else
+        {
+            if (negative)
+            {
+                x = -x;
+            }
+            return true;
+        }
+    }
+
+    public nothrow bool ParseUnsigned<T>(const string& s, T& x) where T is UnsignedInteger
+    {
+        x = cast<T>(0u);
+        if (s.IsEmpty())
+        {
+            return false;
+        }
+        int state = 0;
+        for (char c : s)
+        {
+            switch (state)
+            {
+                case 0:
+                {
+                    if (c == '+') 
+                    {
+                        state = 1;
+                    }
+                    else if (c >= '0' && c <= '9')
+                    {
+                        x = cast<T>(c) - cast<T>('0');
+                        state = 1;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    if (c >= '0' && c <= '9')
+                    {
+                        x = 10u * x + cast<T>(c) - cast<T>('0');
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    break;
+                }
+            }
+        }
+        if (state != 1)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public nothrow bool ParseHex<T>(const string& s, T& x) where T is UnsignedInteger
+    {
+        x = cast<T>(0u);
+        if (s.IsEmpty())
+        {
+            return false;
+        }
+        for (char c : s)
+        {
+            if (c >= '0' && c <= '9')
+            {
+                x = 16u * x + (cast<T>(c) - cast<T>('0'));
+            }
+            else if (c >= 'a' && c <= 'f')
+            {
+                x = 16u * x + 10u + (cast<T>(c) - cast<T>('a'));
+            }
+            else if (c >= 'A' && c <= 'F')
+            {
+                x = 16u * x + 10u + (cast<T>(c) - cast<T>('A'));
+            }
+            else
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public nothrow bool ParseFloating<T>(const string& s, T& x) 
+    {
+        x = cast<T>(0.0);
+        if (s.IsEmpty())
+        {
+            return false;
+        }
+        bool negative = false;
+        int start = 0;
+        if (s[0] == '+')
+        {
+            ++start;
+        }
+        else if (s[0] == '-')
+        {
+            negative = true;
+            ++start;
+        }
+        int state = 0;
+        T d = cast<T>(10.0);
+        int exponent = 0;
+        bool negativeExponent = false;
+        long n = s.Length();
+        for (long i = start; i < n; ++i)
+        {
+            char c = s[i];
+            switch (state)
+            {
+                case 0: 
+                {
+                    if (c >= '0' && c <= '9')
+                    {
+                        x = 10 * x + (cast<int>(c) - cast<int>('0'));
+                    }
+                    else if (c == '.')
+                    {
+                        state = 1;
+                    }
+                    else if (c == 'e' || c == 'E')
+                    {
+                        state = 2;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    if (c >= '0' && c <= '9')
+                    {
+                        x = x + (cast<int>(c) - cast<int>('0')) / d;
+                        d = 10 * d;
+                    }
+                    else if (c == 'e' || c == 'E')
+                    {
+                        state = 2;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    break;
+                }
+                case 2:
+                {
+                    if (c == '+')
+                    {
+                        state = 3;
+                    }
+                    else if (c == '-')
+                    {
+                        negativeExponent = true;
+                        state = 3;
+                    }
+                    else if (c >= '0' && c <= '9')
+                    {
+                        exponent = cast<int>(c) - cast<int>('0');
+                        state = 3;
+                    }
+                    else 
+                    {
+                        return false;
+                    }
+                    break;
+                }
+                case 3:
+                {
+                    if (c >= '0' && c <= '9')
+                    {
+                        exponent = 10 * exponent + (cast<int>(c) - cast<int>('0'));
+                    }
+                    else 
+                    {
+                        return false;
+                    }
+                    break;
+                }
+            }
+        }
+        if (negative)
+        {
+            x = -x;
+        }
+        if (exponent != 0)
+        {
+            if (negativeExponent)
+            {
+                exponent = -exponent;
+            }
+            x = x * cast<T>(pow(10.0, exponent));
+        }
+        return true;
+    }
+
+    public nothrow bool ParseSByte(const string& s, sbyte& x)
+    {
+        return ParseSigned<sbyte>(s, x);
+    }
+
+    public sbyte ParseSByte(const string& s)
+    {
+        sbyte x;
+        if (ParseSByte(s, x))
+        {
+            return x;
+        }
+        else
+        {
+            ThrowConversionException("cannot parse sbyte from string '" + s + "'");
+        }
+        return 0;
+    }
+
+    public nothrow bool ParseByte(const string& s, byte& x)
+    {
+        return ParseUnsigned<byte>(s, x);
+    }
+
+    public byte ParseByte(const string& s)
+    {
+        byte x;
+        if (ParseByte(s, x))
+        {
+            return x;
+        }
+        else
+        {
+            ThrowConversionException("cannot parse byte from string '" + s + "'");
+        }
+        return 0u;
+    }
+
+    public nothrow bool ParseShort(const string& s, short& x)
+    {
+        return ParseSigned<short>(s, x);
+    }
+
+    public short ParseShort(const string& s)
+    {
+        short x;
+        if (ParseShort(s, x))
+        {
+            return x;
+        }
+        else
+        {
+            ThrowConversionException("cannot parse short from string '" + s + "'");
+        }
+        return 0;
+    }
+
+    public nothrow bool ParseUShort(const string& s, ushort& x)
+    {
+        return ParseUnsigned<ushort>(s, x);
+    }
+
+    public ushort ParseUShort(const string& s)
+    {
+        ushort x;
+        if (ParseUShort(s, x))
+        {
+            return x;
+        }
+        else
+        {
+            ThrowConversionException("cannot parse ushort from string '" + s + "'");
+        }
+        return 0u;
+    }
+
+    public nothrow bool ParseInt(const string& s, int& x)
+    {
+        return ParseSigned<int>(s, x);
+    }
+
+    public int ParseInt(const string& s)
+    {
+        int x;
+        if (ParseInt(s, x))
+        {
+            return x;
+        }
+        else
+        {
+            ThrowConversionException("cannot parse int from string '" + s + "'");
+        }
+        return 0;
+    }
+
+    public nothrow bool ParseUInt(const string& s, uint& x)
+    {
+        return ParseUnsigned<uint>(s, x);
+    }
+
+    public uint ParseUInt(const string& s)
+    {
+        uint x;
+        if (ParseUInt(s, x))
+        {
+            return x;
+        }
+        else
+        {
+            ThrowConversionException("cannot parse uint from string '" + s + "'");
+        }
+        return 0u;
+    }
+
+    public nothrow bool ParseLong(const string& s, long& x)
+    {
+        return ParseSigned<long>(s, x);
+    }
+
+    public long ParseLong(const string& s)
+    {
+        long x;
+        if (ParseLong(s, x))
+        {
+            return x;
+        }
+        else
+        {
+            ThrowConversionException("cannot parse long from string '" + s + "'");
+        }
+        return 0;
+    }
+
+    public nothrow bool ParseULong(const string& s, ulong& x)
+    {
+        return ParseUnsigned<ulong>(s, x);
+    }
+
+    public ulong ParseULong(const string& s)
+    {
+        ulong x;
+        if (ParseULong(s, x))
+        {
+            return x;
+        }
+        else
+        {
+            ThrowConversionException("cannot parse ulong from string '" + s + "'");
+        }
+        return 0u;
+    }
+
+    public nothrow bool ParseFloat(const string& s, float& x)
+    {
+        return ParseFloating<float>(s, x);
+    }
+
+    public float ParseFloat(const string& s)
+    {
+        float x;
+        if (ParseFloat(s, x))
+        {
+            return x;
+        }
+        else
+        {
+            ThrowConversionException("cannot parse float from string '" + s + "'");
+        }
+        return 0.0f;
+    }
+
+    public nothrow bool ParseDouble(const string& s, double& x)
+    {
+        return ParseFloating<double>(s, x);
+    }
+
+    public double ParseDouble(const string& s)
+    {
+        double x;
+        if (ParseDouble(s, x))
+        {
+            return x;
+        }
+        else
+        {
+            ThrowConversionException("cannot parse double from string '" + s + "'");
+        }
+        return 0.0;
+    }
+
+    public nothrow bool ParseBool(const string& s, bool& x)
+    {
+        if (s == "true")
+        {
+            x = true;
+            return true;
+        }
+        else if (s == "false")
+        {
+            x = false;
+            return true;
+        }
+        else
+        {
+            x = false;
+            return false;
+        }
+    }
+
+    public bool ParseBool(const string& s)
+    {
+        bool x;
+        if (ParseBool(s, x))
+        {
+            return x;
+        }
+        else
+        {
+            ThrowConversionException("cannot parse bool from string '" + s + "'");
+        }
+        return false;
+    }
+
+    public nothrow bool ParseHexByte(const string& s, byte& x)
+    {
+        return ParseHex<byte>(s, x);
+    }
+
+    public byte ParseHexByte(const string& s)
+    {
+        byte x;
+        if (ParseHexByte(s, x))
+        {
+            return x;
+        }
+        else
+        {
+            ThrowConversionException("cannot parse hex byte from string '" + s + "'");
+        }
+        return 0u;
+    }
+
+    public nothrow bool ParseHexUShort(const string& s, ushort& x)
+    {
+        return ParseHex<ushort>(s, x);
+    }
+
+    public ushort ParseHexUShort(const string& s)
+    {
+        ushort x;
+        if (ParseHexUShort(s, x))
+        {
+            return x;
+        }
+        else
+        {
+            ThrowConversionException("cannot parse hex ushort from string '" + s + "'");
+        }
+        return 0u;
+    }
+
+    public nothrow bool ParseHexUInt(const string& s, uint& x)
+    {
+        return ParseHex<uint>(s, x);
+    }
+
+    public uint ParseHexUInt(const string& s)
+    {
+        uint x;
+        if (ParseHexUInt(s, x))
+        {
+            return x;
+        }
+        else
+        {
+            ThrowConversionException("cannot parse hex uint from string '" + s + "'");
+        }
+        return 0u;
+    }
+
+    public nothrow bool ParseHexULong(const string& s, ulong& x)
+    {
+        return ParseHex<ulong>(s, x);
+    }
+
+    public ulong ParseHexULong(const string& s)
+    {
+        ulong x;
+        if (ParseHexULong(s, x))
+        {
+            return x;
+        }
+        else
+        {
+            ThrowConversionException("cannot parse hex ulong from string '" + s + "'");
+        }
+        return 0u;
+    }
+    
+    public nothrow bool ParseOctal(const string& s, ulong& x)
+    {
+        x = 0u;
+        for (char c : s)
+        {
+            if (c >= '0' && c <= '7')
+            {
+                x = 8u * x + cast<ulong>(cast<int>(c) - cast<int>('0'));
+            }
+            else
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public nothrow ulong ParseOctal(const string& s)
+    {
+        ulong x = 0u;
+        if (ParseOctal(s, x))
+        {
+            return x;
+        }
+        else
+        {
+            ThrowConversionException("cannot parse octal from string '" + s + "'");
+        }
+        return 0u;
+    }
+    
+    public nothrow bool ParseDate(const string& dateStr, Date& date)
+    {
+        int dateEnd = 0;
+        return ParseDate(dateStr, date, dateEnd);
+    }
+    
+    public nothrow bool ParseDate(const string& dateStr, Date& date, int& dateEnd)
+    {
+        short year;
+        if (dateStr.Length() < 4 + 2 + 2)
+        {
+            return false;
+        }
+        if (!ParseShort(dateStr.Substring(0, 4), year))
+        {
+            return false;
+        }
+        int monthStart = 4;
+        if (dateStr[4] == '-')
+        {
+            ++monthStart;
+        }
+        if (dateStr.Length() < monthStart + 2)
+        {
+            return false;
+        }
+        sbyte month;
+        if (!ParseSByte(dateStr.Substring(monthStart, 2), month))
+        {
+            return false;
+        }
+        if (month < 1 || month > 12)
+        {
+            return false;
+        }
+        int dayStart = monthStart + 2;
+        if (dateStr[dayStart] == '-')
+        {
+            ++dayStart;
+        }
+        if (dateStr.Length() < dayStart + 2)
+        {
+            return false;
+        }
+        sbyte day;
+        if (!ParseSByte(dateStr.Substring(dayStart, 2), day))
+        {
+            return false;
+        }
+        if (day < 1 || day > 31)
+        {
+            return false;
+        }
+        dateEnd = dayStart + 2;
+        date = Date(year, cast<Month>(month), day);
+        return true;
+    }
+    
+    public Date ParseDate(const string& s)
+    {
+        Date date;
+        if (!ParseDate(s, date))
+        {
+            ThrowConversionException("cannot parse date from string '" + s + "': not in format YYYY-MM-DD or YYYYMMDD");
+        }
+        return date;
+    }
+    
+    public bool ParseDateTime(const string& dateTimeStr, DateTime& dateTime)
+    {
+        Date date;
+        int dateEnd = 0;
+        if (!ParseDate(dateTimeStr, date, dateEnd))
+        {
+            return false;
+        }
+        int hours = 0;
+        int mins = 0;
+        int secs = 0;
+        if (dateTimeStr.Length() > dateEnd)
+        {
+            if (dateTimeStr[dateEnd] == 'T')
+            {
+                int hoursStart = dateEnd + 1;
+                if (!ParseInt(dateTimeStr.Substring(hoursStart, 2), hours))
+                {
+                    return false;
+                }
+                if (hours < 0 || hours > 24)
+                {
+                    return false;
+                }
+                if (dateTimeStr.Length() > hoursStart + 2)
+                {
+                    int minsStart = hoursStart + 2;
+                    if (dateTimeStr[minsStart] == ':')
+                    {
+                        ++minsStart;
+                    }
+                    if (!ParseInt(dateTimeStr.Substring(minsStart, 2), mins))
+                    {
+                        return false;
+                    }
+                    if (mins < 0 || mins >= 60)
+                    {
+                        return false;
+                    }
+                    if (dateTimeStr.Length() > minsStart + 2)
+                    {
+                        int secsStart = minsStart + 2;
+                        if (dateTimeStr[secsStart] == ':')
+                        {
+                            ++secsStart;
+                        }
+                        if (!ParseInt(dateTimeStr.Substring(secsStart, 2), secs))
+                        {
+                            return false;
+                        }
+                        if (secs < 0 || secs > 60) // 60 is valid if leap second exists
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        int totalSecs = hours * 3600 + mins * 60 + secs;
+        dateTime = DateTime(date, totalSecs);
+        return true;
+    }
+
+    public DateTime ParseDateTime(const string& s)
+    {
+        DateTime dateTime;
+        if (!ParseDateTime(s, dateTime))
+        {
+            ThrowConversionException("cannot parse date time from string '" + s + "': not in format YYYY[-]MM[-]DD or YYYY[-]MM[-]DDTHH[[:]MM[[:]SS]]");
+        }
+        return dateTime;
+    }
+    
+    public List<string> ParseCSV(const string& csv)
+    {
+        return csv.Split(',');
+    }
+}

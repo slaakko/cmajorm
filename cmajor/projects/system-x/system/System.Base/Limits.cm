@@ -1,0 +1,97 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace System
+{
+    public constexpr inline nothrow byte MinValue(byte)
+    {
+        return cast<byte>(0x00);
+    }
+
+    public constexpr inline nothrow byte MaxValue(byte)
+    {
+        return cast<byte>(0xFF);
+    }
+
+    public constexpr inline nothrow sbyte MinValue(sbyte)
+    {
+        return cast<sbyte>(0x80);
+    }
+
+    public constexpr inline nothrow sbyte MaxValue(sbyte)
+    {
+        return cast<sbyte>(0x7F);
+    }
+
+    public constexpr inline nothrow short MinValue(short)
+    {
+        return cast<short>(0x8000);
+    }
+
+    public constexpr inline nothrow short MaxValue(short)
+    {
+        return cast<short>(0x7FFF);
+    }
+
+    public constexpr inline nothrow ushort MinValue(ushort)
+    {
+        return cast<ushort>(0x0000);
+    }
+
+    public constexpr inline nothrow ushort MaxValue(ushort)
+    {
+        return cast<ushort>(0xFFFF);
+    }
+
+    public constexpr inline nothrow int MinValue(int)
+    {
+        return cast<int>(0x80000000);
+    }
+
+    public constexpr inline nothrow int MaxValue(int)
+    {
+        return cast<int>(0x7FFFFFFF);
+    }
+
+    public constexpr inline nothrow uint MinValue(uint)
+    {
+        return cast<uint>(0x00000000);
+    }
+
+    public constexpr inline nothrow uint MaxValue(uint)
+    {
+        return cast<uint>(0xFFFFFFFF);
+    }
+
+    public constexpr inline nothrow long MinValue(long)
+    {
+        return cast<long>(0x8000000000000000);
+    }
+
+    public constexpr inline nothrow long MaxValue(long)
+    {
+        return cast<long>(0x7FFFFFFFFFFFFFFF);
+    }
+
+    public constexpr inline nothrow ulong MinValue(ulong)
+    {
+        return cast<ulong>(0x0000000000000000);
+    }
+
+    public constexpr inline nothrow ulong MaxValue(ulong)
+    {
+        return cast<ulong>(0xFFFFFFFFFFFFFFFF);
+    }
+    
+    public constexpr inline nothrow I MinValue<I>() 
+    {
+        return MinValue(cast<I>(0));
+    }
+
+    public constexpr inline nothrow I MaxValue<I>() 
+    {
+        return MaxValue(cast<I>(0));
+    }
+}

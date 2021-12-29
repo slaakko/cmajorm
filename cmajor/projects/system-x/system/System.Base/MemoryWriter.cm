@@ -1,0 +1,95 @@
+using System;
+
+namespace System.IO
+{
+    public class MemoryWriter
+    {
+        public nothrow MemoryWriter(byte* ptr_, long count_) : ptr(ptr_), pos(ptr), count(count_)
+        {
+        }
+        public void Write(byte x)
+        {
+            if (pos - ptr >= count)
+            {
+                throw Exception("memory writer: end of space");
+            }
+            *pos++ = x;
+        }
+        public void Write(sbyte x)
+        {
+            Write(cast<byte>(x));
+        }
+        public void Write(ushort x)
+        {
+            byte b0 = cast<byte>(x >> 8u);
+            byte b1 = cast<byte>(x);
+            Write(b0);
+            Write(b1);
+        }
+        public void Write(short x)
+        {
+            Write(cast<ushort>(x));
+        }
+        public void Write(uint x)
+        {
+            byte b0 = cast<byte>(x >> 24u);
+            byte b1 = cast<byte>(x >> 16u);
+            byte b2 = cast<byte>(x >> 8u);
+            byte b3 = cast<byte>(x);
+            Write(b0);
+            Write(b1);
+            Write(b2);
+            Write(b3);
+        }
+        public void Write(int x)
+        {
+            Write(cast<uint>(x));
+        }
+        public void Write(ulong x)
+        {
+            byte b0 = cast<byte>(x >> 56u);
+            byte b1 = cast<byte>(x >> 48u);
+            byte b2 = cast<byte>(x >> 40u);
+            byte b3 = cast<byte>(x >> 32u);
+            byte b4 = cast<byte>(x >> 24u);
+            byte b5 = cast<byte>(x >> 16u);
+            byte b6 = cast<byte>(x >> 8u);
+            byte b7 = cast<byte>(x);
+            Write(b0);
+            Write(b1);
+            Write(b2);
+            Write(b3);
+            Write(b4);
+            Write(b5);
+            Write(b6);
+            Write(b7);
+        }
+        public void Write(long x)
+        {
+            Write(cast<ulong>(x));
+        }
+        public void Write(const DateTime& dt)
+        {
+            Date date = dt.GetDate();
+            Write(date.Year());
+            Write(cast<sbyte>(date.GetMonth()));
+            Write(date.Day());
+            Write(dt.Seconds());
+        }
+        public void Write(const string& s)
+        {
+            for (char c : s)
+            {
+                Write(cast<byte>(c));
+            }
+            Write(cast<byte>(0u));
+        }
+        public long Offset() const
+        {
+            return pos - ptr;
+        }
+        private byte* ptr;
+        private byte* pos;
+        private long count;
+    }
+}

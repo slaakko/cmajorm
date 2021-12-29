@@ -61,6 +61,7 @@ public:
     void BindConcept(ConceptSymbol* conceptSymbol, ConceptNode* conceptNode);
 
     void Visit(CompoundStatementNode& compoundStatementNode) override;
+    void Visit(LabeledStatementNode& labeledStatementNode) override;
     void Visit(IfStatementNode& ifStatementNode) override;
     void Visit(WhileStatementNode& whileStatementNode) override;
     void Visit(DoStatementNode& doStatementNode) override;

@@ -1,0 +1,50 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.Concepts;
+
+namespace System
+{
+    public class Pair<T, U> where T is Semiregular and U is Semiregular
+    {
+        public nothrow Pair() : first(), second() {}
+        public Pair(const T& first_, const U& second_) : first(first_), second(second_) {}
+        public T first;
+        public U second;
+    }
+
+    public nothrow inline bool operator<<T, U>(const Pair<T, U>& left, const Pair<T, U>& right) where T is TotallyOrdered and U is TotallyOrdered
+    {
+        if (left.first < right.first) return true;
+        else if (left.first > right.first) return false;
+        else return left.second < right.second;
+    }
+
+    public nothrow inline bool operator==<T, U>(const Pair<T, U>& left, const Pair<T, U>& right) where T is Regular and U is Regular
+    {
+        return left.first == right.first && left.second == right.second;
+    }
+
+    public Pair<T, U> MakePair<T, U>(const T& first, const U& second) where T is Semiregular and U is Semiregular
+    {
+        return Pair<T, U>(first, second);
+    }
+
+    public class SelectFirst<T, U> : UnaryFun<Pair<T, U>, T> where T is Semiregular and U is Semiregular
+    {
+        public nothrow inline const T& operator()(const Pair<T, U>& p) const
+        {
+            return p.first;
+        }
+    }
+
+    public class SelectSecond<T, U> : UnaryFun<Pair<T, U>, U> where T is Semiregular and U is Semiregular
+    {   
+        public nothrow inline const U& operator()(const Pair<T, U>& p) const
+        {
+            return p.second;
+        }
+    }
+}

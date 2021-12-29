@@ -302,8 +302,9 @@ const std::uint8_t TRIP = 0xFFu;
 CMSX_MACHINE_API int GetOpCode(const std::string& opCodeName);
 CMSX_MACHINE_API const std::string& GetOpCodeName(uint8_t opCode);
 CMSX_MACHINE_API int MaxOpCodeNameLength();
-CMSX_MACHINE_API void OpCodeInit();
-CMSX_MACHINE_API void OpCodeDone();
+CMSX_MACHINE_API void InitOpCode();
+CMSX_MACHINE_API void DoneOpCode();
+CMSX_MACHINE_API bool IsJumpInst(std::uint8_t opCode);
 
 } // cmsx::machine
 

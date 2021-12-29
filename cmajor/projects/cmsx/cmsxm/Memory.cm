@@ -28,7 +28,7 @@ namespace cmsx.machine
     public const ushort numSegmentPageEntriesInRootPage = numPtesInPage / numSegments; // 128
     public const ushort numDirectEntries = numSegmentPageEntriesInRootPage - 3u; // 128 - 3 = 125
     public const ushort pteOffsetMask = 0x1FFu; // 511
-    //public const ushort pteOffsetMask = 0x3u; 
+    //public const ushort pteOffsetMask = 0x3u;
     public const byte numPteBits = 9u;
     //public const byte numPteBits = 2u;
     public const ushort maxDigit = 511u;
@@ -41,7 +41,7 @@ namespace cmsx.machine
     public const ushort kernelAddressSpaceNumber = 0u;
     public const ulong invalidAddress = cast<ulong>(-1);
     public const byte segmentNumberShift = 61u;
-    public const byte segmentNumberMask = 0x03u; 
+    public const byte segmentNumberMask = 0x03u;
     public const ulong m2Mask = ~cast<ulong>(1u);
     public const ulong m4Mask = ~cast<ulong>(3u);
     public const ulong m8Mask = ~cast<ulong>(7u);
@@ -395,7 +395,7 @@ namespace cmsx.machine
             {
                 Console.Error() << "out of memory" << endl();
                 throw Exception("out of memory");
-            }
+            }    
             pageFrameMap[pageAddress] = new PageFrame();
             return pageAddress;
         }

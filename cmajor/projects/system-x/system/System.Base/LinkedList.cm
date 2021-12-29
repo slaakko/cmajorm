@@ -1,0 +1,350 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Concepts;
+
+namespace System.Collections
+{
+    public class LinkedListNode<T>
+    {
+        public typedef T ValueType;
+
+        public LinkedListNode(const ValueType& value_, LinkedListNode<T>* prev_, LinkedListNode<T>* next_) : value(value_), prev(prev_), next(next_)
+        {
+        }
+        public inline nothrow const ValueType& Value() const
+        {
+            return value;
+        }
+        public inline nothrow ValueType& Value()
+        {
+            return value;
+        }
+        public inline nothrow LinkedListNode<T>* Prev() const 
+        {
+            return prev; 
+        }
+        public inline nothrow void SetPrev(LinkedListNode<T>* prev_)
+        {
+            prev = prev_;
+        }
+        public inline nothrow LinkedListNode<T>* Next() const 
+        {
+            return next;
+        }
+        public inline nothrow void SetNext(LinkedListNode<T>* next_)
+        {
+            next = next_;
+        }
+        private ValueType value;
+        private LinkedListNode<T>* prev;
+        private LinkedListNode<T>* next;
+    }
+
+    public class LinkedListNodeIterator<T, R, P>
+    {
+        public typedef T ValueType;
+        public typedef R ReferenceType;
+        public typedef P PointerType;
+        private typedef LinkedListNodeIterator<ValueType, ReferenceType, PointerType> Self;
+
+        public nothrow LinkedListNodeIterator() : list(null), node(null)
+        {
+        }
+        public nothrow LinkedListNodeIterator(LinkedList<ValueType>* list_, LinkedListNode<ValueType>* node_) : list(list_), node(node_)
+        {
+        }
+        public inline nothrow ReferenceType operator*()
+        {
+            #assert(node != null);
+            return node->Value();
+        }
+        public inline nothrow PointerType operator->()
+        {
+            #assert(node != null);
+            return &(node->Value());
+        }
+        public inline nothrow Self& operator++()
+        {
+            #assert(node != null);
+            node = node->Next();
+            return *this;
+        }
+        public inline nothrow Self& operator--()
+        {
+            if (node == null)
+            {
+                #assert(list != null);
+                node = list->Tail();
+            }
+            else
+            {
+                node = node->Prev();
+            }
+            return *this;
+        }
+        public inline nothrow LinkedListNode<ValueType>* Node() const
+        {
+            return node;
+        }
+        private LinkedList<ValueType>* list;
+        private LinkedListNode<ValueType>* node;
+    }
+
+    public inline nothrow bool operator==<T, R, P>(const LinkedListNodeIterator<T, R, P>& left, const LinkedListNodeIterator<T, R, P>& right)
+    {
+        return left.Node() == right.Node();
+    }
+
+    public class LinkedList<T> where T is Regular
+    {
+        public typedef T ValueType;
+        public typedef LinkedListNodeIterator<ValueType, ValueType&, ValueType*> Iterator;
+        public typedef LinkedListNodeIterator<ValueType, const ValueType&, const ValueType*> ConstIterator;
+
+        public nothrow LinkedList() : head(null), tail(null), count(0)
+        {
+        }
+        public LinkedList(const LinkedList<ValueType>& that) : head(null), tail(null), count(0)
+        {
+            CopyFrom(that);
+        }
+        public nothrow LinkedList(LinkedList<ValueType>&& that) : head(that.head), tail(that.tail), count(that.count)
+        {
+            that.head = null;
+            that.tail = null;
+            that.count = 0;
+        }
+        public void operator=(const LinkedList<ValueType>& that)
+        {
+            Clear();
+            CopyFrom(that);
+        }
+        public void operator=(LinkedList<ValueType>&& that) 
+        {
+            Swap(head, that.head);
+            Swap(tail, that.tail);
+            Swap(count, that.count);
+        }
+        public ~LinkedList()
+        {
+            Clear();
+        }
+        public inline nothrow Iterator Begin()
+        {
+            return Iterator(this, head);
+        }
+        public inline nothrow ConstIterator Begin() const 
+        {
+            return ConstIterator(this, head);
+        }
+        public inline nothrow ConstIterator CBegin() const 
+        {
+            return ConstIterator(this, head);
+        }
+        public inline nothrow Iterator End() 
+        {
+            return Iterator(this, null);
+        }
+        public inline nothrow ConstIterator End() const 
+        {
+            return ConstIterator(this, null);
+        }
+        public inline nothrow ConstIterator CEnd() const 
+        {
+            return ConstIterator(this, null);
+        }
+        public inline nothrow long Count() const 
+        {
+            return count;
+        }
+        public inline nothrow bool IsEmpty() const
+        {
+            return count == 0;
+        }
+        public nothrow void Clear()
+        {
+            LinkedListNode<ValueType>* n = head;
+            while (n != null)
+            {
+                LinkedListNode<ValueType>* next = n->Next();
+                delete n;
+                n = next;
+            }
+            head = null;
+            tail = null;
+            count = 0;
+        }
+        public Iterator InsertFront(const ValueType& value)
+        {
+            if (head == null)
+            {
+                head = new LinkedListNode<ValueType>(value, null, null);
+                tail = head;
+            }
+            else
+            {
+                head = new LinkedListNode<ValueType>(value, null, head);
+                head->Next()->SetPrev(head);
+            }
+            ++count;
+            return Iterator(this, head);
+        }
+        public Iterator Insert(Iterator pos, const ValueType& value)
+        {
+            LinkedListNode<ValueType>* next = pos.Node();
+            if (next != null)
+            {
+                LinkedListNode<ValueType>* prev = next->Prev();
+                LinkedListNode<ValueType>* n = new LinkedListNode<ValueType>(value, prev, next);
+                next->SetPrev(n);
+                if (prev != null)
+                {
+                    prev->SetNext(n);
+                }
+                else
+                {
+                    head = n;
+                }
+                ++count;
+                return Iterator(this, n);
+            }
+            else
+            {
+                Add(value);
+                return Iterator(this, tail);
+            }
+        }
+        public void Add(const ValueType& value)
+        {
+            if (tail == null)
+            {
+                tail = new LinkedListNode<ValueType>(value, null, null);
+                head = tail;
+            }
+            else
+            {
+                tail = new LinkedListNode<ValueType>(value, tail, null);
+                tail->Prev()->SetNext(tail);
+            }
+            ++count;
+        }
+        public nothrow void RemoveFirst()
+        {
+            #assert(head != null);
+            LinkedListNode<ValueType>* n = head;
+            head = head->Next();
+            if (head != null)
+            {
+                head->SetPrev(null);
+            }
+            else
+            {
+                tail = null;
+            }
+            delete n;
+            --count;
+        }
+        public nothrow void RemoveLast()
+        {
+            #assert(tail != null);
+            LinkedListNode<ValueType>* n = tail;
+            tail = tail->Prev();
+            if (tail != null)
+            {
+                tail->SetNext(null);
+            }
+            else
+            {
+                head = null;
+            }
+            delete n;
+            --count;
+        }
+        public nothrow void Remove(Iterator pos)
+        {
+            LinkedListNode<ValueType>* n = pos.Node();
+            #assert(n != null);
+            LinkedListNode<ValueType>* prev = n->Prev();
+            LinkedListNode<ValueType>* next = n->Next();
+            if (prev != null)
+            {
+                prev->SetNext(next);
+            }
+            else
+            {
+                head = next;
+            }
+            if (next != null)
+            {
+                next->SetPrev(prev);
+            }
+            else
+            {
+                tail = prev;
+            }
+            delete n;
+            --count;
+        }
+        public nothrow void Remove(const ValueType& value)
+        {
+            Iterator i = Begin();
+            Iterator e = End();
+            while (i != e)
+            {
+                if (*i == value)
+                {
+                    Iterator r = i;
+                    ++i;
+                    Remove(r);
+                }
+                else
+                {
+                    ++i;
+                }
+            }
+        }
+        public inline nothrow const ValueType& Front() const
+        {
+            #assert(head != null);
+            return head->Value();
+        }
+        public inline nothrow const ValueType& Back() const
+        {
+            #assert(tail != null);
+            return tail->Value();
+        }
+        public inline nothrow LinkedListNode<ValueType>* Tail()
+        {
+            return tail;
+        }
+        private void CopyFrom(const LinkedList<ValueType>& that)
+        {
+            ConstIterator e = that.CEnd();
+            for (ConstIterator i = that.CBegin(); i != e; ++i)
+            {
+                Add(*i);
+            }
+        }
+        private LinkedListNode<ValueType>* head;
+        private LinkedListNode<ValueType>* tail;
+        private long count;
+    }
+
+    public nothrow bool operator==<T>(const LinkedList<T>& left, const LinkedList<T>& right) where T is Regular
+    {
+        if (left.Count() != right.Count())
+        {
+            return false;
+        }
+        return Equal(left.CBegin(), left.CEnd(), right.CBegin(), right.CEnd());
+    }
+
+    public nothrow bool operator<<T>(const LinkedList<T>& left, const LinkedList<T>& right) where T is TotallyOrdered
+    {
+        return LexicographicalCompare(left.CBegin(), left.CEnd(), right.CBegin(), right.CEnd());
+    }
+}

@@ -4,6 +4,11 @@
 // =================================
 
 #include <cmajor/codegensx/SystemXCodeGenerator.hpp>
+#include <system-x/intermediate/Parser.hpp>
+#include <system-x/intermediate/Verify.hpp>
+#include <system-x/intermediate/PassManager.hpp>
+#include <system-x/intermediate/CppCodeGenerator.hpp>
+#include <system-x/assembler/Interface.hpp>
 #include <cmajor/cmsxbe/EmittingContext.hpp>
 #include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/binder/BoundNamespace.hpp>
@@ -88,6 +93,28 @@ void SystemXCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
         node->Accept(*this);
     }
     nativeCompileUnit->Write();
+    cmsx::intermediate::Context intermediateContext;
+    cmsx::intermediate::Parse(intermediateFilePath, intermediateContext);
+    cmsx::intermediate::Verify(intermediateContext);
+    std::string pass = cmajor::symbols::Pass();
+    if (pass.empty())
+    {
+        int optimizationLevel = GetOptimizationLevel();
+        pass = "opt-" + std::to_string(optimizationLevel);
+    }
+    cmsx::intermediate::PassManager::Instance().Run(boundCompileUnit.GetModule().LogStreamId(), &intermediateContext, pass, true);
+    if (GetGlobalFlag(GlobalFlags::cpp))
+    {
+        cmsx::intermediate::GenerateCppCode(intermediateContext);
+    }
+    else
+    {
+        std::string objectFilePath = boundCompileUnit.ObjectFilePath();
+        std::string assemblyFilePath = Path::ChangeExtension(objectFilePath, ".s");
+        cmsx::assembler::Assemble(boundCompileUnit.GetModule().LogStreamId(), assemblyFilePath, objectFilePath, true);
+    }
+
+/*
     std::string intermediateCompileCommand;
     std::string errors;
     intermediateCompileCommand.append("cmsxic ").append(intermediateFilePath);
@@ -156,6 +183,7 @@ void SystemXCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
     {
         throw std::runtime_error("assembling '" + assemblyFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
+*/
 }
 
 void SystemXCodeGenerator::Visit(BoundNamespace& boundNamespace)

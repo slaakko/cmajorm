@@ -1,0 +1,211 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.IO
+{
+    public class BinaryWriter
+    {
+        public nothrow BinaryWriter(const SharedPtr<Stream>& stream_) : stream(stream_)
+        {
+        }
+        public void Write(bool x)
+        {
+            Write(cast<byte>(x));
+        }
+        public void Write(char x)
+        {
+            Write(cast<byte>(x));
+        }
+        public void Write(wchar x)
+        {
+            Write(cast<ushort>(x));
+        }
+        public void Write(uchar x)
+        {
+            Write(cast<uint>(x));
+        }
+        public void Write(sbyte x)
+        {
+            Write(cast<byte>(x));
+        }
+        public void Write(byte x)
+        {
+            stream->Write(x);
+        }
+        public void Write(short x)
+        {
+            Write(cast<ushort>(x));
+        }
+        public void Write(ushort x)
+        {
+            byte x0 = cast<byte>(x >> 8u);
+            byte x1 = cast<byte>(x);
+            Write(x0);
+            Write(x1);
+        }
+        public void Write(int x)
+        {
+            Write(cast<uint>(x));
+        }
+        public void Write(uint x)
+        {
+            byte x0 = cast<byte>(x >> 24u);
+            byte x1 = cast<byte>(x >> 16u);
+            byte x2 = cast<byte>(x >> 8u);
+            byte x3 = cast<byte>(x);
+            Write(x0);
+            Write(x1);
+            Write(x2);
+            Write(x3);
+        }
+        public void Write(long x)
+        {
+            Write(cast<ulong>(x));
+        }
+        public void Write(ulong x)
+        {
+            byte x0 = cast<byte>(x >> 56u);
+            byte x1 = cast<byte>(x >> 48u);
+            byte x2 = cast<byte>(x >> 40u);
+            byte x3 = cast<byte>(x >> 32u);
+            byte x4 = cast<byte>(x >> 24u);
+            byte x5 = cast<byte>(x >> 16u);
+            byte x6 = cast<byte>(x >> 8u);
+            byte x7 = cast<byte>(x);
+            Write(x0);
+            Write(x1);
+            Write(x2);
+            Write(x3);
+            Write(x4);
+            Write(x5);
+            Write(x6);
+            Write(x7);
+        }
+        public void Write(float x)
+        {
+            void* v = &x;
+            uint* u = cast<uint*>(v);
+            Write(*u);
+        }
+        public void Write(double x)
+        {
+            void* v = &x;
+            ulong* u = cast<ulong*>(v);
+            Write(*u);
+        }
+        public void Write(const string& x)
+        {
+            for (char c : x)
+            {
+                Write(c);
+            }
+            Write('\0');
+        }
+        public void Write(const wstring& x)
+        {
+            Write(ToUtf8(x));
+        }
+        public void Write(const ustring& x)
+        {
+            Write(ToUtf8(x));
+        }
+        public void WriteULEB128UInt(uint x)
+        {
+            do
+            {
+                byte b = cast<byte>(x & 0x7Fu);
+                x = x >> 7u;
+                if (x != 0u)
+                {
+                    b = b | 0x80u;
+                }
+                Write(b);
+            }
+            while (x != 0u);
+        }
+        public void WriteULEB128ULong(ulong x)
+        {
+            do
+            {
+                byte b = cast<byte>(x & 0x7Fu);
+                x = x >> 7u;
+                if (x != 0u)
+                {
+                    b = b | 0x80u;
+                }
+                Write(b);
+            }
+            while (x != 0u);
+        }
+        public void WriteSLEB128Int(int x)
+        {
+            bool more = true;
+            bool negative = x < 0;
+            while (more)
+            {
+                byte b = cast<byte>(x & 0x7F);
+                x = x >> 7;
+                if (negative)
+                {
+                    x = x | (~int(0) << (32 - 7));
+                }
+                if (x == 0 && (b & 0x40u) == 0u || x == -1 && (b & 0x40u) != 0u)
+                {
+                    more = false;
+                }
+                else
+                {
+                    b = b | 0x80u;
+                }
+                Write(b);
+            }
+        }
+        public void WriteSLEB128Long(long x)
+        {
+            bool more = true;
+            bool negative = x < 0;
+            while (more)
+            {
+                byte b = cast<byte>(x & 0x7F);
+                x = x >> 7;
+                if (negative)
+                {
+                    x = x | (~long(0) << (64 - 7));
+                }
+                if (x == 0 && (b & 0x40u) == 0u || x == -1 && (b & 0x40u) != 0u)
+                {
+                    more = false;
+                }
+                else
+                {
+                    b = b | 0x80u;
+                }
+                Write(b);
+            }
+        }
+        public void Write(const Uuid& uuid)
+        {
+            for (byte b : uuid)
+            {
+                Write(b);
+            }
+        }
+        public void Seek(long pos, Origin origin)
+        {
+            stream->Seek(pos, origin);
+        }
+        public long Tell()
+        {
+            return stream->Tell();
+        }
+        public nothrow const SharedPtr<Stream>& GetStream() 
+        {
+            return stream;
+        }
+        private SharedPtr<Stream> stream;
+    }
+}

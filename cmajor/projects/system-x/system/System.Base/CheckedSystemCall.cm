@@ -1,0 +1,671 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.Collections;
+using System.IO;
+
+namespace System.Os
+{
+    public nothrow void Exit(byte exitCode)
+    {
+        exit(exitCode);
+    }
+    
+    public int Wait(ushort* exitCodeAddress)
+    {
+        int result = wait(exitCodeAddress);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public int Fork()
+    {
+        int result = fork();
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public void Exec(const string& program, const List<string>& args)
+    {
+        int argc = 1;
+        long size = program.Length() + 1 + 16;
+        for (const string& arg : args)
+        {
+            size = size + arg.Length() + 1 + 16;
+            ++argc;
+        }
+        Environment& environment = Environment.Instance();
+        int envc = cast<int>(environment.Variables().Count());
+        size = size + environment.Size();
+        UniquePtr<byte> block(cast<byte*>(MemAlloc(size)));
+        MemoryWriter writer(block.Get(), size);
+        List<Pair<long, long>> offsetsAndLengths;
+        for (int i = 0; i < argc; ++i)
+        {
+            offsetsAndLengths.Add(Pair<long, long>(0, 0));
+        }
+        for (int i = 0; i < envc; ++i)
+        {
+            offsetsAndLengths.Add(Pair<long, long>(0, 0));
+        }
+        for (const Pair<long, long>& offsetLength : offsetsAndLengths)
+        {
+            writer.Write(offsetLength.first);
+            writer.Write(offsetLength.second);
+        }
+        offsetsAndLengths.Clear();
+        offsetsAndLengths.Add(Pair<long, long>(writer.Offset(), program.Length() + 1));
+        writer.Write(program);
+        for (const string& arg : args)
+        {
+            offsetsAndLengths.Add(Pair<long, long>(writer.Offset(), arg.Length() + 1));
+            writer.Write(arg);
+        }
+        for (const Pair<string, string>& v : environment.Variables())
+        {
+            string env = v.first;
+            env.Append('=').Append(v.second);
+            offsetsAndLengths.Add(Pair<long, long>(writer.Offset(), env.Length() + 1));
+            writer.Write(env);
+        }
+        MemoryWriter headerWriter(block.Get(), size);
+        for (const Pair<long, long>& offsetLength : offsetsAndLengths)
+        {
+            headerWriter.Write(offsetLength.first);
+            headerWriter.Write(offsetLength.second);
+        }
+        byte* buffer = block.Get();
+        int result = exec(argc, envc, buffer, size);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+
+    public ushort ShellExecute(const string& command, const List<string>& args)
+    {
+        string shell = "/bin/cmsh";
+        if (HasEnv("SHELL"))
+        {
+            shell = GetEnv("SHELL");
+        }
+        List<string> arguments(1, command);
+        for (const string& arg : args)
+        {
+            arguments.Add(arg);
+        }
+        int pid = Fork();
+        if (pid == 0)
+        {
+            Exec(shell, arguments);
+        }
+        ushort exitCode = 0u;
+        Wait(&exitCode);
+        return exitCode;
+    }
+
+    public void Kill(int pid, int sig)
+    {
+        int result = kill(pid, sig);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public int Create(const char* path, int mode)
+    {
+        int result = create(path, mode);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public int Open(const char* path, int flags, int mode)
+    {
+        int result = open(path, flags, mode);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public void Close(int fd)
+    {
+        int result = close(fd);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public long Read(int fd, void* buffer, long count)
+    {
+        long result = read(fd, buffer, count);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public long Write(int fd, void* buffer, long count)
+    {
+        long result = write(fd, buffer, count);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public long Seek(int fd, long pos, byte origin)
+    {
+        long result = seek(fd, pos, origin);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public long Tell(int fd)
+    {
+        long result = tell(fd);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public void Chmod(const char* path, int mode)
+    {
+        int result = chmod(path, mode);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public void Chown(const char* path, int uid, int gid)
+    {
+        int result = chown(path, uid, gid);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public nothrow void* PoolEnd()
+    {
+        return pool_end();
+    }
+    
+    public void SetPoolEnd(void* poolEnd)
+    {
+        long result = set_pool_end(poolEnd);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+
+    public void StackTrace(void* buffer, long count)
+    {
+        long result = stack_trace(buffer, count);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public uint GetRandomSeed()
+    {
+        long seed = get_random_seed();
+        if (seed == -1)
+        {
+            ThrowSystemError();
+        }
+        return cast<uint>(seed);
+    }
+    
+    public void Link(const char* sourcePath, const char* targetPath)
+    {
+        int result = link(sourcePath, targetPath);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public void Unlink(const char* path)
+    {
+        int result = unlink(path);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public void Rename(const char* sourcePath, const char* targetPath)
+    {
+        int result = rename(sourcePath, targetPath);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public void Mkdir(const char* path)
+    {
+        Mkdir(path, 0);
+    }
+    
+    public void Mkdir(const char* path, int mode)
+    {
+        int result = mkdir(path, mode);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public int OpenDir(const char* dirPath)
+    {
+        int result = opendir(dirPath);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public int ReadDir(int dd, int* inodeNumber, char* entryName)
+    {
+        int result = readdir(dd,inodeNumber, entryName);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public void CloseDir(int dd)
+    {
+        int result = closedir(dd);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public void GetCWD(char* buffer, long count)
+    {
+        int result = getcwd(buffer, count);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public void ChDir(const char* path)
+    {
+        int result = chdir(path);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public const int statBufSize = 56;
+
+    public void Stat(const char* path, StatInfo& statInfo)
+    {
+        byte[statBufSize] statBuf;
+        int result = stat(path, &statBuf[0]);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        StatBufToStatInfo(&statBuf[0], statInfo);
+    }
+    
+    public const int IOCTL_IS_CONSOLE_ITEM = 1;
+    public const int IOCTL_IS_HOST_TEXT_FILE_ITEM = 2;
+    public const int IOCTL_HAS_COLORS_ITEM = 3;
+    public const int IOCTL_GET_WINDOW_SIZE_ITEM = 4;
+    public const int IOCTL_GET_COLORS_ITEM = 5;
+    public const int IOCTL_SET_COLORS_ITEM = 6;
+    public const int IOCTL_BEGIN_OBEY_COLOR_STRINGS_ITEM = 7;
+    public const int IOCTL_END_OBEY_COLOR_STRINGS_ITEM = 8;
+    public const int IOCTL_GET_ECHO_ITEM = 9;
+    public const int IOCTL_SET_ECHO_ITEM = 10;
+        
+    public bool IsConsole(int fd)
+    {
+        byte[1] buffer;
+        int result = ioctl(fd, IOCTL_IS_CONSOLE_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        MemoryReader reader(&buffer[0], buffer.Length());
+        bool isConsole = cast<bool>(reader.ReadByte());
+        return isConsole;
+    }
+    
+    public bool IsHostTextFile(int fd)
+    {
+        byte[1] buffer;
+        int result = ioctl(fd, IOCTL_IS_HOST_TEXT_FILE_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        MemoryReader reader(&buffer[0], buffer.Length());
+        bool isHostTextFile = cast<bool>(reader.ReadByte());
+        return isHostTextFile;
+    }
+    
+    public bool HasColors(int fd)
+    {
+        byte[1] buffer;
+        int result = ioctl(fd, IOCTL_HAS_COLORS_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        MemoryReader reader(&buffer[0], buffer.Length());
+        bool hasColors = cast<bool>(reader.ReadByte());
+        return hasColors;
+    }
+
+    public void GetWindowSize(int fd, int& rows, int& cols)
+    {
+        byte[8] buffer;
+        int result = ioctl(fd, IOCTL_GET_WINDOW_SIZE_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {   
+            ThrowSystemError();
+        }
+        MemoryReader reader(&buffer[0], buffer.Length());
+        rows = reader.ReadInt();
+        cols = reader.ReadInt();
+    }
+    
+    public enum ConsoleColor : byte
+    {
+        black = 0u, darkBlue = 1u, darkGreen = 2u, darkCyan = 3u, darkRed = 4u, darkYellow = 6u, gray = 7u,
+        darkGray = 8u, blue = 9u, green = 10u, cyan = 11u, red = 12u, magenta = 13u, yellow = 14u, white = 15u
+    }
+    
+    public void GetConsoleColors(int fd, ConsoleColor& foregroundColor, ConsoleColor& backgroundColor)
+    {
+        byte[2] buffer;
+        int result = ioctl(fd, IOCTL_GET_COLORS_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {   
+            ThrowSystemError();
+        }
+        MemoryReader reader(&buffer[0], buffer.Length());
+        foregroundColor = cast<ConsoleColor>(reader.ReadByte());
+        backgroundColor = cast<ConsoleColor>(reader.ReadByte());
+    }
+    
+    public void SetConsoleColors(int fd, ConsoleColor foregroundColor, ConsoleColor backgroundColor)
+    {
+        byte[2] buffer;
+        MemoryWriter writer(&buffer[0], buffer.Length());
+        writer.Write(cast<byte>(foregroundColor));
+        writer.Write(cast<byte>(backgroundColor));
+        int result = ioctl(fd, IOCTL_SET_COLORS_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {   
+            ThrowSystemError();
+        }
+    }
+    
+    public void BeginObeyColorStrings(int fd)
+    {
+        byte[1] buffer;
+        int result = ioctl(fd, IOCTL_BEGIN_OBEY_COLOR_STRINGS_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {   
+            ThrowSystemError();
+        }
+    }
+    
+    public void EndObeyColorStrings(int fd)
+    {
+        byte[1] buffer;
+        int result = ioctl(fd, IOCTL_END_OBEY_COLOR_STRINGS_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {   
+            ThrowSystemError();
+        }
+    }
+
+    public const uchar beginColors = cast<uchar>(0x100000u);    // begin Unicode supplemental private use area B
+    public const uchar endColors = cast<uchar>(0x10FFFDu);      // end Unicode supplemental private use area B
+
+    public nothrow inline uchar BeginColors(ConsoleColor foregroundColor, ConsoleColor backgroundColor)
+    {
+        return cast<uchar>(cast<uint>(beginColors) | cast<uint>(cast<ushort>(cast<byte>(foregroundColor)) | (cast<ushort>(cast<byte>(backgroundColor)) << 8u)));
+    }
+
+    public nothrow inline uchar EndColors()
+    {
+        return endColors;
+    }
+
+    public bool Echo(int fd)
+    {
+        byte[1] buffer;
+        int result = ioctl(fd, IOCTL_GET_ECHO_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        MemoryReader reader(&buffer[0], buffer.Length());
+        bool echo = cast<bool>(reader.ReadByte());
+        return echo;
+    }
+
+    public void SetEcho(int fd, bool echo)
+    {
+        byte[1] buffer;
+        MemoryWriter writer(&buffer[0], buffer.Length());
+        writer.Write(cast<byte>(echo));
+        int result = ioctl(fd, IOCTL_SET_ECHO_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {   
+            ThrowSystemError();
+        }
+    }
+    
+    public void UTime(const char* path, const DateTime& atime, const DateTime& mtime)
+    {
+        byte[16] buffer;
+        MemoryWriter writer(&buffer[0], buffer.Length());
+        writer.Write(atime);
+        writer.Write(mtime);
+        int result = utime(path, &buffer[0]);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public int GetUID()
+    {
+        int result = getuid();
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public void SetUID(int uid)
+    {
+        int result = setuid(uid);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public int GetGID()
+    {
+        int result = getgid();
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public void SetGID(int gid)
+    {
+        int result = setgid(gid);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public int GetPID()
+    {
+        int result = getpid();
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public int GetPGID()
+    {
+        int result = getpgid();
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public void SetPGID(int pgid)
+    {
+        int result = setpgid(pgid);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public int GetFGPID(int fd)
+    {
+        int result = getfgpid(fd);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public void SetFGPID(int fd, int pid)
+    {
+        int result = setfgpid(fd, pid);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public void Sync()
+    {
+        int result = sync();
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public void Times(Duration& kernelTime, Duration& userTime, Duration& childKernelTime, Duration& childUserTime)
+    {
+        long kernel = 0;
+        long user = 0;
+        long childKernel = 0;
+        long childUser = 0;
+        int result = times(&kernel, &user, &childKernel, &childUser);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        kernelTime = Duration(kernel);
+        userTime = Duration(user);
+        childKernelTime = Duration(childKernel);
+        childUserTime = Duration(childUser);
+    }
+    
+    public string GetHostName()
+    {
+        char[256] buffer;
+        int result = get_host_name(&buffer[0], 256);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return string(&buffer[0]);
+    }
+    
+    public int Dup(int fd)
+    {
+        int result = dup(fd);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public void Pipe(int* readFD, int* writeFD)
+    {
+        int result = pipe(readFD, writeFD);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public bool Log()
+    {
+        int result = log();
+        if (result == -1)
+        {   
+            ThrowSystemError();
+        }
+        return result == 1;
+    }
+    
+    public void LogMessage(const string& method, const string& msg)
+    {
+        int result = log_message(method.Chars(), msg.Chars());
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+}

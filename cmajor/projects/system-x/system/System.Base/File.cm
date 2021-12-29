@@ -1,0 +1,215 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Os;
+
+namespace System.IO
+{
+    public enum FileCopyOptions : int
+    {
+        none = 0, 
+        update = 1 << 0, // copy only if source modified after target
+        preserveMode = 1 << 1, 
+        preserveTimestamps = 1 << 2, 
+        preserveAll = preserveMode | preserveTimestamps
+    }
+
+    public static class File
+    {
+        public static bool Exists(const string& filePath)
+        {
+            byte[statBufSize] statBuf;
+            int result = stat(filePath.Chars(), &statBuf[0]);
+            if (result == -1) 
+            {
+                SystemError systemError = GetSystemError();
+                if (systemError.errorCode == ENOENT)
+                {
+                    return false;
+                }
+                else
+                {
+                    ThrowSystemError();
+                }
+            }
+            else
+            {
+                StatInfo statInfo;
+                StatBufToStatInfo(&statBuf[0], statInfo);
+                if (statInfo.Type() == FileType.regular)
+                {
+                    return true;
+                }
+                else
+                {
+                    throw FileSystemException("path '" + filePath + "' is not a regular file path");
+                }
+            }
+        }
+        public static long Size(const string& filePath)
+        {
+            if (filePath.IsEmpty())
+            {
+                throw InvalidPathException("file path is empty");
+            }
+            StatInfo statInfo;
+            Stat(filePath.Chars(), statInfo);
+            if (statInfo.Type() == FileType.regular)
+            {
+                return statInfo.GetFileSize();
+            }
+            else
+            {
+                throw InvalidPathException("path '" + filePath + "' is not a file path");
+            }
+        }
+        public static StreamWriter CreateText(const string& filePath)
+        {
+            return StreamWriter(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(
+                new FileStream(filePath, cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate | OpenFlags.text))))));
+        }
+        public static BinaryWriter CreateBinary(const string& filePath)
+        {
+            return BinaryWriter(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(
+                new FileStream(filePath, cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate))))));
+        }
+        public static StreamWriter AppendText(const string& filePath)
+        {
+            return StreamWriter(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(
+                new FileStream(filePath, cast<OpenFlags>(OpenFlags.append | OpenFlags.text))))));
+        }
+        public static StreamReader OpenRead(const string& filePath)
+        {
+            return StreamReader(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(
+                new FileStream(filePath, cast<OpenFlags>(OpenFlags.read | OpenFlags.text))))));
+        }
+        public static BinaryReader OpenBinary(const string& filePath)
+        {
+            return BinaryReader(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(
+                new FileStream(filePath, OpenFlags.read)))));
+        }
+        public static string ReadAllText(const string& filePath)
+        {
+            StreamReader reader = OpenRead(filePath);
+            string content = reader.ReadToEnd();
+            if (content.Length() >= 3 && cast<byte>(content[0]) == 0xEFu && cast<byte>(content[1]) == 0xBBu && cast<byte>(content[2]) == 0xBFu)
+            {
+                return content.Substring(3);
+            }
+            else
+            {
+                return content;
+            }
+        }
+        public static List<string> ReadAllLines(const string& filePath)
+        {
+            List<string> lines;
+            bool start = true;
+            StreamReader reader = OpenRead(filePath);
+            string line = reader.ReadLine();
+            while (!reader.Eof())
+            {
+                if (start)
+                {
+                    if (line.Length() >= 3 && cast<byte>(line[0]) == 0xEFu && cast<byte>(line[1]) == 0xBBu && cast<byte>(line[2]) == 0xBFu)
+                    {
+                        line = line.Substring(3);
+                    }
+                    start = false;
+                }
+                lines.Add(line);
+                line = reader.ReadLine();
+            }
+            if (!line.IsEmpty())
+            {
+                lines.Add(line);
+            }
+            return lines;
+        }
+        public static bool Copy(const string& sourceFilePath, const string& targetFilePath)
+        {
+            return Copy(sourceFilePath, targetFilePath, FileCopyOptions.none);
+        }
+        public static bool Copy(const string& sourceFilePath, const string& targetFilePath, FileCopyOptions options)
+        {
+            try
+            {
+                if ((options & FileCopyOptions.update) != FileCopyOptions.none)
+                {
+                    if (Exists(targetFilePath) && ModificationTime(sourceFilePath) <= ModificationTime(targetFilePath))
+                    {
+                        return false;
+                    }
+                }
+                FileStream sourceFile(sourceFilePath, OpenFlags.read);
+                FileStream targetFile(targetFilePath, cast<OpenFlags>(OpenFlags.create | OpenFlags.truncate | OpenFlags.write));
+                sourceFile.CopyTo(targetFile);
+                if ((options & FileCopyOptions.preserveMode) != FileCopyOptions.none)
+                {
+                    int mode = Mode(sourceFilePath);
+                    Chmod(targetFilePath.Chars(), mode);
+                }
+                if ((options & FileCopyOptions.preserveTimestamps) != FileCopyOptions.none)
+                {
+                    DateTime accessTime;
+                    DateTime modificationTime;
+                    GetTimes(sourceFilePath, accessTime, modificationTime);
+                    SetTimes(targetFilePath, accessTime, modificationTime);
+                }
+            }
+            catch (const Exception& ex)
+            {
+                throw FileSystemException("cannot copy '" + sourceFilePath + "' to '" + targetFilePath + "': " + ex.Message());
+            }
+            return true;
+        }
+        public static void Remove(const string& filePath)
+        {
+            if (Exists(filePath))
+            {
+                Unlink(filePath.Chars());
+            }
+            else
+            {
+                throw SystemError(ENOENT, "could not remove file: file '" + filePath + "' does not exist");
+            }
+        }
+        public static int Mode(const string& filePath) const
+        {
+            StatInfo statInfo;
+            Stat(filePath.Chars(), statInfo);
+            return statInfo.GetMode();
+        }
+        public static DateTime AccessTime(const string& filePath)
+        {
+            StatInfo statInfo;
+            Stat(filePath.Chars(), statInfo);
+            return statInfo.ATime();
+        }
+        public static DateTime ModificationTime(const string& filePath)
+        {
+            StatInfo statInfo;
+            Stat(filePath.Chars(), statInfo);
+            return statInfo.MTime();
+        }
+        public static void GetTimes(const string& filePath, DateTime& accessTime, DateTime& modificationTime)
+        {
+            StatInfo statInfo;
+            Stat(filePath.Chars(), statInfo);
+            accessTime = statInfo.ATime();
+            modificationTime = statInfo.MTime();
+        }
+        public static void SetTimes(const string& filePath)
+        {
+            UTime(filePath.Chars(), DateTime(), DateTime()); 
+        }
+        public static void SetTimes(const string& filePath, const DateTime& accessTime, const DateTime& modificationTime)
+        {
+            UTime(filePath.Chars(), accessTime, modificationTime); 
+        }
+    }
+}

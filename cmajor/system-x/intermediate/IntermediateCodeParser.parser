@@ -1,0 +1,716 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <system-x/intermediate/Context.hpp>
+[hpp]#include <system-x/intermediate/Error.hpp>
+[hpp]#include <system-x/intermediate/IntermediateCodeTokens.hpp>
+[hpp]#include <system-x/intermediate/IntermediateCodeLexer.hpp>
+
+using namespace IntermediateCodeTokens;
+using namespace soulng::unicode;
+
+parser api(CMSX_INTERMEDIATE_API) IntermediateCodeParser
+{
+    uselexer IntermediateCodeLexer;
+    farthest_error;
+    state;
+    main;
+
+    IntermediateCodeFile(cmsx::intermediate::Context* context)
+        ::= empty{ context->SetFilePath(lexer.FileName()); }
+            CompileUnitHeader(context):header
+            TypeDeclarations(context):types?
+            DataDefinitions(context):data?
+            FunctionDefinitions(context):functions?
+            Metadata(context):metadata?
+        ;
+
+    CompileUnitHeader(cmsx::intermediate::Context* context)
+        ::= CU LPAREN CompileUnitId:cuid COMMA MetadataRef(context):mdref RPAREN
+        {
+            context->SetCompileUnitInfo(cuid, mdref);
+        }
+        ;
+
+    CompileUnitId : std::string
+        ::= HEXNUM{ return lexer.GetString(pos); }
+        |   NUMBER{ return lexer.GetString(pos); }
+        |   ID{ return lexer.GetString(pos); }
+        ;
+
+    TypeDeclarations(cmsx::intermediate::Context* context)
+        ::= TYPES LBRACE TypeDeclaration(context):typeDeclaration* RBRACE
+        {
+            context->ResolveTypes();
+        }
+        ;
+
+    TypeDeclaration(cmsx::intermediate::Context* context, var int32_t tid)
+        ::= TypeId:typeId{ tid = typeId;} ASSIGN TYPE
+        (   StructureType(context, tid):structureType
+        |   ArrayType(context, tid):arrayType
+        |   FunctionType(context, tid):functionType
+        )
+        ;
+
+    TypeId : int32_t
+        ::= 
+        (
+            TYPEID{ return cmsx::intermediate::MakeUserTypeId(lexer.GetString(pos)); }
+        )
+        ;
+
+    FundamentalTypeId : int32_t
+        ::= VOID{ return cmsx::intermediate::voidTypeId; }
+        |   BOOL{ return cmsx::intermediate::boolTypeId; }
+        |   SBYTE{ return cmsx::intermediate::sbyteTypeId; }
+        |   BYTE{ return cmsx::intermediate::byteTypeId; }
+        |   SHORT{ return cmsx::intermediate::shortTypeId; }
+        |   USHORT{ return cmsx::intermediate::ushortTypeId; }
+        |   INT{ return cmsx::intermediate::intTypeId; }
+        |   UINT{ return cmsx::intermediate::uintTypeId; }
+        |   LONG{ return cmsx::intermediate::longTypeId; }
+        |   ULONG{ return cmsx::intermediate::ulongTypeId; }
+        |   FLOAT{ return cmsx::intermediate::floatTypeId; }
+        |   DOUBLE{ return cmsx::intermediate::doubleTypeId; }
+        ;
+
+    TypeRef(var cmsx::intermediate::SourcePos sp, var int32_t baseTypeId, var int8_t pointerCount) : cmsx::intermediate::TypeRef
+        ::= 
+        (
+            (   TypeId:typeId{ sp = lexer.GetSourcePos(pos); baseTypeId = typeId; }
+            |   FundamentalTypeId:fundamentalTypeId{ sp = lexer.GetSourcePos(pos); baseTypeId = fundamentalTypeId; }
+            )   
+            (AST{ ++pointerCount; })*
+        )
+        {
+            return cmsx::intermediate::MakeTypeRef(sp, baseTypeId, pointerCount); 
+        }
+        ;
+
+    StructureType(cmsx::intermediate::Context* context, int32_t typeId, var cmsx::intermediate::SourcePos sp, var std::vector<cmsx::intermediate::TypeRef> fieldTypeRefs)
+        ::= LBRACE{ sp = lexer.GetSourcePos(pos); } 
+            (TypeRef:first{ fieldTypeRefs.push_back(first); } 
+            (COMMA TypeRef:next{ fieldTypeRefs.push_back(next); })*)? 
+            RBRACE
+        {
+            context->AddStructureType(sp, typeId, fieldTypeRefs);
+        }
+        ;
+
+    ArrayType(cmsx::intermediate::Context* context, int32_t typeId, var cmsx::intermediate::SourcePos sp, var int64_t size)
+        ::= LBRACKET { sp = lexer.GetSourcePos(pos); } 
+            NUMBER{ size = lexer.GetLong(pos); } 
+            ID{ pass = lexer.GetString(pos) == "x"; } 
+            TypeRef:elementTypeRef
+            RBRACKET
+        {
+            context->AddArrayType(sp, typeId, size, elementTypeRef);
+        }
+        ;
+
+    FunctionType(cmsx::intermediate::Context* context, int32_t typeId, var cmsx::intermediate::SourcePos sp, var std::vector<cmsx::intermediate::TypeRef> paramTypeRefs)
+        ::= FUNCTION{ sp = lexer.GetSourcePos(pos); } 
+            TypeRef:returnTypeRef 
+            LPAREN 
+            (TypeRef:first{ paramTypeRefs.push_back(first); } 
+            (COMMA TypeRef:next{ paramTypeRefs.push_back(next); })*)? 
+            RPAREN
+        {
+            context->AddFunctionType(sp, typeId, returnTypeRef, paramTypeRefs);
+        }
+        ;
+
+    DataDefinitions(cmsx::intermediate::Context* context) 
+        ::= DATA LBRACE DataDefinition(context):dataDefinition* RBRACE{ context->ValidateData(); }
+        ;
+
+    DataDefinition(cmsx::intermediate::Context* context, 
+        var cmsx::intermediate::TypeRef tref, var cmsx::intermediate::SourcePos sp, var bool once, var std::string variableName) 
+        ::= TypeRef:typeRef{ tref = typeRef; context->ResolveType(tref); } (ONCE{ once = true; })? ID{ sp = lexer.GetSourcePos(pos); variableName = lexer.GetString(pos); } 
+        (   SEMICOLON{ context->AddGlobalVariable(sp, tref.GetType(), variableName, nullptr, once); }
+        |   ASSIGN Constant(context):initializer{ context->AddGlobalVariable(sp, tref.GetType(), variableName, initializer, once); }
+        )
+        ;
+
+    Constant(cmsx::intermediate::Context* context) : cmsx::intermediate::ConstantValue*
+        ::= BoolConstant(context):boolConstant{ return boolConstant; }
+        |   SByteConstant(context):sbyteConstant{ return sbyteConstant; }
+        |   ByteConstant(context):byteConstant{ return byteConstant; }
+        |   ShortConstant(context):shortConstant{ return shortConstant; }
+        |   UShortConstant(context):ushortConstant{ return ushortConstant; }
+        |   IntConstant(context):intConstant{ return intConstant; }
+        |   UIntConstant(context):uintConstant{ return uintConstant; }
+        |   LongConstant(context):longConstant{ return longConstant; }
+        |   ULongConstant(context):ulongConstant{ return ulongConstant; }
+        |   FloatConstant(context):floatConstant{ return floatConstant; }
+        |   DoubleConstant(context):doubleConstant{ return doubleConstant; }
+        |   AddressConstant(context):addressConstant{ return addressConstant; }
+        |   ArrayConstant(context):arrayConstant{ return arrayConstant; }
+        |   StructureConstant(context):structureConstant{ return structureConstant; }
+        |   StringConstant(context):stringConstant{ return stringConstant; }
+        |   StringArrayConstant(context):stringArrayConstant{ return stringArrayConstant; }
+        |   ConversionConstant(context):conversionConstant{ return conversionConstant; }
+        |   ClsIdConstant(context):clsidConstant{ return clsidConstant; }
+        |   SymbolConstant(context):symbolConstant{ return symbolConstant; }
+        ;
+
+    BoolConstant(cmsx::intermediate::Context* context) : cmsx::intermediate::ConstantValue*
+        ::= BOOL
+        (   TRUE{ return context->GetTrueValue(); }
+        |   FALSE{ return context->GetFalseValue(); }
+        )
+        ;
+
+    SByteConstant(cmsx::intermediate::Context* context) : cmsx::intermediate::ConstantValue*
+        ::= SBYTE NUMBER{ return context->GetSByteValue(lexer.GetSByte(pos)); }
+        ;
+
+    ByteConstant(cmsx::intermediate::Context* context) : cmsx::intermediate::ConstantValue*
+        ::= BYTE NUMBER{ return context->GetByteValue(lexer.GetByte(pos)); }
+        ;
+
+    ShortConstant(cmsx::intermediate::Context* context) : cmsx::intermediate::ConstantValue*
+        ::= SHORT NUMBER{ return context->GetShortValue(lexer.GetShort(pos)); }
+        ;
+
+    UShortConstant(cmsx::intermediate::Context* context) : cmsx::intermediate::ConstantValue*
+        ::= USHORT NUMBER{ return context->GetUShortValue(lexer.GetUShort(pos)); }
+        ;
+
+    IntConstant(cmsx::intermediate::Context* context) : cmsx::intermediate::ConstantValue*
+        ::= INT NUMBER{ return context->GetIntValue(lexer.GetInt(pos)); }
+        ;
+
+    UIntConstant(cmsx::intermediate::Context* context) : cmsx::intermediate::ConstantValue*
+        ::= UINT NUMBER{ return context->GetUIntValue(lexer.GetUInt(pos)); }
+        ;
+
+    LongConstant(cmsx::intermediate::Context* context) : cmsx::intermediate::ConstantValue*
+        ::= LONG NUMBER{ return context->GetLongValue(lexer.GetLong(pos)); }
+        ;
+
+    ULongConstant(cmsx::intermediate::Context* context) : cmsx::intermediate::ConstantValue*
+        ::= ULONG NUMBER{ return context->GetULongValue(lexer.GetULong(pos)); }
+        ;
+
+    FloatConstant(cmsx::intermediate::Context* context) : cmsx::intermediate::ConstantValue*
+        ::= FLOAT NUMBER{ return context->GetFloatValue(lexer.GetFloat(pos)); }
+        ;
+
+    DoubleConstant(cmsx::intermediate::Context* context) : cmsx::intermediate::ConstantValue*
+        ::= DOUBLE NUMBER{ return context->GetDoubleValue(lexer.GetDouble(pos)); }
+        ;
+
+    AddressConstant(cmsx::intermediate::Context* context, var cmsx::intermediate::TypeRef tref) : cmsx::intermediate::ConstantValue*
+        ::= TypeRef:typeRef{ tref = typeRef; context->ResolveType(tref); } 
+        (   NULL_TOKEN
+            {
+                return context->GetNullValue(lexer.GetSourcePos(pos), tref.GetType());
+            }
+        |   ID
+            { 
+                return context->MakeAddressLiteral(lexer.GetSourcePos(pos), tref.GetType(), lexer.GetString(pos)); 
+            }
+        )
+        ;
+
+    ArrayConstant(cmsx::intermediate::Context* context, 
+        var cmsx::intermediate::SourcePos sp, var std::vector<cmsx::intermediate::ConstantValue*> elements) : cmsx::intermediate::ConstantValue*
+        ::= LBRACKET{ sp = lexer.GetSourcePos(pos); } 
+            (Constant(context):first{ elements.push_back(first); } 
+            (COMMA Constant(context):next{ elements.push_back(next); })*)? 
+            RBRACKET
+        {
+            return context->MakeArrayValue(sp, elements);
+        }
+        ;
+
+    StructureConstant(cmsx::intermediate::Context* context, 
+        var cmsx::intermediate::SourcePos sp, var std::vector<cmsx::intermediate::ConstantValue*> fieldValues) : cmsx::intermediate::ConstantValue*
+        ::= LBRACE{ sp = lexer.GetSourcePos(pos); }
+            (Constant(context):first{ fieldValues.push_back(first); }
+            (COMMA Constant(context):next{ fieldValues.push_back(next); })*)?
+            RBRACE
+        {
+            return context->MakeStructureValue(sp, fieldValues);
+        }
+        ;
+
+    StringConstant(cmsx::intermediate::Context* context, var cmsx::intermediate::SourcePos sp) : cmsx::intermediate::ConstantValue*
+        ::= STRING{ return context->MakeStringValue(lexer.GetSourcePos(pos), lexer.GetString(pos)); }
+        ;
+
+    StringArrayConstant(cmsx::intermediate::Context* context, 
+        var cmsx::intermediate::SourcePos sp, var std::vector<cmsx::intermediate::ConstantValue*> strings) : cmsx::intermediate::ConstantValue*
+        ::= StringArrayPrefix:prefix{ sp = lexer.GetSourcePos(pos); } 
+            LBRACKET 
+            (Constant(context):first{ strings.push_back(first); } 
+            (COMMA Constant(context):next{ strings.push_back(next); })*)? 
+            RBRACKET
+        {
+            return context->MakeStringArrayValue(sp, prefix, strings);
+        }
+        ;
+
+    StringArrayPrefix : char
+        ::= ID{ std::string p = lexer.GetString(pos); pass = p == "u" || p == "w" || p == "b"; if (pass) return p[0]; }
+        ;
+
+    ConversionConstant(cmsx::intermediate::Context* context, var cmsx::intermediate::TypeRef tref, var cmsx::intermediate::SourcePos sp) : cmsx::intermediate::ConstantValue*
+        ::= TypeRef:typeRef{ tref = typeRef; context->ResolveType(tref); sp = lexer.GetSourcePos(pos); } CONV LPAREN Constant(context):from RPAREN
+        {
+            return context->MakeConversionValue(sp, tref.GetType(), from);
+        }
+        ;
+
+    ClsIdConstant(cmsx::intermediate::Context* context, var cmsx::intermediate::TypeRef tref, var cmsx::intermediate::SourcePos sp) : cmsx::intermediate::ConstantValue*
+        ::= TypeRef:typeRef{ tref = typeRef; context->ResolveType(tref); sp = lexer.GetSourcePos(pos); } CLSID 
+        {
+            return context->MakeClsIdValue(sp, tref.GetType(), lexer.GetString(pos));
+        }
+        ;
+
+    SymbolConstant(cmsx::intermediate::Context* context, var cmsx::intermediate::TypeRef tref) : cmsx::intermediate::ConstantValue*
+        ::= TypeRef:typeRef{ tref = typeRef; context->ResolveType(tref); } SymbolValue(context, tref.GetType()):symbolValue
+        {
+            return symbolValue;
+        }
+        ;
+
+    Value(cmsx::intermediate::Context* context, cmsx::intermediate::Type* type) : cmsx::intermediate::Value*
+        ::= RegValue(context, type):regValue{ return regValue; }
+        |   SymbolValue(context, type):symbolValue{ return symbolValue; }
+        |   LiteralValue(context, type):literalValue{ return literalValue; }
+        ;
+
+    RegValue(cmsx::intermediate::Context* context, cmsx::intermediate::Type* type, var cmsx::intermediate::SourcePos sp) : cmsx::intermediate::Value*
+        ::= DOLLAR{ sp = lexer.GetSourcePos(pos); } NUMBER{ int32_t reg = lexer.GetInt(pos); return context->CurrentFunction()->GetRegRef(sp, type, reg, context); }
+        ;
+
+    ResultRegValue(cmsx::intermediate::Context* context, cmsx::intermediate::Type* type, var cmsx::intermediate::SourcePos sp) : cmsx::intermediate::RegValue*
+        ::= DOLLAR{ sp = lexer.GetSourcePos(pos); } NUMBER{ int32_t reg = lexer.GetInt(pos); return context->CurrentFunction()->MakeRegValue(sp, type, reg, context); }
+        ;
+
+    SymbolValue(cmsx::intermediate::Context* context, cmsx::intermediate::Type* type, var cmsx::intermediate::SourcePos sp) : cmsx::intermediate::ConstantValue*
+        ::= AT ID{ sp = lexer.GetSourcePos(pos); return context->MakeSymbolValue(sp, type, lexer.GetString(pos));  }
+        ;
+
+    LiteralValue(cmsx::intermediate::Context* context, cmsx::intermediate::Type* type) : cmsx::intermediate::ConstantValue*
+        ::= TRUE{ return context->GetBooleanLiteral(lexer.GetSourcePos(pos), type, true); }
+        |   FALSE{ return context->GetBooleanLiteral(lexer.GetSourcePos(pos), type, false); }
+        |   NULL_TOKEN{ return context->GetNullValue(lexer.GetSourcePos(pos), type); }
+        |   NUMBER{ return context->MakeNumericLiteral(lexer.GetSourcePos(pos), type, lexer.GetString(pos)); }
+        |   ID{ return context->MakeAddressLiteral(lexer.GetSourcePos(pos), type, lexer.GetString(pos)); }
+        ;
+
+    FunctionDefinitions(cmsx::intermediate::Context* context)
+        ::= FunctionDefinition(context):function*
+        ;
+
+    FunctionDefinition(cmsx::intermediate::Context* context, var cmsx::intermediate::Function* function)
+        ::= FunctionHeader(context):header{ function = header; context->SetCurrentFunction(function); } LBRACE BasicBlock(context, function):basicBlock* RBRACE
+        ;
+
+    FunctionHeader(cmsx::intermediate::Context* context, 
+        var cmsx::intermediate::TypeRef functionTypeRef, var cmsx::intermediate::SourcePos sp, var bool once, var std::string functionId) : cmsx::intermediate::Function*
+        ::= 
+        (   
+            FUNCTION{ sp = lexer.GetSourcePos(pos); } 
+            TypeRef:typeRef{ functionTypeRef = typeRef; context->ResolveType(functionTypeRef); } 
+            (ONCE{ once = true; })? 
+            ID{ functionId = lexer.GetString(pos); } 
+            MetadataRef(context):mdRef?
+        )
+        {
+            return context->AddFunctionDefinition(sp, functionTypeRef.GetType(), functionId, once, mdRef);
+        }
+        ;
+
+    BasicBlock(cmsx::intermediate::Context* context, cmsx::intermediate::Function* function, var cmsx::intermediate::BasicBlock* basicBlock, var cmsx::intermediate::SourcePos sp)
+        ::= Label:id{ sp = lexer.GetSourcePos(pos); basicBlock = function->AddBasicBlock(sp, id, context); } Instructions(context, basicBlock):instructions
+        ;
+
+    Label : int32_t
+        ::= AT NUMBER{ return lexer.GetInt(pos); }
+        ;
+
+    Operand(cmsx::intermediate::Context* context, var cmsx::intermediate::TypeRef tref) : cmsx::intermediate::Value*
+        ::= TypeRef:typeRef{ tref = typeRef; context->ResolveType(tref); } Value(context, tref.GetType()):value
+        {
+            return value;
+        }
+        ;
+
+    Instructions(cmsx::intermediate::Context* context, cmsx::intermediate::BasicBlock* basicBlock)
+        ::= 
+        (
+            (Instruction(context):instruction MetadataRef(context):mdRef?){ basicBlock->AddInstruction(instruction, mdRef); }
+        )+
+        ;
+
+    Instruction(cmsx::intermediate::Context* context) : cmsx::intermediate::Instruction*
+        ::= StoreInstruction(context):store{ return store; }
+        |   ArgInstruction(context):arg{ return arg; }
+        |   JmpInstruction(context):jmp{ return jmp; }
+        |   BranchInstruction(context):branch{ return branch; }
+        |   ProcedureCallInstruction(context):procedureCall{ return procedureCall; }
+        |   RetInstruction(context):ret{ return ret; }
+        |   SwitchInstruction(context):switch_{ return switch_; }
+        |   ValueInstruction(context):valueInst{ return valueInst; }
+        |   NoOperationInstruction(context):nopInst{ return nopInst; }
+        ;
+
+    StoreInstruction(cmsx::intermediate::Context* context, 
+        var cmsx::intermediate::SourcePos sp, var cmsx::intermediate::TypeRef tref, var cmsx::intermediate::TypeRef ptref) : cmsx::intermediate::Instruction*
+        ::= STORE{ sp = lexer.GetSourcePos(pos); }
+            TypeRef:typeRef{ tref = typeRef; context->ResolveType(tref); } 
+            Value(context, tref.GetType()):value 
+            COMMA 
+            TypeRef:ptrTypeRef{ ptref = ptrTypeRef; context->ResolveType(ptref); }
+            Value(context, ptref.GetType()):ptr
+        {
+            return new cmsx::intermediate::StoreInstruction(sp, value, ptr);
+        }
+        ;
+
+    ArgInstruction(cmsx::intermediate::Context* context, var cmsx::intermediate::SourcePos sp, var cmsx::intermediate::TypeRef tref) : cmsx::intermediate::Instruction*
+        ::= ARG{ sp = lexer.GetSourcePos(pos); }
+            TypeRef:typeRef{ tref = typeRef; context->ResolveType(tref); } 
+            Value(context, tref.GetType()):arg
+        {
+            return new cmsx::intermediate::ArgInstruction(sp, arg);
+        }
+        ;
+
+    JmpInstruction(cmsx::intermediate::Context* context, var cmsx::intermediate::SourcePos sp) : cmsx::intermediate::Instruction*
+        ::= JMP{ sp = lexer.GetSourcePos(pos); }
+            Label:target
+        {
+            return new cmsx::intermediate::JmpInstruction(sp, target);
+        }
+        ;
+
+    BranchInstruction(cmsx::intermediate::Context* context, var cmsx::intermediate::SourcePos sp, var cmsx::intermediate::TypeRef tref) : cmsx::intermediate::Instruction*
+        ::= BRANCH{ sp = lexer.GetSourcePos(pos); }
+            TypeRef:typeRef{ tref = typeRef; context->ResolveType(tref); }
+            Value(context, tref.GetType()):cond
+            COMMA
+            Label:trueTarget
+            COMMA
+            Label:falseTarget
+        {
+            return new cmsx::intermediate::BranchInstruction(sp, cond, trueTarget, falseTarget);
+        }
+        ;
+
+    ProcedureCallInstruction(cmsx::intermediate::Context* context, 
+        var cmsx::intermediate::SourcePos sp, var cmsx::intermediate::TypeRef tref) : cmsx::intermediate::Instruction*
+        ::= CALL{ sp = lexer.GetSourcePos(pos); }
+            TypeRef:typeRef{ tref = typeRef; context->ResolveType(tref); }
+            Value(context, tref.GetType()):callee
+        {
+            return new cmsx::intermediate::ProcedureCallInstruction(sp, callee);
+        }
+        ;
+
+    RetInstruction(cmsx::intermediate::Context* context, var cmsx::intermediate::SourcePos sp, var cmsx::intermediate::TypeRef tref) : cmsx::intermediate::Instruction*
+        ::= RET{ sp = lexer.GetSourcePos(pos); }
+        (   (VOID - (VOID AST)){ return new cmsx::intermediate::RetInstruction(sp, nullptr); }
+        |   TypeRef:typeRef{ tref = typeRef; context->ResolveType(tref); }  
+            Value(context, tref.GetType()):returnValue{ return new cmsx::intermediate::RetInstruction(sp, returnValue); }
+        )
+        ;
+
+    SwitchInstruction(cmsx::intermediate::Context* context, 
+        var cmsx::intermediate::SourcePos sp, var cmsx::intermediate::TypeRef tref, var cmsx::intermediate::TypeRef caseTref, var cmsx::intermediate::SwitchInstruction* inst) : 
+        cmsx::intermediate::Instruction*
+        ::= 
+        (
+            SWITCH{ sp = lexer.GetSourcePos(pos); }
+            TypeRef:typeRef{ tref = typeRef; context->ResolveType(tref); }  
+            Value(context, tref.GetType()):cond
+            Label:defaultTarget{ inst = new cmsx::intermediate::SwitchInstruction(sp, cond, defaultTarget); }
+            COMMA
+            LBRACKET
+            (
+                (   TypeRef:caseTypeRef{ caseTref = caseTypeRef; context->ResolveType(caseTref); }
+                    Value(context, caseTref.GetType()):caseValue
+                    COMMA
+                    Label:caseTarget{ inst->AddCaseTarget(cmsx::intermediate::CaseTarget(caseValue, caseTarget)); }
+                ) % COLON
+            )
+            RBRACKET
+        )
+        {
+            return inst;
+        }
+        ;
+
+    ValueInstruction(cmsx::intermediate::Context* context, var cmsx::intermediate::TypeRef tref, var cmsx::intermediate::RegValue* rslt) : cmsx::intermediate::Instruction*
+        ::= TypeRef:typeRef{ tref = typeRef; context->ResolveType(tref); } ResultRegValue(context, tref.GetType()):result{ rslt = result; } ASSIGN Operation(context, rslt):inst
+        {
+            return inst;
+        }
+        ;
+
+    Operation(cmsx::intermediate::Context* context, cmsx::intermediate::RegValue* result) : cmsx::intermediate::Instruction*
+        ::= UnaryInstruction(context, result):unaryInst{ return unaryInst; }
+        |   BinaryInstruction(context, result):binaryInst{ return binaryInst; }
+        |   ParamInstruction(context, result):paramInst{ return paramInst; }
+        |   LocalInstruction(context, result):localInst{ return localInst; }
+        |   LoadInstruction(context, result):loadInst{ return loadInst; }
+        |   ElemAddrInstruction(context, result):elemAddrInst{ return elemAddrInst; }
+        |   PtrOffsetInstruction(context, result):ptrOffsetInst{ return ptrOffsetInst; }
+        |   PtrDiffInstruction(context, result):ptrDiffInst{ return ptrDiffInst; }
+        |   FunctionCallInstruction(context, result):functionCallInst{ return functionCallInst; }
+        |   TrapInstruction(context, result):trapInst{ return trapInst; }
+        |   PhiInstruction(context, result):phiInst{ return phiInst; }
+        ;
+
+    UnaryInstruction(cmsx::intermediate::Context* context, cmsx::intermediate::RegValue* result, var cmsx::intermediate::SourcePos sp) : cmsx::intermediate::Instruction*
+        ::= NOT{ sp = lexer.GetSourcePos(pos); } Operand(context):notOp{ return new cmsx::intermediate::NotInstruction(sp, result, notOp); }
+        |   NEG{ sp = lexer.GetSourcePos(pos); } Operand(context):negOp{ return new cmsx::intermediate::NegInstruction(sp, result, negOp); }
+        |   SIGNEXTEND{ sp = lexer.GetSourcePos(pos); } Operand(context):sextOp{ return new cmsx::intermediate::SignExtendInstruction(sp, result, sextOp); }
+        |   ZEROEXTEND{ sp = lexer.GetSourcePos(pos); } Operand(context):zextOp{ return new cmsx::intermediate::ZeroExtendInstruction(sp, result, zextOp); }
+        |   TRUNCATE{ sp = lexer.GetSourcePos(pos); } Operand(context):truncOp{ return new cmsx::intermediate::TruncateInstruction(sp, result, truncOp); }
+        |   BITCAST{ sp = lexer.GetSourcePos(pos); } Operand(context):bcOp{ return new cmsx::intermediate::BitcastInstruction(sp, result, bcOp); }
+        |   INTTOFLOAT{ sp = lexer.GetSourcePos(pos); } Operand(context):ifOp{ return new cmsx::intermediate::IntToFloatInstruction(sp, result, ifOp); }
+        |   FLOATTOINT{ sp = lexer.GetSourcePos(pos); } Operand(context):fiOp{ return new cmsx::intermediate::FloatToIntInstruction(sp, result, fiOp); }
+        |   INTTOPTR{ sp = lexer.GetSourcePos(pos); } Operand(context):ipOp{ return new cmsx::intermediate::IntToPtrInstruction(sp, result, ipOp); }
+        |   PTRTOINT{ sp = lexer.GetSourcePos(pos); } Operand(context):piOp{ return new cmsx::intermediate::PtrToIntInstruction(sp, result, piOp); }
+        ;
+
+    BinaryInstruction(cmsx::intermediate::Context* context, cmsx::intermediate::RegValue* result, var cmsx::intermediate::SourcePos sp) : cmsx::intermediate::Instruction*
+        ::= 
+        (   ADD{ sp = lexer.GetSourcePos(pos); } 
+            Operand(context):leftAdd 
+            COMMA 
+            Operand(context):rightAdd
+        )
+        { 
+            return new cmsx::intermediate::AddInstruction(sp, result, leftAdd, rightAdd); 
+        }
+        |   
+        (   SUB{ sp = lexer.GetSourcePos(pos); } 
+            Operand(context):leftSub 
+            COMMA 
+            Operand(context):rightSub
+        )
+        { 
+            return new cmsx::intermediate::SubInstruction(sp, result, leftSub, rightSub); 
+        }
+        |   
+        (   MUL{ sp = lexer.GetSourcePos(pos); } 
+            Operand(context):leftMul 
+            COMMA 
+            Operand(context):rightMul
+        )
+        { 
+            return new cmsx::intermediate::MulInstruction(sp, result, leftMul, rightMul); 
+        }
+        |   
+        (   DIV{ sp = lexer.GetSourcePos(pos); } 
+            Operand(context):leftDiv 
+            COMMA 
+            Operand(context):rightDiv
+        )
+        { 
+            return new cmsx::intermediate::DivInstruction(sp, result, leftDiv, rightDiv); 
+        }
+        |   
+        (   MOD{ sp = lexer.GetSourcePos(pos); }
+            Operand(context):leftMod 
+            COMMA 
+            Operand(context):rightMod
+        )
+        { 
+            return new cmsx::intermediate::ModInstruction(sp, result, leftMod, rightMod); 
+        }
+        |
+        (   AND{ sp = lexer.GetSourcePos(pos); } 
+            Operand(context):leftAnd 
+            COMMA 
+            Operand(context):rightAnd
+        )
+        { 
+            return new cmsx::intermediate::AndInstruction(sp, result, leftAnd, rightAnd); 
+        }
+        |   
+        (   OR{ sp = lexer.GetSourcePos(pos); } 
+            Operand(context):leftOr 
+            COMMA 
+            Operand(context):rightOr
+        )
+        { 
+            return new cmsx::intermediate::OrInstruction(sp, result, leftOr, rightOr); 
+        }
+        |   
+        (   XOR{ sp = lexer.GetSourcePos(pos); } 
+            Operand(context):leftXor 
+            COMMA 
+            Operand(context):rightXor
+        )
+        { 
+            return new cmsx::intermediate::XorInstruction(sp, result, leftXor, rightXor); 
+        }
+        |   
+        (   SHL{ sp = lexer.GetSourcePos(pos); } 
+            Operand(context):leftShl 
+            COMMA 
+            Operand(context):rightShl
+        )
+        { 
+            return new cmsx::intermediate::ShlInstruction(sp, result, leftShl, rightShl); 
+        }
+        |   
+        (   SHR{ sp = lexer.GetSourcePos(pos); } 
+            Operand(context):leftShr 
+            COMMA 
+            Operand(context):rightShr
+        )
+        { 
+            return new cmsx::intermediate::ShrInstruction(sp, result, leftShr, rightShr); 
+        }
+        |   
+        (   EQUAL{ sp = lexer.GetSourcePos(pos); } 
+            Operand(context):leftEqual 
+            COMMA 
+            Operand(context):rightEqual
+        )
+        { 
+            return new cmsx::intermediate::EqualInstruction(sp, result, leftEqual, rightEqual); 
+        }
+        |   
+        (   LESS{ sp = lexer.GetSourcePos(pos); }
+            Operand(context):leftLess 
+            COMMA 
+            Operand(context):rightLess
+        )
+        { 
+            return new cmsx::intermediate::LessInstruction(sp, result, leftLess, rightLess); 
+        }
+        ;
+
+    ParamInstruction(cmsx::intermediate::Context* context, cmsx::intermediate::RegValue* result, var cmsx::intermediate::SourcePos sp) : cmsx::intermediate::Instruction*
+        ::= PARAM{ sp = lexer.GetSourcePos(pos); return new cmsx::intermediate::ParamInstruction(sp, result); }
+        ;
+
+    LocalInstruction(cmsx::intermediate::Context* context, cmsx::intermediate::RegValue* result, var cmsx::intermediate::SourcePos sp, 
+        var cmsx::intermediate::TypeRef tref) : cmsx::intermediate::Instruction*
+        ::= LOCAL{ sp = lexer.GetSourcePos(pos); } 
+            TypeRef:typeRef{ tref = typeRef; context->ResolveType(tref); return new cmsx::intermediate::LocalInstruction(sp, result, tref.GetType()); }
+        ;
+
+    LoadInstruction(cmsx::intermediate::Context* context, cmsx::intermediate::RegValue* result, var cmsx::intermediate::SourcePos sp) : cmsx::intermediate::Instruction*
+        ::= LOAD{ sp = lexer.GetSourcePos(pos); } Operand(context):ptr{ return new cmsx::intermediate::LoadInstruction(sp, result, ptr); }
+        ;
+
+    ElemAddrInstruction(cmsx::intermediate::Context* context, cmsx::intermediate::RegValue* result, var cmsx::intermediate::SourcePos sp) : cmsx::intermediate::Instruction*
+        ::= ELEMADDR{ sp = lexer.GetSourcePos(pos); } Operand(context):ptr COMMA Operand(context):index
+        { 
+            return new cmsx::intermediate::ElemAddrInstruction(sp, result, ptr, index); 
+        }
+        ;
+
+    PtrOffsetInstruction(cmsx::intermediate::Context* context, cmsx::intermediate::RegValue* result, var cmsx::intermediate::SourcePos sp) : cmsx::intermediate::Instruction*
+        ::= PTROFFSET{ sp = lexer.GetSourcePos(pos); } Operand(context):ptr COMMA Operand(context):offset
+        { 
+            return new cmsx::intermediate::PtrOffsetInstruction(sp, result, ptr, offset); 
+        }
+        ;
+
+    PtrDiffInstruction(cmsx::intermediate::Context* context, cmsx::intermediate::RegValue* result, var cmsx::intermediate::SourcePos sp) : cmsx::intermediate::Instruction*
+        ::= PTRDIFF{ sp = lexer.GetSourcePos(pos); } Operand(context):leftPtr COMMA Operand(context):rightPtr
+        { 
+            return new cmsx::intermediate::PtrDiffInstruction(sp, result, leftPtr, rightPtr); 
+        }
+        ;
+
+    FunctionCallInstruction(cmsx::intermediate::Context* context, cmsx::intermediate::RegValue* result, var cmsx::intermediate::TypeRef tref, 
+        var cmsx::intermediate::SourcePos sp) : cmsx::intermediate::Instruction*
+        ::= CALL{ sp = lexer.GetSourcePos(pos); } TypeRef:typeRef{ tref = typeRef; context->ResolveType(tref); } Value(context, tref.GetType()):callee
+        { 
+            return new cmsx::intermediate::FunctionCallInstruction(sp, result, callee);
+        }
+        ;
+
+    TrapInstruction(cmsx::intermediate::Context* context, cmsx::intermediate::RegValue* result, var cmsx::intermediate::SourcePos sp) : cmsx::intermediate::Instruction*
+        ::= TRAP{ sp = lexer.GetSourcePos(pos); } Operand(context):op1 COMMA Operand(context):op2 COMMA Operand(context):op3
+        { 
+            return new cmsx::intermediate::TrapInstruction(sp, result, op1, op2, op3); 
+        }
+        ;
+
+    PhiInstruction(cmsx::intermediate::Context* context, cmsx::intermediate::RegValue* result, var cmsx::intermediate::SourcePos sp, var cmsx::intermediate::PhiInstruction* inst) : 
+        cmsx::intermediate::Instruction*
+        ::= 
+        (
+            PHI{ sp = lexer.GetSourcePos(pos); inst = new cmsx::intermediate::PhiInstruction(sp, result); } 
+            (BlockValue(context):first{ inst->AddBlockValue(first); } (COMMA BlockValue(context):next{ inst->AddBlockValue(next); })*)?
+        )
+        {
+            return inst;
+        }
+        ;
+
+    BlockValue(cmsx::intermediate::Context* context) : cmsx::intermediate::BlockValue
+        ::= 
+        (
+            LBRACKET Operand(context):operand COMMA Label:blockId RBRACKET
+        )
+        {
+            return cmsx::intermediate::BlockValue(operand, blockId);
+        }
+        ;
+
+    NoOperationInstruction(cmsx::intermediate::Context* context, var cmsx::intermediate::SourcePos sp) : cmsx::intermediate::Instruction*
+        ::= NOP{ sp = lexer.GetSourcePos(pos); return new cmsx::intermediate::NoOperationInstruction(sp); }
+        ;
+
+    Metadata(cmsx::intermediate::Context* context)
+        ::= METADATA LBRACE MetadataStruct(context):mds* RBRACE
+        {
+            context->ResolveMetadataReferences();
+        }
+        ;
+
+    MetadataStruct(cmsx::intermediate::Context* context, var cmsx::intermediate::MetadataStruct* value)
+        ::= EXCLAMATION NUMBER{ value = context->AddMetadataStruct(lexer.GetSourcePos(pos), lexer.GetInt(pos), context); }
+            ASSIGN 
+            LBRACE
+            (MetadataField(context, value):first (COMMA MetadataField(context, value):next)*)?
+            RBRACE
+        ;
+
+    MetadataField(cmsx::intermediate::Context* context, cmsx::intermediate::MetadataStruct* parent, var std::string fieldName)
+        ::= ID{ fieldName = lexer.GetString(pos); } COLON MetadataItem(context):item{ parent->AddItem(fieldName, item); }
+        ;
+
+    MetadataItem(cmsx::intermediate::Context* context) : cmsx::intermediate::MetadataItem*
+        ::= MetadataBool(context):mdBool{ return mdBool; }
+        |   MetadataLong(context):mdLong{ return mdLong; }
+        |   MetadataString(context):mdString{ return mdString; }
+        |   MetadataRef(context):mdRef{ return mdRef; }
+        ;
+
+    MetadataBool(cmsx::intermediate::Context* context) : cmsx::intermediate::MetadataItem*
+        ::= TRUE{ return context->CreateMetadataBool(true); }
+        |   FALSE{ return context->CreateMetadataBool(false); }
+        ;
+
+    MetadataLong(cmsx::intermediate::Context* context) : cmsx::intermediate::MetadataItem*
+        ::= NUMBER{ return context->CreateMetadataLong(lexer.GetLong(pos)); }
+        ;
+
+    MetadataString(cmsx::intermediate::Context* context) : cmsx::intermediate::MetadataItem*
+        ::= STRING{ return context->CreateMetadataString(lexer.GetString(pos)); }
+        ;
+
+    MetadataRef(cmsx::intermediate::Context* context) : cmsx::intermediate::MetadataRef*
+        ::= EXCLAMATION NUMBER{ return context->CreateMetadataRef(lexer.GetSourcePos(pos), lexer.GetInt(pos)); }
+        ;
+} 
+

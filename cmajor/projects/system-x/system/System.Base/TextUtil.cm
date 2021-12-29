@@ -1,0 +1,408 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Text
+{
+    public nothrow string Trim(const string& s)
+    {
+        long b = 0;
+        while (b < s.Length() && IsSpace(s[b]))
+        {
+            ++b;
+        }
+        long e = s.Length() - 1;
+        while (e >= b && IsSpace(s[e]))
+        {
+            --e;
+        }
+        return s.Substring(b, e - b + 1);
+    }
+    
+    public wstring Trim(const wstring& s)
+    {
+        return ToUtf16(Trim(ToUtf32(s)));
+    }
+
+    public ustring Trim(const ustring& s)
+    {
+        long b = 0;
+        while (b < s.Length() && IsWhiteSpace(s[b]))
+        {
+            ++b;
+        }
+        long e = s.Length() - 1;
+        while (e >= b && IsWhiteSpace(s[e]))
+        {
+            --e;
+        }
+        return s.Substring(b, e - b + 1);
+    }
+    
+    public string TrimAll(const string& s)
+    {
+        string result;
+        result.Reserve(s.Length());
+        int state = 0 ;
+        for (char c : s)
+        {
+            switch (state)
+            {
+                case 0:
+                {
+                    if (!IsSpace(c))
+                    {
+                        result.Append(c);
+                        state = 1;
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    if (IsSpace(c))
+                    {
+                        state = 2;
+                    }
+                    else
+                    {
+                        result.Append(c);
+                    }
+                    break;
+                }
+                case 2:
+                {
+                    if (!IsSpace(c))
+                    {
+                        result.Append(' ');
+                        result.Append(c);
+                        state = 1;
+                    }
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+    
+    public wstring TrimAll(const wstring& s)
+    {
+        return ToUtf16(TrimAll(ToUtf32(s)));
+    }
+    
+    public ustring TrimAll(const ustring& s)
+    {
+        ustring result;
+        result.Reserve(s.Length());
+        int state = 0;
+        for (uchar c : s)
+        {
+            switch (state)
+            {
+                case 0: 
+                {
+                    if (!IsWhiteSpace(c)) 
+                    {
+                        result.Append(c);
+                        state = 1;
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    if (IsWhiteSpace(c))
+                    {
+                        state = 2;
+                    }
+                    else
+                    {
+                        result.Append(c);
+                    }
+                    break;
+                }
+                case 2:
+                {
+                    if (!IsWhiteSpace(c))
+                    {
+                        result.Append(u' ');
+                        result.Append(c);
+                        state = 1;
+                    }
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+    
+    public nothrow string HexEscape(char c)
+    {
+        return "\\x" + ToHexString(cast<byte>(c));
+    }
+    
+    public nothrow string HexEscape(wchar c)
+    {
+        return "\\x" + ToHexString(cast<ushort>(c));
+    }
+    
+    public nothrow string HexEscape(uchar c)
+    {
+        return "\\x" + ToHexString(cast<uint>(c));
+    }
+    
+    public nothrow string CharStr(char c)
+    {
+        switch (c)
+        {
+            case '\\': return "\\\\";
+            case '"':  return "\\\"";
+            case '\'': return "\\'";
+            case '\a': return "\\a";
+            case '\b': return "\\b";
+            case '\f': return "\\f";
+            case '\n': return "\\n";
+            case '\r': return "\\r";
+            case '\t': return "\\t";
+            case '\v': return "\\v";
+            case '\0': return "\\0";
+            default:
+            {
+                if (IsPrintable(c))
+                {
+                    return string(c);
+                }
+                else
+                {
+                    return HexEscape(c);
+                }
+            }
+        }
+        return string();
+    }
+    
+    public nothrow string MakeCharLiteral(char c)
+    {
+        if (c == '"')
+        {
+            return string("'\"'");
+        }
+        return "'" + CharStr(c) + "'";
+    }
+    
+    
+    public wstring CharStr(wchar c)
+    {
+        switch (c)
+        {
+            case w'\\': return w"\\\\";
+            case w'"':  return w"\\\"";
+            case w'\'': return w"\\'";
+            case w'\a': return w"\\a";
+            case w'\b': return w"\\b";
+            case w'\f': return w"\\f";
+            case w'\n': return w"\\n";
+            case w'\r': return w"\\r";
+            case w'\t': return w"\\t";
+            case w'\v': return w"\\v";
+            case w'\0': return w"\\0";
+            default:
+            {
+                if (cast<ushort>(c) < 256u && IsPrintable(cast<char>(c)))
+                {
+                    return wstring(c);
+                }
+                else
+                {
+                    return ToUtf16(HexEscape(c));
+                }
+            }
+        }
+        return wstring();
+    }   
+    
+    public ustring CharStr(uchar c)
+    {
+        switch (c)
+        {
+            case u'\\': return u"\\\\";
+            case u'"':  return u"\\\"";
+            case u'\'': return u"\\'";
+            case u'\a': return u"\\a";
+            case u'\b': return u"\\b";
+            case u'\f': return u"\\f";
+            case u'\n': return u"\\n";
+            case u'\r': return u"\\r";
+            case u'\t': return u"\\t";
+            case u'\v': return u"\\v";
+            case u'\0': return u"\\0";
+            default:
+            {
+                if (cast<uint>(c) < 256u && IsPrintable(cast<char>(c)))
+                {
+                    return ustring(c);
+                }
+                else
+                {
+                    return ToUtf32(HexEscape(c));
+                }
+            }
+        }
+        return ustring();
+    }   
+    
+    public nothrow string StringStr(const string& s)
+    {
+        string result;
+        for (char c : s)
+        {
+            if (c == '\'')
+            {
+                result.Append(c);
+            }
+            else
+            {
+                result.Append(CharStr(c));
+            }
+        }
+        return result;
+    }
+    
+    public ustring StringStr(const ustring& s)
+    {
+        ustring result;
+        for (uchar c : s)
+        {
+            if (c == u'\'')
+            {
+                result.Append(c);
+            }
+            else
+            {
+                result.Append(CharStr(c));
+            }
+        }
+        return result;
+    }
+
+    public nothrow string MakeStringLiteral(const string& s)
+    {
+        string result = "\"";
+        result.Append(StringStr(s));
+        result.Append('"');
+        return result;
+    }
+    
+    public ustring MakeStringLiteral(const ustring& s)
+    {
+        ustring result = u"\"";
+        result.Append(StringStr(s));
+        result.Append(u'"');
+        return result;
+    }
+    
+    public enum FormatWidth
+    {
+        exact, min
+    }
+
+    public enum FormatJustify
+    {
+        left, right
+    }
+    
+    public nothrow string Format(const string& s, int width)
+    {
+        return Format(s, width, FormatWidth.exact, FormatJustify.left);
+    }
+
+    public nothrow string Format(const string& s, int width, FormatJustify justify)
+    {
+        return Format(s, width, FormatWidth.exact, justify);
+    }
+
+    public nothrow string Format(const string& s, int width, FormatWidth fw)
+    {
+        return Format(s, width, fw, FormatJustify.left);
+    }
+
+    public nothrow string Format(const string& s, int width, FormatWidth fw, FormatJustify justify)
+    {
+        return Format(s, width, fw, justify, ' ');
+    }
+
+    public nothrow string Format(const string& s, int width, FormatWidth fw, FormatJustify justify, char fillChar)
+    {
+        if (fw == FormatWidth.min)
+        {
+            width = Max(width, cast<int>(s.Length()));
+        }
+        string result(fillChar, width);
+        int n = Min(cast<int>(s.Length()), width);
+        int offset = 0;
+        if (justify == FormatJustify.right)
+        {
+            offset = width - n;
+        }
+        for (int i = 0; i < n; ++i)
+        {
+            result[i + offset] = s[i];
+        }
+        return result;
+    }
+
+    public nothrow ustring Format(const ustring& s, int width)
+    {
+        return Format(s, width, FormatWidth.exact, FormatJustify.left);
+    }
+
+    public nothrow ustring Format(const ustring& s, int width, FormatJustify justify)
+    {
+        return Format(s, width, FormatWidth.exact, justify);
+    }
+
+    public nothrow ustring Format(const ustring& s, int width, FormatWidth fw)
+    {
+        return Format(s, width, fw, FormatJustify.left);
+    }
+    
+    public nothrow ustring Format(const ustring& s, int width, FormatWidth fw, FormatJustify justify)
+    {
+        return Format(s, width, fw, justify, ' ');
+    }
+
+    public nothrow ustring Format(const ustring& s, int width, FormatWidth fw, FormatJustify justify, char fillChar)
+    {
+        ustring result;
+        int m = cast<int>(s.Length());
+        if (fw == FormatWidth.min)
+        {
+            width = Max(width, m);
+        }
+        else if (fw == FormatWidth.exact)
+        {
+            m = Min(m, width);
+        }
+        int n = Max(0, width - m);
+        if (justify == FormatJustify.right)
+        {
+            for (int i = 0; i < n; ++i)
+            {
+                result.Append(fillChar);
+            }
+        }
+        for (int i = 0; i < m; ++i)
+        {
+            result.Append(s[i]);
+        }
+        if (justify == FormatJustify.left)
+        {
+            for (int i = 0; i < n; ++i)
+            {
+                result.Append(fillChar);
+            }
+        }
+        return result;
+    }
+}

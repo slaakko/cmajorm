@@ -5,6 +5,7 @@
 
 #include <cmajor/binder/ControlFlowAnalyzer.hpp>
 #include <cmajor/binder/BoundCompileUnit.hpp>
+#include <cmajor/binder/BoundNamespace.hpp>
 #include <cmajor/binder/BoundClass.hpp>
 #include <cmajor/binder/BoundFunction.hpp>
 #include <cmajor/binder/BoundStatement.hpp>
@@ -21,6 +22,7 @@ class ControlFlowAnalyzer : public BoundNodeVisitor
 public:
     ControlFlowAnalyzer();
     void Visit(BoundCompileUnit& boundCompileUnit) override;
+    void Visit(BoundNamespace& boundNamespace) override;
     void Visit(BoundClass& boundClass) override;
     void Visit(BoundFunction& boundFunction) override;
     void Visit(BoundSequenceStatement& boundSequenceStatement) override;
@@ -122,6 +124,14 @@ void ControlFlowAnalyzer::Visit(BoundCompileUnit& boundCompileUnit)
     {
         BoundNode* boundNode = boundCompileUnit.BoundNodes()[i].get();
         boundNode->Accept(*this);
+    }
+}
+
+void ControlFlowAnalyzer::Visit(BoundNamespace& boundNamespace)
+{
+    for (const auto& member : boundNamespace.Members())
+    {
+        member->Accept(*this);
     }
 }
 

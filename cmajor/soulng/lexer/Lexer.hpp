@@ -107,6 +107,17 @@ public:
     Span GetSpan() const { return Span(fileIndex, line, static_cast<int32_t>(GetPos())); }
     void ConvertExternal(Span& span);
     Token GetToken(int64_t pos) const;
+    std::string GetString(int64_t pos) const;
+    int8_t GetSByte(int64_t pos) const;
+    uint8_t GetByte(int64_t pos) const;
+    int16_t GetShort(int64_t pos) const;
+    uint16_t GetUShort(int64_t pos) const;
+    int32_t GetInt(int64_t pos) const;
+    uint32_t GetUInt(int64_t pos) const;
+    int64_t GetLong(int64_t pos) const;
+    uint64_t GetULong(int64_t pos) const;
+    float GetFloat(int64_t pos) const;
+    double GetDouble(int64_t pos) const;
     void SetTokens(const std::vector<Token>& tokens_);
     void SetLine(int line_) { line = line_; }
     void SetCountLines(bool countLines_) { countLines = countLines_; }
@@ -116,6 +127,7 @@ public:
     std::u32string ErrorLines(const Token& token) const;
     std::string MappedErrorLines(const Token& token) const;
     std::u32string ErrorLines(const Span& span) const;
+    std::u32string ErrorLines(const SourcePos& sourcePos) const;
     void GetColumns(const Span& span, int32_t& startCol, int32_t& endCol) const;
     void ThrowExpectationFailure(const Span& span, const std::u32string& name);
     std::string GetFarthestError() const;
@@ -166,6 +178,7 @@ public:
     bool Recovered() const { return recovered; }
     void SetRecovered() { recovered = true; }
     void ResetRecovered() { recovered = false; }
+    const std::vector<const char32_t*>& LineStarts() const { return lineStarts; }
 private:
     std::u32string content;
     std::string fileName;

@@ -1,0 +1,224 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.IO
+{
+    public class BinaryReader
+    {
+        public nothrow BinaryReader(const SharedPtr<Stream>& stream_) : stream(stream_)
+        {
+        }
+        public bool ReadBool()
+        {
+            byte x = ReadByte();
+            return cast<bool>(x);
+        }
+        public char ReadChar()
+        {
+            byte x = ReadByte();
+            return cast<char>(x);
+        }
+        public wchar ReadWChar()
+        {
+            ushort x = ReadUShort();
+            return cast<wchar>(x);
+        }
+        public uchar ReadUChar()
+        {
+            uint x = ReadUInt();
+            return cast<uchar>(x);
+        }
+        public sbyte ReadSByte()
+        {
+            byte x = ReadByte();
+            return cast<sbyte>(x);
+        }
+        public int ReadByteOrEnd()
+        {
+            return stream->ReadByte();
+        }
+        public byte ReadByte()
+        {
+            int x = stream->ReadByte();
+            if (x == -1)
+            {
+                throw Exception("unexpected end of binary stream");
+            }
+            return cast<byte>(x);
+        }
+        public short ReadShort()
+        {
+            ushort x = ReadUShort();
+            return cast<short>(x);
+        }
+        public ushort ReadUShort()
+        {
+            byte x0 = ReadByte();
+            byte x1 = ReadByte();
+            ushort x = cast<ushort>(x0) << 8u | cast<ushort>(x1);
+            return x;
+        }
+        public int ReadInt()
+        {
+            uint x = ReadUInt();
+            return cast<int>(x);
+        }
+        public uint ReadUInt()
+        {
+            byte x0 = ReadByte();
+            byte x1 = ReadByte();
+            byte x2 = ReadByte();
+            byte x3 = ReadByte();
+            uint x = cast<uint>(x0) << 24u | cast<uint>(x1) << 16u | cast<uint>(x2) << 8u | cast<uint>(x3);
+            return x;
+        }
+        public long ReadLong()
+        {
+            ulong x = ReadULong();
+            return cast<long>(x);
+        }
+        public ulong ReadULong()
+        {
+            byte x0 = ReadByte();
+            byte x1 = ReadByte();
+            byte x2 = ReadByte();
+            byte x3 = ReadByte();
+            byte x4 = ReadByte();
+            byte x5 = ReadByte();
+            byte x6 = ReadByte();
+            byte x7 = ReadByte();
+            ulong x = cast<ulong>(x0) << 56u | cast<ulong>(x1) << 48u | cast<ulong>(x2) << 40u | cast<ulong>(x3) << 32u | 
+                cast<ulong>(x4) << 24u | cast<ulong>(x5) << 16u | cast<ulong>(x6) << 8u | cast<ulong>(x7);
+            return x;
+        }
+        public float ReadFloat()
+        {
+            uint x = ReadUInt();
+            void* u = &x;
+            return *cast<float*>(u);
+        }
+        public double ReadDouble()
+        {
+            ulong x = ReadULong();
+            void* u = &x;
+            return *cast<double*>(u);
+        }
+        public string ReadString()
+        {
+            string s;
+            char c = ReadChar();
+            while (c != '\0')
+            {
+                s.Append(c);
+                c = ReadChar();
+            }
+            return s;
+        }
+        public wstring ReadWString()
+        {
+            string s = ReadString();
+            return ToUtf16(s);
+        }
+        public ustring ReadUString()
+        {
+            string s = ReadString();
+            return ToUtf32(s);
+        }
+        public uint ReadULEB128UInt()
+        {
+            uint result = 0u;
+            uint shift = 0u;
+            while (true)
+            {
+                byte b = ReadByte();
+                result = result | ((b & 0x7Fu) << shift);
+                if ((b & 0x80u) == 0u) break;
+                shift = shift + 7u;
+            }
+            return result;
+        }
+        public ulong ReadULEB128ULong()
+        {
+            ulong result = 0u;
+            ulong shift = 0u;
+            while (true)
+            {
+                byte b = ReadByte();
+                result = result | ((b & 0x7Fu) << shift);
+                if ((b & 0x80u) == 0u) break;
+                shift = shift + 7u;
+            }
+            return result;
+        }
+        public int ReadSLEB128Int()
+        {
+            int result = 0;
+            int shift = 0;
+            byte b = 0u;
+            do
+            {
+                b = ReadByte();
+                result = result | ((b & 0x7Fu) << shift);
+                shift = shift + 7;
+            }
+            while ((b & 0x80u) != 0u);
+            if ((shift < 32) && (b & 0x40u) != 0u)
+            {
+                result = result | ~cast<int>(0) << shift;
+            }
+            return result;
+        }
+        public long ReadSLEB128Long()
+        {
+            long result = 0;
+            long shift = 0;
+            byte b = 0u;
+            do
+            {
+                b = ReadByte();
+                result = result | ((b & 0x7Fu) << shift);
+                shift = shift + 7;
+            }
+            while ((b & 0x80u) != 0u);
+            if ((shift < 64) && (b & 0x40u) != 0u)
+            {
+                result = result | ~cast<long>(0) << shift;
+            }
+            return result;
+        }
+        public Uuid ReadUuid()
+        {
+            Uuid uuid;
+            for (byte& b : uuid)
+            {
+                b = ReadByte();
+            }
+            return uuid;
+        }
+        public void Seek(long pos, Origin origin)
+        {
+            stream->Seek(pos, origin);
+        }
+        public long Tell() 
+        {
+            return stream->Tell();
+        }
+        public long Size()
+        {
+            long pos = Tell();
+            Seek(0, Origin.seekEnd);
+            long size = Tell();
+            Seek(pos, Origin.seekSet);
+            return size;
+        }
+        public nothrow const SharedPtr<Stream>& GetStream() 
+        {
+            return stream;
+        }
+        private SharedPtr<Stream> stream;
+    }
+}

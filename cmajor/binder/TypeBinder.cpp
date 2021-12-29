@@ -1629,6 +1629,11 @@ void TypeBinder::Visit(CompoundStatementNode& compoundStatementNode)
     }
 }
 
+void TypeBinder::Visit(LabeledStatementNode& labeledStatementNode)
+{
+    labeledStatementNode.Stmt()->Accept(*this);
+}
+
 void TypeBinder::Visit(IfStatementNode& ifStatementNode)
 {
     try

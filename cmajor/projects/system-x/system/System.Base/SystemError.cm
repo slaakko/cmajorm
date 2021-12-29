@@ -1,0 +1,47 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace System
+{
+    public const int EFAIL = 1;
+    public const int EBADF = 2;
+    public const int EMEM = 3;
+    public const int RLIMITEXCEEDED = 4;
+    public const int EINVAL = 5;
+    public const int ENOTSUPPORTED = 6;
+    public const int EIO = 7;
+    public const int EPERM = 8;
+    public const int EEXIST = 9;
+    public const int ENOENT = 10;
+    public const int ERANGE = 11;
+
+    public class SystemError : Exception
+    {
+        public nothrow SystemError(int errorCode_, const string& message_) : base(message_), errorCode(errorCode_)
+        {
+        }
+        public int errorCode;
+    }
+    
+    public SystemError GetSystemError()
+    {
+        int errorCode;
+        UniquePtr<byte> buffer(cast<byte*>(MemAlloc(4096)));
+        get_system_error(&errorCode, buffer.Get(), 4096);
+        string errorMessage;
+        byte* p = buffer.Get();
+        while (*p != 0u)
+        {
+            errorMessage.Append(cast<char>(*p));
+            ++p;
+        }
+        return SystemError(errorCode, errorMessage);
+    }
+    
+    public void ThrowSystemError()
+    {
+        throw GetSystemError();
+    }
+}

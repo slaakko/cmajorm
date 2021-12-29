@@ -1,0 +1,129 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace System
+{
+    public class Uuid
+    {
+        public const long size = 16;
+        
+        public typedef byte[size].Iterator Iterator;
+        public typedef byte[size].ConstIterator ConstIterator;
+        
+        public nothrow inline Iterator Begin() 
+        {
+            return data.Begin();
+        }
+        public nothrow inline ConstIterator Begin() const
+        {
+            return data.CBegin();
+        }
+        public nothrow inline ConstIterator CBegin() const
+        {
+            return data.CBegin();
+        }
+        public nothrow inline Iterator End() 
+        {
+            return data.End();
+        }
+        public nothrow inline ConstIterator End() const
+        {
+            return data.CEnd();
+        }
+        public nothrow inline ConstIterator CEnd() const
+        {
+            return data.CEnd();
+        }
+        
+        public nothrow Uuid() : data()
+        {
+        }
+        public nothrow Uuid(ulong leftHalf, ulong rightHalf) : data()
+        {
+            data[0] = cast<byte>(leftHalf >> 56u);
+            data[1] = cast<byte>(leftHalf >> 48u);
+            data[2] = cast<byte>(leftHalf >> 40u);
+            data[3] = cast<byte>(leftHalf >> 32u);
+            data[4] = cast<byte>(leftHalf >> 24u);
+            data[5] = cast<byte>(leftHalf >> 16u);
+            data[6] = cast<byte>(leftHalf >> 8u);
+            data[7] = cast<byte>(leftHalf);
+            data[8] = cast<byte>(rightHalf >> 56u);
+            data[9] = cast<byte>(rightHalf >> 48u);
+            data[10] = cast<byte>(rightHalf >> 40u);
+            data[11] = cast<byte>(rightHalf >> 32u);
+            data[12] = cast<byte>(rightHalf >> 24u);
+            data[13] = cast<byte>(rightHalf >> 16u);
+            data[14] = cast<byte>(rightHalf >> 8u);
+            data[15] = cast<byte>(rightHalf);
+        }
+        public nothrow ulong LeftHalf() const
+        {
+            ulong leftHalf;
+            leftHalf = data[0];
+            leftHalf = (leftHalf << 8u) | data[1];
+            leftHalf = (leftHalf << 8u) | data[2];
+            leftHalf = (leftHalf << 8u) | data[3];
+            leftHalf = (leftHalf << 8u) | data[4];
+            leftHalf = (leftHalf << 8u) | data[5];
+            leftHalf = (leftHalf << 8u) | data[6];
+            leftHalf = (leftHalf << 8u) | data[7];
+            return leftHalf;
+        }
+        public nothrow ulong RightHalf() const
+        {
+            ulong rightHalf;
+            rightHalf = data[8];
+            rightHalf = (rightHalf << 8u) | data[9];
+            rightHalf = (rightHalf << 8u) | data[10];
+            rightHalf = (rightHalf << 8u) | data[11];
+            rightHalf = (rightHalf << 8u) | data[12];
+            rightHalf = (rightHalf << 8u) | data[13];
+            rightHalf = (rightHalf << 8u) | data[14];
+            rightHalf = (rightHalf << 8u) | data[15];
+            return rightHalf;
+        }
+        public static nothrow Uuid Random() 
+        {
+            return Uuid(Random64(), Random64());
+        }
+        public byte[size] data;
+    }
+    
+    public nothrow inline bool operator==(const Uuid& left, const Uuid& right)
+    {
+        for (long i = 0; i < Uuid.size; ++i)
+        {
+            if (left.data[i] != right.data[i]) return false;
+        }
+        return true;
+    }
+    
+    public nothrow string ToString(const Uuid& uuid)
+    {
+        string s;
+        for (byte x : uuid)
+        {
+            s.Append(ToHexString(x));
+        }
+        return s;
+    }
+    
+    public Uuid ParseUuid(const string& uuidHexString)
+    {
+        if (uuidHexString.Length() != 2 * Uuid.size)
+        {
+            ThrowConversionException("wrong number of hex bytes in uuid string '" + uuidHexString + "'." + ToString(Uuid.size) + " hex bytes expected.");
+        }
+        Uuid uuid;
+        for (long i = 0; i < Uuid.size; ++i)
+        {
+            string hexByteStr = uuidHexString.Substring(2 * i, 2);
+            byte hexByte = ParseHexByte(hexByteStr);
+            uuid.data[i] = hexByte;
+        }
+        return uuid;
+    }
+}

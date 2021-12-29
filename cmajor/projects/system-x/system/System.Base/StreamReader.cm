@@ -1,0 +1,158 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.IO
+{
+    public class StreamReader
+    {
+        public nothrow StreamReader(const SharedPtr<Stream>& stream_) : stream(stream_), buffered(false), buffer(-1), state(0), eof(false)
+        {
+        }
+        public int Read()
+        {
+            int x = Get(false);
+            eof = x == -1;
+            return x;
+        }
+        public int Peek()
+        {
+            int x = Get(true);
+            eof = x == -1;
+            return x;
+        }
+        public string ReadLine()
+        {
+            string result;
+            int x = Read();
+            while (x != -1)
+            {
+                if (cast<char>(x) == '\n')
+                {
+                    return result;
+                }
+                else
+                {
+                    result.Append(cast<char>(x));
+                }
+                x = Read();
+            }
+            eof = true;
+            if (state == 1)
+            {
+                result.Append('\r');
+            }
+            return result;
+        }
+        public string ReadToEnd()
+        {
+            string result;
+            int x = Read();
+            while (x != -1)
+            {
+                result.Append(cast<char>(x));
+                x = Read();
+            }
+            eof = true;
+            if (state == 1)
+            {
+                result.Append('\r');
+            }
+            return result;
+        }
+        public void PutBack(byte b)
+        {
+            buffered = true;
+            buffer = b;
+        }
+        private int Get(bool peek)
+        {
+            if (buffered)
+            {
+                if (!peek)
+                {
+                    buffered = false;
+                }
+                return buffer;
+            }
+            else
+            {
+                while (true)
+                {
+                    int x = stream->ReadByte();
+                    switch (state)
+                    {
+                        case 0:
+                        {
+                            if (cast<char>(x) == '\r')
+                            {
+                                state = 1;
+                            }
+                            else
+                            {
+                                if (peek)
+                                {
+                                    buffer = x;
+                                    buffered = true;
+                                }
+                                return x;
+                            }
+                            break;
+                        }
+                        case 1:
+                        {
+                            if (cast<char>(x) == '\r')
+                            {
+                                if (peek)
+                                {
+                                    buffer = x;
+                                    buffered = true;
+                                }
+                                return x;
+                            }
+                            else if (cast<char>(x) == '\n')
+                            {
+                                state = 0;
+                                if (peek)
+                                {
+                                    buffer = x;
+                                    buffered = true;
+                                }
+                                return x;
+                            }
+                            else
+                            {
+                                state = 0;
+                                buffer = x;
+                                buffered = true;
+                                return cast<int>('\r');
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            return -1;
+        }
+        public nothrow inline bool Eof() const
+        {
+            return eof;
+        }
+        public nothrow inline void ResetEof()
+        {
+            eof = false;
+        }
+        public nothrow const SharedPtr<Stream>& GetStream() const
+        {
+            return stream;
+        }
+        private SharedPtr<Stream> stream;
+        private bool buffered;
+        private int buffer;
+        private int state;
+        private bool eof;
+    }
+}

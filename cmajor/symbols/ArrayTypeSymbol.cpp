@@ -160,7 +160,7 @@ void ArrayLengthFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>
 {
     emitter.SetCurrentDebugLocation(span);
     Assert(genObjects.size() == 1, "array length needs one object");
-    void* size = emitter.CreateIrValueForULong(arrayType->Size());
+    void* size = emitter.CreateIrValueForLong(arrayType->Size());
     emitter.Stack().Push(size);
 }
 

@@ -12,9 +12,13 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/ModuleCache.hpp>
 #include <cmajor/symbols/Warning.hpp>
+#include <system-x/assembler/InitDone.hpp>
+#include <system-x/intermediate/InitDone.hpp>
+#include <system-x/machine/InitDone.hpp>
 #include <sngxml/dom/Document.hpp>
 #include <sngxml/dom/Element.hpp>
 #include <sngxml/dom/CharacterData.hpp>
+#include <sngxml/xpath/InitDone.hpp>
 #include <soulng/lexer/ParsingException.hpp>
 #include <soulng/util/Util.hpp>
 #include <soulng/util/Path.hpp>
@@ -30,8 +34,23 @@
 void InitApplication()
 {
     soulng::util::Init();
+    sngxml::xpath::Init();
     sngcm::ast::Init();
     cmajor::symbols::Init();
+    cmsx::machine::Init();
+    cmsx::assembler::Init();
+    cmsx::intermediate::Init();
+}
+
+void DoneApplication()
+{
+    cmsx::intermediate::Done();
+    cmsx::assembler::Done();
+    cmsx::machine::Done();
+    cmajor::symbols::Done();
+    sngcm::ast::Done();
+    sngxml::xpath::Done();
+    soulng::util::Done();
 }
 
 struct BackendInit
@@ -46,7 +65,7 @@ struct BackendInit
     }
 };
 
-const char* version = "0.2.0";
+const char* version = "4.3.0";
 
 void PrintHelp()
 {
@@ -80,7 +99,7 @@ void PrintHelp()
         "   build although sources not changed\n" <<
         "--clean (-e)\n" <<
         "   clean given solutions and projects\n" <<
-        "--debug-parse (-p)\n" <<
+        "--debug-parse (-dp)\n" <<
         "   debug parsing to stdout\n" <<
         "--define SYMBOL (-D SYMBOL)\n" <<
         "   define a conditional compilation symbol SYMBOL.\n" <<
@@ -96,6 +115,8 @@ void PrintHelp()
         "   compile source files in a project using a single thread\n" <<
         "--debug-compile (-dc)\n" <<
         "   show debug messages from multithreaded compilation\n" <<
+        "--pass=PASS (-p=PASS)\n" <<
+        "   process intermediate code by running PASS\n" <<
         std::endl;
 }
 
@@ -107,6 +128,7 @@ using namespace cmajor::build;
 int main(int argc, const char** argv)
 {
     SetBackEnd(cmajor::symbols::BackEnd::cmsx);
+    SetGlobalFlag(GlobalFlags::disableCodeGen);
     //SetNumBuildThreads(1);
     //SetGlobalFlag(GlobalFlags::singleThreadedCompile);
     std::set<std::string> builtProjects;
@@ -154,7 +176,7 @@ int main(int argc, const char** argv)
                     {
                         SetGlobalFlag(GlobalFlags::clean);
                     }
-                    else if (arg == "--debug-parse" || arg == "-p")
+                    else if (arg == "--debug-parse" || arg == "-dp")
                     {
                         SetGlobalFlag(GlobalFlags::debugParsing);
                     }
@@ -221,6 +243,10 @@ int main(int argc, const char** argv)
                                 {
                                     throw std::runtime_error("unknown optimization level '" + components[1] + "'");
                                 }
+                            }
+                            else if (components[0] == "--pass" || components[0] == "-p")
+                            {
+                                SetPass(components[1]);
                             }
                             else if (components[0] == "--reference" || components[0] == "-r")
                             {
@@ -431,5 +457,6 @@ int main(int argc, const char** argv)
         }
         return 1;
     }
+    DoneApplication();
     return 0;
 }

@@ -1,0 +1,95 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Concepts;
+
+namespace System.Collections
+{
+    public class HashSet<T, H = Hasher<T>, C = EqualTo<T>>
+        where T is Semiregular and HashFunction<H, T> and C is Relation and C.Domain is T
+    {
+        public typedef T ValueType;
+        public typedef T KeyType;
+        public typedef H HashFun;
+        public typedef C Compare;
+        public typedef TableType.ConstIterator ConstIterator;
+        public typedef TableType.Iterator Iterator;
+        private typedef HashSet<ValueType, HashFun, Compare> Self;
+        private typedef Hashtable<KeyType, ValueType, Identity<ValueType>, HashFun, Compare> TableType;
+
+        public inline nothrow Iterator Begin()
+        {
+            return table.Begin();
+        }
+        public inline nothrow ConstIterator Begin() const
+        {
+            return table.CBegin();
+        }
+        public inline nothrow ConstIterator CBegin() const
+        {
+            return table.CBegin();
+        }
+        public inline nothrow Iterator End()
+        {
+            return table.End();
+        }
+        public inline nothrow ConstIterator End() const
+        {
+            return table.CEnd();
+        }
+        public inline nothrow ConstIterator CEnd() const
+        {
+            return table.CEnd();
+        }
+        public inline nothrow long Count() const
+        {
+            return table.Count();
+        }
+        public inline nothrow bool IsEmpty() const
+        {
+            return table.IsEmpty();
+        }
+        public inline nothrow void Clear()
+        {
+            table.Clear();
+        }
+        public inline nothrow Iterator Find(const KeyType& key)
+        {
+            return table.Find(key);
+        }
+        public inline nothrow ConstIterator Find(const KeyType& key) const
+        {
+            return table.CFind(key);
+        }
+        public inline nothrow ConstIterator CFind(const KeyType& key) const
+        {
+            return table.CFind(key);
+        }
+        public inline Pair<Iterator, bool> Insert(const ValueType& value)
+        {
+            return table.Insert(value);
+        }
+        public inline nothrow void Remove(const KeyType& key)
+        {
+            table.Remove(key);
+        }
+        public inline nothrow void Remove(Iterator pos)
+        {
+            table.Remove(pos);
+        }
+        private TableType table;
+    }
+
+    public nothrow bool operator==<T, H, C>(const HashSet<T, H, C>& left, const HashSet<T, H, C>& right) where T is Semiregular and HashFunction<H, T> and C is Relation and C.Domain is T
+    {
+        if (left.Count() != right.Count()) return false;
+        for (const T& value : left)
+        {
+            if (right.CFind(value) == right.CEnd()) return false;
+        }
+        return true;
+    }
+}

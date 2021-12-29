@@ -48,7 +48,10 @@ enum class GlobalFlags : uint64_t
     printDebugMessages = 1 << 29,
     repository = 1 << 30,
     updateSourceFileModuleMap = 1ll << 31,
-    trace = 1ll << 32
+    trace = 1ll << 32,
+    cpp = 1ll << 33,
+    fnxml = 1ll << 34,
+    dtxml = 1ll << 35
 };
 
 enum class BackEnd : int
@@ -67,6 +70,8 @@ SYMBOLS_API bool GetGlobalFlag(GlobalFlags flag);
 SYMBOLS_API std::string GetConfig();
 SYMBOLS_API int GetOptimizationLevel();
 SYMBOLS_API void SetOptimizationLevel(int optimizationLevel_);
+SYMBOLS_API std::string Pass();
+SYMBOLS_API void SetPass(const std::string& passes_);
 SYMBOLS_API int GetNumBuildThreads();
 SYMBOLS_API void SetNumBuildThreads(int numBuildThreads_);
 

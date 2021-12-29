@@ -505,6 +505,24 @@ uint8_t ParseHexByte(const std::string& hexByteStr)
     return static_cast<uint8_t>(value);
 }
 
+uint64_t ParseHexULong(const std::string& hexByteStr)
+{
+    std::string hex;
+    if (StartsWith(hexByteStr, "0x") || StartsWith(hexByteStr, "0X"))
+    {
+        hex = hexByteStr;
+    }
+    else
+    {
+        hex = "0x" + hexByteStr;
+    }
+    std::stringstream s;
+    s.str(hex);
+    uint64_t value = 0;
+    s >> std::hex >> value;
+    return value;
+}
+
 int Log10(int n)
 {
     int log10 = 1;

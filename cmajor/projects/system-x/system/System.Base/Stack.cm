@@ -1,0 +1,49 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Concepts;
+
+namespace System.Collections
+{
+    public class Stack<T> where T is Semiregular
+    {
+        public typedef T ValueType;
+
+        public inline nothrow bool IsEmpty() const
+        {
+            return items.IsEmpty();
+        }
+        public inline nothrow long Count() const
+        {
+            return items.Count();
+        }
+        public inline void Push(const ValueType& item) where T is Copyable
+        {
+            items.Add(item);
+        }
+        public inline void Push(ValueType&& item) where T is Movable
+        {
+            items.Add(item);
+        }
+        public inline ValueType Pop() where T is Movable
+        {
+            return items.RemoveLast();
+        }
+        public inline nothrow const ValueType& Top() const
+        {
+            return items.Back();
+        }
+        public inline nothrow ValueType& Top()
+        {
+            return items.Back();
+        }
+        public inline nothrow void Clear()
+        {
+            items.Clear();
+        }
+        private List<ValueType> items;
+    }
+}

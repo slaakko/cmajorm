@@ -1,0 +1,425 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Os;
+
+namespace System.IO
+{
+    public const int nameMax = 252;
+    public const int pathMax = 4096;
+    
+    public static class Directory
+    {
+        public static bool Exists(const string& directoryPath)
+        {
+            byte[statBufSize] statBuf;
+            int result = stat(directoryPath.Chars(), &statBuf[0]);
+            if (result == -1) 
+            {
+                SystemError systemError = GetSystemError();
+                if (systemError.errorCode == ENOENT)
+                {
+                    return false;
+                }
+                else
+                {
+                    ThrowSystemError();
+                }
+            }
+            else
+            {
+                StatInfo statInfo;
+                StatBufToStatInfo(&statBuf[0], statInfo);
+                if (statInfo.Type() == FileType.directory)
+                {
+                    return true;
+                }
+                else
+                {
+                    throw FileSystemException("path '" + directoryPath + "' is not a directory path");
+                }
+            }
+        }
+        public static DateTime AccessTime(const string& directoryPath)
+        {
+            StatInfo statInfo;
+            Stat(directoryPath.Chars(), statInfo);
+            if (statInfo.Type() != FileType.directory)
+            {
+                throw FileSystemException("path '" + directoryPath + "' is not a directory path");
+            }
+            return statInfo.ATime();
+        }
+        public static DateTime ModificationTime(const string& directoryPath)
+        {
+            StatInfo statInfo;
+            Stat(directoryPath.Chars(), statInfo);
+            if (statInfo.Type() != FileType.directory)
+            {
+                throw FileSystemException("path '" + directoryPath + "' is not a directory path");
+            }
+            return statInfo.MTime();
+        }
+        public static void GetTimes(const string& directoryPath, DateTime& accessTime, DateTime& modificationTime)
+        {
+            StatInfo statInfo;
+            Stat(directoryPath.Chars(), statInfo);
+            if (statInfo.Type() != FileType.directory)
+            {
+                throw FileSystemException("path '" + directoryPath + "' is not a directory path");
+            }
+            accessTime = statInfo.ATime();
+            modificationTime = statInfo.MTime();
+        }
+        public static void SetTimes(const string& directoryPath, const DateTime& accessTime, const DateTime& modificationTime)
+        {
+            UTime(directoryPath.Chars(), accessTime, modificationTime); 
+        }
+        public static void Remove(const string& directoryPath)
+        {
+            if (Exists(directoryPath))
+            {
+                Unlink(directoryPath.Chars());
+            }
+            else
+            {
+                throw SystemError(ENOENT, "could not remove directory: directory '" + directoryPath + "' does not exist");
+            }
+        }
+    }
+    
+    public void CreateDirectories(const string& directoryPath)
+    {
+        CreateDirectories(directoryPath, 0);
+    }
+    
+    public void CreateDirectories(const string& directoryPath, int mode)
+    {
+        CreateDirectories(directoryPath, 0, false);
+    }
+    
+    public void CreateDirectories(const string& directoryPath, int mode, bool verbose)
+    {
+        if (directoryPath.IsEmpty())
+        {
+            throw InvalidPathException("directory path is empty");
+        }
+        List<string> components = directoryPath.Split('/');
+        int n = cast<int>(components.Count());
+        string dir;
+        int next = 0;
+        if (components[0].IsEmpty())
+        {
+            dir = "/" + components[1];
+            next = 2;
+        }
+        else
+        {
+            dir = components[0];
+            next = 1;
+        }
+        if (!Directory.Exists(dir))
+        {
+            Mkdir(dir.Chars(), mode);
+            if (verbose)
+            {
+                Console.Out() << "created directory '" + dir + "'" << endl();
+            }
+        }
+        for (int i = next; i < n; ++i)
+        {
+            dir = Path.Combine(dir, components[i]);
+            if (!Directory.Exists(dir))
+            {
+                Mkdir(dir.Chars(), mode);
+                Console.Out() << "created directory '" + dir + "'" << endl();
+            }
+        }
+    }
+    
+    public class DirectoryEntry
+    {
+        public int inodeNumber;
+        public char[nameMax] name;
+    }
+    
+    public class DirectoryReader
+    {
+        public nothrow DirectoryReader(const string& dirPath) : dd(OpenDir(dirPath.Chars()))
+        {
+        }
+        public bool Read(DirectoryEntry& dirEntry)
+        {
+            int result = ReadDir(dd, &dirEntry.inodeNumber, &dirEntry.name[0]);
+            return result == 1;
+        }
+        public ~DirectoryReader()
+        {
+            try
+            {
+                CloseDir(dd);
+            }
+            catch (const Exception&)
+            {
+            }
+        }
+        private int dd;
+    }
+    
+    public string GetCurrentWorkingDirectory()
+    {
+        Buffer buffer(pathMax);
+        char* buf = cast<char*>(cast<void*>(buffer.Mem()));
+        long count = buffer.Size();
+        GetCWD(buf, count);
+        return string(buf);
+    }
+    
+    public enum FileType : int
+    {
+        free = 0, regular = 1, directory = 2, characterSpecial = 3, blockSpecial = 4, fifo = 5, symlink = 6
+    }
+    
+    public nothrow string FileTypeStr(FileType fileType)
+    {
+        switch (fileType)
+        {
+            case FileType.free: return "free";
+            case FileType.regular: return "regular";
+            case FileType.directory: return "directory";
+            case FileType.characterSpecial: return "characterSpecial";
+            case FileType.blockSpecial: return "blockSpecial";
+            case FileType.fifo: return "fifo";
+            case FileType.symlink: return "symlink";
+        }
+        return string();
+    }
+    
+    public enum Access : int
+    {
+        none =  0,
+        read = 1 << 2,
+        write = 1 << 1,
+        execute = 1 << 0
+    }
+
+    public nothrow string AccessStr(Access access)
+    {
+        string s;
+        if ((access & Access.read) != Access.none)
+        {
+            s.Append("read");
+        }
+        if ((access & Access.write) != Access.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append('-');
+            }
+            s.Append("write");
+        }
+        if ((access & Access.execute) != Access.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append('-');
+            }
+            s.Append("execute");
+        }
+        if (s.IsEmpty())
+        {
+            s.Append("-");
+        }
+        return s;
+    }
+
+    public nothrow string ShortAccessStr(Access access)
+    {
+        string s;
+        if ((access & Access.read) != Access.none)
+        {
+            s.Append('r');
+        }
+        else
+        {
+            s.Append('-');
+        }
+        if ((access & Access.write) != Access.none)
+        {
+            s.Append('w');
+        }
+        else
+        {
+            s.Append('-');
+        }
+        if ((access & Access.execute) != Access.none)
+        {
+            s.Append('x');
+        }
+        else
+        {
+            s.Append('-');
+        }
+        return s;
+    }
+
+    public nothrow string AccessModeStr(int mode)
+    {
+        string modeStr;
+        Access ownerAccess = cast<Access>((mode >> 6) & 7);
+        Access groupAccess = cast<Access>((mode >> 3) & 7);
+        Access otherAccess = cast<Access>(mode & 7);
+        modeStr.Append(ShortAccessStr(ownerAccess)).Append(ShortAccessStr(groupAccess)).Append(ShortAccessStr(otherAccess));
+        return modeStr;
+    }
+
+    public nothrow inline int EncodeMode(FileType fileType, Access ownerAccess, Access groupAccess, Access otherAccess)
+    {
+        return (cast<int>(fileType) << 9) | (cast<int>(ownerAccess) << 6) | (cast<int>(groupAccess) << 3) | (cast<int>(otherAccess));
+    }
+
+    public nothrow inline void DecodeMode(int mode, FileType& fileType, Access& ownerAccess, Access& groupAccess, Access& otherAccess)
+    {
+        fileType = cast<FileType>((mode >> 9) & 7);
+        ownerAccess = cast<Access>((mode >> 6) & 7);
+        groupAccess = cast<Access>((mode >> 3) & 7);
+        otherAccess = cast<Access>(mode & 7);
+    }
+        
+    public class StatInfo
+    {
+        public nothrow void Read(MemoryReader& reader)
+        {
+            inodeNumber = reader.ReadInt();
+            fsNumber = reader.ReadInt();
+            int mode = reader.ReadInt();
+            SetMode(mode);
+            uid = reader.ReadInt();
+            gid = reader.ReadInt();
+            nlinks = reader.ReadInt();
+            fileSize = reader.ReadLong();
+            ctime = reader.ReadDateTime();
+            mtime = reader.ReadDateTime();
+            atime = reader.ReadDateTime();
+        }
+        public nothrow inline int INodeNumber() const
+        {
+            return inodeNumber;
+        }
+        public nothrow inline void SetINodeNumber(int inodeNumber_)
+        {
+            inodeNumber = inodeNumber_;
+        }
+        public nothrow inline int FSNumber() const
+        {
+            return fsNumber;
+        }
+        public nothrow inline void SetFSNumber(int fsNumber_)
+        {
+            fsNumber = fsNumber_;
+        }
+        public nothrow inline int GetMode() const
+        {
+            return EncodeMode(fileType, ownerAccess, groupAccess, otherAccess);
+        }
+        public nothrow inline void SetMode(int mode)
+        {
+            DecodeMode(mode, fileType, ownerAccess, groupAccess, otherAccess);
+        }
+        public nothrow inline FileType Type() const
+        {
+            return fileType;
+        }
+        public nothrow inline Access OwnerAccess() const
+        {
+            return ownerAccess;
+        }
+        public nothrow inline Access GroupAccess() const
+        {
+            return groupAccess;
+        }
+        public nothrow inline Access OtherAccess() const
+        {
+            return otherAccess;
+        }
+        public nothrow inline int UID() const
+        {
+            return uid;
+        }        
+        public nothrow inline void SetUID(int uid_)
+        {
+            uid = uid_;
+        }
+        public nothrow inline int GID() const
+        {
+            return gid;
+        }
+        public nothrow inline void SetGID(int gid_)
+        {
+            gid = gid_;
+        }
+        public nothrow inline int GetNumLinks() const
+        {
+            return nlinks;
+        }
+        public nothrow inline void SetNumLinks(int nlinks_)
+        {
+            nlinks = nlinks_;
+        }
+        public nothrow inline long GetFileSize() const
+        {
+            return fileSize;
+        }
+        public nothrow inline void SetFileSize(long fileSize_)
+        {
+            fileSize = fileSize_;
+        }
+        public nothrow inline const DateTime& CTime() const
+        {
+            return ctime;
+        }
+        public nothrow void SetCTime(const DateTime& ctime_)
+        {
+            ctime = ctime_;
+        }
+        public nothrow inline const DateTime& MTime() const
+        {
+            return mtime;
+        }
+        public nothrow void SetMTime(const DateTime& mtime_)
+        {
+            mtime = mtime_;
+        }
+        public nothrow inline const DateTime& ATime() const
+        {
+            return atime;
+        }
+        public nothrow void SetATime(const DateTime& atime_)
+        {
+            atime = atime_;
+        }
+        private int inodeNumber;
+        private int fsNumber;
+        private FileType fileType;
+        private Access ownerAccess;
+        private Access groupAccess;
+        private Access otherAccess;
+        private int uid;
+        private int gid;
+        private int nlinks;
+        private long fileSize;
+        private DateTime ctime;
+        private DateTime mtime;
+        private DateTime atime;
+    }
+    
+    public nothrow void StatBufToStatInfo(byte* statBuf, StatInfo& statInfo)
+    {
+        MemoryReader reader(statBuf, statBufSize);
+        statInfo.Read(reader);
+    }
+}

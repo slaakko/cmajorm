@@ -1,0 +1,204 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.Collections;
+
+namespace System.Unicode
+{
+    public class UnicodeEngine
+    {
+        public nothrow UnicodeEngine() : resultReady(false), result('\0'), state(0)
+        {
+        }
+        public void Put(byte x)
+        {
+            switch (state)
+            {
+                case 0:
+                {
+                    resultReady = false;
+                    if ((x & 0x80u) == 0u)
+                    {
+                        result = cast<uchar>(x);
+                        resultReady = true;
+                    }
+                    else if ((x & 0xE0u) == 0xC0u)
+                    {
+                        bytes[0] = x;
+                        state = 1;
+                    }
+                    else if ((x & 0xF0u) == 0xE0u)
+                    {
+                        bytes[0] = x;
+                        state = 2;
+                    }
+                    else if ((x & 0xF8u) == 0xF0u)
+                    {
+                        bytes[0] = x;
+                        state = 4;
+                    }
+                    else
+                    {
+                        ThrowUnicodeException("invalid UTF-8 sequence");
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    result = cast<uchar>(0);
+                    bytes[1] = x;
+                    byte b1 = bytes[1];
+                    if ((b1 & 0xC0u) != 0x80u)
+                    {
+                        ThrowUnicodeException("invalid UTF-8 sequence");
+                    }
+                    byte shift = 0u;
+                    for (byte i = 0u; i < 6u; ++i)
+                    {
+                        byte bit = b1 & 1u;
+                        b1 = b1 >> 1u;
+                        result = cast<uchar>(cast<uint>(result) | (cast<uint>(bit) << shift));
+                        ++shift;
+                    }
+                    byte b0 = bytes[0];
+                    for (byte i = 0u; i < 5u; ++i)
+                    {
+                        byte bit = b0 & 1u;
+                        b0 = b0 >> 1u;
+                        result = cast<uchar>(cast<uint>(result) | (cast<uint>(bit) << shift));
+                        ++shift;
+                    }
+                    resultReady = true;
+                    state = 0;
+                    break;
+                }
+                case 2:
+                {
+                    bytes[1] = x;
+                    state = 3;
+                    break;
+                }
+                case 3:
+                {
+                    bytes[2] = x;
+                    result = cast<uchar>(0);
+                    byte b2 = bytes[2];
+                    if ((b2 & 0xC0u) != 0x80u)
+                    {
+                        ThrowUnicodeException("invalid UTF-8 sequence");
+                    }
+                    byte shift = 0u;
+                    for (byte i = 0u; i < 6u; ++i)
+                    {
+                        byte bit = b2 & 1u;
+                        b2 = b2 >> 1u;
+                        result = cast<uchar>(cast<uint>(result) | (cast<uint>(bit) << shift));
+                        ++shift;
+                    }
+                    byte b1 = bytes[1];
+                    if ((b1 & 0xC0u) != 0x80u)
+                    {
+                        ThrowUnicodeException("invalid UTF-8 sequence");
+                    }
+                    for (byte i = 0u; i < 6u; ++i)
+                    {
+                        byte bit = b1 & 1u;
+                        b1 = b1 >> 1u;
+                        result = cast<uchar>(cast<uint>(result) | (cast<uint>(bit) << shift));
+                        ++shift;
+                    }
+                    byte b0 = bytes[0];
+                    for (byte i = 0u; i < 4u; ++i)
+                    {
+                        byte bit = b0 & 1u;
+                        b0 = b0 >> 1u;
+                        result = cast<uchar>(cast<uint>(result) | (cast<uint>(bit) << shift));
+                        ++shift;
+                    }
+                    resultReady = true;
+                    state = 0;
+                    break;
+                }
+                case 4:
+                {
+                    bytes[1] = x;
+                    state = 5;
+                    break;
+                }
+                case 5: 
+                {
+                    bytes[2] = x;
+                    state = 6;
+                    break;
+                }
+                case 6:
+                {
+                    bytes[3] = x;
+                    result = cast<uchar>(0);
+                    byte b3 = bytes[3];
+                    if ((b3 & 0xC0u) != 0x80u)
+                    {
+                        ThrowUnicodeException("invalid UTF-8 sequence");
+                    }
+                    byte shift = 0u;
+                    for (byte i = 0u; i < 6u; ++i)
+                    {
+                        byte bit = b3 & 1u;
+                        b3 = b3 >> 1u;
+                        result = cast<uchar>(cast<uint>(result) | (cast<uint>(bit) << shift));
+                        ++shift;
+                    }
+                    byte b2 = bytes[2];
+                    if ((b2 & 0xC0u) != 0x80u)
+                    {
+                        ThrowUnicodeException("invalid UTF-8 sequence");
+                    }
+                    for (byte i = 0u; i < 6u; ++i)
+                    {
+                        byte bit = b2 & 1u;
+                        b2 = b2 >> 1u;
+                        result = cast<uchar>(cast<uint>(result) | (cast<uint>(bit) << shift));
+                        ++shift;
+                    }
+                    byte b1 = bytes[1];
+                    if ((b1 & 0xC0u) != 0x80u)
+                    {
+                        ThrowUnicodeException("invalid UTF-8 sequence");
+                    }
+                    for (byte i = 0u; i < 6u; ++i)
+                    {
+                        byte bit = b1 & 1u;
+                        b1 = b1 >> 1u;
+                        result = cast<uchar>(cast<uint>(result) | (cast<uint>(bit) << shift));
+                        ++shift;
+                    }
+                    byte b0 = bytes[0];
+                    for (byte i = 0u; i < 3u; ++i)
+                    {
+                        byte bit = b0 & 1u;
+                        b0 = b0 >> 1u;
+                        result = cast<uchar>(cast<uint>(result) | (cast<uint>(bit) << shift));
+                        ++shift;
+                    }
+                    resultReady = true;
+                    state = 0;
+                    break;
+                }
+            }
+        }
+        public nothrow inline bool ResultReady() const
+        {
+            return resultReady;
+        }
+        public nothrow uchar Get()
+        {
+            return result;
+        }
+        private bool resultReady;
+        private uchar result;
+        private int state;
+        private byte[4] bytes;
+    }
+}

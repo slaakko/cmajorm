@@ -1,0 +1,82 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+#include <system-x/intermediate/Api.hpp>
+
+classmap IntermediateCodeClassMap;
+
+prefix "system-x/intermediate";
+
+tokens IntermediateCodeTokens
+{
+    (CU, "'cu'"), (ID, "identifier"), (TYPES, "'types'"), (DATA, "'data'"), (FUNCTION, "'function'"), (ONCE, "'once'"),
+    (STORE, "'store'"), (ARG, "'arg'"), (JMP, "'jmp'"), (BRANCH, "'branch'"), (CALL, "'call'"), (RET, "'ret'"), (SWITCH, "'switch'"), (NOP, "'nop'"), (SAVE, "'save'"),
+    (NOT, "'not'"), (NEG, "'neg'"), (SIGNEXTEND, "'signextend'"), (ZEROEXTEND, "'zeroextend'"), (TRUNCATE, "'truncate'"), (BITCAST, "'bitcast'"),
+    (INTTOFLOAT, "'inttofloat'"), (FLOATTOINT, "'floattoint'"), (INTTOPTR, "'inttoptr'"), (PTRTOINT, "'ptrtoint'"),
+    (ADD, "'add'"), (SUB, "'sub'"), (MUL, "'mul'"), (DIV, "'div'"), (MOD, "'mod'"), (AND, "'and'"), (OR, "'or'"), (XOR, "'xor'"), (SHL, "'shl'"), (SHR, "'shr'"),
+    (EQUAL, "'equal'"), (LESS, "'less'"), (PARAM, "'param'"), (LOCAL, "'local'"), (LOAD, "'load'"), (ELEMADDR, "'elemaddr'"), (PTROFFSET, "'ptroffset'"), 
+    (PTRDIFF, "'ptrdiff'"), (TRAP, "'trap'"), (PHI, "'phi'"),
+    (TYPE, "'type'"), (OFFSET, "'offset'"), (SIZE, "'size'"), (ALIGNMENT, "'alignment'"),
+    (VOID, "'void'"), (BOOL, "'bool'"), (SBYTE, "'sbyte'"), (BYTE, "'byte'"), (SHORT, "'short'"), (USHORT, "'ushort'"), (INT, "'int'"), (UINT, "'uint'"), (LONG, "'long'"), (ULONG, "'ulong'"),
+    (FLOAT, "'float'"), (DOUBLE, "'double'"),
+    (TRUE, "'true'"), (FALSE, "'false'"), (NULL_TOKEN, "'null'"), (CONV, "'conv'"), (METADATA, "'metadata'"),
+    (LPAREN, "'('"), (RPAREN, "')'"), (COMMA, "','"), (LBRACE, "'{'"), (RBRACE, "'}'"), (AST, "'*'"), (COLON, "':'"), (SEMICOLON, "';'"), (LBRACKET, "'['"), (RBRACKET, "']'"), (ASSIGN, "'='"),
+    (AT, "'@'"), (DOLLAR, "'$'"), (EXCLAMATION, "'!'"), (TYPEID, "type identifier"), (CLSID, "class identifier"), (STRING, "string"), (NUMBER, "number"), (HEXNUM, "hex number")
+}
+
+keywords IntermediateCodeKeywords
+{
+    ("cu", CU), ("types", TYPES), ("data", DATA), ("function", FUNCTION), ("once", ONCE),
+    ("store", STORE), ("arg", ARG), ("jmp", JMP), ("branch", BRANCH), ("call", CALL), ("ret", RET), ("switch", SWITCH), ("nop", NOP), ("save", SAVE),
+    ("not", NOT), ("neg", NEG), ("signextend", SIGNEXTEND), ("zeroextend", ZEROEXTEND), ("truncate", TRUNCATE), ("bitcast", BITCAST),
+    ("inttofloat", INTTOFLOAT), ("floattoint", FLOATTOINT), ("inttoptr", INTTOPTR), ("ptrtoint", PTRTOINT),
+    ("add", ADD), ("sub", SUB), ("mul", MUL), ("div", DIV), ("mod", MOD), ("and", AND), ("or", OR), ("xor", XOR), ("shl", SHL), ("shr", SHR),
+    ("equal", EQUAL), ("less", LESS), ("param", PARAM), ("local", LOCAL), ("load", LOAD), ("elemaddr", ELEMADDR), ("ptroffset", PTROFFSET), ("ptrdiff", PTRDIFF), ("trap", TRAP),
+    ("phi", PHI),
+    ("type", TYPE), ("offset", OFFSET), ("size", SIZE), ("alignment", ALIGNMENT),
+    ("void", VOID), ("bool", BOOL), ("sbyte", SBYTE), ("byte", BYTE), ("short", SHORT), ("ushort", USHORT), ("int", INT), ("uint", UINT), ("long", LONG), ("ulong", ULONG),
+    ("float", FLOAT), ("double", DOUBLE),
+    ("true", TRUE), ("false", FALSE), ("null", NULL_TOKEN), ("conv", CONV), ("metadata", METADATA)
+}
+
+expressions
+{
+    ws = "[ \t\n\r]+";
+    id = "({idstart}|_)({idcont}|@|_)*";
+    digit = "[0-9]";
+    typeidentifier = "$T{digit}+";
+    hexdigit = "[0-9a-fA-F]";
+    clsid = "clsid\({hexdigit}+\)";
+    string = "\"[^\"\r\n]*\"";
+    sign = "[+-]";
+    fraction = "{digit}*\.{digit}+|{digit}+\.";
+    number = "{sign}?({fraction}|{digit}+)([eE]{sign}?{digit}+)?";
+    hexnum = "{hexdigit}+";
+}
+
+lexer api(CMSX_INTERMEDIATE_API) IntermediateCodeLexer
+{
+    "{ws}" {}
+    "{clsid}"  { return CLSID; }
+    "{id}" { int kw = GetKeywordToken(token.match); if (kw == INVALID_TOKEN) return ID; else return kw; }
+    "{typeidentifier}" { return TYPEID; }
+    "{string}" { return STRING; }
+    "{number}" { return NUMBER; }
+    "{hexnum}" { return HEXNUM; }
+    "\(" { return LPAREN; }
+    "\)" { return RPAREN; }
+    "," { return COMMA; }
+    "\{" { return LBRACE; }
+    "\}" { return RBRACE; }
+    "\*" { return AST; }
+    ":" { return COLON; }
+    ";" { return SEMICOLON; }
+    "\[" { return LBRACKET; }
+    "\]" { return RBRACKET; }
+    "=" { return ASSIGN; }
+    "@" { return AT; }
+    "$" { return DOLLAR; }
+    "!" { return EXCLAMATION; }
+}

@@ -19,6 +19,7 @@ public:
     CompileUnit& operator=(const CompileUnit&) = delete;
     Function* GetOrInsertFunction(const std::string& name, FunctionType* type);
     void SetId(const std::string& id_);
+    const std::string& SourceFilePath() const { return sourceFilePath; }
     void SetSourceFilePath(const std::string& sourceFilePath_);
     void Write();
     Context* GetContext() { return &context; }

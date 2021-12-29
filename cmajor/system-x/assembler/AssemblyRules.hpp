@@ -1,6 +1,7 @@
 #ifndef RULES_H
 #define RULES_H
-#include <system-x/assembler/Api.hpp>
+#include <system-x/assembler/Assembler.hpp>
+#include <system-x/assembler/Expression.hpp>
 #include <vector>
 
 CMSX_ASSEMBLER_API std::vector<const char*>* GetRuleNameVecPtr();

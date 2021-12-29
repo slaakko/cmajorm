@@ -1,0 +1,703 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.Collections;
+using System.Unicode;
+
+namespace System
+{
+    public ustring ToUtf32(const string& utf8Str)
+    {
+        ustring result;
+        const char* p = utf8Str.Chars();
+        long bytesRemaining = utf8Str.Length();
+        while (bytesRemaining > 0)
+        {
+            char c = *p;
+            byte x = cast<byte>(c);
+            if ((x & 0x80u) == 0u)
+            {
+                result.Append(cast<uchar>(cast<uint>(x)));
+                --bytesRemaining;
+                ++p;
+            }
+            else if ((x & 0xE0u) == 0xC0u)
+            {
+                if (bytesRemaining < 2)
+                {
+                    ThrowConversionException("invalid UTF-8 sequence");
+                }
+                uchar u = cast<uchar>(cast<uint>(0u));
+                byte b1 = cast<byte>(p[1]);
+                if ((b1 & 0xC0u) != 0x80u)
+                {
+                    ThrowConversionException("invalid UTF-8 sequence");
+                }
+                byte shift = 0u;
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    byte bit = b1 & 1u;
+                    b1 = b1 >> 1u;
+                    u = cast<uchar>(cast<uint>(u) | (cast<uint>(bit) << shift));
+                    ++shift;
+                }
+                byte b0 = x;
+                for (byte i = 0u; i < 5u; ++i)
+                {
+                    byte bit = b0 & 1u;
+                    b0 = b0 >> 1u;
+                    u = cast<uchar>(cast<uint>(u) | (cast<uint>(bit) << shift));
+                    ++shift;
+                }
+                result.Append(u);
+                bytesRemaining = bytesRemaining - 2;
+                p = p + 2;
+            }
+            else if ((x & 0xF0u) == 0xE0u)
+            {
+                if (bytesRemaining < 3)
+                {
+                    ThrowConversionException("invalid UTF-8 sequence");
+                }
+                uchar u = cast<uchar>(cast<uint>(0u));
+                byte b2 = cast<byte>(p[2]);
+                if ((b2 & 0xC0u) != 0x80u)
+                {
+                    ThrowConversionException("invalid UTF-8 sequence");
+                }
+                byte shift = 0u;
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    byte bit = b2 & 1u;
+                    b2 = b2 >> 1u;
+                    u = cast<uchar>(cast<uint>(u) | (cast<uint>(bit) << shift));
+                    ++shift;
+                }
+                byte b1 = cast<byte>(p[1]);
+                if ((b1 & 0xC0u) != 0x80u)
+                {
+                    ThrowConversionException("invalid UTF-8 sequence");
+                }
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    byte bit = b1 & 1u;
+                    b1 = b1 >> 1u;
+                    u = cast<uchar>(cast<uint>(u) | (cast<uint>(bit) << shift));
+                    ++shift;
+                }
+                byte b0 = x;
+                for (byte i = 0u; i < 4u; ++i)
+                {
+                    byte bit = b0 & 1u;
+                    b0 = b0 >> 1u;
+                    u = cast<uchar>(cast<uint>(u) | (cast<uint>(bit) << shift));
+                    ++shift;
+                }
+                result.Append(u);
+                bytesRemaining = bytesRemaining - 3;
+                p = p + 3;
+            }
+            else if ((x & 0xF8u) == 0xF0u)
+            {
+                if (bytesRemaining < 4)
+                {
+                    ThrowConversionException("invalid UTF-8 sequence");
+                }
+                uchar u = cast<uchar>(cast<uint>(0u));
+                byte b3 = cast<byte>(p[3]);
+                if ((b3 & 0xC0u) != 0x80u)
+                {
+                    ThrowConversionException("invalid UTF-8 sequence");
+                }
+                byte shift = 0u;
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    byte bit = b3 & 1u;
+                    b3 = b3 >> 1u;
+                    u = cast<uchar>(cast<uint>(u) | (cast<uint>(bit) << shift));
+                    ++shift;
+                }
+                byte b2 = cast<byte>(p[2]);
+                if ((b2 & 0xC0u) != 0x80u)
+                {
+                    ThrowConversionException("invalid UTF-8 sequence");
+                }
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    byte bit = b2 & 1u;
+                    b2 = b2 >> 1u;
+                    u = cast<uchar>(cast<uint>(u) | (cast<uint>(bit) << shift));
+                    ++shift;
+                }
+                byte b1 = cast<byte>(p[1]);
+                if ((b1 & 0xC0u) != 0x80u)
+                {
+                    ThrowConversionException("invalid UTF-8 sequence");
+                }
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    byte bit = b1 & 1u;
+                    b1 = b1 >> 1u;
+                    u = cast<uchar>(cast<uint>(u) | (cast<uint>(bit) << shift));
+                    ++shift;
+                }
+                byte b0 = x;
+                for (byte i = 0u; i < 3u; ++i)
+                {
+                    byte bit = b0 & 1u;
+                    b0 = b0 >> 1u;
+                    u = cast<uchar>(cast<uint>(u) | (cast<uint>(bit) << shift));
+                    ++shift;
+                }
+                result.Append(u);
+                bytesRemaining = bytesRemaining - 4;
+                p = p + 4;
+            }
+            else
+            {
+                ThrowConversionException("invalid UTF-8 sequence");
+            }
+        }
+        return result;
+    }
+    
+    public ustring ToUtf32(const wstring& utf16Str)
+    {
+        ustring result;
+        const wchar* w = utf16Str.Chars();
+        long remaining = utf16Str.Length();
+        while (remaining > 0)
+        {
+            wchar w1 = *w++;
+            --remaining;
+            if (cast<ushort>(w1) < 0xD800u || cast<ushort>(w1) > 0xDFFFu)
+            {
+                result.Append(w1);
+            }
+            else
+            {
+                if (cast<ushort>(w1) < 0xD800u || cast<ushort>(w1) > 0xDBFFu)
+                {
+                    ThrowConversionException("invalid UTF-16 sequence");
+                }
+                if (remaining > 0)
+                {
+                    wchar w2 = *w++;
+                    --remaining;
+                    if (cast<ushort>(w2) < 0xDC00u || cast<ushort>(w2) > 0xDFFFu)
+                    {
+                        ThrowConversionException("invalid UTF-16 sequence");
+                    }
+                    else
+                    {
+                        uchar uprime = cast<uchar>(((0x03FFu & cast<uint>(w1)) << 10u) | (0x03FFu & cast<uint>(w2)));
+                        uchar u = cast<uchar>(cast<uint>(uprime) + 0x10000u);
+                        result.Append(u);
+                    }
+                }
+                else
+                {
+                    ThrowConversionException("invalid UTF-16 sequence");
+                }
+            } 
+        }
+        return result;
+    }
+
+    public wstring ToUtf16(const ustring& utf32Str)
+    {
+        wstring result;
+        for (uchar u : utf32Str)
+        {
+            if (cast<uint>(u) > 0x10FFFFu)
+            {
+                ThrowConversionException("invalid UTF-32 code point");
+            }
+            if (cast<uint>(u) < 0x10000u)
+            {
+                if (cast<uint>(u) >= 0xD800 && cast<uint>(u) <= 0xDFFF)
+                {
+                    ThrowConversionException("invalid UTF-32 code point (reserved for UTF-16)");
+                }
+                wchar x = cast<wchar>(u);
+                result.Append(x);
+            }
+            else
+            {
+                uchar uprime = cast<uchar>(cast<uint>(u) - 0x10000u);
+                wchar w1 = cast<wchar>(0xD800u);
+                wchar w2 = cast<wchar>(0xDC00u);
+                for (ushort i = 0u; i < 10u; ++i)
+                {
+                    ushort bit = cast<ushort>(cast<uint>(uprime) & (cast<uint>(0x1u) << i));
+                    w2 = cast<wchar>(cast<ushort>(w2) | bit);
+                }
+                for (ushort i = 10u; i < 20u; ++i)
+                {
+                    ushort bit = cast<ushort>((cast<uint>(uprime) & (cast<uint>(0x1u) << i)) >> 10u);
+                    w1 = cast<wchar>(cast<ushort>(w1) | bit);
+                }
+                result.Append(w1);
+                result.Append(w2);
+            }
+        }
+        return result;
+    }
+
+    public wstring ToUtf16(const string& utf8Str)
+    {
+        return ToUtf16(ToUtf32(utf8Str));
+    }
+
+    public string ToUtf8(const ustring& utf32Str)
+    {
+        string result;
+        for (uchar c : utf32Str)
+        {
+            uint x = cast<uint>(c);
+            if (x < 0x80u)
+            {
+                result.Append(cast<char>(x & 0x7Fu));
+            }
+            else if (x < 0x800u)
+            {
+                byte b1 = 0x80u;
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    b1 = b1 | (cast<byte>(x & 1u) << i);
+                    x = x >> 1u;
+                }
+                byte b0 = 0xC0u;
+                for (byte i = 0u; i < 5u; ++i)
+                {
+                    b0 = b0 | (cast<byte>(x & 1u) << i);
+                    x = x >> 1u;
+                }
+                result.Append(cast<char>(b0));
+                result.Append(cast<char>(b1));
+            }
+            else if (x < 0x10000u)
+            {
+                byte b2 = 0x80u;
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    b2 = b2 | (cast<byte>(x & 1u) << i);
+                    x = x >> 1u;
+                }
+                byte b1 = 0x80u;
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    b1 = b1 | (cast<byte>(x & 1u) << i);
+                    x = x >> 1u;
+                }
+                byte b0 = 0xE0u;
+                for (byte i = 0u; i < 4u; ++i)
+                {
+                    b0 = b0 | (cast<byte>(x & 1u) << i);
+                    x = x >> 1u;
+                }
+                result.Append(cast<char>(b0));
+                result.Append(cast<char>(b1));
+                result.Append(cast<char>(b2));
+            }
+            else if (x < 0x110000u)
+            {
+                byte b3 = 0x80u;
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    b3 = b3 | (cast<byte>(x & 1u) << i);
+                    x = x >> 1u;
+                }
+                byte b2 = 0x80u;
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    b2 = b2 | (cast<byte>(x & 1u) << i);
+                    x = x >> 1u;
+                }
+                byte b1 = 0x80u;
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    b1 = b1 | (cast<byte>(x & 1u) << i);
+                    x = x >> 1u;
+                }
+                byte b0 = 0xF0u;
+                for (byte i = 0u; i < 3u; ++i)
+                {
+                    b0 = b0 | (cast<byte>(x & 1u) << i);
+                    x = x >> 1u;
+                }
+                result.Append(cast<char>(b0));
+                result.Append(cast<char>(b1));
+                result.Append(cast<char>(b2));
+                result.Append(cast<char>(b3));
+            }
+            else
+            {
+                ThrowConversionException("invalid UTF-32 code point");
+            }
+        }
+        return result;
+    }
+
+    public string ToUtf8(const wstring& utf16Str)
+    {
+        return ToUtf8(ToUtf32(utf16Str));
+    }
+
+    public bool IsUpperLetter(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Lu;
+    }
+
+    public bool IsLowerLetter(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Ll;
+    }
+    
+    public bool IsTitleLetter(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Lt;
+    }
+    
+    public bool IsModifierLetter(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Lm;
+    }
+
+    public bool IsOtherLetter(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Lo;
+    }
+    
+    public bool IsCasedLetter(uchar c)
+    {
+        return HasGeneralCategory(c, GeneralCategoryId.LC);
+    }
+
+    public bool IsLetter(uchar c)
+    {
+        return HasGeneralCategory(c, GeneralCategoryId.L);
+    }
+                                                
+    public bool IsNonspacingMark(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Mn;
+    }
+    
+    public bool IsSpacingMark(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Mc;
+    }
+
+    public bool IsEnclosingMark(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Me;
+    }
+        
+    public bool IsMark(uchar c)
+    {
+        return HasGeneralCategory(c, GeneralCategoryId.M);
+    }
+
+    public bool IsDecimalNumber(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Nd;
+    }
+    
+    public bool IsLetterNumber(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Nl;
+    }
+
+    public bool IsOtherNumber(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.No;
+    }
+
+    public bool IsNumber(uchar c)
+    {
+        return HasGeneralCategory(c, GeneralCategoryId.N);
+    }
+
+    public bool IsConnectorPunctuation(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Pc;
+    }
+
+    public bool IsDashPunctuation(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Pd;
+    }
+
+    public bool IsOpenPunctuation(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Ps;
+    }
+
+    public bool IsClosePunctuation(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Pe;
+    }
+
+    public bool IsInitialPunctuation(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Pi;
+    }
+
+    public bool IsFinalPunctuation(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Pf;
+    }
+
+    public bool IsOtherPunctuation(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Po;
+    }
+
+    public bool IsPunctuation(uchar c)
+    {
+        return HasGeneralCategory(c, GeneralCategoryId.P);
+    }
+
+    public bool IsMathSymbol(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Sm;
+    }
+
+    public bool IsCurrencySymbol(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Sc;
+    }
+
+    public bool IsModifierSymbol(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Sk;
+    }
+
+    public bool IsOtherSymbol(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.So;
+    }
+
+    public bool IsSymbol(uchar c)
+    {
+        return HasGeneralCategory(c, GeneralCategoryId.S);
+    }
+
+    public bool IsSpaceSeparator(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Zs;
+    }
+
+    public bool IsLineSeparator(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Zl;
+    }
+
+    public bool IsParagraphSeparator(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Zp;
+    }
+    
+    public bool IsSeparator(uchar c)
+    {
+        return HasGeneralCategory(c, GeneralCategoryId.Z);
+    }
+    
+    public bool IsControl(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Cc;
+    }
+    
+    public bool IsFormat(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Cf;
+    }
+
+    public bool IsSurrogate(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Cs;
+    }
+
+    public bool IsPrivateUse(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Co;
+    }
+
+    public bool IsUnassigned(uchar c)
+    {
+        return GetGeneralCategory(c) == GeneralCategoryId.Cn;
+    }
+
+    public bool IsOther(uchar c)
+    {
+        return HasGeneralCategory(c, GeneralCategoryId.C);
+    }
+
+    public bool IsGraphic(uchar c)
+    {
+        return HasGeneralCategory(c, GeneralCategoryId.G);
+    }
+
+    public bool IsBaseChar(uchar c)
+    {
+        return HasGeneralCategory(c, GeneralCategoryId.B);
+    }
+
+    public bool IsCombining(uchar c)
+    {
+        return IsMark(c);
+    }
+
+    public uchar ToUpper(uchar c)
+    {
+        return GetCharacterInfo(c).Upper();
+    }
+
+    public uchar ToLower(uchar c)
+    {
+        return GetCharacterInfo(c).Lower();
+    }
+
+    public uchar ToTitle(uchar c)
+    {
+        return GetCharacterInfo(c).Title();
+    }
+    
+    public uchar ToFolding(uchar c)
+    {
+        return GetCharacterInfo(c).Folding();
+    }
+    
+    public ustring FullUpper(uchar c)
+    {
+        return GetExtendedCharacterInfo(c).FullUpper();
+    }
+
+    public ustring FullLower(uchar c)
+    {
+        return GetExtendedCharacterInfo(c).FullLower();
+    }
+
+    public ustring FullTitle(uchar c)
+    {
+        return GetExtendedCharacterInfo(c).FullTitle();
+    }
+
+    public ustring FullFolding(uchar c)
+    {
+        return GetExtendedCharacterInfo(c).FullFolding();
+    }
+
+    public bool IsWhiteSpace(uchar c)
+    {
+        return GetCharacterInfo(c).GetBinaryProperty(BinaryPropertyId.whiteSpace);
+    }
+
+    public bool IsAlphabetic(uchar c)
+    {
+        return GetCharacterInfo(c).GetBinaryProperty(BinaryPropertyId.alphabetic);
+    }
+
+    public bool IsAsciiHexDigit(uchar c)
+    {
+        return GetCharacterInfo(c).GetBinaryProperty(BinaryPropertyId.asciiHexDigit);
+    }
+
+    public bool IsAsciiDigit(uchar c)
+    {
+        return cast<uint>(c) < 256u && IsDigit(cast<char>(c));
+    }
+
+    public bool IsUppercase(uchar c)
+    {
+        return GetCharacterInfo(c).GetBinaryProperty(BinaryPropertyId.uppercase);
+    }
+
+    public bool IsLowercase(uchar c)
+    {
+        return GetCharacterInfo(c).GetBinaryProperty(BinaryPropertyId.lowercase);
+    }
+
+    public bool IsIdStart(uchar c)
+    {
+        return GetCharacterInfo(c).GetBinaryProperty(BinaryPropertyId.idStart);
+    }
+
+    public bool IsIdCont(uchar c)
+    {
+        return GetCharacterInfo(c).GetBinaryProperty(BinaryPropertyId.idContinue);
+    }
+
+    public bool IsGraphemeBase(uchar c)
+    {
+        return GetCharacterInfo(c).GetBinaryProperty(BinaryPropertyId.graphemeBase);
+    }
+
+    public bool IsGraphemeExtender(uchar c)
+    {
+        return GetCharacterInfo(c).GetBinaryProperty(BinaryPropertyId.graphemeExtend);
+    }
+
+    public bool IsOtherLower(uchar c)
+    {
+        return GetCharacterInfo(c).GetBinaryProperty(BinaryPropertyId.otherLowercase);
+    }
+
+    public bool IsOtherUpper(uchar c)
+    {
+        return GetCharacterInfo(c).GetBinaryProperty(BinaryPropertyId.otherUppercase);
+    }
+
+    public string GetCharacterName(uchar c)
+    {
+        return GetExtendedCharacterInfo(c).CharacterName();
+    }
+
+    public string GetUnicode1Name(uchar c)
+    {
+        return GetExtendedCharacterInfo(c).Unicode1Name();
+    }
+
+    public NumericTypeId GetNumericType(uchar c)
+    {
+        return GetExtendedCharacterInfo(c).NumericTypeValue();
+    }
+
+    public ustring GetNumericValue(uchar c)
+    {
+        return GetExtendedCharacterInfo(c).NumericValue();
+    }
+
+    public bool IsBidiMirrored(uchar c)
+    {
+        return GetCharacterInfo(c).GetBinaryProperty(BinaryPropertyId.bidiMirrored);
+    }
+
+    public bool IsBidiControl(uchar c)
+    {
+        return GetCharacterInfo(c).GetBinaryProperty(BinaryPropertyId.bidiControl);
+    }
+
+    public uchar GetBidiMirroringGlyph(uchar c)
+    {
+        return GetExtendedCharacterInfo(c).BidiMirroringGlyph();
+    }
+
+    public BidiPairedBracketTypeId GetBidiPairedBracketType(uchar c)
+    {
+        return GetExtendedCharacterInfo(c).BidiPairedBracketTypeValue();
+    }
+
+    public uchar GetBidiPairedBracket(uchar c)
+    {
+        return GetExtendedCharacterInfo(c).BidiPairedBracket();
+    }
+
+    public const List<Alias>& Aliases(uchar c)
+    {
+        return GetExtendedCharacterInfo(c).Aliases();
+    }
+}

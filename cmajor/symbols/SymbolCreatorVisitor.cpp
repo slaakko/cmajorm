@@ -1665,6 +1665,7 @@ void SymbolCreatorVisitor::Visit(LabeledStatementNode& labeledStatementNode)
 {
     labeledStatementNode.Label()->Accept(*this);
     symbolTable.SetCursorContainer(labeledStatementNode);
+    labeledStatementNode.Stmt()->Accept(*this);
 }
 
 void SymbolCreatorVisitor::Visit(CompoundStatementNode& compoundStatementNode)

@@ -1,0 +1,52 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace System
+{
+    public delegate void ExitFunc(void* arg);
+
+    public class ExitEntry
+    {
+        public nothrow ExitEntry() : fun(null), arg(null), next(null)
+        {
+        }
+        public void* fun;
+        public void* arg;
+        public ExitEntry* next;
+    }
+    
+    private ExitEntry* atExitList = null;
+
+    public nothrow void AtExit(ExitEntry* entry, void* fun, void* arg)
+    {
+        entry->fun = fun;
+        entry->arg = arg;
+        entry->next = atExitList;
+        atExitList = entry;
+    }
+    
+    public nothrow void RunAtExits()
+    {
+        ExitEntry* entry = atExitList;
+        while (entry != null)
+        {
+            atExitList = entry->next;
+            ExitFunc fun = cast<ExitFunc>(entry->fun);
+            void* arg = entry->arg;
+            fun(arg);
+            entry = atExitList;
+        }
+    }
+}
+
+public cdecl nothrow void at_exit(System.ExitEntry* entry, void* fun, void* arg)
+{
+    System.AtExit(entry, fun, arg);
+}
+
+public cdecl nothrow void run_at_exits()
+{
+    System.RunAtExits();
+}

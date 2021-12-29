@@ -1,0 +1,97 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Concepts;
+
+namespace System.Collections
+{
+    public class Set<T, C = Less<T>> 
+        where T is Semiregular and C is Relation and C.Domain is T
+    {
+        public typedef T ValueType;
+        public typedef T KeyType;
+        public typedef C Compare;
+        public typedef TreeType.ConstIterator ConstIterator;
+        public typedef TreeType.Iterator Iterator;
+        private typedef Set<ValueType, Compare> Self;
+        private typedef RedBlackTree<KeyType, ValueType, Identity<ValueType>, Compare> TreeType;
+
+        public inline nothrow Iterator Begin() 
+        {
+            return tree.Begin();
+        }
+        public inline nothrow ConstIterator Begin() const
+        {
+            return tree.CBegin();
+        }
+        public inline nothrow ConstIterator CBegin() const
+        {
+            return tree.CBegin();
+        }
+        public inline nothrow Iterator End() 
+        {
+            return tree.End();
+        }
+        public inline nothrow ConstIterator End() const
+        {
+            return tree.CEnd();
+        }
+        public inline nothrow ConstIterator CEnd() const
+        {
+            return tree.CEnd();
+        }
+        public inline nothrow long Count() const
+        {
+            return tree.Count();
+        }
+        public inline nothrow bool IsEmpty() const
+        {
+            return tree.IsEmpty();
+        }
+        public nothrow void Clear()
+        {
+            tree.Clear();
+        }
+        public inline nothrow Iterator Find(const KeyType& key)
+        {
+            return tree.Find(key);
+        }
+        public inline nothrow ConstIterator Find(const KeyType& key) const
+        {
+            return tree.CFind(key);
+        }
+        public inline nothrow ConstIterator CFind(const KeyType& key) const
+        {
+            return tree.CFind(key);
+        }
+        public inline Pair<Iterator, bool> Insert(const ValueType& value) 
+            where T is Copyable
+        {
+            return tree.Insert(value);
+        }
+        public inline nothrow bool Remove(const KeyType& key)
+        {
+            return tree.Remove(key);
+        }
+        public inline nothrow void Remove(Iterator pos)
+        {
+            tree.Remove(pos);
+        }
+        private TreeType tree;
+    }
+
+    public inline nothrow bool operator==<T, C>(const Set<T, C>& left, const Set<T, C>& right) 
+        where T is Regular and C is Relation and C.Domain is T
+    {
+        return left.Count() == right.Count() && Equal(left.CBegin(), left.CEnd(), right.CBegin(), right.CEnd(), EqualTo<T>());
+    }
+
+    public inline nothrow bool operator<<T, C>(const Set<T, C>& left, const Set<T, C>& right) 
+        where T is Semiregular and C is Relation and C.Domain is T
+    {
+        return LexicographicalCompare(left.CBegin(), left.CEnd(), right.CBegin(), right.CEnd(), C());
+    }
+}

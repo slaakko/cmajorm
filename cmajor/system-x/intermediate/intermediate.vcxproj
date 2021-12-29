@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{0439352c-3fa6-415e-9bd9-5b4e629c0017}</ProjectGuid>
+    <RootNamespace>intermediate</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\config\build.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\config\build.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\config\build.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\config\build.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>intermediate</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>intermediate</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>cmsx_intermediated</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>cmsx_intermediate</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;INTERMEDIATE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;INTERMEDIATE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;CMSX_INTERMEDIATE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..;../..;../../..;$(BOOST_INCLUDE_DIR)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996;4251;4275</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>$(OutDir);$(BOOST_LIB_DIR)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;CMSX_INTERMEDIATE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>..;../..;../../..;$(BOOST_INCLUDE_DIR)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996;4251;4275</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>$(OutDir);$(BOOST_LIB_DIR)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="IntermediateCodeLexer.lexer" />
+    <None Include="IntermediateCodeParser.parser" />
+    <None Include="IntermediateCodeParser.spg" />
+    <None Include="IntermediateCodeTokens.tokens" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Api.hpp" />
+    <ClInclude Include="Code.hpp" />
+    <ClInclude Include="CodeGen.hpp" />
+    <ClInclude Include="CompileUnit.hpp" />
+    <ClInclude Include="ComputeSuccPredPass.hpp" />
+    <ClInclude Include="Context.hpp" />
+    <ClInclude Include="CppCodeGenerator.hpp" />
+    <ClInclude Include="CppProjectFileGenerator.hpp" />
+    <ClInclude Include="Data.hpp" />
+    <ClInclude Include="DominatorTreeCooper.hpp" />
+    <ClInclude Include="DominatorTreePass.hpp" />
+    <ClInclude Include="EntryExitPass.hpp" />
+    <ClInclude Include="Error.hpp" />
+    <ClInclude Include="FunctionPassDriver.hpp" />
+    <ClInclude Include="InitDone.hpp" />
+    <ClInclude Include="AssemblyConfig.hpp" />
+    <ClInclude Include="LinearScanRegisterAllocator.hpp" />
+    <ClInclude Include="ModulePassDriver.hpp" />
+    <ClInclude Include="Pass.hpp" />
+    <ClInclude Include="Passes.hpp" />
+    <ClInclude Include="PassManager.hpp" />
+    <ClInclude Include="Mem2RegPass.hpp" />
+    <ClInclude Include="RegisterAllocator.hpp" />
+    <ClInclude Include="SimpleAssemblyCodeGenerator.hpp" />
+    <ClInclude Include="SimpleAssemblyCodeGenPass.hpp" />
+    <ClInclude Include="WriteCfgPass.hpp" />
+    <ClInclude Include="WriteDominatorTreePass.hpp" />
+    <ClInclude Include="WritePass.hpp" />
+    <ClInclude Include="Writer.hpp" />
+    <ClInclude Include="IntermediateCodeClassMap.hpp" />
+    <ClInclude Include="IntermediateCodeKeywords.hpp" />
+    <ClInclude Include="IntermediateCodeLexer.hpp" />
+    <ClInclude Include="IntermediateCodeParser.hpp" />
+    <ClInclude Include="IntermediateCodeRules.hpp" />
+    <ClInclude Include="IntermediateCodeTokens.hpp" />
+    <ClInclude Include="Metadata.hpp" />
+    <ClInclude Include="Parser.hpp" />
+    <ClInclude Include="SimplifyCfgPass.hpp" />
+    <ClInclude Include="Types.hpp" />
+    <ClInclude Include="Util.hpp" />
+    <ClInclude Include="Verify.hpp" />
+    <ClInclude Include="Visit.hpp" />
+    <ClInclude Include="Visitor.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="RegisterAllocator.cpp" />
+    <ClCompile Include="Api.cpp" />
+    <ClCompile Include="AssemblyConfig.cpp" />
+    <ClCompile Include="Code.cpp" />
+    <ClCompile Include="CodeGen.cpp" />
+    <ClCompile Include="CompileUnit.cpp" />
+    <ClCompile Include="ComputeSuccPredPass.cpp" />
+    <ClCompile Include="Context.cpp" />
+    <ClCompile Include="CppCodeGenerator.cpp" />
+    <ClCompile Include="CppProjectFileGenerator.cpp" />
+    <ClCompile Include="Data.cpp" />
+    <ClCompile Include="DominatorTreeCooper.cpp" />
+    <ClCompile Include="DominatorTreePass.cpp" />
+    <ClCompile Include="EntryExitPass.cpp" />
+    <ClCompile Include="Error.cpp" />
+    <ClCompile Include="FunctionPassDriver.cpp" />
+    <ClCompile Include="InitDone.cpp" />
+    <ClCompile Include="LinearScanRegisterAllocator.cpp" />
+    <ClCompile Include="ModulePassDriver.cpp" />
+    <ClCompile Include="Pass.cpp" />
+    <ClCompile Include="Passes.cpp" />
+    <ClCompile Include="PassManager.cpp" />
+    <ClCompile Include="Mem2RegPass.cpp" />
+    <ClCompile Include="SimpleAssemblyCodeGenerator.cpp" />
+    <ClCompile Include="SimpleAssemblyCodeGenPass.cpp" />
+    <ClCompile Include="WriteCfgPass.cpp" />
+    <ClCompile Include="WriteDominatorTreePass.cpp" />
+    <ClCompile Include="WritePass.cpp" />
+    <ClCompile Include="Writer.cpp" />
+    <ClCompile Include="IntermediateCodeClassMap.cpp" />
+    <ClCompile Include="IntermediateCodeKeywords.cpp" />
+    <ClCompile Include="IntermediateCodeLexer.cpp" />
+    <ClCompile Include="IntermediateCodeParser.cpp" />
+    <ClCompile Include="IntermediateCodeRules.cpp" />
+    <ClCompile Include="IntermediateCodeTokens.cpp" />
+    <ClCompile Include="Metadata.cpp" />
+    <ClCompile Include="Parser.cpp" />
+    <ClCompile Include="SimplifyCfgPass.cpp" />
+    <ClCompile Include="Types.cpp" />
+    <ClCompile Include="Util.cpp" />
+    <ClCompile Include="Verify.cpp" />
+    <ClCompile Include="Visit.cpp" />
+    <ClCompile Include="Visitor.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

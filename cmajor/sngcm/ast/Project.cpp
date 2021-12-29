@@ -98,7 +98,7 @@ std::string CmajorSystemLibDir(const std::string& config, BackEnd backend, const
     {
         boost::filesystem::path sld(CmajorRootDir());
         sld /= "projects";
-        sld /= "cmsx";
+        sld /= "system-x";
         sld /= "system";
         sld /= "lib";
         sld /= config;
@@ -377,7 +377,7 @@ Project::Project(const std::u32string& name_, const std::string& filePath_, cons
 #ifdef _WIN32
     if (backend == BackEnd::cmsx)
     {
-        efp.replace_extension();
+        efp.replace_extension(".x");
     }
     else if (backend == BackEnd::llvm)
     {

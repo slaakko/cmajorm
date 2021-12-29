@@ -38,6 +38,7 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
 #include <cmajor/symbols/Meta.hpp>
+#include <cmajor/symbols/Error.hpp>
 #include <cmajor/ast2dom/Ast2Dom.hpp>
 #include <cmajor/bdt2dom/Bdt2Dom.hpp>
 #include <cmajor/cmdoclib/Input.hpp>
@@ -49,6 +50,10 @@
 #ifdef _WIN32
 #include <cmajor/cmres/ResourceProcessor.hpp>
 #endif
+#include <system-x/object/Archive.hpp>
+#include <system-x/object/Link.hpp>
+#include <system-x/intermediate/CppProjectFileGenerator.hpp>
+#include <system-x/intermediate/CppCodeGenerator.hpp>
 #include <sngjson/json/JsonLexer.hpp>
 #include <sngjson/json/JsonParser.hpp>
 #include <sngcm/ast/Attribute.hpp>
@@ -586,54 +591,13 @@ void GenerateLibrarySystemX(Module* module, const std::vector<std::string>& obje
         LogMessage(module->LogStreamId(), "Creating library...");
     }
     boost::filesystem::remove(libraryFilePath);
-    module->SetCurrentToolName(U"cmsxar");
-    std::vector<std::string> args;
-    args.push_back("-o=" + QuotedPath(libraryFilePath));
-    int n = objectFilePaths.size();
-    for (int i = 0; i < n; ++i)
-    {
-        args.push_back(QuotedPath(objectFilePaths[i]));
-        if (GetGlobalFlag(GlobalFlags::verbose))
-        {
-            LogMessage(module->LogStreamId(), "> " + QuotedPath(objectFilePaths[i]));
-        }
-    }
-    std::string libCommandLine = "cmsxar";
-    std::string errors;
-    for (const std::string& arg : args)
-    {
-        libCommandLine.append(1, ' ').append(arg);
-    }
     try
     {
-        Process::Redirections redirections = Process::Redirections::processStdErr;
-        if (GetGlobalFlag(GlobalFlags::verbose))
-        {
-            redirections = redirections | Process::Redirections::processStdOut;
-        }
-        Process process(libCommandLine, redirections);
-        if (GetGlobalFlag(GlobalFlags::verbose))
-        {
-            while (!process.Eof(Process::StdHandle::stdOut))
-            {
-                std::string line = process.ReadLine(Process::StdHandle::stdOut);
-                if (!line.empty())
-                {
-                    LogMessage(module->LogStreamId(), PlatformStringToUtf8(line));
-                }
-            }
-        }
-        errors = process.ReadToEnd(Process::StdHandle::stdErr);
-        process.WaitForExit();
-        int exitCode = process.ExitCode();
-        if (exitCode != 0)
-        {
-            throw std::runtime_error("executing '" + libCommandLine + "' failed with exit code: " + std::to_string(exitCode));
-        }
+        cmsx::object::CreateArchive(module->LogStreamId(), libraryFilePath, objectFilePaths, GetGlobalFlag(GlobalFlags::verbose));
     }
     catch (const std::exception& ex)
     {
-        throw std::runtime_error("generating library '" + libraryFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
+        throw std::runtime_error("generating library '" + libraryFilePath + "' failed: " + ex.what());
     }
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
@@ -941,6 +905,11 @@ std::string GetCppSolutionDirectoryPath(Project* project)
     const Tool& libraryManagerTool = GetLibraryManagerTool(GetPlatform(), GetToolChain());
     const Configuration& configuration = GetToolConfiguration(libraryManagerTool, GetConfig());
     return GetFullPath(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::GetDirectoryName(currentSolution->FilePath()), "cpp"), GetToolChain()), GetConfig()), configuration.outputDirectory));
+}
+
+void CreateCppProjectFileSystemX(Project* project, Module& module, const std::string& mainObjectFilePath)
+{
+    cmsx::intermediate::GenerateProjectFile(project, &module, mainObjectFilePath, true);
 }
 
 void CreateCppProjectFile(Project* project, Module& module, const std::string& mainSourceFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths)
@@ -1372,60 +1341,26 @@ void LinkSystemX(const std::string& executableFilePath, const std::string& libra
     }
     std::string classIdFileName = Path::ChangeExtension(libraryFilePath, ".clsid");
     MakeClassIdFile(module.GetSymbolTable().PolymorphicClasses(), classIdFileName);
-    module.SetCurrentToolName(U"cmsxlink");
+    module.SetCurrentToolName(U"sxlink");
     boost::filesystem::path bdp = executableFilePath;
     bdp.remove_filename();
     boost::filesystem::create_directories(bdp);
-    std::vector<std::string> args;
-    args.push_back("--clsid=" + QuotedPath(classIdFileName));
-    args.push_back("--out=" + QuotedPath(executableFilePath));
-    args.push_back(QuotedPath(mainObjectFilePath));
+    std::vector<std::string> binaryFileNames;
+    std::string systemMainObjectFilePath = GetFullPath(Path::Combine(CmajorRootDir(), "projects/system-x/system/Main/Main.o"));
+    binaryFileNames.push_back(systemMainObjectFilePath);
+    binaryFileNames.push_back(mainObjectFilePath);
     int n = libraryFilePaths.size();
     for (int i = n - 1; i >= 0; --i)
     {
-        args.push_back(QuotedPath(libraryFilePaths[i]));
-    }
-    std::string linkCommandLine;
-    std::string errors;
-    linkCommandLine = "cmsxlink";
-    for (const std::string& arg : args)
-    {
-        linkCommandLine.append(1, ' ').append(arg);
+        binaryFileNames.push_back(libraryFilePaths[i]);
     }
     try
     {
-        Process::Redirections redirections = Process::Redirections::processStdErr;
-        if (GetGlobalFlag(GlobalFlags::verbose))
-        {
-            redirections = redirections | Process::Redirections::processStdOut;
-        }
-        Process process(linkCommandLine, redirections);
-        if (GetGlobalFlag(GlobalFlags::verbose))
-        {
-            while (!process.Eof(Process::StdHandle::stdOut))
-            {
-                std::string line = process.ReadLine(Process::StdHandle::stdOut);
-                if (!line.empty())
-                {
-                    LogMessage(-1, PlatformStringToUtf8(line));
-                }
-            }
-        }
-        errors = process.ReadToEnd(Process::StdHandle::stdErr);
-        process.WaitForExit();
-        int exitCode = process.ExitCode();
-        if (exitCode != 0)
-        {
-            throw std::runtime_error("executing '" + linkCommandLine + "' failed with exit code: " + std::to_string(exitCode));
-        }
+        cmsx::object::Link(module.LogStreamId(), executableFilePath, binaryFileNames, classIdFileName, GetGlobalFlag(GlobalFlags::verbose));
     }
     catch (const std::exception& ex)
     {
-        throw std::runtime_error("linking executable '" + executableFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
-    }
-    if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
-    {
-        LogMessage(module.LogStreamId(), "==> " + executableFilePath);
+        throw std::runtime_error("linking executable '" + executableFilePath + "' failed: " + ex.what());
     }
 }
 
@@ -2004,11 +1939,13 @@ void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& mo
     ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new IntNode(Span(), boost::uuids::nil_uuid()), 
         new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"));
     mainFunctionBody->AddStatement(constructExitCode);
+/*
     CompoundStatementNode* tryBlock = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
     InvokeNode* invokeSetupEnvironment = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"StartupSetupEnvironment"));
     invokeSetupEnvironment->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"envp"));
     StatementNode* callSetEnvironmentStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeSetupEnvironment);
     tryBlock->AddStatement(callSetEnvironmentStatement);
+*/
     FunctionSymbol* userMain = module.GetSymbolTable().MainFunctionSymbol();
     InvokeNode* invokeMain = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), userMain->GroupName()));
     if (!userMain->Parameters().empty())
@@ -2025,6 +1962,7 @@ void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& mo
     {
         callMainStatement = new AssignmentStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"), invokeMain);
     }
+/*
     tryBlock->AddStatement(callMainStatement);
     TryStatementNode* tryStatement = new TryStatementNode(Span(), boost::uuids::nil_uuid(), tryBlock);
     CompoundStatementNode* catchBlock = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
@@ -2044,6 +1982,8 @@ void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& mo
         new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"System.Exception"))), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"ex"), catchBlock);
     tryStatement->AddCatch(catchAll);
     mainFunctionBody->AddStatement(tryStatement);
+*/
+    mainFunctionBody->AddStatement(callMainStatement);
     ReturnStatementNode* returnStatement = new ReturnStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"));
     mainFunctionBody->AddStatement(returnStatement);
     mainFunction->SetBody(mainFunctionBody);
@@ -3138,6 +3078,13 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                 {
                     CreateCppProjectFile(project, *rootModule, mainSourceFilePath, project->LibraryFilePath(), rootModule->LibraryFilePaths());
                 }
+                else if (GetBackEnd() == BackEnd::cmsx)
+                {
+                    if (GetGlobalFlag(GlobalFlags::cpp))
+                    {
+                        CreateCppProjectFileSystemX(project, *rootModule, mainObjectFilePath);
+                    }
+                }
                 if (project->GetTarget() == Target::program || project->GetTarget() == Target::winguiapp || project->GetTarget() == Target::winapp)
                 {
                     Link(project->GetTarget(), project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(),
@@ -3232,6 +3179,11 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
         {
             ResetModuleCache();
         }
+    }
+    catch (const cmajor::symbols::Error& ex) 
+    {
+        LogMessage(-1, "project: " + ToUtf8(project->Name()) + ": " + ex.Message());
+        throw;
     }
     catch (const std::exception& ex)
     {

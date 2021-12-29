@@ -1,0 +1,2397 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>System X Intermediate Language Reference</title>
+    <link href="style/style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <h1>System X Intermediate Language Reference</h1>
+
+	<h2>Intermediate File Structure</h2>
+
+	<p>
+		An intermediate code file consists of:
+		<ul>
+			<li><a href="#header">a compile unit header</a></li>
+			<li><a href="#types">type declarations</a></li>
+			<li><a href="#data">data definitions</a></li>
+			<li><a href="#functions">function definitions</a></li>
+			<li><a href="#metadata">metadata declarations</a></li>
+		</ul>
+	</p>
+	
+	<h3>Syntax</h3>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.intermediate-code-file">intermediate&#8209;code&#8209;file</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.compile-unit-header">compile&#8209;unit&#8209;header</a></span>
+				<span class="rule"><a href="#rule.type-declarations">type&#8209;declarations</a></span>?
+				<span class="rule"><a href="#rule.data-definitions">data&#8209;definitions</a></span>?
+				<span class="rule"><a href="#rule.function-definitions">function&#8209;definitions</a></span>?
+				<span class="rule"><a href="#rule.metadata-declarations">metadata&#8209;declarations</a></span>?
+			</td>
+		</tr>
+	</table>
+	
+	<h2>Compile Unit Header</h2>
+	
+	<h3>Syntax</h3>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.compile-unit-header">compile&#8209;unit&#8209;header</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">cu</span>
+				<span class="mono">(</span>
+				<span class="rule"><a href="#rule.compile-unit-id">compile&#8209;unit&#8209;id</a></span>
+				<span class="mono">,</span>
+				<span class="rule"><a href="#rule.metadata-ref">metadata&#8209;ref</a></span>
+				<span class="mono">)</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.compile-unit-id">compile&#8209;unit&#8209;id</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.hex-number">hex&#8209;number</a></span> |
+				<span class="rule"><a href="#rule.number">number</a></span> |
+				<span class="rule"><a href="#rule.identifier">identifier</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.hex-number">hex&#8209;number</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>+
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.hex-digit">hex&#8209;digit</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="op">[0-9A-Fa-f]</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.number">number</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.sign">sign</a></span>?
+				(<span class="rule"><a href="#rule.fractional-part">fractional&#8209;part</a></span> |
+				<span class="rule"><a href="#rule.digit">digit</a></span>+)
+				<span class="rule"><a href="#rule.exponent-part">exponent&#8209;part</a></span>?
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.sign">sign</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">+</span> | <span class="mono">-</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.digit">digit</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="op">[0-9]</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.fractional-part">fractional&#8209;part</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.digit">digit</a></span>*
+				<span class="mono">.</span>
+				<span class="rule"><a href="#rule.digit">digit</a></span>+ |
+				<span class="rule"><a href="#rule.digit">digit</a></span>+
+				<span class="mono">.</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.exponent-part">exponent&#8209;part</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				(<span class="mono">e</span> | <span class="mono">E</span>)
+				<span class="rule"><a href="#rule.sign">sign</a></span>?
+				<span class="rule"><a href="#rule.digit">digit</a></span>+
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.identifier">identifier</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.id-start">id&#8209;start</a></span>
+				<span class="rule"><a href="#rule.id-cont">id&#8209;cont</a></span>*
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.id-start">id&#8209;start</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				'Unicode characters having <a href="https://www.unicode.org/reports/tr31/tr31-35.html#Default_Identifier_Syntax">ID_Start</a> Property' |
+				<span class="mono">_</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.id-cont">id&#8209;cont</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				'Unicode characters having <a href="https://www.unicode.org/reports/tr31/tr31-35.html#Default_Identifier_Syntax">ID_Continue</a> Property' |
+				<span class="mono">@</span> |
+				<span class="mono">_</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.metadata-ref">metadata&#8209;ref</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">!</span>
+				<span class="rule"><a href="#rule.digit">digit</a></span>+
+			</td>
+		</tr>
+	</table>
+	
+	<h2 id="types">Types</h2>
+	
+	<p>
+		The types of the intermediate language can be grouped into <a href="#fundamental-types"><em>fundamental</em></a> and <a href="#compound-types"><em>compound</em></a> types.
+	</p>
+	
+	<h3 id="fundamental-types">Fundamental Types</h3>
+
+	<p>
+		The following table contains a summary of fundamental types:
+	</p>
+
+	<table class="type">
+		<tr>
+			<th>type</th>
+			<th>kind</th>
+			<th>signed | unsigned</th>
+			<th>size</th>
+			<th>range</th>
+		</tr>
+		<tr>
+			<td><span class="kw">void</span></td>
+			<td>-</td>
+			<td>-</td>
+			<td>-</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">bool</span></td>
+			<td>Boolean</td>
+			<td>-</td>
+			<td>1 byte</td>
+			<td>true | false</td>
+		</tr>
+		<tr>
+			<td><span class="kw">sbyte</span></td>
+			<td>integer</td>
+			<td>signed</td>
+			<td>1 byte</td>
+			<td>-128...127</td>
+		</tr>
+		<tr>
+			<td><span class="kw">byte</span></td>
+			<td>integer</td>
+			<td>unsigned</td>
+			<td>1 byte</td>
+			<td>0...255</td>
+		</tr>
+		<tr>
+			<td><span class="kw">short</span></td>
+			<td>integer</td>
+			<td>signed</td>
+			<td>2 bytes</td>
+			<td>-32768...32767</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ushort</span></td>
+			<td>integer</td>
+			<td>unsigned</td>
+			<td>2 bytes</td>
+			<td>0...65535</td>
+		</tr>
+		<tr>
+			<td><span class="kw">int</span></td>
+			<td>integer</td>
+			<td>signed</td>
+			<td>4 bytes</td>
+			<td>-2147483648...2147483647</td>
+		</tr>
+		<tr>
+			<td><span class="kw">uint</span></td>
+			<td>integer</td>
+			<td>unsigned</td>
+			<td>4 bytes</td>
+			<td>0...4294967295</td>
+		</tr>
+		<tr>
+			<td><span class="kw">long</span></td>
+			<td>integer</td>
+			<td>signed</td>
+			<td>8 bytes</td>
+			<td>-9223372036854775808...9223372036854775807</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ulong</span></td>
+			<td>integer</td>
+			<td>unsigned</td>
+			<td>8 bytes</td>
+			<td>0...18446744073709551615</td>
+		</tr>
+		<tr>
+			<td><span class="kw">float</span></td>
+			<td>floating-point</td>
+			<td>-</td>
+			<td>4 bytes</td>
+			<td>IEEE single precision floating-point type range</td>
+		</tr>
+		<tr>
+			<td><span class="kw">double</span></td>
+			<td>floating-point</td>
+			<td>-</td>
+			<td>8 bytes</td>
+			<td>IEEE double precision floating-point type range</td>
+		</tr>
+	</table>
+	
+	<p>
+		The <span class="kw">void</span> keyword represents lack of type.
+	</p>
+	
+	<p>
+		Other fundamental types can divided into <em>Boolean</em>, <em>integer</em> and <em>floating-point</em> types.
+	</p>
+	
+	<p>
+		The <strong>integer</strong> and <strong>floating-point</strong> types are together called the <strong>arithmetic</strong> types.
+	</p>
+
+	<h3 id="compound-types">Compound Types</h3>
+	
+	<p>
+		There are four kinds of compound types:
+		<ul>
+			<li><a href="#structured-types">structured types</a></li>
+			<li><a href="#array-types">array types</a></li>
+			<li><a href="#function-types">function types</a></li>
+			<li><a href="#pointer-types">pointer types</a></li>
+		</ul>
+	</p>
+	
+	<p>
+		The structured, array and function types used in the intermediate file has to be declared in the <em><a href="#type-declarations">type declaration part</a></em> of the intermediate file.
+	</p>
+
+	<h4 id="structured-types">Structured Types</h4>
+	
+	<p>
+		A structured type consists of a non-empty sequence of fields.
+		Each field has a type identified using a <span class="rule"><a href="#rule.type-ref">type-ref</a></span>.
+	</p>
+	
+	<p>
+		A structured type has to be declared using a <span class="rule"><a href="#rule.structure-type-declaration">structure&#8209;type&#8209;declaration</a>.
+	</p>
+	
+	<h4 id="array-types">Array Types</h4>
+	
+	<p>
+		An array type consists of a non-empty sequence of elements of the same type. The type of the elements are identified using a a <span class="rule"><a href="#rule.type-ref">type-ref</a></span>.
+	</p>
+	
+	<p>
+		An array type has to be declared using a <span class="rule"><a href="#rule.array-type-declaration">array&#8209;type&#8209;declaration</a></span>.
+	</P>
+	
+	<h4 id="function-types">Function Types</h4>
+	
+	<p>
+		A function type consists of the return type and the types of the parameters of a function.
+		The return type and the types of the parameters are identified using a <span class="rule"><a href="#rule.type-ref">type-ref</a></span>.
+	</p>
+	
+	<p>
+		An function type has to be declared using a <span class="rule"><a href="#rule.function-type-declaration">function&#8209;type&#8209;declaration</a></span>.
+	</p>
+	
+	<h4 id="pointer-types">Pointer Types</h4>
+
+	<p>
+		A pointer type is identified using a <span class="rule"><a href="#rule.type-ref">type-ref</a></span> that consists of a prefix that identifies a <em>base type</em> and a 
+		suffix consisting of one or more <span class="mono">*</span> symbols.
+	</p>
+	
+	<p>
+		The base type may be <a href="#fundamental-types">fundamental</a> type, a <a href="#structured-types">structured</a> type, an <a href="#array-types">array</a> type or
+		a <a href="#function-types">function</a> type.
+	</p>
+
+	<p>
+		The value of a pointer type object is a memory address of the pointed-to object.
+	</p>
+	
+	<h3 id="type-declarations">Type Declarations</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.type-declarations">type&#8209;declarations</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">types</span>
+				<span class="mono">{</span>
+				<span class="rule"><a href="#rule.type-declaration">type&#8209;declaration</a></span>*
+				<span class="mono">}</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.type-declaration">type&#8209;declaration</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.type-id">type&#8209;id</a></span>
+				<span class="mono">=</span>
+				<span class="kw">type</span></br>
+				(
+					<span class="rule"><a href="#rule.structure-type-declaration">structure&#8209;type&#8209;declaration</a></span> |
+					<span class="rule"><a href="#rule.array-type-declaration">array&#8209;type&#8209;declaration</a></span> |
+					<span class="rule"><a href="#rule.function-type-declaration">function&#8209;type&#8209;declaration</a></span>
+				)
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.structure-type-declaration">structure&#8209;type&#8209;declaration</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">{</span>
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				(
+					<span class="mono">,</span>
+					<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				)*
+				<span class="mono">}</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.array-type-declaration">array&#8209;type&#8209;declaration</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">[</span>
+				<span class="rule"><a href="#rule.array-size">array&#8209;size</a></span>
+				<span class="mono">x</span>
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				<span class="mono">]</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.function-type-declaration">function&#8209;type&#8209;declaration</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">function</span>
+				<span class="rule"><a href="#rule.return-type">return&#8209;type</a></span>
+				<span class="mono">(</span>
+				(
+				<span class="rule"><a href="#rule.param-type">param&#8209;type</a></span>
+				(<span class="mono">,</span> <span class="rule"><a href="#rule.param-type">param&#8209;type</a></span>)*
+				)?
+				<span class="mono">)</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.return-type">return&#8209;type</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.param-type">param&#8209;type</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.type-ref">type&#8209;ref</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.base-type">base&#8209;type</a></span>
+				<span class="mono">*</span>*
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.base-type">base&#8209;type</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.type-id">type&#8209;id</a></span> |
+				<span class="rule"><a href="#rule.fundamental-type">fundamental&#8209;type</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.type-id">type&#8209;id</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">$T</span>
+				<span class="rule"><a href="#rule.digit">digit</a></span>+
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.fundamental-type">fundamental&#8209;type</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">void</span> |
+				<span class="kw">bool</span> |
+				<span class="kw">sbyte</span> |
+				<span class="kw">byte</span> |
+				<span class="kw">short</span> |
+				<span class="kw">ushort</span> |
+				<span class="kw">int</span> |
+				<span class="kw">uint</span> |
+				<span class="kw">long</span> |
+				<span class="kw">ulong</span> |
+				<span class="kw">float</span> |
+				<span class="kw">double</span> 
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.array-size">array&#8209;size</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.digit">digit</a></span>+
+			</td>
+		</tr>
+	</table>
+	
+	<h2 id="data">Data</h2>
+	
+	<h3 id="data-definitions">Data Definitions</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.data-definitions">data&#8209;definitions</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">data</span>
+				<span class="mono">{</span>
+				<span class="rule"><a href="#rule.data-definition">data&#8209;definition</a></span>*
+				<span class="mono">}</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.data-definition">data&#8209;definition</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				<span class="kw">once</span>?
+				<span class="rule"><a href="#rule.identifier">identifier</a></span>
+				(	<span class="mono">;</span> |
+					<span class="mono">=</span> <span class="rule"><a href="#rule.initializer">initializer</span>
+				)
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.initializer">initializer</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.constant">constant</a></span>
+			</td>
+		</tr>
+	</table>
+
+	<h3 id="constants">Constants</h3>
+	
+	<h4>Syntax</h4>
+
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.constant">constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.bool-constant">bool&#8209;constant</a></span> |
+				<span class="rule"><a href="#rule.sbyte-constant">sbyte&#8209;constant</a></span> |
+				<span class="rule"><a href="#rule.byte-constant">byte&#8209;constant</a></span> |
+				<span class="rule"><a href="#rule.short-constant">short&#8209;constant</a></span> |
+				<span class="rule"><a href="#rule.ushort-constant">ushort&#8209;constant</a></span> |
+				<span class="rule"><a href="#rule.int-constant">int&#8209;constant</a></span> |
+				<span class="rule"><a href="#rule.uint-constant">uint&#8209;constant</a></span> |
+				<span class="rule"><a href="#rule.long-constant">long&#8209;constant</a></span> |
+				<span class="rule"><a href="#rule.ulong-constant">ulong&#8209;constant</a></span> |
+				<span class="rule"><a href="#rule.float-constant">float&#8209;constant</a></span> |
+				<span class="rule"><a href="#rule.double-constant">double&#8209;constant</a></span> |
+				<span class="rule"><a href="#rule.address-constant">address&#8209;constant</a></span> |
+				<span class="rule"><a href="#rule.array-constant">array&#8209;constant</a></span> |
+				<span class="rule"><a href="#rule.structure-constant">structure&#8209;constant</a></span> |
+				<span class="rule"><a href="#rule.string-constant">string&#8209;constant</a></span> |
+				<span class="rule"><a href="#rule.string-array-constant">string&#8209;array&#8209;constant</a></span> |
+				<span class="rule"><a href="#rule.conversion-constant">conversion&#8209;constant</a></span> |
+				<span class="rule"><a href="#rule.clsid-constant">clsid&#8209;constant</a></span> |
+				<span class="rule"><a href="#rule.symbol-constant">symbol&#8209;constant</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.bool-constant">bool&#8209;constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">bool</span> (<span class="kw">true</span> | <span class="kw">false</span>)
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.sbyte-constant">sbyte&#8209;constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">sbyte</span> 
+				<span class="rule"><a href="#rule.number">number</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.byte-constant">byte&#8209;constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">byte</span> 
+				<span class="rule"><a href="#rule.number">number</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.short-constant">short&#8209;constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">short</span> 
+				<span class="rule"><a href="#rule.number">number</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.ushort-constant">ushort&#8209;constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">ushort</span> 
+				<span class="rule"><a href="#rule.number">number</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.int-constant">int&#8209;constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">int</span> 
+				<span class="rule"><a href="#rule.number">number</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.uint-constant">uint&#8209;constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">uint</span> 
+				<span class="rule"><a href="#rule.number">number</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.long-constant">long&#8209;constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">long</span> 
+				<span class="rule"><a href="#rule.number">number</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.ulong-constant">ulong&#8209;constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">ulong</span> 
+				<span class="rule"><a href="#rule.number">number</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.float-constant">float&#8209;constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">float</span> 
+				<span class="rule"><a href="#rule.number">number</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.double-constant">double&#8209;constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">double</span> 
+				<span class="rule"><a href="#rule.number">number</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.address-constant">address&#8209;constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.ptr-type">ptr&#8209;type</a></span>
+				(
+					<span class="kw">null</span> |
+					<span class="rule"><a href="#rule.identifier">identifier</a></span>
+				)
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.ptr-type">ptr&#8209;type</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.array-constant">array&#8209;constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">[</span>
+				(<span class="rule"><a href="#rule.constant">constant</a></span>
+				(<span class="mono">,</span>
+				<span class="rule"><a href="#rule.constant">constant</a></span>)*
+				)?
+				<span class="mono">]</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.structure-constant">structure&#8209;constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">{</span>
+				(<span class="rule"><a href="#rule.constant">constant</a></span>
+				(<span class="mono">,</span>
+				<span class="rule"><a href="#rule.constant">constant</a></span>)*
+				)?
+				<span class="mono">}</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.string-constant">string&#8209;constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">"</span>
+				<span class="op">[^\r\n]</span>*
+				<span class="mono">"</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.string-array-constant">string&#8209;array&#8209;constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.string-array-prefix">string&#8209;array&#8209;prefix</a></span>
+				<span class="mono">[</span>
+				(<span class="rule"><a href="#rule.constant">constant</a></span>
+				(<span class="mono">,</span>
+				<span class="rule"><a href="#rule.constant">constant</a></span>)*
+				)?
+				<span class="mono">]</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.string-array-prefix">string&#8209;array&#8209;prefix</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">u</span> | <span class="mono">w</span> | <span class="mono">b</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.conversion-constant">conversion&#8209;constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				<span class="kw">conv</span>
+				<span class="mono">(</span>
+				<span class="rule"><a href="#rule.constant">constant</a></span>
+				<span class="mono">)</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.clsid-constant">clsid&#8209;constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				<span class="kw">clsid</span>
+				<span class="mono">(</span>
+				<span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>+
+				<span class="mono">)</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.symbol-constant">symbol&#8209;constant</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				<span class="rule"><a href="#rule.symbol-value">symbol&#8209;value</a></span>
+			</td>
+		</tr>
+	</table>
+	
+	<h3>Values</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.value">value</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.reg-value">reg&#8209;value</a></span> |
+				<span class="rule"><a href="#rule.symbol-value">symbol&#8209;value</a></span> | 
+				<span class="rule"><a href="#rule.literal-value">literal&#8209;value</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.reg-value">reg&#8209;value</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">$</span>
+				<span class="rule"><a href="#rule.digit">digit</a></span>+
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.symbol-value">symbol&#8209;value</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">@</span>
+				<span class="rule"><a href="#rule.identifier">identifier</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.literal-value">literal&#8209;value</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">true</span> |
+				<span class="kw">false</span> |
+				<span class="kw">null</span> |
+				<span class="rule"><a href="#rule.number">number</a></span> |
+				<span class="rule"><a href="#rule.identifier">identifier</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.ptr-value">ptr-value</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.value">value</a></span>
+			</td>
+		</tr>
+	</table>
+	
+	<h2 id="functions">Functions</h2>
+	
+	<h3 id="function-definitions">Function Definitions</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.function-definitions">function&#8209;definitions</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.function-definition">function&#8209;definition</a></span>*
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.function-definition">function&#8209;definition</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.function-header">function&#8209;header</a></span>
+				<span class="mono">{</span>
+				<span class="rule"><a href="#rule.basic-block">basic&#8209;block</a></span>*
+				<span class="mono">}</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.function-header">function&#8209;header</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">function</span>
+				<span class="rule"><a href="#rule.function-type">function&#8209;type&#8209;id</a></span>
+				<span class="kw">once</span>?
+				<span class="rule"><a href="#rule.identifier">identifier</a></span>
+				<span class="rule"><a href="#rule.metadata-ref">metadata&#8209;ref</a></span>?
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.function-type">function&#8209;type&#8209;id</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.type-id">type&#8209;id</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.basic-block">basic&#8209;block</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.label">label</a></span>
+				<span class="rule"><a href="#rule.instructions">instructions</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.label">label</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">@</span>
+				<span class="rule"><a href="#rule.digit">digit</a></span>+
+			</td>
+		</tr>
+	</table>
+	
+	<h2>Instructions</h2>
+	
+	<h3>Syntax</h3>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.instructions">instructions</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+			(
+				<span class="rule"><a href="#rule.instruction">instruction</a></span>
+				<span class="rule"><a href="#rule.metadata-ref">metadata&#8209;ref</a></span>?
+			)+
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.instruction">instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.store-instruction">store&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.arg-instruction">arg&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.jmp-instruction">jmp&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.branch-instruction">branch&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.procedure-call-instruction">procedure&#8209;call&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.ret-instruction">ret&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.switch-instruction">switch&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.no-operation-instruction">no&#8209;operation&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.value-instruction">value&#8209;instruction</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.value-instruction">value&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				<span class="rule"><a href="#rule.reg-value">reg&#8209;value</a></span>
+				<span class="mono"=</span>
+				<span class="rule"><a href="#rule.operation">operation</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.operation">operation</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.unary-instruction">unary&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.binary-instruction">binary&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.param-instruction">param&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.local-instruction">local&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.load-instruction">load&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.elemaddr-instruction">elemaddr&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.ptroffset-instruction">ptroffset&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.ptrdiff-instruction">ptrdiff&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.function-call-instruction">function&#8209;call&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.trap-instruction">trap&#8209;instruction</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.unary-instruction">unary&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.unary-inst">unary&#8209;inst</a></span>
+				<span class="rule"><a href="#rule.operand">operand</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.unary-instr">unary&#8209;inst</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.not-instruction">not&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.neg-instruction">neg&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.signextend-instruction">signextend&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.zeroextend-instruction">zeroextend&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.truncate-instruction">truncate&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.bitcast-instruction">bitcast&#8209;instruction</a></span>|
+				<span class="rule"><a href="#rule.inttofloat-instruction">inttofloat&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.floattoint-instruction">floattoint&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.inttoptr-instruction">inttoptr&#8209;instruction</a></span> |
+				<span class="rule"><a href="#rule.ptrtoint-instruction">ptrtoint&#8209;instruction</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.operand">operand</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				<span class="rule"><a href="#rule.value">value</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.binary-instruction">binary&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.binary-inst">binary&#8209;inst</a></span>
+				<span class="rule"><a href="#rule.operand">operand</a></span>
+				<span class="mono">,</span>
+				<span class="rule"><a href="#rule.operand">operand</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.binary-inst">binary&#8209;inst</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.add-instruction">add&#8209;instruction</a></span>
+				<span class="rule"><a href="#rule.sub-instruction">sub&#8209;instruction</a></span>
+				<span class="rule"><a href="#rule.mul-instruction">mul&#8209;instruction</a></span>
+				<span class="rule"><a href="#rule.div-instruction">div&#8209;instruction</a></span>
+				<span class="rule"><a href="#rule.mod-instruction">mod&#8209;instruction</a></span>
+				<span class="rule"><a href="#rule.and-instruction">and&#8209;instruction</a></span>
+				<span class="rule"><a href="#rule.or-instruction">or&#8209;instruction</a></span>
+				<span class="rule"><a href="#rule.xor-instruction">xor&#8209;instruction</a></span>
+				<span class="rule"><a href="#rule.shl-instruction">shl&#8209;instruction</a></span>
+				<span class="rule"><a href="#rule.shr-instruction">shr&#8209;instruction</a></span>
+				<span class="rule"><a href="#rule.equal-instruction">equal&#8209;instruction</a></span>
+				<span class="rule"><a href="#rule.less-instruction">less&#8209;instruction</a></span>
+			</td>
+		</tr>
+	</table>
+
+	<h3 id="instruction-list">Alphabetical List of Instructions</h3>
+	
+	<div class="toc">
+	1 <a href="#add">'add' instruction</a><br />
+	2 <a href="#and">'and' instruction</a><br />
+	3 <a href="#arg">'arg' instruction</a><br />
+	4 <a href="#bitcast">'bitcast' instruction</a><br />
+	5 <a href="#branch">'branch' instruction</a><br />
+	6 <a href="#function-call">'call' instruction (Function Call)</a><br />
+	7 <a href="#procedure-call">'call' instruction (Procedure Call)</a><br />
+	8 <a href="#div">'div' instruction</a><br />
+	9 <a href="#elemaddr">'elemaddr' instruction</a><br />
+	10 <a href="#equal">'equal' instruction</a><br />
+	11 <a href="#floattoint">'floattoint' instruction</a><br />
+	12 <a href="#inttofloat">'inttofloat' instruction</a><br />
+	13 <a href="#inttoptr">'inttoptr' instruction</a><br />
+	14 <a href="#jmp">'jmp' instruction</a><br />
+	15 <a href="#less">'less' instruction</a><br />
+	16 <a href="#load">'load' instruction</a><br />
+	17 <a href="#local">'local' instruction</a><br />
+	18 <a href="#mod">'mod' instruction</a><br />
+	19 <a href="#mul">'mul' instruction</a><br />
+	20 <a href="#neg">'neg' instruction</a><br />
+	21 <a href="#nop">'nop' instruction</a><br />
+	22 <a href="#not">'not' instruction</a><br />
+	23 <a href="#or">'or' instruction</a><br />
+	24 <a href="#param">'param' instruction</a><br />
+	25 <a href="#ptrdiff">'ptrdiff' instruction</a><br />
+	26 <a href="#ptroffset">'ptroffset' instruction</a><br />
+	27 <a href="#ptrtoint">'ptrtoint' instruction</a><br />
+	28 <a href="#ret">'ret' instruction</a><br />
+	29 <a href="#shl">'shl' instruction</a><br />
+	30 <a href="#shr">'shr' instruction</a><br />
+	31 <a href="#signextend">'signextend' instruction</a><br />
+	32 <a href="#store">'store' instruction</a><br />
+	33 <a href="#sub">'sub' instruction</a><br />
+	34 <a href="#switch">'switch' instruction</a><br />
+	35 <a href="#trap">'trap' instruction</a><br />
+	36 <a href="#truncate">'truncate' instruction</a><br />
+	37 <a href="#xor">'xor' instruction</a><br />
+	38 <a href="#zeroextend">'zeroextend' instruction</a><br />
+	</div>
+	
+	<h3 id="add">'add' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.add-instruction">add&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">add</span> 
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">add</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;left></span><span class="operator">, </span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;right></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'add' instruction adds two values.
+	</p>
+
+	<h3 id="and">'and' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.and-instruction">and&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">and</span> 
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">and</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;left></span><span class="operator">, </span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;right></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'and' instruction returns the bitwise AND of its left and right operands.
+	</p>
+	
+	<h3 id="arg">'arg' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.arg-instruction">arg&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">arg</span> 
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				<span class="rule"><a href="#rule.value">value</a></span>
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="inst">arg</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;argument></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'arg' instruction passes a function argument to a following <a href="#function-call">function call</a> or <a href="#procedure-call">procedure call</a>.
+	</p>
+
+	<h3 id="bitcast">'bitcast' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.bitcast-instruction">bitcast&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">bitcast</span> 
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">bitcast</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;operand></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+
+	<h4>Description</h4>
+	
+	<p>
+		The 'bitcast' instruction converts its operand to a target type without changing the bits of the operand.
+	</p>
+
+	<h3 id="branch">'branch' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.branch-instruction">branch&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">branch</span> 
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				<span class="rule"><a href="#rule.value">value</a></span>
+				<span class="mono">,</span>
+				<span class="rule"><a href="#rule.label">label</a></span>
+				<span class="mono">,</span>
+				<span class="rule"><a href="#rule.label">label</a></span>
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="inst">branch</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;condition></span><span class="operator">, </span>
+		<span class="label">&lt;true-target></span><span class="operator">, </span>
+		<span class="label">&lt;false-target></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'branch' instruction transfers control to the intermediate instruction that has the true-target label if condition is <strong>true</strong> and to the
+		intermedite instruction that has the false-target label if condition is <strong>false</strong>.
+	</p>
+	
+	<h3 id="function-call">'call' Instruction (Function Call)</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.function-call-instruction">function&#8209;call&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">call</span> 
+				<span class="rule"><a href="#rule.function-type-id">function&#8209;type&#8209;id</a></span>
+				<span class="rule"><a href="#rule.callee">callee</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.function-type-id">function&#8209;type&#8209;id</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.type-id">type&#8209;id</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.callee">callee</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.value">value</a></span>
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">call</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;callee></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The function call 'call' instruction calls the 'callee' function that returns a result.
+	</p>
+	
+	<h3 id="procedure-call">'call' Instruction (Procedure Call)</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.procedure-call-instruction">procedure&#8209;call&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">call</span> 
+				<span class="rule"><a href="#rule.procedure-type-id">procedure&#8209;type&#8209;id</a></span>
+				<span class="rule"><a href="#rule.callee">callee</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.procedure-type-id">procedure&#8209;type&#8209;id</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.type-id">type&#8209;id</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.callee">callee</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.value">value</a></span>
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="inst">call</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;callee></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The procedure call 'call' instruction calls the void 'callee' function.
+	</p>
+
+	<h3 id="div">'div' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.div-instruction">div&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">div</span> 
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">div</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;left></span><span class="operator">, </span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;right></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'div' instruction divides its left operand by its right operand.
+	</p>
+
+	<h3 id="elemaddr">'elemaddr' Instruction</h3>
+
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.elemaddr-instruction">elemaddr&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">elemaddr</span> 
+				<span class="rule"><a href="#rule.operand">operand</a></span>
+				<span class="mono">,</span>
+				<span class="rule"><a href="#rule.operand">operand</a></span>
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">elemaddr</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;ptr></span><span class="operator">, </span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;index></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'elemaddr' instruction returns an address of an index'th element from an aggregate pointed by ptr.
+	</p>
+
+	<h3 id="equal">'equal' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.equal-instruction">equal&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">equal</span> 
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">equal</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;left></span><span class="operator">, </span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;right></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'equal' instruction returns <strong>true</strong> if its left and right operands are equal and <strong>false</strong> otherwise.
+	</p>
+
+	<h3 id="floattoint">'floattoint' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.floattoint-instruction">floattoint&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">floattoint</span> 
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">floattoint</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;operand></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'floattoint' instruction converts its floating-point type operand to an integer type.
+	</p>
+
+	<h3 id="inttofloat">'inttofloat' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.inttofloat-instruction">inttofloat&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">inttofloat</span> 
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">inttofloat</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;operand></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'inttofloat' instruction converts its integer type operand to a floating-point type.
+	</p>
+
+	<h3 id="inttoptr">'inttoptr' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.inttoptr-instruction">inttoptr&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">inttoptr</span> 
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">inttoptr</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;operand></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'inttoptr' instruction converts its integer type operand to a pointer type.
+	</p>
+
+	<h3 id="jmp">'jmp' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.jmp-instruction">jmp&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">jmp</span> 
+				<span class="rule"><a href="#rule.label">label</a></span>
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="inst">jmp</span>
+		<span class="label">&lt;label></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'jmp' instruction transfers control to the intermediate instruction that has the given label.
+	</p>
+
+	<h3 id="less">'less' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.less-instruction">less&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">less</span> 
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">less</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;left></span><span class="operator">, </span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;right></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'less' instruction returns <strong>true</strong> if its left operand is less than its right operand and <strong>false</strong> otherwise.
+	</p>
+
+	<h3 id="load">'load' Instruction</h3>
+
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.load-instruction">load&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">load</span> 
+				<span class="rule"><a href="#rule.operand">operand</a></span>
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">load</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;from></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'load' instruction reads from memory.
+	</p>
+	
+	<h3 id="local">'local' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.local-instruction">local&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">local</span> 
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;var></span>
+		<span class="operator"> = </span>
+		<span class="inst">local</span>
+		<span class="type">&lt;type></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'local' instruction allocates space for a local variable from a function frame.
+	</p>
+
+	<h3 id="mod">'mod' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.mod-instruction">mod&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">mod</span> 
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">mod</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;left></span><span class="operator">, </span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;right></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'mod' instruction returns the remainder of the division of its left and right operands.
+	</p>
+	
+	<h3 id="mul">'mul' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.mul-instruction">mul&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">mul</span> 
+			</td>
+		</tr>
+	</table>
+
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">mul</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;left></span><span class="operator">, </span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;right></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'mul' instruction multiplies two values.
+	</p>
+
+	<h3 id="neg">'neg' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.neg-instruction">neg&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">neg</span> 
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">neg</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;operand></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'neg' instruction returns its operand subtracted from zero.
+	</p>
+
+	<h3 id="nop">'nop' Instruction</h3>
+
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.no-operation-instruction">no&#8209;operation&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">nop</span> 
+			</td>
+		</tr>
+	</table>
+
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="inst">nop</span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+
+	<h4>Description</h4>
+	
+	<p>
+		The 'nop' instruction is a no-operation.
+	</p>
+
+	<h3 id="not">'not' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.not-instruction">not&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">not</span> 
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">not</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;operand></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'not' instruction returns <strong>true</strong> if its operand is <strong>false</strong> and <strong>false</strong> if its operand is <strong>true</strong>.
+	</p>
+
+	<h3 id="or">'or' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.or-instruction">or&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">or</span> 
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">or</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;left></span><span class="operator">, </span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;right></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'or' instruction returns the bitwise OR of its left and right operands.
+	</p>
+	
+	<h3 id="param">'param' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.param-instruction">param&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">param</span>
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">param</span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'param' instruction receives a value of a function parameter of a given type.
+	</p>
+
+	<h3 id="ptrdiff">'ptrdiff' Instruction</h3>
+
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.ptrdiff-instruction">ptrdiff&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">ptrdiff</span> 
+				<span class="rule"><a href="#rule.operand">operand</a></span>
+				<span class="mono">,</span>
+				<span class="rule"><a href="#rule.operand">operand</a></span>
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">ptrdiff</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;left-ptr></span><span class="operator">, </span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;right-ptr></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'ptrdiff' instruction returns the number of elements between pointers left-ptr and right-ptr.
+	</p>
+
+	<h3 id="ptroffset">'ptroffset' Instruction</h3>
+
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.ptroffset-instruction">ptroffset&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">ptroffset</span> 
+				<span class="rule"><a href="#rule.operand">operand</a></span>
+				<span class="mono">,</span>
+				<span class="rule"><a href="#rule.operand">operand</a></span>
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">prtoffset</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;ptr></span><span class="operator">, </span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;offset></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'ptroffset' instruction returns an address of an element having given offset added to pointer ptr.
+	</p>
+
+	<h3 id="ptrtoint">'ptrtoint' Instruction</h3>
+
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.ptrtoint-instruction">ptrtoint&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">ptrtoint</span> 
+			</td>
+		</tr>
+	</table>
+
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">ptrtoint</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;operand></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'ptrtoint' instruction converts its pointer type operand to an integer type.
+	</p>
+
+	<h3 id="ret">'ret' instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.ret-instruction">ret&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">ret</span> 
+				(<span class="kw">void</span> | 
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				<span class="rule"><a href="#rule.value">value</a></span>)
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="inst">ret</span> 
+		(<span class="type">void</span> |
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;value></span>)
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+
+	<p>
+		The 'ret' instruction has two forms: The first form is used for returning control from a void function, and the second form is used for returning a value from a non-void function.
+	</p>
+
+	<h3 id="shl">'shl' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.shl-instruction">shl&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">shl</span> 
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">shl</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;left></span><span class="operator">, </span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;right></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'shl' instruction returns its left operand shifted left by the number of bit positions indicated by its right operand.
+	</p>
+
+	<h3 id="shr">'shr' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.shr-instruction">shr&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">shr</span> 
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">shr</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;left></span><span class="operator">, </span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;right></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'shr' instruction returns its left operand shifted right by the number of bit positions indicated by its right operand.
+	</p>
+
+	<h3 id="signextend">'signextend' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.signextend-instruction">signextend&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">signextend</span> 
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">signextend</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;operand></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'signextend' instruction increases the number of bits of its operand while preserving the value of its operand.
+		If the operand is non-negative the vacant most significant bit positions of the result are filled with zero bits,
+		otherwise the vacant most significant bit positions of the result are fillled with one bits.
+	</p>
+
+	<h3 id="store">'store' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.store-instruction">store&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">store</span> 
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				<span class="rule"><a href="#rule.value">value</a></span>
+				<span class="mono">,</span> 
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				<span class="rule"><a href="#rule.ptr-value">ptr&#8209;value</a></span>
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="inst">store</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;value></span><span class="operator">, </span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;ptr></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'store' instruction writes a value to the memory location indicated by ptr.
+	</p>
+	
+	<h3 id="sub">'sub' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.sub-instruction">sub&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">sub</span> 
+			</td>
+		</tr>
+	</table>
+
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">sub</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;left></span><span class="operator">, </span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;right></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<h3 id="switch">'switch' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.switch-instruction">switch&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">switch</span> 
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				<span class="rule"><a href="#rule.value">value</a></span>
+				<span class="rule"><a href="#rule.label">label</a></span>
+				<span class="mono">,</span>
+				<span class="mono">[</span>
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				<span class="rule"><a href="#rule.value">value</a></span>
+				<span class="mono">,</span>
+				<span class="rule"><a href="#rule.label">label</a></span>
+				(<span class="mono">:</span>
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				<span class="rule"><a href="#rule.value">value</a></span>
+				<span class="mono">,</span>
+				<span class="rule"><a href="#rule.label">label</a></span>)*
+				<span class="mono">]</span>
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="inst">switch</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;condition></span>
+		<span class="label">&lt;default-target></span>
+		<span class="operator">, [</span>
+		(
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;value></span><span class="operator">, </span>
+		<span class="label">&lt;case-target></span>
+		(
+		<span class="operator">:</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;value></span><span class="operator">, </span>
+		<span class="label">&lt;case-target></span>
+		)<span class="op">*</span>
+		)<span class="op">?</span>
+		<span class="operator">]</span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+
+	<h4>Description</h4>
+	
+	<p>
+		The 'switch' instruction transfers control to an instruction having a label case-target if the condition is equal to the value associated with the case-target.
+		If none of the values associated with case-targets match the condition, control is transfered to the instruction having label default-target.
+	</p>
+
+	<h3 id="trap">'trap' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.trap-instruction">trap&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">trap</span> 
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				<span class="rule"><a href="#rule.value">value</a></span>
+				<span class="mono">,</span>
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				<span class="rule"><a href="#rule.value">value</a></span>
+				<span class="mono">,</span>
+				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
+				<span class="rule"><a href="#rule.value">value</a></span>
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">trap</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;op1></span><span class="operator">, </span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;op2></span><span class="operator">, </span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;op3></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+
+	<h4>Description</h4>
+	
+	<p>
+		The 'trap' instruction calls the operating system.
+	</p>
+
+	<h3 id="truncate">'truncate' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.truncate-instruction">truncate&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">truncate</span> 
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">truncate</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;operand></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'truncate' instruction truncates its operand by throwing away the most significant bits of the operand so that it fits the type of the result.
+	</p>
+
+	<h3 id="xor">'xor' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.xor-instruction">xor&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">xor</span> 
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">xor</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;left></span><span class="operator">, </span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;right></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'xor' instruction returns the bitwise exclusive OR of its left and right operands.
+	</p>
+
+	<h3 id="zeroextend">'zeroextend' Instruction</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.zeroextend-instruction">zeroextend&#8209;instruction</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">zeroextend</span> 
+			</td>
+		</tr>
+	</table>
+	
+	<h4>Synopsis</h4>
+	
+	<span class="syntax">
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;result></span>
+		<span class="operator"> = </span>
+		<span class="inst">zeroextend</span>
+		<span class="type">&lt;type></span>
+		<span class="value">&lt;operand></span>
+		<span class="meta">&lt;meta></span><span class="op">?</span>
+	</span>
+	
+	<h4>Description</h4>
+	
+	<p>
+		The 'zeroextend' instruction increases the number of bits of its operand by adding zero bits to the vacant most significant bit positions of the result.
+	</p>
+
+	<h2 id="metadata">Metadata</h2>
+	
+	<h3>Metadata Declarations</h3>
+	
+	<h4>Syntax</h4>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.metadata-declarations">metada&#8209;declarations</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">metadata</span> 
+				<span class="mono">{</span>
+				<span class="rule"><a href="#rule.mdstruct">mdstruct</a></span>*
+				<span class="mono">}</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.mdstruct">mdstruct</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">!</span>
+				<span class="rule"><a href="#rule.digit">digit</a></span>+
+				<span class="mono">=</span>
+				<span class="mono">{</span>
+				(<span class="rule"><a href="#rule.mdfield">mdfield</a></span>
+				(<span class="mono">,</span>
+				<span class="rule"><a href="#rule.mdfield">mdfield</a></span>)*)?
+				<span class="mono">}</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.mdfield">mdfield</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.identifier">identifier</a></span>
+				<span class="mono">:</span>
+				<span class="rule"><a href="#rule.mditem">mditem</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.mditem">mditem</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.mdbool">mdbool</a></span> |
+				<span class="rule"><a href="#rule.mdlong">mdlong</a></span> |
+				<span class="rule"><a href="#rule.mdstring">mdstring</a></span> |
+				<span class="rule"><a href="#rule.metadata-ref">metadata&#8209;ref</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.mditem">mdbool</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">true</span> | <span class="kw">false</span> 
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.mdlong">mdlong</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.number">number</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.mdstring">mdstring</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.string-constant">string&#8209;constant</a></span>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>
+

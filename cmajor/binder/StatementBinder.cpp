@@ -797,6 +797,12 @@ void StatementBinder::Visit(CompoundStatementNode& compoundStatementNode)
     containerScope = prevContainerScope;
 }
 
+void StatementBinder::Visit(LabeledStatementNode& labeledStatementNode)
+{
+    labeledStatementNode.Stmt()->Accept(*this);
+    statement->SetLabel(labeledStatementNode.Label()->Label());
+}
+
 void StatementBinder::Visit(ReturnStatementNode& returnStatementNode) 
 {
     if (returnStatementNode.Expression())

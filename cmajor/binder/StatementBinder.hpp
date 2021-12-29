@@ -37,6 +37,7 @@ public:
     void Visit(MemberFunctionNode& memberFunctionNode) override;
     void Visit(ConversionFunctionNode& conversionFunctionNode) override;
     void Visit(CompoundStatementNode& compoundStatementNode) override;
+    void Visit(LabeledStatementNode& labeledStatementNode) override;
     void Visit(ReturnStatementNode& returnStatementNode) override;
     void Visit(IfStatementNode& ifStatementNode) override;
     void Visit(WhileStatementNode& whileStatementNode) override;

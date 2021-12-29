@@ -1,0 +1,171 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+
+namespace System.Text
+{
+    public class CodeFormatter
+    {
+        public nothrow CodeFormatter(StreamWriter& writer_) : 
+            writer(writer_), indent(0), indentSize(4), atBeginningOfLine(true), line(1), start(false), startText(), preserveSpace(false), pos(0)
+        {
+        }
+        public void Write(const char* text, long length)
+        {
+            if (atBeginningOfLine)
+            {
+                if (indent != 0)
+                {
+                    string s(' ', indentSize * indent);
+                    writer.Write(s.Chars(), indentSize * indent);
+                    pos = pos + indentSize * indent;
+                    atBeginningOfLine = false;
+                }
+            }
+            writer.Write(text, length);
+            pos = pos + length;
+        }
+        public void Write(const char* text)
+        {
+            Write(text, StrLen(text));
+        }
+        public void WriteLine(const char* text)
+        {
+            Write(text);
+            WriteLine();
+        }
+        public void WriteLine(const char* text, long length)
+        {
+            Write(text, length);
+            WriteLine();
+        }
+        public void Write(const string& text)
+        {
+            Write(text.Chars(), text.Length());
+        }
+        public void WriteLine(const string& text)
+        {
+            WriteLine(text.Chars(), text.Length());
+        }
+        public void WriteLine()
+        {
+            writer.WriteLine();
+            atBeginningOfLine = true;
+            ++line;
+            pos = 0;
+        }
+        public inline nothrow int Indent() const
+        {
+            return indent;
+        }
+        public inline nothrow void IncIndent()
+        {
+            ++indent;
+        }
+        public inline nothrow void DecIndent()
+        {
+            --indent;
+        }
+        public inline nothrow int IndentSize() const
+        {
+            return indentSize;
+        }
+        public inline nothrow void SetIndentSize(int indentSize_)
+        {
+            indentSize = indentSize_;
+        }
+        public inline nothrow int CurrentIndent() const
+        {
+            return indent * indentSize;
+        }
+        public inline nothrow bool AtBeginningOfLine() const
+        {
+            return atBeginningOfLine;
+        }
+        public inline nothrow int Line() const
+        {
+            return line;
+        }
+        public inline nothrow void SetLine(int line_)
+        {
+            line = line_;
+        }
+        public inline nothrow bool Start() const
+        {
+            return start;
+        }
+        public inline nothrow void SetStart(bool start_)
+        {
+            start = start_;
+        }
+        public inline nothrow const string& StartText() const
+        {
+            return startText;
+        }
+        public nothrow void SetStartText(const string& startText_)
+        {
+            startText = startText_;
+        }
+        public inline nothrow StreamWriter& Writer()
+        {
+            return writer;
+        }           
+        public nothrow inline bool PreserveSpace() const 
+        { 
+            return preserveSpace; 
+        }
+        public nothrow inline void SetPreserveSpace(bool preserveSpace_) 
+        { 
+            preserveSpace = preserveSpace_; 
+        }
+        public nothrow inline long Pos() const
+        {
+            return pos;
+        }
+        private StreamWriter& writer;
+        private int indent;
+        private int indentSize;
+        private bool atBeginningOfLine;
+        private int line;
+        private bool start;
+        private string startText;
+        private bool preserveSpace;
+        private long pos;
+    }
+
+    public CodeFormatter& operator<<(CodeFormatter& formatter, const char* s)
+    {
+        formatter.Write(s);
+        return formatter;
+    }
+
+    public CodeFormatter& operator<<(CodeFormatter& formatter, const string& s)
+    {
+        formatter.Write(s);
+        return formatter;
+    }
+
+    public CodeFormatter& operator<<(CodeFormatter& formatter, long x)
+    {
+        string s = ToString(x);
+        formatter.Write(s);
+        return formatter;
+    }
+
+    public CodeFormatter& operator<<(CodeFormatter& formatter, ulong x)
+    {
+        string s = ToString(x);
+        formatter.Write(s);
+        return formatter;
+    }
+
+    public CodeFormatter& operator<<(CodeFormatter& formatter, const Endl&)
+    {
+        formatter.WriteLine();
+        return formatter;
+    }
+}

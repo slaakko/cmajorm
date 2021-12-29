@@ -1,0 +1,64 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.Concepts;
+
+namespace System
+{
+    public class InsertProxy<C> where C is InsertionSequence
+    {
+        private typedef InsertProxy<C> Self;
+        private typedef C.Iterator Iterator;
+        private typedef C.ValueType ValueType;
+
+        public inline nothrow InsertProxy() : c(null), i()
+        {
+        }
+        public inline nothrow InsertProxy(C* c_, Iterator i_) : c(c_), i(i_)
+        {
+        }
+        public inline void operator=(const ValueType& value)
+        {
+            i = c->Insert(i, value);
+            ++i;
+        }
+        private C* c;
+        private Iterator i;
+    }
+
+    public class InsertIterator<C> where C is InsertionSequence
+    {
+        private typedef InsertIterator<C> Self;
+        private typedef InsertProxy<C> Proxy;
+        public typedef C.ValueType ValueType;
+        public typedef Proxy& ReferenceType;
+        public typedef Proxy* PointerType;
+
+        public inline nothrow InsertIterator() : proxy()
+        {
+        }
+        public inline nothrow InsertIterator(C& c, C.Iterator i) : proxy(&c, i)
+        {
+        }
+        public inline nothrow ReferenceType operator*() 
+        {
+            return proxy;
+        }
+        public inline nothrow PointerType operator->()
+        {
+            return &proxy;
+        }
+        public inline nothrow Self& operator++()
+        {
+            return *this;
+        }
+        private Proxy proxy;
+    }
+
+    public nothrow InsertIterator<C> Inserter<C, I>(C& c, I i) where C is InsertionSequence and I is C.Iterator
+    {
+        return InsertIterator<C>(c, i);
+    }
+}

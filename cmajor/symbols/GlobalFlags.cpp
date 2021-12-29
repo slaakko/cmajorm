@@ -12,6 +12,7 @@ BackEnd backend = BackEnd::llvm;
 GlobalFlags globalFlags = GlobalFlags::none;
 int optimizationLevel = -1;
 int numBuildThreads = -1;
+std::string pass;
 
 void SetBackEnd(BackEnd backend_)
 {
@@ -96,6 +97,16 @@ int GetOptimizationLevel()
 void SetOptimizationLevel(int optimizationLevel_)
 {
     optimizationLevel = optimizationLevel_;
+}
+
+std::string Pass()
+{
+    return pass;
+}
+
+void SetPass(const std::string& pass_)
+{
+    pass = pass_;
 }
 
 int GetNumBuildThreads()

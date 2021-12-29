@@ -1,0 +1,546 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.Collections;
+
+namespace System
+{
+    public typedef String<char> string;     // UTF-8 string
+    public typedef String<wchar> wstring;   // UTF-16 string
+    public typedef String<uchar> ustring;   // UTF-32 string
+
+    public nothrow const char* EmptyString(char x)
+    {
+        return "";
+    }
+    
+    public nothrow const wchar* EmptyString(wchar x)
+    {
+        return w"";
+    }
+
+    public nothrow const uchar* EmptyString(uchar x)
+    {
+        return u"";
+    }
+
+    public class String<CharT>
+    {
+        public typedef RandomAccessIter<CharT, const CharT&, const CharT*> ConstIterator;
+        public typedef RandomAccessIter<CharT, CharT&, CharT*> Iterator;
+
+        public nothrow inline String() : chars(null), len(0), res(0)
+        {
+        }
+        public nothrow inline String(const CharT* chars_) : len(StrLen(chars_)), res(0), chars(null)
+        {
+            if (len > 0)
+            {
+                Reserve(len);
+                StrCopy(chars, chars_);
+            }
+        }
+        public nothrow inline String(const CharT* chars_, long length_) : len(0), res(0), chars(null)
+        {
+            if (length_ > 0)
+            {
+                Reserve(length_);
+                len = StrCopy(chars, chars_, length_);
+            }
+        }
+        public nothrow inline String(const CharT* begin, const CharT* end) : this(begin, end - begin)
+        {
+        }
+        public nothrow String(const String<CharT>& that) : len(that.len), res(0), chars(null)
+        {
+            if (len > 0)
+            {
+                Reserve(len);
+                StrCopy(chars, that.chars);
+            }
+        }
+        public nothrow String(String<CharT>&& that) : len(that.len), res(that.res), chars(that.chars)
+        {
+            that.len = 0;
+            that.res = 0;
+            that.chars = null;
+        }
+        public nothrow inline String(CharT c) : len(1), res(0), chars(null)
+        {
+            Reserve(1);
+            chars[0] = c;
+            chars[1] = '\0';
+        }
+        public nothrow String(CharT c, long n) : len(n), res(0), chars(null)
+        {
+            Reserve(n);
+            for (long i = 0; i < n; ++i)
+            {
+                chars[i] = c;
+            }
+        }
+        public nothrow void operator=(const String<CharT>& that)
+        {
+            Deallocate();
+            Reserve(that.len);
+            len = that.len;
+            if (len > 0)
+            {
+                StrCopy(chars, that.chars);
+            }
+        }
+        public nothrow inline void operator=(String<CharT>&& that)
+        {
+            Swap(len, that.len);
+            Swap(res, that.res);
+            Swap(chars, that.chars);
+        }
+        public ~String()
+        {
+            Deallocate();
+        }
+        public nothrow inline long Length() const
+        {
+            return len;
+        }
+        public nothrow inline long Capacity() const
+        {
+            return res;
+        }
+        public nothrow inline bool IsEmpty() const
+        {
+            return len == 0;
+        }
+        public nothrow void Clear()
+        {
+            Deallocate();
+        }
+        public nothrow inline const CharT* Chars() const
+        {
+            if (chars != null)
+            {
+                return chars;
+            }
+            return EmptyString(CharT());
+        }
+        public nothrow inline CharT operator[](long index) const
+        {
+            #assert(index >= 0 && index < len);
+            return chars[index];
+        }
+        public nothrow inline CharT& operator[](long index)
+        {
+            #assert(index >= 0 && index < len);
+            return chars[index];
+        }
+        public nothrow void Reserve(long minLen)
+        {
+            if (minLen > 0)
+            {
+                long minRes = minLen + 1;
+                if (minRes > res)
+                {
+                    Grow(minRes);
+                }
+            }
+        }
+        public nothrow inline String<CharT>& Append(CharT c)
+        {
+            Reserve(len + 1);
+            chars[len] = c;
+            chars[++len] = '\0';
+            return *this;
+        }
+        public nothrow String<CharT>& Append(CharT c, long count)
+        {
+            #assert(count >= 0);
+            if (count > 0)
+            {
+                Reserve(len + count);
+                for (long i = 0; i < count; ++i)
+                {
+                    chars[len++] = c;
+                }
+                chars[len] = '\0';
+            }            
+            return *this;
+        }
+        public nothrow inline String<CharT>& Append(const CharT* that)
+        {
+            AppendFrom(that, StrLen(that));
+            return *this;
+        }
+        public nothrow inline String<CharT>& Append(const CharT* that, long count)
+        {
+            AppendFrom(that, count);
+            return *this;
+        }
+        public nothrow inline String<CharT>& Append(const String<CharT>& that)
+        {
+            AppendFrom(that.chars, that.len);
+            return *this;
+        }
+        public nothrow void Replace(CharT oldChar, CharT newChar)
+        {
+            long n = len;
+            for (long i = 0; i < n; ++i)
+            {
+                if (chars[i] == oldChar)
+                {
+                    chars[i] = newChar;
+                }
+            }
+        }
+        public nothrow String<CharT> Substring(long start) const
+        {
+            if (start >= 0 && start < len)
+            {
+                return String<CharT>(chars + start);
+            }
+            return String<CharT>();
+        }
+        public nothrow String<CharT> Substring(long start, long length) const
+        {
+            if (start >= 0 && start < len)
+            {
+                return String<CharT>(chars + start, length);
+            }
+            return String<CharT>();
+        }
+        public nothrow inline Iterator Begin()
+        {
+            return Iterator(chars);
+        }
+        public nothrow inline ConstIterator Begin() const
+        {
+            return ConstIterator(chars);
+        }
+        public nothrow inline ConstIterator CBegin() const
+        {
+            return ConstIterator(chars);
+        }
+        public nothrow inline Iterator End()
+        {
+            if (chars != null)
+            {
+                return Iterator(chars + len);
+            }
+            return Iterator(null);
+        }
+        public nothrow inline ConstIterator End() const
+        {
+            if (chars != null)
+            {
+                return ConstIterator(chars + len);
+            }
+            return ConstIterator(null);
+        }
+        public nothrow inline ConstIterator CEnd() const
+        {
+            if (chars != null)
+            {
+                return ConstIterator(chars + len);
+            }
+            return ConstIterator(null);
+        }
+        public nothrow bool StartsWith(const String<CharT>& prefix) const
+        {
+            long n = prefix.len;
+            if (len < n) return false;
+            for (long i = 0; i < n; ++i)
+            {
+                if (chars[i] != prefix[i]) return false;
+            }
+            return true;
+        }
+        public nothrow bool EndsWith(const String<CharT>& suffix) const
+        {
+            long n = len;
+            long m = suffix.len;
+            if (n < m) return false;
+            for (long i = 0; i < m; ++i)
+            {
+                if (chars[i + n - m] != suffix[i]) return false;
+            }
+            return true;
+        }
+        public List<String<CharT>> Split(CharT c)
+        {
+            List<String<CharT>> result;
+            long start = 0;
+            for (long i = 0; i < len; ++i)
+            {
+                if (chars[i] == c)
+                {
+                    result.Add(Substring(start, i - start));
+                    start = i + 1;
+                }
+            }
+            if (start < len)
+            {
+                result.Add(Substring(start));
+            }
+            return result;
+        }
+        public List<String<CharT>> Split(const String<CharT>& s)
+        {
+            List<String<CharT>> result;
+            long start = 0;
+            while (start < len)
+            {
+                long end = Find(s, start);
+                if (end != -1)
+                {
+                    result.Add(Substring(start, end));
+                    start = end + s.len;
+                }
+                else
+                {
+                    result.Add(Substring(start));
+                    start = len;
+                }
+            }
+            return result;
+        }
+        public nothrow inline long Find(CharT x) const
+        {
+            return Find(x, 0);
+        }
+        public nothrow inline long Find(CharT x, long start) const
+        {
+            #assert(start >= 0);
+            for (long i = start; i < len; ++i)
+            {
+                if (chars[i] == x)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+        public nothrow inline long RFind(CharT x) const
+        {
+            return RFind(x, len - 1);
+        }
+        public nothrow inline long RFind(CharT x, long start) const
+        {
+            #assert(start < len);
+            for (long i = start; i >= 0; --i)
+            {
+                if (chars[i] == x)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+        public nothrow inline long Find(const String<CharT>& s) const
+        {
+            return Find(s, 0);
+        }
+        public nothrow long Find(const String<CharT>& s, long start) const
+        {
+            #assert(start >= 0);
+            if (s.IsEmpty()) return start;
+            long n = s.Length();
+            CharT x = s[0];
+            long i = Find(x, start);
+            while (i != -1)
+            {
+                if (len < i + n) return -1;
+                bool found = true;
+                for (long k = 1; k < n; ++k)
+                {
+                    if (chars[i + k] != s[k])
+                    {
+                        found = false;
+                        break;
+                    }
+                }
+                if (found)
+                {
+                    return i;
+                }
+                i = Find(x, i + 1);
+            }
+            return -1;
+        }
+        public nothrow long RFind(const String<CharT>& s) const
+        {
+            return RFind(s, len - 1);
+        }
+        public nothrow long RFind(const String<CharT>& s, long start) const
+        {
+            #assert(start < len);
+            if (s.IsEmpty()) return start;
+            long n = s.Length();
+            CharT x = s[0];
+            long i = RFind(x, start);
+            while (i != -1)
+            {
+                if (len >= i + n)
+                {
+                    bool found = true;
+                    for (long k = 1; k < n; ++k)
+                    {
+                        if (chars[i + k] != s[k])
+                        {
+                            found = false;
+                            break;
+                        }
+                    }
+                    if (found)
+                    {
+                        return i;
+                    }
+                }
+                i = RFind(x, i - 1);
+            }
+            return -1;
+        }
+        private nothrow void AppendFrom(const CharT* that, long thatLen)
+        {
+            long newLen = len + thatLen;
+            if (newLen > 0)
+            {
+                Reserve(newLen);
+                newLen = len + StrCopy(chars + len, that, thatLen);
+            }
+            len = newLen;
+        }
+        private nothrow void Grow(long minRes)
+        {
+            minRes = MemGrow(minRes);
+            CharT* newChars = cast<CharT*>(MemAlloc(sizeof(CharT) * minRes));
+            if (chars != null)
+            {
+                StrCopy(newChars, chars);
+                MemFree(chars);
+            }
+            chars = newChars;
+            res = minRes;
+        }
+        private nothrow void Deallocate()
+        {
+            len = 0;
+            if (res != 0)
+            {
+                MemFree(chars);
+                res = 0;
+            }
+            chars = null;
+        }
+        private long len;
+        private long res;
+        private CharT* chars;
+    }
+
+    public nothrow bool operator==<CharT>(const String<CharT>& left, const String<CharT>& right)
+    {
+        long len = left.Length();
+        if (len != right.Length()) return false;
+        for (long i = 0; i < len; ++i)
+        {
+            if (left[i] != right[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public nothrow bool operator<<CharT>(const String<CharT>& left, const String<CharT>& right)
+    {
+        long leftLen = left.Length();
+        long rightLen = right.Length();
+        if (leftLen == 0 && rightLen > 0) return true;
+        if (leftLen > 0 && rightLen == 0) return false;
+        long n = Min(leftLen, rightLen);
+        for (long i = 0; i < n; ++i)
+        {
+            CharT l = left[i];
+            CharT r = right[i];
+            if (l < r) return true;
+            if (l > r) return false;
+        }
+        if (leftLen < rightLen) return true;
+        return false;
+    }
+
+    public nothrow String<CharT> operator+<CharT>(const String<CharT>& first, const String<CharT>& second)
+    {
+        String<CharT> temp(first);
+        temp.Append(second);
+        return temp;
+    }
+
+    public nothrow String<CharT> operator+<CharT>(const String<CharT>& first, const CharT* second)
+    {
+        String<CharT> temp(first);
+        temp.Append(second);
+        return temp;
+    }
+
+    public nothrow String<CharT> operator+<CharT>(const CharT* first, const String<CharT>& second)
+    {
+        String<CharT> temp(first);
+        temp.Append(second);
+        return temp;
+    }
+
+    public bool LastComponentsEqual<CharT>(const String<CharT>& s0, const String<CharT>& s1, CharT componentSeparator)
+    {
+        List<String<CharT>> c0 = s0.Split(componentSeparator);
+        List<String<CharT>> c1 = s1.Split(componentSeparator);
+        long n0 = c0.Count();
+        long n1 = c1.Count();
+        long n = Min(n0, n1);
+        for (long i = 0; i < n; ++i)
+        {
+            if (c0[n0 - i - 1] != c1[n1 - i - 1]) return false;
+        }
+        return true;
+    }
+    
+    public ustring ToLower(const ustring& s)
+    {
+        ustring lower;
+        for (uchar c : s)
+        {
+            lower.Append(ToLower(c));
+        }
+        return lower;
+    }
+    
+    public ustring ToUpper(const ustring& s)
+    {
+        ustring upper;
+        for (uchar c : s)
+        {
+            upper.Append(ToUpper(c));
+        }
+        return upper;
+    }
+    
+    public wstring ToLower(const wstring& s)
+    {
+        return ToUtf16(ToLower(ToUtf32(s)));
+    }
+    
+    public wstring ToUpper(const wstring& s)
+    {
+        return ToUtf16(ToUpper(ToUtf32(s)));
+    }
+    
+    public string ToLower(const string& s)
+    {
+        return ToUtf8(ToLower(ToUtf32(s)));
+    }
+    
+    public string ToUpper(const string& s)
+    {
+        return ToUtf8(ToUpper(ToUtf32(s)));
+    }
+}

@@ -1,0 +1,359 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.IO
+{
+    public class StreamWriter
+    {
+        public nothrow StreamWriter(const SharedPtr<Stream>& stream_) : this(stream_, stream_->IsHostTextFile())
+        {
+        }
+        public nothrow StreamWriter(const SharedPtr<Stream>& stream_, bool expandLineEndings_) : 
+            stream(stream_), expandLineEndings(expandLineEndings_)
+        {
+        }
+        public void Write(const char* x, long length)
+        {
+            if (expandLineEndings)
+            {
+                long start = 0;
+                for (long i = 0; i < length; ++i)
+                {
+                    if (x[i] == '\n')
+                    {
+                        if (i > start)
+                        {
+                            stream->Write(cast<byte*>(cast<void*>(x)) + start, i - start);
+                        }
+                        stream->Write(cast<byte*>(cast<void*>("\r\n")), 2);
+                        start = i + 1;
+                    }
+                }
+                if (length > start)
+                {
+                    stream->Write(cast<byte*>(cast<void*>(x)) + start, length - start);
+                }
+            }
+            else
+            {
+                stream->Write(cast<byte*>(cast<void*>(x)), length);
+            }
+        }
+        public void Write(const string& x)
+        {
+            Write(x.Chars(), x.Length());
+        }
+        public void Write(const wstring& x)
+        {
+            Write(ToUtf8(x));
+        }
+        public void Write(const ustring& x)
+        {
+            Write(ToUtf8(x));
+        }
+        public void Write(bool x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(char x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(wchar x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(uchar x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(sbyte x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(byte x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(short x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(ushort x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(int x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(uint x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(long x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(ulong x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(float x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(double x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(const Date& date)
+        {
+            Write(date.ToString());
+        }
+        public void Write(const DateTime& dateTime)
+        {            
+            Write(dateTime.ToString());
+        }
+        public void WriteLine()
+        {
+            Write("\n", 1);
+        }
+        public void WriteLine(const string& x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(const wstring& x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(const ustring& x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(bool x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(sbyte x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(byte x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(short x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(ushort x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(int x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(uint x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(long x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(ulong x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(float x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(double x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(const Date& date)
+        {
+            Write(date);
+            WriteLine();
+        }
+        public void WriteLine(const DateTime& dateTime)
+        {            
+            Write(dateTime);
+            WriteLine();
+        }
+        public nothrow const SharedPtr<Stream>& GetStream() const
+        {
+            return stream;
+        }
+        public nothrow inline bool ExpandLineEndings() const
+        {
+            return expandLineEndings;
+        }
+        public nothrow inline void SetExpandLineEndings(bool expandLineEndings_)
+        {
+            expandLineEndings = expandLineEndings_;
+        }
+        private SharedPtr<Stream> stream;
+        private bool expandLineEndings;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, const char* x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, const wchar* x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, const uchar* x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, const string& x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, const wstring& x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, const ustring& x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, bool x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, sbyte x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, byte x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, short x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, ushort x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, int x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, uint x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, long x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, ulong x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, float x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, double x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+    
+    public StreamWriter& operator<<(StreamWriter& writer, const Date& date)
+    {
+        writer.Write(date);
+        return writer;
+    }
+    
+    public StreamWriter& operator<<(StreamWriter& writer, const DateTime& dateTime)
+    {
+        writer.Write(dateTime);
+        return writer;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, char x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+    
+    public StreamWriter& operator<<(StreamWriter& writer, wchar x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+    
+    public StreamWriter& operator<<(StreamWriter& writer, uchar x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, const Endl&)
+    {
+        writer.WriteLine();
+        return writer;
+    }
+}

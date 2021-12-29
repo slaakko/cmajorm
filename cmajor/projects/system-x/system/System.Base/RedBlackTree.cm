@@ -1,0 +1,940 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Concepts;
+
+namespace System.Collections
+{
+    public class RedBlackTreeNodeBase
+    {
+        public enum Color { red, black }
+        
+        public nothrow RedBlackTreeNodeBase(RedBlackTreeNodeBase* parent_) : color(Color.black), parent(parent_), left(null), right(null)
+        {
+        }
+        public virtual ~RedBlackTreeNodeBase()
+        {
+            if (left != null && left != this)
+            {
+                delete left;
+            }
+            if (right != null && right != this)
+            {
+                delete right;
+            }
+        }
+        public inline nothrow Color GetColor() const
+        {
+            return color;
+        }
+        public inline nothrow void SetColor(Color color_)
+        {
+            color = color_;
+        }
+        public inline nothrow RedBlackTreeNodeBase* Parent() const
+        {
+            return parent;
+        }
+        public inline nothrow RedBlackTreeNodeBase*& ParentRef()
+        {
+            return parent;
+        }
+        public inline nothrow void SetParent(RedBlackTreeNodeBase* parent_)
+        {
+            parent = parent_;
+        }
+        public inline nothrow RedBlackTreeNodeBase* Left() const
+        {
+            return left;
+        }
+        public inline nothrow RedBlackTreeNodeBase*& LeftRef()
+        {
+            return left;
+        }
+        public inline nothrow void SetLeft(RedBlackTreeNodeBase* left_)
+        {
+            left = left_;
+        }
+        public inline nothrow RedBlackTreeNodeBase* Right() const
+        {
+            return right;
+        }
+        public inline nothrow RedBlackTreeNodeBase*& RightRef()
+        {
+            return right;
+        }
+        public inline nothrow void SetRight(RedBlackTreeNodeBase* right_)
+        {
+            right = right_;
+        }
+        public inline nothrow bool IsHeaderNode() const
+        {
+            return color == Color.red && parent != null && parent->parent == this;
+        }
+        public static inline nothrow RedBlackTreeNodeBase* Min(RedBlackTreeNodeBase* n)
+        {
+            #assert(n != null);
+            while (n->left != null)
+            {
+                n = n->left;
+            }
+            return n;
+        }
+        public static inline nothrow RedBlackTreeNodeBase* Max(RedBlackTreeNodeBase* n)
+        {
+            #assert(n != null);
+            while (n->right != null)
+            {
+                n = n->right;
+            }
+            return n;
+        }
+        public static inline nothrow RedBlackTreeNodeBase* Prev(RedBlackTreeNodeBase* n)
+        {
+            #assert(n != null);
+            if (n->IsHeaderNode())
+            {
+                return n->right; // rightmost
+            }
+            else if (n->left != null)
+            {
+                return Max(n->left);
+            }
+            else
+            {
+                RedBlackTreeNodeBase* u = n->parent;
+                while (n == u->left)
+                {
+                    n = u;
+                    u = u->parent;
+                }
+                return u;
+            }
+        }
+        public static inline nothrow RedBlackTreeNodeBase* Next(RedBlackTreeNodeBase* n)
+        {
+            #assert(n != null);
+            if (n->right != null)
+            {
+                return Min(n->right);
+            }
+            else 
+            {
+                RedBlackTreeNodeBase* u = n->parent;
+                while (n == u->right)
+                {
+                    n = u;
+                    u = u->parent;
+                }
+                if (n->right != u)
+                {
+                    return u;
+                }
+                return n;
+            }
+        }
+        /*
+            REBALANCE-AFTER-INSERT:
+
+                 g            g
+                /  \         /  \
+               p    u   OR  u    p
+              /                   \
+             n                     n
+
+        */
+        public static nothrow void RebalanceAfterInsert(RedBlackTreeNodeBase* n, RedBlackTreeNodeBase*& root)
+        {
+            #assert(n != null);
+            n->color = Color.red;
+            while (n != root && n->parent->color == Color.red)
+            {
+                if (n->parent == n->parent->parent->left)
+                {
+                    RedBlackTreeNodeBase* u = n->parent->parent->right;
+                    if (u != null && u->color == Color.red)
+                    {
+                        n->parent->color = Color.black;
+                        u->color = Color.black;
+                        n->parent->parent->color = Color.red;
+                        n = n->parent->parent;
+                    }
+                    else
+                    {
+                        if (n == n->parent->right)
+                        {
+                            n = n->parent;
+                            RotateLeft(n, root);
+                        }
+                        n->parent->color = Color.black;
+                        n->parent->parent->color = Color.red;
+                        RotateRight(n->parent->parent, root);
+                    }
+                }
+                else
+                {
+                    RedBlackTreeNodeBase* u = n->parent->parent->left;
+                    if (u != null && u->color == Color.red)
+                    {
+                        n->parent->color = Color.black;
+                        u->color = Color.black;
+                        n->parent->parent->color = Color.red;
+                        n = n->parent->parent;
+                    }
+                    else
+                    {
+                        if (n == n->parent->left)
+                        {
+                            n = n->parent;
+                            RotateRight(n, root);
+                        }
+                        n->parent->color = Color.black;
+                        n->parent->parent->color = Color.red;
+                        RotateLeft(n->parent->parent, root);
+                    }
+                }
+            }
+            root->color = Color.black;
+        }
+        /*
+            REBALANCE-FOR-REMOVE:
+        */
+        public static nothrow RedBlackTreeNodeBase* RebalanceForRemove(RedBlackTreeNodeBase* z, RedBlackTreeNodeBase*& root, RedBlackTreeNodeBase*& leftmost, RedBlackTreeNodeBase*& rightmost)
+        {
+            #assert(z != null);
+            RedBlackTreeNodeBase* y = z;
+            RedBlackTreeNodeBase* x = null;
+            RedBlackTreeNodeBase* p = null;
+            if (y->left == null)    // z has at most one non-null child. y == z
+            {
+                x = y->right;       // x might be null
+            }
+            else
+            {
+                if (y->right == null)   // z has exactly one non-null child. y == z
+                {
+                    x = y->left;        // x is not null
+                }
+                else                    // z has two non-null children. set y to z's successor. x might be null.
+                {
+                    y = y->right;
+                    while (y->left != null)
+                    {
+                        y = y->left;
+                    }
+                    x = y->right;
+                }
+            }
+            if (y != z)     // relink y in place of z. y is z's successor
+            {
+                z->left->parent = y;
+                y->left = z->left;
+                if (y != z->right)
+                {
+                    p = y->parent;
+                    if (x != null)
+                    {
+                        x->parent = y->parent;
+                    }
+                    y->parent->left = x;    // y must be child of left
+                    y->right = z->right;
+                    z->right->parent = y;
+                }
+                else
+                {
+                    p = y;
+                }
+                if (root == z)
+                {
+                    root = y;
+                }
+                else if (z->parent->left == z)
+                {
+                    z->parent->left = y;
+                }
+                else
+                {
+                    z->parent->right = y;
+                }
+                y->parent = z->parent;
+                Color c = y->color;
+                y->color = z->color;
+                z->color = c;
+                y = z;
+                // y now points to node to be actually deleted
+            }
+            else    // y == z
+            {
+                p = y->parent;
+                if (x != null)
+                {
+                    x->parent = y->parent;
+                }
+                if (root == z)
+                {
+                    root = x;
+                }
+                else
+                {
+                    if (z->parent->left == z)
+                    {
+                        z->parent->left = x;
+                    }
+                    else
+                    {
+                        z->parent->right = x;
+                    }
+                }
+                if (leftmost == z)
+                {
+                    if (z->right == null)   // z->left must be null also
+                    {
+                        leftmost = z->parent;
+                    }
+                    else
+                    {
+                        leftmost = Min(x);
+                    }
+                }
+                if (rightmost == z)
+                {
+                    if (z->left == null)
+                    {
+                        rightmost = z->parent;
+                    }
+                    else
+                    {
+                        rightmost = Max(x);
+                    }
+                }
+            }
+            if (y->color != Color.red)
+            {
+                while (x != root && (x == null || x->color == Color.black))
+                {
+                    if (x == p->left)
+                    {
+                        RedBlackTreeNodeBase* w = p->right;
+                        if (w->color == Color.red)
+                        {
+                            w->color = Color.black;
+                            p->color = Color.red;
+                            RotateLeft(p, root);
+                            w = p->right;
+                        }
+                        if ((w->left == null || w->left->color == Color.black) &&
+                            (w->right == null || w->right->color == Color.black))
+                        {
+                            w->color = Color.red;
+                            x = p;
+                            p = p->parent;
+                        }
+                        else
+                        {
+                            if (w->right == null || w->right->color == Color.black)
+                            {
+                                if (w->left != null)
+                                {
+                                    w->left->color = Color.black;
+                                }
+                                w->color = Color.red;
+                                RotateRight(w, root);
+                                w = p->right;
+                            }
+                            w->color = p->color;
+                            p->color = Color.black;
+                            if (w->right != null)
+                            {
+                                w->right->color = Color.black;
+                            }
+                            RotateLeft(p, root);
+                            break;
+                        }
+                    }
+                    else    // same as above, with right <-> left
+                    {
+                        RedBlackTreeNodeBase* w = p->left;
+                        if (w->color == Color.red)
+                        {
+                            w->color = Color.black;
+                            p->color = Color.red;
+                            RotateRight(p, root);
+                            w = p->left;
+                        }
+                        if ((w->right == null || w->right->color == Color.black) &&
+                            (w->left == null || w->left->color == Color.black))
+                        {
+                            w->color = Color.red;
+                            x = p;
+                            p = p->parent;
+                        }
+                        else
+                        {
+                            if (w->left == null || w->left->color == Color.black)
+                            {
+                                if (w->right != null)
+                                {
+                                    w->right->color = Color.black;
+                                }
+                                w->color = Color.red;
+                                RotateLeft(w, root);
+                                w = p->left;
+                            }
+                            w->color = p->color;
+                            p->color = Color.black;
+                            if (w->left != null)
+                            {
+                                w->left->color = Color.black;
+                            }
+                            RotateRight(p, root);
+                            break;
+                        }
+                    }
+                }
+            }
+            if (x != null)
+            {
+                x->color = Color.black;
+            }
+            return y;
+        }
+        /*  ROTATE LEFT:
+                  n              u
+                 / \            / \
+                a   u    =>    n   c
+                   / \        / \
+                  b   c      a   b
+        */
+        private static inline nothrow void RotateLeft(RedBlackTreeNodeBase* n, RedBlackTreeNodeBase*& root)
+        {
+            #assert(n != null);
+            RedBlackTreeNodeBase* u = n->right;
+            #assert(u != null);
+            n->right = u->left;
+            if (u->left != null)
+            {
+                u->left->parent = n;
+            }
+            u->parent = n->parent;
+            if (n == root)
+            {
+                root = u;
+            }
+            else if (n == n->parent->left)
+            {
+                n->parent->left = u;
+            }
+            else
+            {
+                n->parent->right = u;
+            }
+            u->left = n;
+            n->parent = u;
+        }
+        /*  ROTATE RIGHT:
+                n                u
+               / \              / \
+              u   c     =>     a   n
+             / \                  / \
+            a   b               b    c
+        */
+        private static inline nothrow void RotateRight(RedBlackTreeNodeBase* n, RedBlackTreeNodeBase*& root)
+        {
+            #assert(n != null);
+            RedBlackTreeNodeBase* u = n->left;
+            #assert(u != null);
+            n->left = u->right;
+            if (u->right != null)
+            {
+                u->right->parent = n;
+            }
+            u->parent = n->parent;
+            if (n == root)
+            {
+                root = u;
+            }
+            else if (n == n->parent->right)
+            {
+                n->parent->right = u;
+            }
+            else
+            {
+                n->parent->left = u;
+            }
+            u->right = n;
+            n->parent = u;
+        }
+        private Color color;
+        private RedBlackTreeNodeBase* parent;
+        private RedBlackTreeNodeBase* left;
+        private RedBlackTreeNodeBase* right;
+    }
+
+    public class RedBlackTreeNode<T> : RedBlackTreeNodeBase
+    {
+        public typedef T ValueType;
+
+        public RedBlackTreeNode(const ValueType& value_, RedBlackTreeNode<T>* parent_) : base(parent_), value(value_) 
+        {
+        }
+        public inline nothrow const ValueType& Value() const 
+        { 
+            return value; 
+        }
+        public inline nothrow ValueType& Value() 
+        { 
+            return value; 
+        }
+        private ValueType value;
+    }
+
+    public class RedBlackTreeNodeIterator<T, R, P>
+    {
+        public typedef T ValueType;
+        public typedef R ReferenceType;
+        public typedef P PointerType;
+        private typedef RedBlackTreeNodeIterator<ValueType, ReferenceType, PointerType> Self;
+
+        public nothrow RedBlackTreeNodeIterator() : node(null)
+        {
+        }
+        public nothrow RedBlackTreeNodeIterator(RedBlackTreeNode<ValueType>* node_) : node(node_)
+        {
+        }
+        public inline nothrow ReferenceType operator*()
+        {
+            #assert(node != null);
+            return node->Value();
+        }
+        public inline nothrow PointerType operator->()
+        {
+            #assert(node != null);
+            return &(node->Value());
+        }
+        public inline nothrow Self& operator++()
+        {
+            #assert(node != null);
+            node = cast<RedBlackTreeNode<ValueType>*>(RedBlackTreeNodeBase.Next(node));
+            return *this;
+        }
+        public inline nothrow Self& operator--()
+        {
+            #assert(node != null);
+            node = cast<RedBlackTreeNode<ValueType>*>(RedBlackTreeNodeBase.Prev(node));
+            return *this;
+        }
+        public inline nothrow RedBlackTreeNode<ValueType>* Node() const
+        {
+            return node;
+        }
+        private RedBlackTreeNode<ValueType>* node;
+    }
+
+    public inline nothrow bool operator==<T, R, P>(const RedBlackTreeNodeIterator<T, R, P>& left, const RedBlackTreeNodeIterator<T, R, P>& right)
+    {
+        return left.Node() == right.Node();
+    }
+
+    public class RedBlackTree<KeyType, ValueType, KeyOfValue, Compare>
+        where KeyType is Semiregular and ValueType is Semiregular and KeySelectionFunction<KeyOfValue, KeyType, ValueType> and Compare is Relation and Compare.Domain is KeyType
+    {
+        public typedef RedBlackTreeNodeIterator<ValueType, const ValueType&, const ValueType*> ConstIterator;
+        public typedef RedBlackTreeNodeIterator<ValueType, ValueType&, ValueType*> Iterator;
+        private typedef RedBlackTree<KeyType, ValueType, KeyOfValue, Compare> Self;
+
+        public RedBlackTree() : header(), count(0), keyOf(), comp()
+        {
+            Init(); 
+        }
+        public RedBlackTree(const Self& that) : header(), count(0), keyOf(), comp()
+            where ValueType is Copyable
+        {
+            Init();
+            CopyFrom(that);
+        }
+        public nothrow RedBlackTree(Self&& that) : header(Rvalue(that.header)), count(that.count), keyOf(that.keyOf), comp(that.comp)
+            where ValueType is Movable
+        {
+            that.count = 0;
+        }
+        public void operator=(const Self& that) 
+            where ValueType is Copyable
+        {
+            Clear();
+            Init();
+            CopyFrom(that);
+        }
+        public nothrow void operator=(Self&& that) 
+            where ValueType is Movable
+        {
+            Swap(header, that.header);
+            Swap(count, that.count);
+            Swap(keyOf, that.keyOf);
+            Swap(comp, that.comp);
+        }
+        public ~RedBlackTree()
+        {
+            Clear();
+        }
+        public inline nothrow ConstIterator Begin() const
+        {
+            if (header.IsNull())
+            {
+                return CEnd();
+            }
+            else
+            {
+                return ConstIterator(Leftmost());
+            }            
+        }
+        public inline nothrow Iterator Begin()
+        {
+            if (header.IsNull())
+            {
+                return End();
+            }
+            else
+            {
+                return Iterator(Leftmost());
+            }            
+        }
+        public inline nothrow ConstIterator CBegin() const
+        {
+            if (header.IsNull())
+            {
+                return CEnd();
+            }
+            else
+            {
+                return ConstIterator(Leftmost());
+            }            
+        }
+        public inline nothrow ConstIterator End() const
+        {
+            return ConstIterator(header.Get());
+        }
+        public inline nothrow Iterator End()
+        {
+            return Iterator(header.Get());
+        }
+        public inline nothrow ConstIterator CEnd() const
+        {
+            return ConstIterator(header.Get());
+        }
+        public inline nothrow long Count() const
+        {
+            #assert(count >= 0);
+            return count;
+        }
+        public inline nothrow bool IsEmpty() const
+        {
+            #assert(count >= 0);
+            return count == 0;
+        }
+        public nothrow void Clear()
+        {
+            if (header.IsNull())
+            {
+                return;        
+            }
+            RedBlackTreeNode<ValueType>* root = Root();
+            if (root != null)
+            {
+                delete root;
+                SetRoot(null);
+            }
+            SetLeftmost(header.Get());
+            SetRightmost(header.Get());
+            count = 0;
+        }
+        public nothrow Iterator Find(const KeyType& key)
+        {
+            if (IsEmpty())
+            {
+                return End();
+            }
+            RedBlackTreeNode<ValueType>* x = Root();
+            while (x != null)
+            {
+                if (Comp(key, KeyOf(x->Value())))
+                {
+                    x = cast<RedBlackTreeNode<ValueType>*>(x->Left());
+                }
+                else if (Comp(KeyOf(x->Value()), key))
+                {
+                    x = cast<RedBlackTreeNode<ValueType>*>(x->Right());
+                }
+                else
+                {
+                    return Iterator(x);
+                }
+            }
+            return End();
+        }
+        public nothrow ConstIterator Find(const KeyType& key) const
+        {
+            if (IsEmpty())
+            {                
+                return CEnd();
+            }
+            RedBlackTreeNode<ValueType>* x = Root();
+            while (x != null)
+            {
+                if (Comp(key, KeyOf(x->Value())))
+                {
+                    x = cast<RedBlackTreeNode<ValueType>*>(x->Left());
+                }
+                else if (Comp(KeyOf(x->Value()), key))
+                {
+                    x = cast<RedBlackTreeNode<ValueType>*>(x->Right());
+                }
+                else
+                {
+                    return ConstIterator(x);
+                }
+            }
+            return CEnd();
+        }
+        public nothrow ConstIterator CFind(const KeyType& key) const
+        {
+            if (IsEmpty())
+            {
+                return CEnd();
+            }
+            RedBlackTreeNode<ValueType>* x = Root();
+            while (x != null)
+            {
+                if (Comp(key, KeyOf(x->Value())))
+                {
+                    x = cast<RedBlackTreeNode<ValueType>*>(x->Left());
+                }
+                else if (Comp(KeyOf(x->Value()), key))
+                {
+                    x = cast<RedBlackTreeNode<ValueType>*>(x->Right());
+                }
+                else
+                {
+                    return ConstIterator(x);
+                }
+            }
+            return CEnd();
+        }
+        public Pair<Iterator, bool> Insert(const ValueType& value) 
+            where ValueType is Copyable
+        {
+            if (header.IsNull())
+            {
+                Init();
+            }
+            RedBlackTreeNode<ValueType>* x = Root();
+            RedBlackTreeNode<ValueType>* p = header.Get();
+            bool comp = true;
+            while (x != null)
+            {
+                p = x;
+                comp = Comp(KeyOf(value), KeyOf(x->Value()));
+                if (comp)
+                {
+                    x = cast<RedBlackTreeNode<ValueType>*>(x->Left());
+                }
+                else 
+                {
+                    x = cast<RedBlackTreeNode<ValueType>*>(x->Right());
+                }
+            }
+            Iterator j = p;
+            if (comp)
+            {
+                if (j == Begin())
+                {
+                    return MakePair(Insert(x, p, value), true);
+                }
+                else
+                {
+                    --j;
+                }
+            }
+            if (Comp(KeyOf(j.Node()->Value()), KeyOf(value)))
+            {
+                return MakePair(Insert(x, p, value), true);
+            }
+            return MakePair(j, false);
+        }
+        private Iterator Insert(RedBlackTreeNode<ValueType>* x, RedBlackTreeNode<ValueType>* p, const ValueType& value) 
+            where ValueType is Copyable
+        {
+            if (header.IsNull())
+            {
+                Init();
+            }
+            RedBlackTreeNode<ValueType>* n = new RedBlackTreeNode<ValueType>(value, p);
+            if (p == header.Get() || x != null || Comp(KeyOf(value), KeyOf(p->Value())))
+            {
+                p->SetLeft(n);
+                if (p == header.Get())
+                {
+                    SetRoot(n);
+                    SetRightmost(n);
+                }
+                else if (p == Leftmost())
+                {
+                    SetLeftmost(n);
+                }
+            }
+            else
+            {
+                p->SetRight(n);
+                if (p == Rightmost())
+                {
+                    SetRightmost(n);
+                }
+            }
+            RedBlackTreeNodeBase.RebalanceAfterInsert(n, RootRef());
+            ++count;
+            return Iterator(n);
+        }
+        public nothrow bool Remove(const KeyType& key)
+        {
+            if (IsEmpty())
+            {
+                return false;
+            }
+            RedBlackTreeNode<ValueType>* n = Root();
+            while (n != null)
+            {
+                if (Comp(key, KeyOf(n->Value())))
+                {
+                    n = cast<RedBlackTreeNode<ValueType>*>(n->Left());
+                }
+                else if (Comp(KeyOf(n->Value()), key))
+                {
+                    n = cast<RedBlackTreeNode<ValueType>*>(n->Right());
+                }
+                else
+                {
+                    break;
+                }
+            }
+            if (n != null)
+            {
+                if (count == 1)
+                {
+                    Clear();
+                }
+                else
+                {
+                    Remove(Iterator(n));
+                }
+                return true;
+            }
+            return false;
+        }
+        public nothrow void Remove(Iterator pos)
+        {
+            RedBlackTreeNode<ValueType>* toRemove = cast<RedBlackTreeNode<ValueType>*>(RedBlackTreeNodeBase.RebalanceForRemove(pos.Node(), RootRef(), LeftmostRef(), RightmostRef()));
+            toRemove->SetLeft(null);
+            toRemove->SetRight(null);
+            delete toRemove;
+            --count;
+        }
+        private void Init()
+        {
+            header.Reset(new RedBlackTreeNode<ValueType>(ValueType(), null));
+            header->SetColor(RedBlackTreeNodeBase.Color.red);
+            SetLeftmost(header.Get());
+            SetRightmost(header.Get());
+        }
+        private void CopyFrom(const Self& that) 
+            where ValueType is Copyable
+        {
+            if (that.Root() != null)
+            {
+                SetRoot(Copy(that.Root(), header.Get()));
+                SetLeftmost(cast<RedBlackTreeNode<ValueType>*>(RedBlackTreeNodeBase.Min(Root())));
+                SetRightmost(cast<RedBlackTreeNode<ValueType>*>(RedBlackTreeNodeBase.Max(Root())));
+                count = that.Count();
+            }
+        }
+        private RedBlackTreeNode<ValueType>* Copy(RedBlackTreeNode<ValueType>* x, RedBlackTreeNode<ValueType>* p)
+        {
+            #assert(x != null && p != null);
+            RedBlackTreeNode<ValueType>* top = CloneNode(x, p);
+            if (x->Right() != null)
+            {
+                top->SetRight(Copy(cast<RedBlackTreeNode<ValueType>*>(x->Right()), top));
+            }
+            p = top;
+            x = cast<RedBlackTreeNode<ValueType>*>(x->Left());
+            while (x != null)
+            {
+                RedBlackTreeNode<ValueType>* y = CloneNode(x, p);
+                p->SetLeft(y);
+                if (x->Right() != null)
+                {
+                    y->SetRight(Copy(cast<RedBlackTreeNode<ValueType>*>(x->Right()), y));
+                }
+                p = y;
+                x = cast<RedBlackTreeNode<ValueType>*>(x->Left());
+            }
+            return top;
+        }
+        private RedBlackTreeNode<ValueType>* CloneNode(RedBlackTreeNode<ValueType>* x, RedBlackTreeNode<ValueType>* p) const
+        {
+            #assert(x != null && p != null);
+            RedBlackTreeNode<ValueType>* clone = new RedBlackTreeNode<ValueType>(x->Value(), p);
+            clone->SetColor(x->GetColor());
+            return clone;
+        }
+        private inline nothrow const KeyType& KeyOf(const ValueType& value) const
+        {
+            return keyOf(value);
+        }
+        private inline nothrow bool Comp(const KeyType& left, const KeyType& right) const
+        {
+            return comp(left, right);
+        }
+        private inline nothrow RedBlackTreeNode<ValueType>* Root()
+        {
+            return cast<RedBlackTreeNode<ValueType>*>(header->Parent());
+        }
+        private inline nothrow RedBlackTreeNodeBase*& RootRef()
+        {
+            return header->ParentRef();
+        }
+        private inline nothrow void SetRoot(RedBlackTreeNode<ValueType>* root)
+        {
+            header->SetParent(root);
+        }
+        private inline nothrow RedBlackTreeNode<ValueType>* Leftmost()
+        {
+            return cast<RedBlackTreeNode<ValueType>*>(header->Left());
+        }
+        private inline nothrow RedBlackTreeNodeBase*& LeftmostRef()
+        {
+            return header->LeftRef();
+        }
+        private inline nothrow void SetLeftmost(RedBlackTreeNode<ValueType>* lm)
+        {
+            header->SetLeft(lm);
+        }
+        private inline nothrow RedBlackTreeNode<ValueType>* Rightmost()
+        {
+            return cast<RedBlackTreeNode<ValueType>*>(header->Right());
+        }
+        private inline nothrow RedBlackTreeNodeBase*& RightmostRef()
+        {
+            return header->RightRef();
+        }
+        private inline nothrow void SetRightmost(RedBlackTreeNode<ValueType>* rm)
+        {
+            header->SetRight(rm);
+        }
+        private UniquePtr<RedBlackTreeNode<ValueType>> header;
+        private long count;
+        private KeyOfValue keyOf;
+        private Compare comp;
+    }
+}

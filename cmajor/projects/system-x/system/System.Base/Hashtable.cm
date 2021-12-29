@@ -1,0 +1,527 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Concepts;
+
+namespace System.Collections
+{
+    public const long[] hashtablePrimes = 
+    [   
+        53, 97, 193, 389, 769, 1543, 3079, 6151,
+        12289, 24593, 49157, 98317, 196613, 393241, 786433, 1572869,
+        3145739, 6291469, 12582917, 25165843, 50331653, 100663319, 201326611, 402653189,
+        805306457, 1610612741
+    ];
+    
+    public constexpr inline nothrow long GetNextHashtablePrime(long n)
+    {
+        const long* p = LowerBound(hashtablePrimes.CBegin(), hashtablePrimes.CEnd(), n);
+        if (p < hashtablePrimes.CEnd())
+        {
+            return *p;
+        }
+        return hashtablePrimes[hashtablePrimes.Length() - 1];
+    } 
+    
+    public inline nothrow ulong GetHashCode(long x)
+    {
+        return cast<ulong>(x);
+    }
+    
+    public inline nothrow ulong GetHashCode(ulong x)
+    {
+        return x;
+    }
+    
+    public inline nothrow ulong GetHashCode(char x)
+    {
+        return cast<ulong>(x);
+    }
+    
+    public inline nothrow ulong GetHashCode(wchar x)
+    {
+        return cast<ulong>(x);
+    }
+    
+    public inline nothrow ulong GetHashCode(uchar x)
+    {
+        return cast<ulong>(x);
+    }
+    
+    public inline nothrow ulong GetHashCode(void* x)
+    {
+        return cast<ulong>(x);
+    }
+    
+    public inline nothrow ulong GetHashCode(const string& s)
+    {
+        ulong hashCode = 14695981039346656037u;
+        for (char c : s)
+        {
+            hashCode = hashCode ^ cast<ulong>(c);
+            hashCode = hashCode * 1099511628211u;
+        }
+        return hashCode;
+    }
+    
+    public inline nothrow ulong GetHashCode(const wstring& s)
+    {
+        ulong hashCode = 14695981039346656037u;
+        for (wchar c : s)
+        {
+            hashCode = hashCode ^ cast<ulong>(c);
+            hashCode = hashCode * 1099511628211u;
+        }
+        return hashCode;
+    }
+
+    public inline nothrow ulong GetHashCode(const ustring& s)
+    {
+        ulong hashCode = 14695981039346656037u;
+        for (uchar c : s)
+        {
+            hashCode = hashCode ^ cast<ulong>(c);
+            hashCode = hashCode * 1099511628211u;
+        }
+        return hashCode;
+    }
+    
+    public inline nothrow ulong GetHashCode(const Uuid& uuid)
+    {
+        ulong hashCode = 14695981039346656037u;
+        for (byte b : uuid)
+        {
+            hashCode = hashCode ^ cast<ulong>(b);
+            hashCode = hashCode * 1099511628211u;
+        }
+        return hashCode;
+    }
+
+    public class Hasher<T> : UnaryFun<T, ulong>
+    {
+        public inline nothrow ulong operator()(const T& x)
+        {
+            return GetHashCode(x);
+        }
+    }
+
+    public class Bucket<T> where T is Semiregular
+    {
+        public typedef T ValueType;
+        
+        public Bucket(const ValueType& value_, Bucket<ValueType>* next_) : value(value_), next(next_)
+        {
+        }
+        public inline nothrow const ValueType& Value() const 
+        {
+            return value;
+        }
+        public inline nothrow ValueType& Value()
+        {
+            return value;
+        }
+        public inline nothrow Bucket<ValueType>* Next() const
+        {
+            return next;
+        }
+        public inline nothrow void SetNext(Bucket<ValueType>* next_)
+        {
+            next = next_;
+        }
+        private ValueType value;
+        private Bucket<ValueType>* next;
+    }
+
+    public class HashtableIterator<T, R, P, H>
+    {
+        public typedef T ValueType;
+        public typedef R ReferenceType;
+        public typedef P PointerType;
+        public typedef H HashtableType;
+        private typedef HashtableIterator<ValueType, ReferenceType, PointerType, HashtableType> Self;
+
+        public inline nothrow HashtableIterator() : table(null), bucket(null)
+        {
+        }
+        public inline nothrow HashtableIterator(HashtableType* table_, Bucket<ValueType>* bucket_) : table(table_), bucket(bucket_)
+        {
+        }
+        public inline nothrow ReferenceType operator*()
+        {
+            #assert(bucket != null);
+            return bucket->Value();
+        }
+        public inline nothrow PointerType operator->()
+        {
+            #assert(bucket != null);
+            return &(bucket->Value());
+        }
+        public inline nothrow Self& operator++()
+        {
+            #assert(bucket != null && table != null);
+            Bucket<ValueType>* old = bucket;
+            bucket = bucket->Next();
+            if (bucket == null)
+            {
+                long index = table->GetBucketIndex(old->Value());
+                #assert(index != -1);
+                ++index;
+                long n = table->GetBucketCount();
+                while (bucket == null && index < n)
+                {
+                    bucket = table->GetBucket(index);
+                    ++index;
+                }
+            }
+            return *this;
+        }
+        public inline nothrow Bucket<ValueType>* GetBucket() const
+        {
+            return bucket;
+        }
+        private HashtableType* table;
+        private Bucket<ValueType>* bucket;
+    }
+
+    public nothrow bool operator==<T, R, P, H>(const HashtableIterator<T, R, P, H>& left, const HashtableIterator<T, R, P, H>& right)
+    {
+        return left.GetBucket() == right.GetBucket();
+    }
+
+    public class Hashtable<KeyType, ValueType, KeyOfValue, HashFun = Hasher<KeyType>, Compare = EqualTo<KeyType>>
+        where KeyType is Semiregular and 
+            ValueType is Semiregular and 
+            KeySelectionFunction<KeyOfValue, KeyType, ValueType> and 
+            HashFunction<HashFun, KeyType> and 
+            Compare is Relation and 
+            Compare.Domain is KeyType
+    {
+        private typedef Hashtable<KeyType, ValueType, KeyOfValue, HashFun, Compare> Self;
+        public typedef HashtableIterator<ValueType, ValueType&, ValueType*, Self> Iterator;
+        public typedef HashtableIterator<ValueType, const ValueType&, const ValueType*, Self> ConstIterator;
+
+        public nothrow Hashtable() : buckets(), count(0), loadFactor(0.0), maxLoadFactor(0.8), keyOf(), hash(), equal()
+        {
+        }
+        public Hashtable(const Self& that) : buckets(), count(0), loadFactor(that.loadFactor), maxLoadFactor(that.maxLoadFactor), keyOf(that.keyOf), hash(that.hash), equal(that.equal)
+        {
+            CopyFrom(that);
+        }
+        public nothrow Hashtable(Self&& that) : 
+            buckets(Rvalue(that.buckets)), count(that.count), loadFactor(that.loadFactor), maxLoadFactor(that.maxLoadFactor), keyOf(that.keyOf), hash(that.hash), equal(that.equal)
+        {
+            that.count = 0;
+        }
+        public void operator=(const Self& that)
+        {
+            Clear();
+            CopyFrom(that);
+        }
+        public nothrow void operator=(Self&& that)
+        {
+            Swap(buckets, that.buckets);
+            Swap(count, that.count);
+            Swap(loadFactor, that.loadFactor);
+            Swap(maxLoadFactor, that.maxLoadFactor);
+            Swap(keyOf, that.keyOf);
+            Swap(hash, that.hash);
+            Swap(equal, that.equal);
+        }
+        public ~Hashtable()
+        {
+            Clear();
+        }
+        public inline nothrow long Count() const
+        {
+            return count;
+        }
+        public inline nothrow bool IsEmpty() const
+        {
+            return count == 0;
+        }
+        public nothrow void Clear()
+        {
+            long n = buckets.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                Bucket<ValueType>* bucket = buckets[i];
+                while (bucket != null)
+                {
+                    Bucket<ValueType>* next = bucket->Next();
+                    delete bucket;
+                    bucket = next;
+                }
+                buckets[i] = null;
+            }
+            count = 0;
+        }
+        public inline nothrow Iterator Begin()
+        {
+            return Iterator(this, GetFirstBucket());
+        }
+        public inline nothrow ConstIterator Begin() const
+        {
+            return ConstIterator(this, GetFirstBucket());
+        }
+        public inline nothrow ConstIterator CBegin() const
+        {
+            return ConstIterator(this, GetFirstBucket());
+        }
+        public inline nothrow Iterator End()
+        {
+            return Iterator(this, null);
+        }
+        public inline nothrow ConstIterator End() const
+        {
+            return ConstIterator(this, null);
+        }
+        public inline nothrow ConstIterator CEnd() const
+        {
+            return ConstIterator(this, null);
+        }
+        public inline nothrow void SetMaxLoadFactor(double maxLoadFactor_)
+        {
+            maxLoadFactor = maxLoadFactor_;
+        }
+        public Pair<Iterator, bool> Insert(const ValueType& value)
+        {
+            if (buckets.Count() == 0)
+            {
+                buckets.Resize(GetNextHashtablePrime(0));
+            }
+            const KeyType& key = KeyOf(value);
+            long index = Hash(key);
+            #assert(index != -1);
+            Bucket<ValueType>* bucket = buckets[index];
+            while (bucket != null)
+            {
+                if (KeysEqual(KeyOf(bucket->Value()), key))
+                {
+                    return MakePair(Iterator(this, bucket), false);
+                }
+                bucket = bucket->Next();
+            }
+            bucket = new Bucket<ValueType>(value, buckets[index]);
+            buckets[index] = bucket;
+            ++count;
+            SetLoadFactor();
+            CheckForRehash();
+            return MakePair(Iterator(this, bucket), true);
+        }
+        public nothrow void Remove(const KeyType& key) 
+        {
+            long index = Hash(key);
+            if (index == -1) return;
+            Bucket<ValueType>* bucket = buckets[index];
+            Bucket<ValueType>* prev = null;
+            while (bucket != null)
+            {
+                if (KeysEqual(KeyOf(bucket->Value()), key))
+                {
+                    if (prev != null)
+                    {
+                        prev->SetNext(bucket->Next());
+                    }
+                    else
+                    {
+                        buckets[index] = bucket->Next();
+                    }
+                    delete bucket;
+                    --count;
+                    SetLoadFactor();
+                    return;
+                }
+                prev = bucket;
+                bucket = bucket->Next();
+            }
+        }
+        public nothrow void Remove(Iterator pos)
+        {
+            Bucket<ValueType>* bucket = pos.GetBucket();
+            if (bucket != null)
+            {
+                long index = Hash(KeyOf(bucket->Value()));
+                if (index == -1) return;
+                Bucket<ValueType>* b = buckets[index];
+                Bucket<ValueType>* prev = null;
+                while (b != bucket && b != null)
+                {
+                    prev = b;
+                    b = b->Next();
+                }
+                if (b == bucket)
+                {
+                    if (prev != null)
+                    {
+                        prev->SetNext(b->Next());
+                    }
+                    else
+                    {
+                        buckets[index] = b->Next();
+                    }
+                    delete bucket;
+                    --count;
+                    SetLoadFactor();
+                }
+            }
+        }
+        public nothrow Iterator Find(const KeyType& key) 
+        {
+            long index = Hash(key);
+            if (index >= 0)
+            {
+                Bucket<ValueType>* bucket = buckets[index];
+                while (bucket != null)
+                {
+                    if (KeysEqual(KeyOf(bucket->Value()), key))
+                    {
+                        return Iterator (this, bucket);
+                    }
+                    bucket = bucket->Next();
+                }
+            }            
+            return Iterator(this, null);
+        }
+        public nothrow ConstIterator Find(const KeyType& key) const
+        {
+            long index = Hash(key);
+            if (index >= 0)
+            {
+                Bucket<ValueType>* bucket = buckets[index];
+                while (bucket != null)
+                {
+                    if (KeysEqual(KeyOf(bucket->Value()), key))
+                    {
+                        return ConstIterator(this, bucket);
+                    }
+                    bucket = bucket->Next();
+                }
+            }            
+            return ConstIterator(this, null);
+        }
+        public nothrow ConstIterator CFind(const KeyType& key) const
+        {
+            long index = Hash(key);
+            if (index >= 0)
+            {
+                Bucket<ValueType>* bucket = buckets[index];
+                while (bucket != null)
+                {
+                    if (KeysEqual(KeyOf(bucket->Value()), key))
+                    {
+                        return ConstIterator(this, bucket);
+                    }
+                    bucket = bucket->Next();
+                }
+            }            
+            return ConstIterator(this, null);
+        }
+        public inline nothrow long GetBucketCount() const
+        {
+            return buckets.Count();
+        }
+        public inline nothrow long GetBucketIndex(const ValueType& value) const
+        {
+            return Hash(KeyOf(value));
+        }
+        public inline nothrow Bucket<ValueType>* GetBucket(long index) const
+        {
+            return buckets[index];
+        }
+        private inline nothrow void SetLoadFactor()
+        {
+            long bc = buckets.Count();
+            if (bc == 0)
+            {
+                loadFactor = 1.0;
+            }
+            else
+            {
+                double c = count;
+                loadFactor = c / bc;
+            }
+        }
+        private inline void CheckForRehash()
+        {
+            if (loadFactor > maxLoadFactor)
+            {
+                Rehash();
+            }
+        }
+        private void Rehash()
+        {
+            List<Bucket<ValueType>*> b;
+            Swap(buckets, b);
+            long n = b.Count();
+            buckets.Resize(GetNextHashtablePrime(n + 1));
+            for (long i = 0; i < n; ++i)
+            {
+                Bucket<ValueType>* bucket = b[i];
+                while (bucket != null)
+                {
+                    const KeyType& key = KeyOf(bucket->Value());
+                    long index = Hash(key);
+                    #assert(index != -1);
+                    Bucket<ValueType>* next = bucket->Next();
+                    bucket->SetNext(buckets[index]);
+                    buckets[index] = bucket;
+                    bucket = next;
+                }
+            }
+        }
+        private nothrow Bucket<ValueType>* GetFirstBucket() const
+        {
+            Bucket<ValueType>* bucket = null;
+            long n = buckets.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                bucket = buckets[i];
+                if (bucket != null)
+                {
+                    break;
+                }
+            }
+            return bucket;
+        }
+        private void CopyFrom(const Self& that)
+        {
+            long n = that.buckets.Count();
+            buckets.Resize(n);
+            for (long i = 0; i < n; ++i)
+            {
+                Bucket<ValueType>* bucket = that.buckets[i];
+                while (bucket != null)
+                {
+                    buckets[i] = new Bucket<ValueType>(bucket->Value(), buckets[i]);
+                    bucket = bucket->Next();
+                }
+            }
+            count = that.count;
+            loadFactor = that.loadFactor;
+            maxLoadFactor = that.maxLoadFactor;
+        }
+        private inline nothrow const KeyType& KeyOf(const ValueType& value) const
+        {
+            return keyOf(value);
+        }
+        private inline nothrow long Hash(const KeyType& key) const
+        {
+            if (buckets.IsEmpty()) return -1;
+            return cast<long>(hash(key) % cast<ulong>(buckets.Count()));
+        }
+        private inline nothrow bool KeysEqual(const KeyType& left, const KeyType& right) const
+        {
+            return equal(left, right);
+        }
+        private List<Bucket<ValueType>*> buckets;
+        private long count;
+        private double loadFactor;
+        private double maxLoadFactor;
+        private KeyOfValue keyOf;
+        private HashFun hash;
+        private Compare equal;
+    }
+}

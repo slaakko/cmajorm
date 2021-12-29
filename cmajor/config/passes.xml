@@ -1,0 +1,55 @@
+<passes>
+	<pass name="compute-succ-pred" kind="function">
+	</pass>
+	<pass name="simplify-cfg" kind="function">
+		<require pass="compute-succ-pred"/>
+	</pass>
+	<pass name="entry-exit" kind="function">
+		<require pass="simplify-cfg"/>
+	</pass>
+	<pass name="write-cfg" kind="function">
+		<require pass="entry-exit"/>
+	</pass>
+	<pass name="dominator-tree" kind="function">
+		<require pass="entry-exit"/>
+	</pass>
+	<pass name="mem2reg" kind="function">
+		<require pass="dominator-tree"/>
+	</pass>
+	<pass name="write-dominator-tree" kind="function">
+		<require pass="dominator-tree"/>
+	</pass>
+	<pass name="write" kind="module">
+		<require pass="mem2reg"/>
+	</pass>
+	<pass name="simple-assembly-code-gen" kind="module">
+	</pass>
+	<pass name="opt-0" kind="composite">
+		<require pass="simple-assembly-code-gen"/>
+	</pass>
+	<pass name="opt-1" kind="composite">
+		<require pass="simplify-cfg"/>
+		<require pass="entry-exit"/>
+		<require pass="dominator-tree"/>
+	</pass>
+	<pass name="opt-2" kind="composite">
+		<require pass="simplify-cfg"/>
+		<require pass="entry-exit"/>
+		<require pass="dominator-tree"/>
+	</pass>
+	<pass name="opt-3" kind="composite">
+		<require pass="simplify-cfg"/>
+		<require pass="entry-exit"/>
+		<require pass="dominator-tree"/>
+	</pass>
+	<pass name="test-dt" kind="composite">
+		<require pass="write-cfg"/>
+		<require pass="dominator-tree"/>
+		<require pass="write-dominator-tree"/>
+		<require pass="write"/>
+	</pass>
+	<pass name="test-mem2reg" kind="composite">
+		<require pass="mem2reg"/>
+		<require pass="write"/>
+	</pass>
+</passes>

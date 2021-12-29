@@ -1,0 +1,340 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Concepts;
+
+namespace System.Collections
+{
+    public class List<T> where T is Semiregular
+    {
+        public typedef T ValueType;
+        private typedef List<ValueType> Self;
+        public typedef RandomAccessIter<ValueType, const ValueType&, const ValueType*> ConstIterator;
+        public typedef RandomAccessIter<ValueType, ValueType&, ValueType*> Iterator;
+
+        public nothrow List() : items(null), count(0), res(0)
+        {
+        }
+        public List(const Self& that) : items(null), count(that.count), res(0) where T is Copyable
+        {
+            if (count > 0)
+            {
+                Reserve(count);
+                ConstructiveCopy(items, that.items, count);
+            }
+        }
+        public nothrow List(Self&& that) : items(that.items), count(that.count), res(that.res) where T is Movable
+        {
+            that.items = null;
+            that.count = 0;
+            that.res = 0;
+        }
+        public List(long n, const ValueType& value) : items(null), count(0), res(0) where T is Copyable
+        {
+            #assert(n >= 0);
+            count = n;
+            Reserve(count);
+            for (long i = 0; i < n; ++i)
+            {
+                construct<ValueType>(items + i, value);
+            }
+        }
+        public void operator=(const Self& that) where T is Copyable
+        {
+            Destroy();
+            count = that.count;
+            Reserve(count);
+            ConstructiveCopy(items, that.items, count);
+        }
+        public nothrow void operator=(Self&& that) where T is Movable
+        {
+            Swap(items, that.items);
+            Swap(count, that.count);
+            Swap(res, that.res);
+        }
+        public ~List()
+        {
+            Destroy();
+        }
+        public void Reserve(long minRes)
+        {
+            if (minRes > res)
+            {
+                Grow(minRes);
+            }
+        }
+        public void Resize(long newCount) where T is Movable
+        {
+            #assert(newCount >= 0);
+            if (newCount != count)
+            {
+                if (newCount < count)
+                {
+                    for (long i = newCount; i < count; ++i)
+                    {
+                        destroy(items + i);
+                    }
+                }
+                else if (newCount > count)
+                {
+                    Reserve(newCount);
+                    for (long i = count; i < newCount; ++i)
+                    {
+                        construct<ValueType>(items + i, ValueType());
+                    }
+                }
+                count = newCount;
+            }
+        }
+        public nothrow inline long Count() const
+        {
+            return count;
+        }
+        public nothrow inline long Capacity() const
+        {
+            return res;
+        }
+        public nothrow inline bool IsEmpty() const
+        {
+            return count == 0;
+        }
+        public nothrow void Clear()
+        {
+            Destroy();
+        }
+        public void Add(const ValueType& item) where T is Copyable
+        {
+            Reserve(count + 1);
+            construct<ValueType>(items + count, item);
+            ++count;
+        }
+        public void Add(ValueType&& item) where T is Movable
+        {
+            Reserve(count + 1);
+            construct<ValueType>(items + count, item);
+            ++count;
+        }
+        public Iterator Insert(Iterator pos, const ValueType& item) where T is Copyable
+        {
+            long p = pos - Begin();
+            Reserve(count + 1);
+            pos = Begin() + p;
+            Iterator end = End();
+            if (count > 0)
+            {
+                construct<ValueType>(end.Ptr(), ValueType());
+                MoveBackward(pos, end, end + 1);
+                *pos = item;
+            }
+            else
+            {
+                construct<ValueType>(end.Ptr(), item);
+                pos = end;
+            }
+           ++count;
+           return pos;
+        }
+        public Iterator Insert(Iterator pos, ValueType&& item) where T is Movable
+        {
+            long p = pos - Begin();
+            Reserve(count + 1);
+            pos = Begin() + p;
+            Iterator end = End();
+            if (count > 0)
+            {
+                construct<ValueType>(end.Ptr(), ValueType());
+                MoveBackward(pos, end, end + 1);
+                *pos = item;
+            }
+            else
+            {
+                construct<ValueType>(end.Ptr(), item);
+                pos = end;
+            }
+           ++count;
+           return pos;
+        }
+        public Iterator InsertFront(const ValueType& item) where T is Copyable
+        {
+            return Insert(Begin(), item);
+        }
+        public Iterator InsertFront(ValueType&& item) where T is Movable
+        {
+            return Insert(Begin(), item);
+        }
+        public ValueType Remove(Iterator pos)
+        {
+            #assert(pos >= Begin() && pos < End());
+            ValueType result = Rvalue(*pos);
+            Move(pos + 1, End(), pos);
+            --count;
+            Iterator end = End();
+            destroy(end.Ptr());
+            return result;
+        }
+        public ValueType RemoveFirst()
+        {
+            return Remove(Begin());
+        }
+        public ValueType RemoveLast()
+        {
+            #assert(!IsEmpty());
+            --count;
+            Iterator end = End();
+            ValueType result = Rvalue(*end);
+            destroy(end.Ptr());
+            return result;
+        }
+        public nothrow inline const ValueType& operator[](long index) const
+        {
+            #assert(index >= 0 && index < count);
+            return items[index];
+        }
+        public nothrow inline ValueType& operator[](long index)
+        {
+            #assert(index >= 0 && index < count);
+            return items[index];
+        }
+        public nothrow inline Iterator Begin()
+        {
+            return Iterator(items);
+        }
+        public nothrow inline ConstIterator Begin() const
+        {
+            return ConstIterator(items);
+        }
+        public nothrow inline ConstIterator CBegin() const
+        {
+            return ConstIterator(items);
+        }
+        public nothrow inline Iterator End()
+        {
+            if (items != null)
+            {
+                return Iterator(items + count);
+            }
+            return Iterator(null);
+        }
+        public nothrow inline ConstIterator End() const
+        {
+            if (items != null)
+            {
+                return ConstIterator(items + count);
+            }
+            return ConstIterator(null);
+        }
+        public nothrow inline ConstIterator CEnd() const
+        {
+            if (items != null)
+            {
+                return ConstIterator(items + count);
+            }
+            return ConstIterator(null);
+        }
+        public nothrow inline const ValueType& Front() const
+        {
+            #assert(!IsEmpty());
+            return *Begin();
+        }
+        public nothrow inline ValueType& Front()
+        {
+            #assert(!IsEmpty());
+            return *Begin();
+        }
+        public nothrow inline const ValueType& Back() const
+        {
+            #assert(!IsEmpty());
+            return *(End() - 1);
+        }
+        public nothrow inline ValueType& Back()
+        {
+            #assert(!IsEmpty());
+            return *(End() - 1);
+        }
+        private void Grow(long minRes)
+        {
+            minRes = MemGrow(minRes);
+            ValueType* newItems = cast<ValueType*>(MemAlloc(minRes * sizeof(ValueType)));
+            if (items != null)
+            {
+                ConstructiveMove(newItems, items, count);
+                long saveCount = count;
+                Destroy();
+                count = saveCount;
+            }
+            items = newItems;
+            res = minRes;
+        }
+        private nothrow void Destroy()
+        {
+            if (count > 0)
+            {
+                Destroy(items, count);
+                count = 0;
+            }
+            if (res > 0)
+            {
+                MemFree(items);
+                items = null;
+                res = 0;
+            }
+        }
+        private ValueType* items;
+        private long count;
+        private long res;
+    }
+
+    public nothrow bool operator==<T>(const List<T>& left, const List<T>& right) where T is Regular
+    {
+        long n = left.Count();
+        if (n != right.Count())
+        {
+            return false;
+        }
+        for (long i = 0; i < n; ++i)
+        {
+            if (left[i] != right[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public nothrow bool operator<<T>(const List<T>& left, const List<T>& right) where T is TotallyOrdered
+    {
+        return LexicographicalCompare(left.Begin(), left.End(), right.Begin(), right.End());
+    }
+
+    public void ConstructiveCopy<ValueType>(ValueType* to, ValueType* from, long count) where ValueType is CopyConstructible
+    {
+        for (long i = 0; i < count; ++i)
+        {
+            construct<ValueType>(to, *from);
+            ++to;
+            ++from;
+        }
+    }
+
+    public void ConstructiveMove<ValueType>(ValueType* to, ValueType* from, long count) where ValueType is MoveConstructible
+    {
+        for (long i = 0; i < count; ++i)
+        {
+            construct<ValueType>(to, Rvalue(*from));
+            ++to;
+            ++from;
+        }
+    }
+
+    public nothrow void Destroy<ValueType>(ValueType* items, long count) where ValueType is Destructible
+    {
+        for (long i = 0; i < count; ++i)
+        {
+            destroy(items);
+            ++items;
+        }
+    }
+}

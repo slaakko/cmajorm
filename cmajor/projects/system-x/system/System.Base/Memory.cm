@@ -1,0 +1,139 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace System
+{
+    internal class Block
+    {
+        public nothrow Block() : next(this), size(0)
+        {
+        }
+        public Block* next;
+        public long size;
+    }
+
+    public nothrow void* malloc(long numBytes)
+    {
+        Block* block = Memory.AllocateBlock(numBytes);
+        if (block == null)
+        {
+            return null;
+        }
+        else
+        {
+            return block + 1;
+        }
+    }
+
+    public void* MemAlloc(long numBytes)
+    {
+        void* ptr = malloc(numBytes);
+        if (ptr == null)
+        {
+            ThrowSystemError();
+        }
+        else
+        {
+            return ptr;
+        }
+    }
+    
+    public nothrow void MemFree(void* ptr)
+    {
+        Block* block = cast<Block*>(ptr) - 1;
+        Memory.FreeBlock(block);
+    }
+
+    internal static class Memory
+    {
+        internal const long minBlockSize = 64 * 1024;
+    
+        static nothrow Memory() : baseBlock(), free(&baseBlock)
+        {
+        }
+        public nothrow static Block* AllocateBlock(long numBytes)
+        {
+            long numUnits = (numBytes + sizeof(Block) - 1) / sizeof(Block) + 1;
+            Block* prev = free;
+            Block* p = prev->next;
+            while (true)
+            {
+                if (p->size >= numUnits)
+                {
+                    if (p->size == numUnits)
+                    {
+                        prev->next = p->next;
+                    }
+                    else
+                    {
+                        p->size = p->size - numUnits;
+                        p = p + p->size;
+                        p->size = numUnits;
+                    }
+                    free = prev;
+                    return p;
+                }
+                if (p == free)
+                {
+                    p = AllocateMoreMemory(numUnits);
+                    if (p == null)
+                    {
+                        return null;
+                    }
+                }
+                prev = p; 
+                p = p->next;
+            }
+        }
+        public static nothrow void FreeBlock(Block* block)
+        {
+            Block* p = free;
+            for ( ; !(block > p && block < p->next); p = p->next)
+            {
+                if (p >= p->next && (block > p || block < p->next)) break;
+            }
+            if (block + block->size == p->next)
+            {
+                block->size = block->size + p->next->size;
+                block->next = p->next->next;
+            }
+            else
+            {
+                block->next = p->next;
+            }
+            if (p + p->size == block)
+            {
+                p->size = p->size + block->size;
+                p->next = block->next;
+            }
+            else
+            {
+                p->next = block;
+            }
+            free = p;
+        }
+        private static nothrow Block* AllocateMoreMemory(long numUnits)
+        {
+            long numBytes = numUnits * sizeof(Block);
+            if (numBytes < minBlockSize)
+            {
+                numBytes = minBlockSize;
+            }
+            void* p = pool_end();
+            long r = set_pool_end(cast<void*>(cast<byte*>(p) + numBytes));
+            if (r == -1)
+            {
+                return null;
+            }
+            Block* u = cast<Block*>(p);
+            u->next = null;
+            u->size = numBytes / sizeof(Block);
+            FreeBlock(u);
+            return free;
+        }
+        private static Block baseBlock;
+        private static Block* free;
+    }
+}
