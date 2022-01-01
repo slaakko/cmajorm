@@ -20,6 +20,8 @@
 
 namespace cmsx::db {
 
+extern const char* cmsxDBVersion;
+
 using namespace cmajor::wing;
 
 const int DEBUGGER_READY = WM_USER + 1;
@@ -49,6 +51,7 @@ protected:
     bool ProcessMessage(Message& msg) override;
     void OnMouseWheel(MouseWheelEventArgs& args) override;
 private:
+    void AboutClick();
     void OpenFileClick();
     void ExitClick();
     void ViewCodeClick();

@@ -4,6 +4,7 @@
 // =================================
 
 #include <system-x/db/MainWindow.hpp>
+#include <system-x/db/AboutDialog.hpp>
 #include <system-x/os/Load.hpp>
 #include <system-x/os/ProcessManager.hpp>
 #include <wing/Theme.hpp>
@@ -15,6 +16,8 @@
 #undef max
 
 namespace cmsx::db {
+
+const char* cmsxDBVersion = "4.3.0";
 
 using namespace soulng::util;
 
@@ -111,6 +114,11 @@ MainWindow::MainWindow(const std::string& filePath_, const std::vector<std::stri
     prevPageMenuItemPtr->Click().AddHandler(this, &MainWindow::PrevPageClick);
     viewMenuItem->AddMenuItem(prevPageMenuItemPtr.release());
     menuBar->AddMenuItem(viewMenuItem.release());
+    std::unique_ptr<MenuItem> helpMenuItem(new MenuItem("&Help"));
+    std::unique_ptr<MenuItem> aboutMenuItemPtr(new MenuItem("&About..."));
+    aboutMenuItemPtr->Click().AddHandler(this, &MainWindow::AboutClick);
+    helpMenuItem->AddMenuItem(aboutMenuItemPtr.release());
+    menuBar->AddMenuItem(helpMenuItem.release());
     AddChild(menuBar.release());
 
     SplitContainerCreateParams verticalSplitContainerCreateParams(SplitterOrientation::vertical);
@@ -136,14 +144,13 @@ MainWindow::MainWindow(const std::string& filePath_, const std::vector<std::stri
     topTabControl->SetTabNormalBackgroundItemName("code.tab.control.tab.normal.background");
     topTabControl->SetTabSelectedBackgroundItemName("code.tab.control.tab.selected.background");
     topTabControl->SetCloseBoxSelectedBackgroundItemName("code.tab.control.close.box.selected.background");
-    //topTabControl->TabPageSelected().AddHandler(this, &MainWindow::TopTabPageSelected);
-    //topTabControl->ControlRemoved().AddHandler(this, &MainWindow::TopTabPageRemoved);
+    topTabControl->TabPageSelected().AddHandler(this, &MainWindow::TopTabPageSelected);
+    topTabControl->ControlRemoved().AddHandler(this, &MainWindow::TopTabPageRemoved);
     std::unique_ptr<Control> paddedTopTabControl(new PaddedControl(PaddedControlCreateParams(topTabControlPtr.release()).Defaults()));
     std::unique_ptr<Control> borderedTopTabControl(new BorderedControl(BorderedControlCreateParams(paddedTopTabControl.release()).SetBorderStyle(BorderStyle::single).
         NormalSingleBorderColor(GetColor("code.tab.control.frame")).FocusedSingleBorderColor(GetColor("code.tab.control.frame")).SetDock(Dock::fill)));
     borderedTopTabControl->SetFrameItemName("code.tab.control.frame");
     verticalSplitContainer->Pane1Container()->AddChild(borderedTopTabControl.release());
-/*
 
     std::unique_ptr<TabControl> bottomTabControlPtr(
         new TabControl(TabControlCreateParams().
@@ -167,17 +174,14 @@ MainWindow::MainWindow(const std::string& filePath_, const std::vector<std::stri
     std::unique_ptr<Control> borderedBottomTabControl(new BorderedControl(BorderedControlCreateParams(paddedBottomTabControl.release()).SetBorderStyle(BorderStyle::single).
         NormalSingleBorderColor(GetColor("code.tab.control.frame")).FocusedSingleBorderColor(GetColor("code.tab.control.frame")).SetDock(Dock::fill)));
     borderedBottomTabControl->SetFrameItemName("code.tab.control.frame");
-    //verticalSplitContainer->Pane2Container()->AddChild(borderedBottomTabControl.release());
+    verticalSplitContainer->Pane2Container()->AddChild(borderedBottomTabControl.release());
 
-*/
     AddChild(verticalSplitContainerPtr.release());
 
-/*
     if (!filePath.empty())
     {
         LoadProcess();
     }
-*/
 }
 
 MainWindow::~MainWindow()
@@ -197,11 +201,13 @@ bool MainWindow::ProcessMessage(Message& msg)
         }
         case DEBUGGER_ERROR:
         {
+            // todo
             msg.result = 0;
             return true;
         }
         case DEBUGGER_PROCESS_EXIT:
         {
+            // todo
             msg.result = 0;
             return true;
         }
@@ -224,6 +230,19 @@ void MainWindow::OnMouseWheel(MouseWheelEventArgs& args)
         NextQuarterClick();
     }
     args.handled = true;
+}
+
+void MainWindow::AboutClick()
+{
+    try
+    {
+        AboutDialog dialog;
+        dialog.ShowDialog(*this);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::OpenFileClick()
@@ -415,7 +434,6 @@ void MainWindow::EndClick()
 
 void MainWindow::TopTabPageSelected()
 {
-/*
     currentTopView->SetVisible(false);
     TabPage* selectedTabPage = topTabControl->SelectedTabPage();
     if (selectedTabPage->Key() == "code")
@@ -444,12 +462,10 @@ void MainWindow::TopTabPageSelected()
     }
     currentTopView->SetVisible(true);
     currentTopView->UpdateView();
-*/
 }
 
 void MainWindow::TopTabPageRemoved(ControlEventArgs& controlEventArgs)
 {
-/*
     TabPage* tabPage = static_cast<TabPage*>(controlEventArgs.control);
     if (tabPage->Key() == "code")
     {
@@ -481,12 +497,10 @@ void MainWindow::TopTabPageRemoved(ControlEventArgs& controlEventArgs)
         RemoveView(stackView);
         stackView = nullptr;
     }
-*/
 }
 
 void MainWindow::BottomTabPageSelected()
 {
-/*
     currentBottomView->SetVisible(false);
     TabPage* selectedTabPage = bottomTabControl->SelectedTabPage();
     if (selectedTabPage->Key() == "regs")
@@ -495,12 +509,10 @@ void MainWindow::BottomTabPageSelected()
     }
     currentBottomView->SetVisible(true);
     currentBottomView->UpdateView();
-*/
 }
 
 void MainWindow::BottomTabPageRemoved(ControlEventArgs& controlEventArgs)
 {
-/*
     TabPage* tabPage = static_cast<TabPage*>(controlEventArgs.control);
     if (tabPage->Key() == "regs")
     {
@@ -511,7 +523,6 @@ void MainWindow::BottomTabPageRemoved(ControlEventArgs& controlEventArgs)
     {
 
     }
-*/
 }
 
 void MainWindow::LoadProcess()
@@ -536,7 +547,6 @@ void MainWindow::LoadProcess()
     {
         CreateRegisterView();
     }
-/*
     if (!dataView)
     {
         CreateDataView();
@@ -557,7 +567,6 @@ void MainWindow::LoadProcess()
     {
         CreateStackView();
     }
-*/
     for (DebugView* view : views)
     {
         view->SetMachine(machine.get());
@@ -639,8 +648,7 @@ void MainWindow::CreateCodeView()
     }
     else
     {
-        //topTabControl->InsertTabPageBefore(tabPage.release(), static_cast<TabPage*>(topTabControl->TabPages().FirstChild()));
-        // todo
+        topTabControl->InsertTabPageBefore(tabPage.release(), static_cast<TabPage*>(topTabControl->TabPages().FirstChild()));
     }
     codeView->UpdateView();
 }
@@ -661,8 +669,7 @@ void MainWindow::CreateRegisterView()
     }
     else
     {
-        //bottomTabControl->InsertTabPageBefore(tabPage.release(), static_cast<TabPage*>(bottomTabControl->TabPages().FirstChild()));
-        // todo
+        bottomTabControl->InsertTabPageBefore(tabPage.release(), static_cast<TabPage*>(bottomTabControl->TabPages().FirstChild()));
     }
     registerView->UpdateView();
 }
@@ -683,8 +690,7 @@ void MainWindow::CreateDataView()
     }
     else
     {
-        //topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage("code"));
-        // todo
+        topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage("code"));
     }
     dataView->UpdateView();
 }
@@ -705,8 +711,7 @@ void MainWindow::CreateArgsView()
     }
     else
     {
-        //topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage("data"));
-        // todo
+        topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage("data"));
     }
     argsView->UpdateView();
 }
@@ -727,8 +732,7 @@ void MainWindow::CreateEnvView()
     }
     else
     {
-        //topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage("args"));
-        // todo
+        topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage("args"));
     }
     envView->UpdateView();
 }
@@ -749,8 +753,7 @@ void MainWindow::CreateHeapView()
     }
     else
     {
-        //topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage("env"));
-        // todo
+        topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage("env"));
     }
     heapView->UpdateView();
 }
@@ -771,8 +774,7 @@ void MainWindow::CreateStackView()
     }
     else
     {
-        //topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage("heap"));
-        // todo
+        topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage("heap"));
     }
     stackView->UpdateView();
 }

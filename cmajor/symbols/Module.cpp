@@ -522,7 +522,7 @@ void Import(sngcm::ast::Target target, Module* rootModule, Module* module, const
                 }
             }
             std::string moduleFilePath = GetFullPath(mfp.generic_string());
-            if (readMap.find(moduleFilePath) == readMap.cend()) // CHANGED 9.2.2021 !!!!!
+            if (readMap.find(moduleFilePath) == readMap.cend()) 
             {
                 Module* referencedModule = GetModuleFromModuleCache(moduleFilePath);
                 if (referencedModule->GetFlag(ModuleFlags::readFromModuleFile))

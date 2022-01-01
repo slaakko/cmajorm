@@ -318,6 +318,22 @@ void TabControl::AddTabPage(TabPage* tabPage)
     SetChanged();
 }
 
+void TabControl::InsertTabPageBefore(TabPage* tabPage, TabPage* before)
+{
+    AddTabPageToTabPageMap(tabPage);
+    tabPages.InsertBefore(tabPage, before);
+    SetSelectedTabPage(tabPage);
+    SetChanged();
+}
+
+void TabControl::InsertTabPageAfter(TabPage* tabPage, TabPage* after)
+{
+    AddTabPageToTabPageMap(tabPage);
+    tabPages.InsertAfter(tabPage, after);
+    SetSelectedTabPage(tabPage);
+    SetChanged();
+}
+
 void TabControl::AddTabPage(const std::string& text, const std::string& key)
 {
     AddTabPage(new TabPage(text, key));

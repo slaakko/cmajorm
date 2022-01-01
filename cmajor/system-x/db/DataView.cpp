@@ -85,7 +85,6 @@ int64_t StackDataRange::Length() const
 
 DataRanges::DataRanges()
 {
-/*
     DataRange* dataRange = new DataSegmentDataRange();
     ranges.push_back(std::unique_ptr<DataRange>(dataRange));
     rangeMap["data"] = dataRange;
@@ -101,7 +100,6 @@ DataRanges::DataRanges()
     DataRange* stackRange = new StackDataRange();
     ranges.push_back(std::unique_ptr<DataRange>(stackRange));
     rangeMap["stack"] = stackRange;
-*/
 }
 
 DataRange* DataRanges::GetDataRange(const std::string& rangeName) const

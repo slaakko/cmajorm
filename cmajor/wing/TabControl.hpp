@@ -100,6 +100,8 @@ public:
     TabPage* SelectedTabPage() const { return selectedTabPage; }
     void SetSelectedTabPage(TabPage* tabPage);
     void AddTabPage(TabPage* tabPage);
+    void InsertTabPageBefore(TabPage* tabPage, TabPage* before);
+    void InsertTabPageAfter(TabPage* tabPage, TabPage* after);
     void AddTabPage(const std::string& text, const std::string& key);
     void AddTabPage(const std::string& text);
     void CloseTabPage(TabPage* tabPage);
