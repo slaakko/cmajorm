@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2021 Seppo Laakko
+// Copyright (c) 2022 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -190,7 +190,8 @@ public:
     SymbolSection* GetSymbolSection() const { return symbolSection; }
     LinkSection* GetLinkSection() const { return linkSection; }
     DebugSection* GetDebugSection() const { return debugSection; }
-    SymbolTable& GetSymbolTable() { return symbolTable; }
+    SymbolTable& GetSymbolTable() { return *symbolTable; }
+    SymbolTable* ReleaseSymbolTable() { return symbolTable.release(); }
 private:
     BinaryFileKind kind;
     std::string filePath;
@@ -202,7 +203,7 @@ private:
     SymbolSection* symbolSection;
     LinkSection* linkSection;
     DebugSection* debugSection;
-    SymbolTable symbolTable;
+    std::unique_ptr<SymbolTable> symbolTable;
 };
 
 class CMSX_OBJECT_API ObjectFile : public BinaryFile

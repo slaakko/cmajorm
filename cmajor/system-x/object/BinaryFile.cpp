@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2021 Seppo Laakko
+// Copyright (c) 2022 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -741,7 +741,8 @@ BinaryFile::BinaryFile(const std::string& filePath_, BinaryFileKind kind_) :
     dataSection(nullptr),
     symbolSection(nullptr),
     linkSection(nullptr),
-    debugSection(nullptr)
+    debugSection(nullptr),
+    symbolTable(new SymbolTable())
 {
 }
 

@@ -1,12 +1,15 @@
 // =================================
-// Copyright (c) 2021 Seppo Laakko
+// Copyright (c) 2022 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
 #ifndef CMSX_MACHINE_MEMORY_INCLUDED
 #define CMSX_MACHINE_MEMORY_INCLUDED
 #include <system-x/machine/Api.hpp>
+#include <mutex>
+#include <memory>
 #include <map>
+#include <vector>
 #include <stdint.h>
 #include <assert.h>
 
@@ -53,6 +56,9 @@ class CMSX_MACHINE_API Memory
 {
 public:
     Memory(Machine& machine_);
+    ~Memory();
+    Memory(const Memory&) = delete;
+    Memory& operator=(const Memory&) = delete;
     uint8_t ReadByte(uint64_t virtualAddress, Protection protection);
     void WriteByte(uint64_t virtualAddress, uint8_t value, Protection protection);
     uint16_t ReadWyde(uint64_t virtualAddress, Protection protection);
@@ -61,9 +67,11 @@ public:
     void WriteTetra(uint64_t virtualAddress, uint32_t value, Protection protection);
     uint64_t ReadOcta(uint64_t virtualAddress, Protection protection);
     void WriteOcta(uint64_t virtualAddress, uint64_t value, Protection protection);
+    uint64_t AllocateTranslationMap();
     void FreeMemory(uint64_t rv);
 private:
     uint64_t AllocatePage();
+    void FreeMemoryUnlocked(uint64_t rv);
     void FreePage(uint64_t pageAddress);
     uint8_t ReadByte(uint64_t address);
     void WriteByte(uint64_t address, uint8_t value);
@@ -75,7 +83,9 @@ private:
     void WriteOcta(uint64_t address, uint64_t value);
     uint64_t TranslateAddress(uint64_t virtualAddress, Protection access);
     Machine& machine;
-    std::map<uint64_t, std::map<uint64_t, uint64_t>> memoryMap;
+    int maxProcs;
+    uint64_t nextRV;
+    std::vector<std::unique_ptr<std::map<uint64_t, uint64_t>>> translationMaps;
 };
 
 } // cmsx::machine

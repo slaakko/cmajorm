@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2021 Seppo Laakko
+// Copyright (c) 2022 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -36,6 +36,7 @@ int main(int argc, const char** argv)
     try
     {
         InitApplication();
+        cmsx::machine::Machine machine;
         bool verbose = false;
         std::vector<std::string> fileNames;
         for (int i = 1; i < argc; ++i)
@@ -78,7 +79,7 @@ int main(int argc, const char** argv)
         }
         for (const auto& fileName : fileNames)
         {
-            cmsx::object::WriteBinaryFileAsText(fileName);
+            cmsx::object::WriteBinaryFileAsText(fileName, machine);
         }
     }
     catch (const std::exception& ex)

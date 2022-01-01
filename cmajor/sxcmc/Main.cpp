@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2021 Seppo Laakko
+// Copyright (c) 2022 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -128,7 +128,7 @@ using namespace cmajor::build;
 int main(int argc, const char** argv)
 {
     SetBackEnd(cmajor::symbols::BackEnd::cmsx);
-    SetGlobalFlag(GlobalFlags::disableCodeGen);
+    //SetGlobalFlag(GlobalFlags::disableCodeGen);
     //SetNumBuildThreads(1);
     //SetGlobalFlag(GlobalFlags::singleThreadedCompile);
     std::set<std::string> builtProjects;

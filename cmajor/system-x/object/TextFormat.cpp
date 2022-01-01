@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2021 Seppo Laakko
+// Copyright (c) 2022 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -19,10 +19,10 @@ using namespace soulng::util;
 class TextFormatter : public BinaryFileFormatter
 {
 public:
-    TextFormatter(BinaryFile* file_);
-    void FormatCurrentAddress() override;
+    TextFormatter(cmsx::machine::Machine& machine, BinaryFile* file_);
+    void FormatCurrentAddress(uint64_t currentAddress) override;
     void FormatAssembledBytes(uint8_t opc, uint8_t x, uint8_t y, uint8_t z) override;
-    void FormatLabel() override;
+    void FormatLabel(uint64_t currentAddress) override;
     void FormatOpCode(const std::string& opCodeName) override;
     void FormatByteOperand(uint8_t operand) override;
     void FormatRegOperand(uint8_t reg) override;
@@ -39,13 +39,13 @@ private:
     CodeFormatter formatter;
 };
 
-TextFormatter::TextFormatter(BinaryFile* file_) : BinaryFileFormatter(file_), file(file_->FilePath() + ".txt"), formatter(file)
+TextFormatter::TextFormatter(cmsx::machine::Machine& machine, BinaryFile* file_) : BinaryFileFormatter(machine, file_), file(file_->FilePath() + ".txt"), formatter(file)
 {
 }
 
-void TextFormatter::FormatCurrentAddress()
+void TextFormatter::FormatCurrentAddress(uint64_t currentAddress)
 {
-    formatter.Write("#" + ToHexString(static_cast<uint64_t>(AbsoluteAddress())) + " ");
+    formatter.Write("#" + ToHexString(currentAddress) + " ");
 }
 
 void TextFormatter::FormatAssembledBytes(uint8_t opc, uint8_t x, uint8_t y, uint8_t z)
@@ -53,9 +53,9 @@ void TextFormatter::FormatAssembledBytes(uint8_t opc, uint8_t x, uint8_t y, uint
     formatter.Write(ToHexString(opc) + " " + ToHexString(x) + " " + ToHexString(y) + " " + ToHexString(z) + " ");
 }
 
-void TextFormatter::FormatLabel()
+void TextFormatter::FormatLabel(uint64_t currentAddress)
 {
-    Symbol* symbol = File()->GetSymbolTable().GetSymbol(static_cast<uint64_t>(AbsoluteAddress()));
+    Symbol* symbol = File()->GetSymbolTable().GetSymbol(currentAddress);
     if (symbol)
     {
         if (!symbol->LocalName().empty()) 
@@ -159,10 +159,10 @@ void TextFormatter::FormatSetAddress(uint64_t saddr)
     }
 }
 
-void WriteBinaryFileAsText(const std::string& binaryFileName)
+void WriteBinaryFileAsText(const std::string& binaryFileName, cmsx::machine::Machine& machine)
 {
     std::unique_ptr<BinaryFile> binaryFile(ReadBinaryFile(binaryFileName));
-    TextFormatter formatter(binaryFile.get());
+    TextFormatter formatter(machine, binaryFile.get());
     formatter.Format();
 }
 

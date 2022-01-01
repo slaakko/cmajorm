@@ -1,10 +1,10 @@
 // =================================
-// Copyright (c) 2021 Seppo Laakko
+// Copyright (c) 2022 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMSX_MACHINE_FROMATTER_INCLUDED
-#define CMSX_MACHINE_FROMATTER_INCLUDED
+#ifndef CMSX_MACHINE_FORMATTER_INCLUDED
+#define CMSX_MACHINE_FORMATTER_INCLUDED
 #include <system-x/machine/Api.hpp>
 #include <stdint.h>
 
@@ -463,4 +463,4 @@ public:
 
 } // cmsx::machine
 
-#endif // CMSX_MACHINE_FROMATTER_INCLUDED
+#endif // CMSX_MACHINE_FORMATTER_INCLUDED

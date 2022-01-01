@@ -1,33 +1,41 @@
 // =================================
-// Copyright (c) 2021 Seppo Laakko
+// Copyright (c) 2022 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
-#include <system-x/object/Load.hpp>
+#include <system-x/os/Load.hpp>
+#include <system-x/os/Process.hpp>
 #include <system-x/object/BinaryFile.hpp>
-#include <system-x/machine/Memory.hpp>
 #include <soulng/util/Util.hpp>
-#include <memory>
-#include <stdexcept>
 
-namespace cmsx::object {
+namespace cmsx::os {
 
-void SetupImage(ExecutableFile* executable, cmsx::machine::Memory& memory)
+void SetupCode(cmsx::object::ExecutableFile* executable, cmsx::machine::Memory& memory)
 {
-    CodeSection* codeSection = executable->GetCodeSection();
+    cmsx::object::CodeSection* codeSection = executable->GetCodeSection();
     int64_t codeSectionBaseAddress = codeSection->BaseAddress();
     for (int64_t i = 0; i < codeSection->Length(); ++i)
     {
         uint8_t value = codeSection->GetByte(i);
         memory.WriteByte(static_cast<uint64_t>(codeSectionBaseAddress + i), value, cmsx::machine::Protection::write);
     }
-    DataSection* dataSection = executable->GetDataSection();
+}
+
+void SetupData(cmsx::object::ExecutableFile* executable, cmsx::machine::Memory& memory)
+{
+    cmsx::object::DataSection* dataSection = executable->GetDataSection();
     int64_t dataSectionBaseAddress = dataSection->BaseAddress();
     for (int64_t i = 0; i < dataSection->Length(); ++i)
     {
         uint8_t value = dataSection->GetByte(i);
         memory.WriteByte(static_cast<uint64_t>(dataSectionBaseAddress + i), value, cmsx::machine::Protection::write);
     }
+}
+
+void SetupStack(cmsx::machine::Memory& memory)
+{
+    int64_t stackStart = cmsx::machine::stackSegmentBaseAddress;
+    memory.WriteOcta(static_cast<uint64_t>(stackStart), 0, cmsx::machine::Protection::write);
 }
 
 int64_t WriteString(const std::string& s, int64_t address, cmsx::machine::Memory& memory)
@@ -96,26 +104,43 @@ int64_t SetupEnv(int64_t address, const std::vector<std::string>& env, cmsx::mac
     return end;
 }
 
-void Load(const std::string& executableFilePath, uint64_t rv, const std::vector<std::string>& args, const std::vector<std::string>& env, cmsx::machine::Machine& machine)
+void Load(Process* process, const std::vector<std::string>& args, const std::vector<std::string>& env, cmsx::machine::Machine& machine)
 {
+    uint64_t rv = machine.Mem().AllocateTranslationMap();
+    process->SetRV(rv);
     int argCount = args.size();
-    std::unique_ptr<BinaryFile> binaryFile(ReadBinaryFile(executableFilePath));
-    if (binaryFile->Kind() == BinaryFileKind::executableFile)
+    std::unique_ptr<cmsx::object::BinaryFile> binaryFile(cmsx::object::ReadBinaryFile(process->FilePath()));
+    if (binaryFile->Kind() == cmsx::object::BinaryFileKind::executableFile)
     {
-        ExecutableFile* executable = static_cast<ExecutableFile*>(binaryFile.get());
-        machine.Regs().SetSpecial(cmsx::machine::rV, rv);
+        cmsx::object::ExecutableFile* executable = static_cast<cmsx::object::ExecutableFile*>(binaryFile.get());
+        process->SetCodeStartAddress(executable->GetCodeSection()->BaseAddress());
+        process->SetCodeLength(executable->GetCodeSection()->Length());
+        machine.Regs().SetSpecial(cmsx::machine::rV, process->RV());
         machine.Regs().Set(cmsx::machine::regSP, cmsx::machine::stackSegmentBaseAddress);
-        SetupImage(executable, machine.Mem());
+        SetupCode(executable, machine.Mem());
+        process->SetDataStartAddress(executable->GetDataSection()->BaseAddress());
+        process->SetDataLength(executable->GetDataSection()->Length());
+        SetupData(executable, machine.Mem());
+        SetupStack(machine.Mem());
+        process->SetStackStartAddress(cmsx::machine::stackSegmentBaseAddress);
         int64_t poolSegmentBaseAddress = cmsx::machine::poolSegmentBaseAddress;
         int64_t address = poolSegmentBaseAddress;
         int64_t argsAddress = soulng::util::Align(address, 8);
+        process->SetArgumentsStartAddress(argsAddress);
         address = SetupArgs(argsAddress, args, machine.Mem());
+        process->SetArgumentsLength(address - argsAddress);
         int64_t envAddress = soulng::util::Align(address, 8);
+        process->SetEnvironmentStartAddress(envAddress);
         address = SetupEnv(envAddress, env, machine.Mem());
-        Symbol* main = executable->GetSymbolTable().GetSymbol("main");
+        process->SetEnvironmentLength(address - envAddress);
+        address = soulng::util::Align(address, 4096);
+        process->SetHeapStartAddress(address);
+        process->SetHeapLength(0);
+        cmsx::object::Symbol* main = executable->GetSymbolTable().GetSymbol("Main");
         if (main)
         {
             int64_t entryPoint = main->Start();
+            process->SetEntryPoint(entryPoint);
             machine.Regs().SetPC(static_cast<uint64_t>(entryPoint));
             int64_t mainFrame = cmsx::machine::stackSegmentBaseAddress;
             int64_t mainArgAddr = mainFrame;
@@ -124,16 +149,17 @@ void Load(const std::string& executableFilePath, uint64_t rv, const std::vector<
             machine.Mem().WriteOcta(static_cast<uint64_t>(mainArgAddr), static_cast<uint64_t>(argsAddress), cmsx::machine::Protection::write);
             mainArgAddr = mainArgAddr + 8;
             machine.Mem().WriteOcta(static_cast<uint64_t>(mainArgAddr), static_cast<uint64_t>(envAddress), cmsx::machine::Protection::write);
+            process->SetSymbolTable(executable->ReleaseSymbolTable());
         }
         else
         {
-            throw std::runtime_error("error loading file '" + executableFilePath + "': 'main' entry point not found");
+            throw std::runtime_error("error loading file '" + process->FilePath() + "': 'Main' entry point not found");
         }
     }
     else
     {
-        throw std::runtime_error("error loading file '" + executableFilePath + "': executable file expected");
+        throw std::runtime_error("error loading file '" + process->FilePath() + "': executable file expected");
     }
 }
 
-} // namespace cmsx::object
+} // namespace cmsx::os

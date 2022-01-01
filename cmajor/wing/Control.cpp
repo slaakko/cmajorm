@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2021 Seppo Laakko
+// Copyright (c) 2022 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -125,7 +125,9 @@ Control::Control(ControlCreateParams& createParams) :
     mouseHoverMs(0),
     mouseHoverLocation(),
     mouseHoverRectSize(DefaultMouseHoverSize()),
-    backgroundBrushes()
+    backgroundBrushes(),
+    minWidth(0),
+    minHeight(0)
 {
     RegisterUpdateColorsListener(this);
     if ((windowStyle & WS_DISABLED) != 0)

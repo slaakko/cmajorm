@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2021 Seppo Laakko
+// Copyright (c) 2022 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -114,7 +114,7 @@ void LinkTable::CheckUnresolvedSymbols(int logStreamId)
         for (const auto& unprocessedLinkCommand : p.second)
         {
             ObjectFile* objectFile = unprocessedLinkCommand.GetObjectFile();
-            LogMessage(logStreamId, "unresolved extern symbol '" + symbolName + "' detected in object file '" + objectFile->FileName() + "'");
+            LogMessage(logStreamId, "unresolved external symbol '" + symbolName + "' detected in object file '" + objectFile->FileName() + "'");
             unresolvedSymbols = true;
         }
     }

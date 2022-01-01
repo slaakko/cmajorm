@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2021 Seppo Laakko
+// Copyright (c) 2022 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -505,6 +505,10 @@ public:
     virtual Control* GetLastEnabledTabStopControl() const;
     void TranslateContentLocationInternal(Point& location) { TranslateContentLocation(location); }
     void TranslateMousePosInternal(Point& location) { TranslateMousePos(location); }
+    int MinWidth() const { return minWidth; }
+    void SetMinWidth(int minWidth_) { minWidth = minWidth_; }
+    int MinHeight() const { return minHeight; }
+    void SetMinHeight(int minHeight_) { minHeight = minHeight_; }
 protected:
     virtual bool IsDecoratorControl() const { return false; }
     virtual void TranslateChildGraphics(Graphics& graphics);
@@ -655,6 +659,8 @@ private:
     std::string textItemName;
     std::string frameItemName;
     std::string focusedFrameItemName;
+    int minWidth;
+    int minHeight;
 };
 
 WING_API HWND LParamHandle(Message& msg);

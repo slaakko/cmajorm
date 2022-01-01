@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2021 Seppo Laakko
+// Copyright (c) 2022 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -436,7 +436,7 @@ void MarkUsedSymbols(LinkTable& linkTable, ObjectFile* objectFile)
 
 void MarkUsedSymbols(LinkTable& linkTable, const std::vector<std::unique_ptr<BinaryFile>>& binaryFiles)
 {
-    linkTable.AddUsedSymbolName("main");
+    linkTable.AddUsedSymbolName("Main");
     for (const auto& binaryFile : binaryFiles)
     {
         switch (binaryFile->Kind())

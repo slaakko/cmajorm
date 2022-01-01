@@ -1,13 +1,11 @@
 // =================================
-// Copyright (c) 2021 Seppo Laakko
+// Copyright (c) 2022 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
 #ifndef CMSX_OBJECT_BINARY_FILE_FORMATTER_INCLUDED
 #define CMSX_OBJECT_BINARY_FILE_FORMATTER_INCLUDED
-#include <system-x/object/Api.hpp>
-#include <system-x/machine/Formatter.hpp>
-#include <system-x/machine/Machine.hpp>
+#include <system-x/object/InstructionFormatter.hpp>
 
 namespace cmsx::object {
 
@@ -23,15 +21,12 @@ class LinkSection;
 class DebugSection;
 class SymbolTable;
 
-class CMSX_OBJECT_API BinaryFileFormatter : public Formatter
+class CMSX_OBJECT_API BinaryFileFormatter : public InstructionFormatter
 {
 public:
-    BinaryFileFormatter(BinaryFile* file_);
+    BinaryFileFormatter(cmsx::machine::Machine& machine_, BinaryFile* file_);
     BinaryFile* File() const { return file; }
     Section* CurrentSection() const { return currentSection; }
-    int64_t Address() const { return address; }
-    int64_t AbsoluteAddress() const { return absoluteAddress; }
-    int64_t SetAddress() const { return setAddress; }
     virtual void Format();
     virtual void FormatSection(HeaderSection* section);
     virtual void FormatSection(CodeSection* section);
@@ -40,249 +35,10 @@ public:
     virtual void FormatSection(LinkSection* section);
     virtual void FormatSection(DebugSection* section);
     virtual void FormatSymbolTable(SymbolTable& symbolTable);
-    virtual void FormatCurrentAddress();
-    virtual void FormatAssembledBytes(uint8_t opc, uint8_t x, uint8_t y, uint8_t z);
-    virtual void FormatLabel();
-    virtual void FormatOpCode(const std::string& opCodeName);
-    virtual void FormatByteOperand(uint8_t operand);
-    virtual void FormatRegOperand(uint8_t reg);
-    virtual void FormatComma();
-    virtual void FormatColon();
-    virtual void FormatEol();
-    virtual void FormatUndefined();;
-    virtual void FormatSpecialReg(uint8_t reg);
-    virtual void FormatWydeOperand(uint16_t wyde);
-    virtual void FormatAddress(uint64_t address);
-    virtual void FormatSetAddress(uint64_t saddr);
-    void Format(Trap& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Swym& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldb& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldbi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldw& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldwi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldt& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldti& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldo& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldoi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldbu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldbui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldwu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldwui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldtu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldtui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldou& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldoui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldht& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldhti& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldsf& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ldsfi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Stb& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Stbi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Stw& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Stwi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Stt& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Stti& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Sto& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Stoi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Stbu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Stbui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Stwu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Stwui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Sttu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Sttui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Stou& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Stoui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Stht& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Sthti& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Stsf& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Stsfi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Stco& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Stcoi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Add& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Addi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Sub& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Subi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Mul& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Muli& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Div& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Divi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Addu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Addui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Subu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Subui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Mulu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Mului& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Divu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Divui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(I2Addu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(I2Addui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(I4Addu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(I4Addui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(I8Addu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(I8Addui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(I16Addu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(I16Addui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Neg& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Negi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Negu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Negui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Sl& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Sli& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Slu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Sluí& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Sr& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Sri& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Sru& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Srui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Cmp& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Cmpi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Cmpu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Cmpui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Csn& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Csni& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Csz& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Cszi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Csp& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Cspi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Csod& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Csodi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Csnn& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Csnni& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Csnz& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Csnzi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Csnp& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Csnpi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Csev& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Csevi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Zsn& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Zsni& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Zsz& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Zszi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Zsp& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Zspi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Zsod& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Zsodi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Zsnn& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Zsnni& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Zsnz& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Zsnzi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Zsnp& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Zsnpi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Zsev& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Zsevi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(And& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Andi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Or& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ori& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Xor& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Xori& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Andn& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Andni& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Orn& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Orni& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Nand& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Nandi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Nor& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Nori& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Nxor& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Nxori& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Mux& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Muxi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Sadd& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Saddi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Bdif& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Bdifi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Wdif& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Wdifi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Tdif& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Tdifi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Odif& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Odifi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Fadd& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Fsub& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Fmul& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Fdiv& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Frem& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Fsqrt& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Fint& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Fcmp& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Feql& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Fix& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Fixu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Flot& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Floti& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Flotu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Flotui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Sflot& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Sfloti& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Sflotu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Sflotui& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Seth& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Setmh& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Setml& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Setl& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Inch& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Incmh& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Incml& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Incl& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Orh& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ormh& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Orml& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Orl& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Andnh& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Andnmh& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Andnml& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Andnl& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Jmp& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Jmpb& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Go& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Goi& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Call& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Calli& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Ret& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Bn& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Bnb& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Bz& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Bzb& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Bp& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Bpb& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Bod& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Bodb& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Bnn& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Bnnb& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Bnz& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Bnzb& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Bnp& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Bnpb& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Bev& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Bevb& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Pbn& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Pbnb& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Pbz& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Pbzb& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Pbp& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Pbpb& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Pbod& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Pbodb& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Pbnn& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Pbnnb& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Pbnz& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Pbnzb& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Pbnp& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Pbnpb& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Pbev& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Pbevb& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Get& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Put& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Geta& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Getab& inst, uint8_t x, uint8_t y, uint8_t z) override;
 private:
-    Machine machine;
     BinaryFile* file;
     Section* currentSection;
-    int64_t address;
-    int64_t absoluteAddress;
-    int64_t setAddress;
+    std::map<int64_t, int64_t> binaryFileFormatterSetAddressMap;
 };
 
 } // namespace cmsx::object

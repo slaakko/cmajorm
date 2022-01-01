@@ -1,10 +1,11 @@
 // =================================
-// Copyright (c) 2021 Seppo Laakko
+// Copyright (c) 2022 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
 #include <system-x/machine/Memory.hpp>
 #include <system-x/machine/Machine.hpp>
+#include <system-x/machine/Config.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <Windows.h>
 #include <stdexcept>
@@ -23,8 +24,22 @@ inline uint64_t MakePageOffset(uint64_t virtualAddress)
     return virtualAddress & (pageSize - 1);
 }
 
-Memory::Memory(Machine& machine_) : machine(machine_)
+Memory::Memory(Machine& machine_) : machine(machine_), maxProcs(MaxProcs()), nextRV(0)
 {
+    if (maxProcs <= 0 || maxProcs > 64 * 1024)
+    {
+        throw std::runtime_error("invalid 'maxProcs' (" + std::to_string(maxProcs) + ") in '" + ConfigFilePath() + "': value should be in range 1..." + std::to_string(64 * 1024));
+    }
+    translationMaps.resize(maxProcs);
+}
+
+Memory::~Memory()
+{
+    std::lock_guard<std::recursive_mutex> lock(machine.Lock());
+    for (uint64_t rv = 0; rv < maxProcs; ++rv)
+    {
+        FreeMemoryUnlocked(rv);
+    }
 }
 
 uint8_t Memory::ReadByte(uint64_t virtualAddress, Protection protection)
@@ -187,21 +202,66 @@ void Memory::WriteOcta(uint64_t address, uint64_t value)
     WriteByte(a + 7, m7);
 }
 
+uint64_t Memory::AllocateTranslationMap()
+{
+    std::lock_guard<std::recursive_mutex> lock(machine.Lock());
+    if (nextRV >= maxProcs)
+    {
+        nextRV = 0;
+    }
+    while (nextRV < maxProcs && translationMaps[nextRV])
+    {
+        ++nextRV;
+    }
+    if (nextRV >= maxProcs)
+    {
+        throw std::runtime_error("all memory translation maps in use");
+    }
+    uint64_t rv = nextRV++;
+    translationMaps[rv].reset(new std::map<uint64_t, uint64_t>());
+    return rv;
+}
+
 void Memory::FreeMemory(uint64_t rv)
 {
-    auto& translationMap = memoryMap[rv];
-    for (const auto& p : translationMap)
+    std::lock_guard<std::recursive_mutex> lock(machine.Lock());
+    FreeMemoryUnlocked(rv);
+}
+
+void Memory::FreeMemoryUnlocked(uint64_t rv)
+{
+    if (rv >= maxProcs)
     {
-        uint64_t pageAddress = p.second;
-        FreePage(pageAddress);
+        throw std::runtime_error("invalid virtual translation register (rV) value #" + ToHexString(rv) + ": value greater than or equal to maxProcs (#" +
+            ToHexString(static_cast<uint32_t>(maxProcs)) + ")");
     }
-    translationMap.clear();
+    auto& translationMapPtr = translationMaps[rv];
+    if (translationMapPtr)
+    {
+        auto& translationMap = *translationMapPtr;
+        for (const auto& p : translationMap)
+        {
+            uint64_t pageAddress = p.second;
+            FreePage(pageAddress);
+        }
+        translationMapPtr.reset();
+    }
 }
 
 uint64_t Memory::TranslateAddress(uint64_t virtualAddress, Protection access)
 {
     uint64_t rv = machine.Regs().GetSpecial(rV);
-    auto& translationMap = memoryMap[rv];
+    if (rv >= maxProcs)
+    {
+        throw std::runtime_error("invalid virtual translation register (rV) value #" + ToHexString(rv) + ": value greater than or equal to maxProcs (#" + 
+            ToHexString(static_cast<uint32_t>(maxProcs)) + ")");
+    }
+    auto& translationMapPtr = translationMaps[rv];
+    if (!translationMapPtr)
+    {
+        throw std::runtime_error("translation map for virtual translation register (rV) value #" + ToHexString(rv) + " not allocated");
+    }
+    auto& translationMap = *translationMapPtr;
     int64_t pageNumber = MakePageNumber(virtualAddress);
     int64_t pageOffset = MakePageOffset(virtualAddress);
     auto it = translationMap.find(pageNumber);
@@ -218,7 +278,7 @@ uint64_t Memory::TranslateAddress(uint64_t virtualAddress, Protection access)
     }
     else
     {
-        throw std::runtime_error("virtual address " + ToHexString(virtualAddress) + " not found from translation map");
+        throw std::runtime_error("virtual address #" + ToHexString(virtualAddress) + " not found from memory translation map #" + ToHexString(rv));
     }
 }
 

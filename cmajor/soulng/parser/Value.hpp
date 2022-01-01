@@ -1,13 +1,13 @@
 // =================================
-// Copyright (c) 2021 Seppo Laakko
+// Copyright (c) 2022 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
 #ifndef SOULNG_PARSER_VALUE_INCLUDED
 #define SOULNG_PARSER_VALUE_INCLUDED
-#include <soulng/parser/ParserApi.hpp>
+#include <soulng/parser/Parser.hpp>
 
-namespace soulng { namespace parser {
+namespace soulng::parser {
 
 template<class T>
 struct Value
@@ -16,6 +16,6 @@ struct Value
     T value;
 };
 
-} } // namespace soulng::parser;
+} // namespace soulng::parser;
 
 #endif // SOULNG_PARSER_VALUE_INCLUDED
