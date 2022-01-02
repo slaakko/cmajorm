@@ -41,6 +41,30 @@ public:
     void Write(CodeFormatter& formatter) override;
 };
 
+class CMSX_ASSEMBLER_API ByteConstant : public IntegralConstant
+{
+public:
+    ByteConstant(const SourcePos& sourcePos_, uint8_t value_);
+    void Accept(Visitor& visitor) override;
+    void Write(CodeFormatter& formatter) override;
+};
+
+class CMSX_ASSEMBLER_API WydeConstant : public IntegralConstant
+{
+public:
+    WydeConstant(const SourcePos& sourcePos_, uint16_t value_);
+    void Accept(Visitor& visitor) override;
+    void Write(CodeFormatter& formatter) override;
+};
+
+class CMSX_ASSEMBLER_API TetraConstant : public IntegralConstant
+{
+public:
+    TetraConstant(const SourcePos& sourcePos_, uint32_t value_);
+    void Accept(Visitor& visitor) override;
+    void Write(CodeFormatter& formatter) override;
+};
+
 class CMSX_ASSEMBLER_API CharacterConstant : public Constant
 {
 public:

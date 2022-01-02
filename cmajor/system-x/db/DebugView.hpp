@@ -5,7 +5,7 @@
 
 #ifndef CMSX_DB_DEBUG_VIEW_INCLUDED
 #define CMSX_DB_DEBUG_VIEW_INCLUDED
-#include <system-x/os/Process.hpp>
+#include <system-x/kernel/Process.hpp>
 #include <system-x/machine/Machine.hpp>
 
 namespace cmsx::db {
@@ -15,17 +15,19 @@ class DebugView
 public: 
     DebugView();
     virtual ~DebugView();
-    virtual void UpdateView() = 0;
-    virtual void SetMachine(cmsx::machine::Machine* machine) = 0;
-    virtual void SetProcess(cmsx::os::Process* process) = 0;
-    virtual void ToStart() = 0;
-    virtual void ToEnd() = 0;
-    virtual void NextPage() = 0;
-    virtual void PrevPage() = 0;
-    virtual void NextLine() = 0;
-    virtual void PrevLine() = 0;
-    virtual void NextQuarter() = 0;
-    virtual void PrevQuarter() = 0;
+    virtual void UpdateView();
+    virtual void SetMachine(cmsx::machine::Machine* machine);
+    virtual void SetProcess(cmsx::kernel::Process* process);
+    virtual void WriteLine(const std::string& logMessage);
+    virtual void Clear();
+    virtual void ToStart();
+    virtual void ToEnd();
+    virtual void NextPage();
+    virtual void PrevPage();
+    virtual void NextLine();
+    virtual void PrevLine();
+    virtual void NextQuarter();
+    virtual void PrevQuarter();
     void SetVisible(bool visible_) { visible = visible_; }
     bool IsVisible() const { return visible; }
 private:

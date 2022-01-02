@@ -3,12 +3,12 @@
 // Distributed under the MIT license
 // =================================
 
-#include <system-x/os/InitDone.hpp>
-#include <system-x/os/Trap.hpp>
-#include <system-x/os/TrapExit.hpp>
-#include <system-x/os/ProcessManager.hpp>
+#include <system-x/kernel/InitDone.hpp>
+#include <system-x/kernel/Trap.hpp>
+#include <system-x/kernel/TrapExit.hpp>
+#include <system-x/kernel/ProcessManager.hpp>
 
-namespace cmsx::os {
+namespace cmsx::kernel {
 
 void Init()
 {
@@ -24,4 +24,4 @@ void Done()
     DoneTrap();
 }
 
-} // namespace cmsx::os
+} // namespace cmsx::kernel

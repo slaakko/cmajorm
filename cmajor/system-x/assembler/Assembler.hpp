@@ -29,6 +29,9 @@ public:
     void Assemble();
     void Visit(DecimalConstant& node) override;
     void Visit(HexadecimalConstant& node) override;
+    void Visit(ByteConstant& node) override;
+    void Visit(WydeConstant& node) override;
+    void Visit(TetraConstant& node) override;
     void Visit(CharacterConstant& node) override;
     void Visit(StringConstant& node) override;
     void Visit(ClsIdConstant& node) override;

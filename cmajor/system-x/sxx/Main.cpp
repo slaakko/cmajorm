@@ -4,12 +4,12 @@
 // =================================
 
 #include <system-x/machine/Machine.hpp>
-#include <system-x/os/Load.hpp>
-#include <system-x/os/ProcessManager.hpp>
+#include <system-x/kernel/Load.hpp>
+#include <system-x/kernel/ProcessManager.hpp>
 #include <soulng/util/InitDone.hpp>
 #include <sngxml/xpath/InitDone.hpp>
 #include <system-x/machine/InitDone.hpp>
-#include <system-x/os/InitDone.hpp>
+#include <system-x/kernel/InitDone.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Time.hpp>
 #include <iostream>
@@ -22,12 +22,12 @@ void InitApplication()
     soulng::util::Init();
     sngxml::xpath::Init();
     cmsx::machine::Init();
-    cmsx::os::Init();
+    cmsx::kernel::Init();
 }
 
 void DoneApplication()
 {
-    cmsx::os::Done();
+    cmsx::kernel::Done();
     cmsx::machine::Done();
     sngxml::xpath::Done();
     soulng::util::Done();
@@ -90,10 +90,10 @@ int main(int argc, const char** argv)
             throw std::runtime_error("no program set");
         }
         cmsx::machine::Machine machine;
-        cmsx::os::Process* process = cmsx::os::ProcessManager::Instance().CreateProcess();
+        cmsx::kernel::Process* process = cmsx::kernel::ProcessManager::Instance().CreateProcess();
         process->SetFilePath(args[0]);
-        cmsx::os::Load(process, args, env, machine);
-        cmsx::os::ProcessManager::Instance().SetCurrentProcess(process);
+        cmsx::kernel::Load(process, args, env, machine);
+        cmsx::kernel::ProcessManager::Instance().SetCurrentProcess(process);
         if (verbose)
         {
             std::cout << "running '" << args[0] << "'..." << std::endl;;
@@ -112,7 +112,7 @@ int main(int argc, const char** argv)
             std::cout << "system time: " << DurationStr(systemTime) << " (" << systemTimePercent << "%)" << std::endl;
             std::cout << "total time:  " << DurationStr(totalTime) << std::endl;
         }
-        cmsx::os::ProcessManager::Instance().DeleteProcess(process->Id());
+        cmsx::kernel::ProcessManager::Instance().DeleteProcess(process->Id());
     }
     catch (const std::exception& ex)
     {

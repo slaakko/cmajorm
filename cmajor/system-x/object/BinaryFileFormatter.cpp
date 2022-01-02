@@ -37,14 +37,11 @@ void BinaryFileFormatter::FormatSection(CodeSection* section)
     while (address < n)
     {
         int8_t opc = section->GetByte(address);
-        ++address;
-        int8_t x = section->GetByte(address);
-        ++address;
-        int8_t y = section->GetByte(address);
-        ++address;
-        int8_t z = section->GetByte(address);
-        ++address;
+        int8_t x = section->GetByte(address + 1);
+        int8_t y = section->GetByte(address + 2);
+        int8_t z = section->GetByte(address + 3);
         FormatInstruction(baseAddress + address, &binaryFileFormatterSetAddressMap, opc, x, y, z);
+        address += 4;
     }
 }
 

@@ -47,7 +47,64 @@ void HexadecimalConstant::Accept(Visitor& visitor)
 
 void HexadecimalConstant::Write(CodeFormatter& formatter)
 {
-    formatter.Write("#" + ToHexString(Value()));
+    if (Value() <= std::numeric_limits<uint8_t>::max())
+    {
+        formatter.Write("#" + ToHexString(static_cast<uint8_t>(Value())));
+    }
+    else if (Value() <= std::numeric_limits<uint16_t>::max())
+    {
+        formatter.Write("#" + ToHexString(static_cast<uint16_t>(Value())));
+    }
+    else if (Value() <= std::numeric_limits<uint32_t>::max())
+    {
+        formatter.Write("#" + ToHexString(static_cast<uint32_t>(Value())));
+    }
+    else
+    {
+        formatter.Write("#" + ToHexString(Value()));
+    }
+}
+
+ByteConstant::ByteConstant(const SourcePos& sourcePos_, uint8_t value_) : IntegralConstant(NodeKind::byteConstantNode, sourcePos_, value_)
+{
+}
+
+void ByteConstant::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+void ByteConstant::Write(CodeFormatter& formatter)
+{
+    formatter.Write("#" + ToHexString(static_cast<uint8_t>(Value())));
+}
+
+WydeConstant::WydeConstant(const SourcePos& sourcePos_, uint16_t value_) : IntegralConstant(NodeKind::wydeConstantNode, sourcePos_, value_)
+{
+}
+
+void WydeConstant::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+void WydeConstant::Write(CodeFormatter& formatter)
+{
+    formatter.Write("#" + ToHexString(static_cast<uint16_t>(Value())));
+}
+
+TetraConstant::TetraConstant(const SourcePos& sourcePos_, uint32_t value_) : IntegralConstant(NodeKind::tetraConstantNode, sourcePos_, value_)
+{
+}
+
+void TetraConstant::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+void TetraConstant::Write(CodeFormatter& formatter)
+{
+    formatter.Write("#" + ToHexString(static_cast<uint32_t>(Value())));
 }
 
 CharacterConstant::CharacterConstant(const SourcePos& sourcePos_, char32_t value_) : Constant(NodeKind::characterConstantNode, sourcePos_), value(value_)
@@ -97,59 +154,52 @@ Node* MakeConstantExpr(bool value)
 {
     if (value)
     {
-        return new DecimalConstant(SourcePos(), static_cast<uint64_t>(1));
+        return new ByteConstant(SourcePos(), static_cast<uint8_t>(1));
     }
     else
     {
-        return new DecimalConstant(SourcePos(), static_cast<uint64_t>(0));
+        return new ByteConstant(SourcePos(), static_cast<uint8_t>(0));
     }
 }
 
 Node* MakeConstantExpr(int8_t value)
 {
-    return MakeConstantExpr(static_cast<int64_t>(value));
+    return MakeConstantExpr(static_cast<uint8_t>(value));
 }
 
 Node* MakeConstantExpr(uint8_t value)
 {
-    return new DecimalConstant(SourcePos(), value);
+    return new ByteConstant(SourcePos(), value);
 }
 
 Node* MakeConstantExpr(int16_t value)
 {
-    return MakeConstantExpr(static_cast<int64_t>(value));
+    return new WydeConstant(SourcePos(), static_cast<uint16_t>(value));
 }
 
 Node* MakeConstantExpr(uint16_t value)
 {
-    return new DecimalConstant(SourcePos(), value);
+    return new WydeConstant(SourcePos(), value);
 }
 
 Node* MakeConstantExpr(int32_t value)
 {
-    return MakeConstantExpr(static_cast<int64_t>(value));
+    return MakeConstantExpr(static_cast<uint32_t>(value));
 }
 
 Node* MakeConstantExpr(uint32_t value)
 {
-    return new DecimalConstant(SourcePos(), value);
+    return new TetraConstant(SourcePos(), value);
 }
 
 Node* MakeConstantExpr(int64_t value)
 {
-    if (value >= 0)
-    {
-        return new DecimalConstant(SourcePos(), static_cast<uint64_t>(value));
-    }
-    else
-    {
-        return new UnaryExpression(SourcePos(), Operator::unaryMinus, new DecimalConstant(SourcePos(), static_cast<uint64_t>(-value)));
-    }
+    return new HexadecimalConstant(SourcePos(), static_cast<uint64_t>(value));
 }
 
 Node* MakeConstantExpr(uint64_t value)
 {
-    return new DecimalConstant(SourcePos(), value);
+    return new HexadecimalConstant(SourcePos(), value);
 }
 
 Node* MakeConstantExpr(uint64_t value, bool hex)

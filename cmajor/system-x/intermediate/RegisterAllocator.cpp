@@ -15,21 +15,21 @@ ArgLocation::ArgLocation(int index_) : index(index_), constant(nullptr)
 {
 }
 
-void ArgLocation::SetConstant(cmsx::assembler::DecimalConstant* constant_)
+void ArgLocation::SetConstant(cmsx::assembler::HexadecimalConstant* constant_)
 {
     constant = constant_;
 }
 
 void ArgLocation::SetValue(uint64_t start)
 {
-    constant->SetValue(start + static_cast<uint64_t>(index) * 8);
+    constant->SetValue(start + static_cast<uint64_t>(index + 1) * 8);
 }
 
 CallFrame::CallFrame() : saveNumLocals(0)
 {
 }
 
-void CallFrame::NextArgLocation(cmsx::assembler::DecimalConstant* constant)
+void CallFrame::NextArgLocation(cmsx::assembler::HexadecimalConstant* constant)
 {
     ArgLocation* argLocation = new ArgLocation(argLocations.size());
     argLocation->SetConstant(constant);

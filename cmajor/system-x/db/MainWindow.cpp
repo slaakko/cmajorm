@@ -5,12 +5,15 @@
 
 #include <system-x/db/MainWindow.hpp>
 #include <system-x/db/AboutDialog.hpp>
-#include <system-x/os/Load.hpp>
-#include <system-x/os/ProcessManager.hpp>
+#include <system-x/kernel/Load.hpp>
+#include <system-x/kernel/ProcessManager.hpp>
 #include <wing/Theme.hpp>
 #include <wing/PaddedControl.hpp>
 #include <wing/BorderedControl.hpp>
+#include <wing/Dialog.hpp>
 #include <soulng/util/Path.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <boost/filesystem.hpp>
 
 #undef min
 #undef max
@@ -20,6 +23,14 @@ namespace cmsx::db {
 const char* cmsxDBVersion = "4.3.0";
 
 using namespace soulng::util;
+using namespace soulng::unicode;
+
+std::string CmajorProjectsDir()
+{
+    std::string projectsDir = Path::Combine(CmajorRoot(), "projects");
+    boost::filesystem::create_directories(projectsDir);
+    return projectsDir;
+}
 
 MainDebuggerObserver::MainDebuggerObserver(MainWindow* mainWindow_) : mainWindow(mainWindow_)
 {
@@ -33,18 +44,33 @@ void MainDebuggerObserver::DebuggerReady()
 void MainDebuggerObserver::DebuggerError(const std::string& message)
 {
     errorMessage = message;
-    SendMessage(mainWindow->Handle(), DEBUGGER_ERROR, 0, 0);
+    if (mainWindow->WaitingDebugger())
+    {
+        mainWindow->NotifyDebuggerError();
+    }
+    else
+    {
+        SendMessage(mainWindow->Handle(), DEBUGGER_ERROR, 0, 0);
+    }
 }
 
 void MainDebuggerObserver::DebuggerProcessExit()
 {
-    SendMessage(mainWindow->Handle(), DEBUGGER_PROCESS_EXIT, 0, 0);
+    if (mainWindow->WaitingDebugger())
+    {
+        mainWindow->NotifyDebuggingStopped();
+    }
+    else
+    {
+        SendMessage(mainWindow->Handle(), DEBUGGER_PROCESS_EXIT, 0, 0);
+    }
 }
 
-MainWindow::MainWindow(const std::string& filePath_, const std::vector<std::string>& args_, const std::vector<std::string>& env_) : 
+MainWindow::MainWindow(const std::string& filePath_) : 
     Window(WindowCreateParams().Text("System X Debugger").BackgroundColor(GetColor("window.background")).WindowClassName("system.x.db.MainWindow")),
-    observer(this), filePath(GetFullPath(filePath_)), args(args_), env(env_), machine(nullptr), process(nullptr), codeView(nullptr), registerView(nullptr), 
-    dataView(nullptr), argsView(nullptr), envView(nullptr), heapView(nullptr), stackView(nullptr), currentTopView(nullptr), currentBottomView(nullptr)
+    observer(this), filePath(filePath_), args(), env(), machine(nullptr), process(nullptr), codeView(nullptr), registerView(nullptr), 
+    dataView(nullptr), argsView(nullptr), envView(nullptr), heapView(nullptr), stackView(nullptr), logView(nullptr), currentTopView(nullptr), currentBottomView(nullptr),
+    waitingDebugger(false), startContinueMenuItem(nullptr), stopMenuItem(nullptr), resetMenuItem(nullptr), singleStepMenuItem(nullptr), stepOverMenuItem(nullptr)
 {
     std::unique_ptr<MenuBar> menuBar(new MenuBar());
     std::unique_ptr<MenuItem> fileMenuItem(new MenuItem("&File"));
@@ -114,6 +140,40 @@ MainWindow::MainWindow(const std::string& filePath_, const std::vector<std::stri
     prevPageMenuItemPtr->Click().AddHandler(this, &MainWindow::PrevPageClick);
     viewMenuItem->AddMenuItem(prevPageMenuItemPtr.release());
     menuBar->AddMenuItem(viewMenuItem.release());
+
+    std::unique_ptr<MenuItem> debugMenuItem(new MenuItem("&Debug"));
+
+    std::unique_ptr<MenuItem> continueMenuItemPtr(new MenuItem("&Start/Continue Debugging"));
+    startContinueMenuItem = continueMenuItemPtr.get();
+    startContinueMenuItem->SetShortcut(Keys::f5);
+    startContinueMenuItem->Click().AddHandler(this, &MainWindow::ContinueClick);
+    debugMenuItem->AddMenuItem(continueMenuItemPtr.release());
+
+    std::unique_ptr<MenuItem> stopMenuItemPtr(new MenuItem("S&top Debugging"));
+    stopMenuItem = stopMenuItemPtr.get();
+    stopMenuItem->SetShortcut(Keys::shiftModifier | Keys::f5);
+    stopMenuItem->Click().AddHandler(this, &MainWindow::StopClick);
+    debugMenuItem->AddMenuItem(stopMenuItemPtr.release());
+
+    std::unique_ptr<MenuItem> resetMenuItemPtr(new MenuItem("&Reset Program To Start"));
+    resetMenuItem = resetMenuItemPtr.get();
+    resetMenuItem->SetShortcut(Keys::controlModifier | Keys::f4);
+    resetMenuItem->Click().AddHandler(this, &MainWindow::ResetClick);
+    debugMenuItem->AddMenuItem(resetMenuItemPtr.release());
+
+    std::unique_ptr<MenuItem> singleStepMenuItemPtr(new MenuItem("S&ingle Step"));;
+    singleStepMenuItem = singleStepMenuItemPtr.get();
+    singleStepMenuItem->SetShortcut(Keys::f11);
+    singleStepMenuItem->Click().AddHandler(this, &MainWindow::SingleStepClick);
+    debugMenuItem->AddMenuItem(singleStepMenuItemPtr.release());
+
+    std::unique_ptr<MenuItem> stepOverMenuItemPtr(new MenuItem("Step &Over"));;
+    stepOverMenuItem = stepOverMenuItemPtr.get();
+    stepOverMenuItem->SetShortcut(Keys::f12);
+    stepOverMenuItem->Click().AddHandler(this, &MainWindow::StepOverClick);
+    debugMenuItem->AddMenuItem(stepOverMenuItemPtr.release());
+    menuBar->AddMenuItem(debugMenuItem.release());
+
     std::unique_ptr<MenuItem> helpMenuItem(new MenuItem("&Help"));
     std::unique_ptr<MenuItem> aboutMenuItemPtr(new MenuItem("&About..."));
     aboutMenuItemPtr->Click().AddHandler(this, &MainWindow::AboutClick);
@@ -178,6 +238,8 @@ MainWindow::MainWindow(const std::string& filePath_, const std::vector<std::stri
 
     AddChild(verticalSplitContainerPtr.release());
 
+    SetState(DebuggingState::debuggerIdle);
+
     if (!filePath.empty())
     {
         LoadProcess();
@@ -186,7 +248,21 @@ MainWindow::MainWindow(const std::string& filePath_, const std::vector<std::stri
 
 MainWindow::~MainWindow()
 {
-    StopDebugging();
+    StopDebugging(true);
+}
+
+void MainWindow::NotifyDebuggingStopped()
+{
+    std::unique_lock<std::mutex> lock(mtx);
+    SetState(DebuggingState::debuggerExit);
+    debuggingStoppedOrErrorVar.notify_one();
+}
+
+void MainWindow::NotifyDebuggerError()
+{
+    std::unique_lock<std::mutex> lock(mtx);
+    SetState(DebuggingState::debuggerError);
+    debuggingStoppedOrErrorVar.notify_one();
 }
 
 bool MainWindow::ProcessMessage(Message& msg)
@@ -195,19 +271,24 @@ bool MainWindow::ProcessMessage(Message& msg)
     {
         case DEBUGGER_READY:
         {
+            SetState(DebuggingState::debuggerWaitingForCommand);
             UpdateViews();
             msg.result = 0;
             return true;
         }
         case DEBUGGER_ERROR:
         {
-            // todo
+            SetState(DebuggingState::debuggerError);
+            UpdateViews();
+            PrintError(observer.ErrorMessage());
             msg.result = 0;
             return true;
         }
         case DEBUGGER_PROCESS_EXIT:
         {
-            // todo
+            SetState(DebuggingState::debuggerExit);
+            UpdateViews();
+            PrintExit();
             msg.result = 0;
             return true;
         }
@@ -216,7 +297,6 @@ bool MainWindow::ProcessMessage(Message& msg)
             return Window::ProcessMessage(msg);
         }
     }
-
 }
 
 void MainWindow::OnMouseWheel(MouseWheelEventArgs& args)
@@ -230,6 +310,66 @@ void MainWindow::OnMouseWheel(MouseWheelEventArgs& args)
         NextQuarterClick();
     }
     args.handled = true;
+}
+
+void MainWindow::SingleStepClick()
+{
+    try
+    {
+        if (state == DebuggingState::debuggerWaitingForCommand)
+        {
+            SetState(DebuggingState::debuggerBusy);
+            debugger->SingleStep();
+        }
+        else
+        {
+            throw std::runtime_error("debugger not waiting for command");
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::StepOverClick()
+{
+    try
+    {
+        if (state == DebuggingState::debuggerWaitingForCommand)
+        {
+            SetState(DebuggingState::debuggerBusy);
+            debugger->StepOver();
+        }
+        else
+        {
+            throw std::runtime_error("debugger not waiting for command");
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::ContinueClick()
+{
+    try
+    {
+        if (state == DebuggingState::debuggerWaitingForCommand)
+        {
+            SetState(DebuggingState::debuggerBusy);
+            debugger->Continue();
+        }
+        else
+        {
+            throw std::runtime_error("debugger not waiting for command");
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::AboutClick()
@@ -247,7 +387,77 @@ void MainWindow::AboutClick()
 
 void MainWindow::OpenFileClick()
 {
-    // todo
+    try
+    {
+        std::vector<std::pair<std::string, std::string>> descriptionFilterPairs;
+        descriptionFilterPairs.push_back(std::make_pair("System X executable files (*.x)", "*.x"));
+        std::string initialDirectory = CmajorProjectsDir();
+        std::string filePath;
+        std::string currentDirectory;
+        std::vector<std::string> fileNames;
+        bool selected = OpenFileName(Handle(), descriptionFilterPairs, initialDirectory, std::string(), "x", 
+            OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST, filePath, currentDirectory, fileNames);
+        if (selected)
+        {
+            waitingDebugger = true;
+            if (state == DebuggingState::debuggerWaitingForCommand)
+            {
+                StopDebugging(true);
+                WaitUntilDebuggingStoppedOrError();
+            }
+            this->filePath = GetFullPath(filePath);
+            waitingDebugger = false;
+            LoadProcess();
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        waitingDebugger = false;
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::ResetClick()
+{
+    try
+    {
+        if (filePath.empty())
+        {
+            throw std::runtime_error("no executable file open");
+        }
+        waitingDebugger = true;
+        if (state == DebuggingState::debuggerWaitingForCommand)
+        {
+            StopDebugging(true);
+            WaitUntilDebuggingStoppedOrError();
+        }
+        waitingDebugger = false;
+        LoadProcess();
+    }
+    catch (const std::exception& ex)
+    {
+        waitingDebugger = false;
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::StopClick()
+{
+    try
+    {
+        waitingDebugger = true;
+        if (state == DebuggingState::debuggerWaitingForCommand)
+        {
+            StopDebugging(false);
+            WaitUntilDebuggingStoppedOrError();
+        }
+        waitingDebugger = false;
+    }
+    catch (const std::exception& ex)
+    {
+        waitingDebugger = false;
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::ExitClick()
@@ -257,14 +467,15 @@ void MainWindow::ExitClick()
 
 void MainWindow::ViewCodeClick()
 {
-
     if (codeView)
     {
+        codeView->SetVisible(true);
         TabPage* tabPage = topTabControl->GetTabPageByKey("code");
         if (tabPage)
         {
             tabPage->Select();
         }
+        codeView->UpdateView();
     }
     else
     {
@@ -276,11 +487,13 @@ void MainWindow::ViewRegsClick()
 {
     if (registerView)
     {
+        registerView->SetVisible(true);
         TabPage* tabPage = bottomTabControl->GetTabPageByKey("regs");
         if (tabPage)
         {
             tabPage->Select();
         }
+        registerView->UpdateView();
     }
     else
     {
@@ -292,11 +505,13 @@ void MainWindow::ViewDataClick()
 {
     if (dataView)
     {
+        dataView->SetVisible(true);
         TabPage* tabPage = topTabControl->GetTabPageByKey("data");
         if (tabPage)
         {
             tabPage->Select();
         }
+        dataView->UpdateView();
     }
     else
     {
@@ -308,11 +523,13 @@ void MainWindow::ViewArgsClick()
 {
     if (argsView)
     {
+        argsView->SetVisible(true);
         TabPage* tabPage = topTabControl->GetTabPageByKey("args");
         if (tabPage)
         {
             tabPage->Select();
         }
+        argsView->UpdateView();
     }
     else
     {
@@ -324,11 +541,13 @@ void MainWindow::ViewEnvClick()
 {
     if (envView)
     {
+        envView->SetVisible(true);
         TabPage* tabPage = topTabControl->GetTabPageByKey("env");
         if (tabPage)
         {
             tabPage->Select();
         }
+        envView->UpdateView();
     }
     else
     {
@@ -340,11 +559,13 @@ void MainWindow::ViewHeapClick()
 {
     if (heapView)
     {
+        heapView->SetVisible(true);
         TabPage* tabPage = topTabControl->GetTabPageByKey("heap");
         if (tabPage)
         {
             tabPage->Select();
         }
+        heapView->UpdateView();
     }
     else
     {
@@ -356,7 +577,25 @@ void MainWindow::ViewStackClick()
 {
     if (stackView)
     {
+        stackView->SetVisible(true);
         TabPage* tabPage = topTabControl->GetTabPageByKey("stack");
+        if (tabPage)
+        {
+            tabPage->Select();
+        }
+        stackView->UpdateView();
+    }
+    else
+    {
+        CreateStackView();
+    }
+}
+
+void MainWindow::ViewLogClick()
+{
+    if (logView)
+    {
+        TabPage* tabPage = bottomTabControl->GetTabPageByKey("log");
         if (tabPage)
         {
             tabPage->Select();
@@ -364,7 +603,7 @@ void MainWindow::ViewStackClick()
     }
     else
     {
-        CreateStackView();
+        CreateLogView();
     }
 }
 
@@ -501,14 +740,14 @@ void MainWindow::TopTabPageRemoved(ControlEventArgs& controlEventArgs)
 
 void MainWindow::BottomTabPageSelected()
 {
-    currentBottomView->SetVisible(false);
     TabPage* selectedTabPage = bottomTabControl->SelectedTabPage();
     if (selectedTabPage->Key() == "regs")
     {
+        currentBottomView->SetVisible(false);
         currentBottomView = registerView;
+        currentBottomView->SetVisible(true);
+        currentBottomView->UpdateView();
     }
-    currentBottomView->SetVisible(true);
-    currentBottomView->UpdateView();
 }
 
 void MainWindow::BottomTabPageRemoved(ControlEventArgs& controlEventArgs)
@@ -519,20 +758,23 @@ void MainWindow::BottomTabPageRemoved(ControlEventArgs& controlEventArgs)
         RemoveView(registerView);
         registerView = nullptr;
     }
-    else
+    else if (tabPage->Key() == "log")
     {
-
+        logView = nullptr;
     }
 }
 
 void MainWindow::LoadProcess()
 {
+    SetState(DebuggingState::debuggerBusy);
     machine.reset(new cmsx::machine::Machine());
-    cmsx::os::ProcessManager::Instance().SetMachine(machine.get());
-    process = cmsx::os::ProcessManager::Instance().CreateProcess();
+    cmsx::kernel::ProcessManager::Instance().SetMachine(machine.get());
+    process = cmsx::kernel::ProcessManager::Instance().CreateProcess();
     process->SetFilePath(filePath);
-    cmsx::os::Load(process, args, env, *machine);
-    cmsx::os::ProcessManager::Instance().SetCurrentProcess(process);
+    args.clear();
+    args.push_back(filePath);
+    cmsx::kernel::Load(process, args, env, *machine);
+    cmsx::kernel::ProcessManager::Instance().SetCurrentProcess(process);
     dataRanges.SetMachine(machine.get());
     dataRanges.SetProcess(process);
     if (codeView)
@@ -547,6 +789,11 @@ void MainWindow::LoadProcess()
     {
         CreateRegisterView();
     }
+    if (!logView)
+    {
+        CreateLogView();
+    }
+    logView->Clear();
     if (!dataView)
     {
         CreateDataView();
@@ -571,8 +818,10 @@ void MainWindow::LoadProcess()
     {
         view->SetMachine(machine.get());
         view->SetProcess(process);
+        view->SetVisible(false);
     }
     ViewCodeClick();
+    ViewRegsClick();
     StartDebugging();
 }
 
@@ -587,12 +836,16 @@ void MainWindow::StartDebugging()
     {
         return;
     }
+    if (debuggerThread.joinable())
+    {
+        debuggerThread.join();
+    }
     debugger.reset(new Debugger(*machine));
     debugger->SetObserver(&observer);
     debuggerThread = std::thread(RunDebugger, debugger.get(), machine.get());
 }
 
-void MainWindow::StopDebugging()
+void MainWindow::StopDebugging(bool unloadProcess)
 {
     if (debugger)
     {
@@ -603,13 +856,24 @@ void MainWindow::StopDebugging()
         debuggerThread.join();
     }
     debugger.reset();
-    if (process)
+    if (unloadProcess)
     {
-        cmsx::os::ProcessManager::Instance().DeleteProcess(process->Id());
-        process = nullptr;
+        if (process)
+        {
+            cmsx::kernel::ProcessManager::Instance().DeleteProcess(process->Id());
+            process = nullptr;
+        }
+        machine.reset();
+        cmsx::kernel::ProcessManager::Instance().SetMachine(nullptr);
+        dataRanges.SetMachine(nullptr);
+        dataRanges.SetProcess(nullptr);
+        for (auto& view : views)
+        {
+            view->SetMachine(nullptr);
+            view->SetProcess(nullptr);
+        }
+        UpdateViews();
     }
-    machine.reset();
-    cmsx::os::ProcessManager::Instance().SetMachine(nullptr);
 }
 
 void MainWindow::UpdateViews()
@@ -690,7 +954,7 @@ void MainWindow::CreateDataView()
     }
     else
     {
-        topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage("code"));
+        topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage(topTabControl, "code"));
     }
     dataView->UpdateView();
 }
@@ -711,7 +975,7 @@ void MainWindow::CreateArgsView()
     }
     else
     {
-        topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage("data"));
+        topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage(topTabControl, "data"));
     }
     argsView->UpdateView();
 }
@@ -732,7 +996,7 @@ void MainWindow::CreateEnvView()
     }
     else
     {
-        topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage("args"));
+        topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage(topTabControl, "args"));
     }
     envView->UpdateView();
 }
@@ -753,7 +1017,7 @@ void MainWindow::CreateHeapView()
     }
     else
     {
-        topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage("env"));
+        topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage(topTabControl, "env"));
     }
     heapView->UpdateView();
 }
@@ -774,25 +1038,115 @@ void MainWindow::CreateStackView()
     }
     else
     {
-        topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage("heap"));
+        topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage(topTabControl, "heap"));
     }
     stackView->UpdateView();
 }
 
-TabPage* MainWindow::GetTabPageByNameOrFirstTabPage(const std::string& tabName) const
+void MainWindow::CreateLogView()
 {
-    TabPage* tabPage = topTabControl->GetTabPageByKey(tabName);
+    std::unique_ptr<TabPage> tabPage(new TabPage("Log", "log"));
+    logView = new LogView(TextViewCreateParams().SetDock(Dock::fill));
+    tabPage->AddChild(logView);
+    if (bottomTabControl->TabPages().IsEmpty())
+    {
+        bottomTabControl->AddTabPage(tabPage.release());
+    }
+    else
+    {
+        bottomTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage(bottomTabControl, "regs"));
+    }
+}
+
+TabPage* MainWindow::GetTabPageByNameOrFirstTabPage(TabControl* tabControl, const std::string& tabName) const
+{
+    TabPage* tabPage = tabControl->GetTabPageByKey(tabName);
     if (tabPage)
     {
         return tabPage;
     }
-    else if (!topTabControl->TabPages().IsEmpty())
+    else if (!tabControl->TabPages().IsEmpty())
     {
-        return static_cast<TabPage*>(topTabControl->TabPages().FirstChild());
+        return static_cast<TabPage*>(tabControl->TabPages().FirstChild());
     }
     else
     {
         return nullptr;
+    }
+}
+
+void MainWindow::WaitUntilDebuggingStoppedOrError()
+{
+    std::unique_lock<std::mutex> lock(mtx);
+    debuggingStoppedOrErrorVar.wait(lock, [this] { return state == DebuggingState::debuggerExit || state == DebuggingState::debuggerError; });
+    waitingDebugger = false;
+    switch (state)
+    {
+        case DebuggingState::debuggerError:
+        {
+            std::string errorMessage = observer.ErrorMessage();
+            PrintError(errorMessage);
+            break;
+        }
+        case DebuggingState::debuggerExit:
+        {
+            PrintExit();
+            break;
+        }
+    }
+}
+
+void MainWindow::PrintError(const std::string& errorMessage)
+{
+    ViewLogClick();
+    logView->WriteLine(errorMessage);
+}
+
+void MainWindow::PrintExit()
+{
+    uint8_t exitCode = 255;
+    if (machine)
+    {
+        exitCode = machine->GetProcessor().GetExitCode();
+    }
+    ViewLogClick();
+    logView->WriteLine("process exited with code " + std::to_string(static_cast<int>(exitCode)));
+}
+
+void MainWindow::SetState(DebuggingState state_)
+{
+    state = state_;
+    startContinueMenuItem->Disable();
+    stopMenuItem->Disable();
+    resetMenuItem->Disable();
+    singleStepMenuItem->Disable();
+    stepOverMenuItem->Disable();
+    switch (state)
+    {
+        case DebuggingState::debuggerBusy:
+        {
+            stopMenuItem->Enable();
+            break;
+        }
+        case DebuggingState::debuggerWaitingForCommand:
+        {
+            startContinueMenuItem->Enable();
+            stopMenuItem->Enable();
+            resetMenuItem->Enable();
+            singleStepMenuItem->Enable();
+            stepOverMenuItem->Enable();
+            break;
+        }
+        case DebuggingState::debuggerError:
+        {
+            resetMenuItem->Enable();
+            break;
+        }
+        case DebuggingState::debuggerExit:
+        {
+            resetMenuItem->Enable();
+            break;
+        }
     }
 }
 

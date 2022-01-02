@@ -11,7 +11,7 @@
 
 namespace cmsx::object {
 
-CMSX_OBJECT_API void WriteBinaryFileAsText(const std::string& binaryFileName, cmsx::machine::Machine& machine);
+CMSX_OBJECT_API void WriteBinaryFileAsText(const std::string& binaryFileName, cmsx::machine::Machine& machine, std::string& textFileName);
 
 } // namespace cmsx::object
 

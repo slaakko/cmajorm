@@ -33,16 +33,8 @@ class RegisterView : public Control, public DebugView
 public:
     RegisterView(RegisterViewCreateParams& createParams);
     void SetMachine(cmsx::machine::Machine* machine_) override;
-    void SetProcess(cmsx::os::Process* process_) override;
+    void SetProcess(cmsx::kernel::Process* process_) override;
     void UpdateView() override;
-    void NextLine() override;
-    void PrevLine() override;
-    void NextQuarter() override;
-    void PrevQuarter() override;
-    void NextPage() override;
-    void PrevPage() override;
-    void ToStart() override;
-    void ToEnd() override;
 protected:
     void OnPaint(PaintEventArgs& args) override;
 private:

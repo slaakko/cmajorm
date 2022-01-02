@@ -3,11 +3,11 @@
 // Distributed under the MIT license
 // =================================
 
-#include <system-x/os/ProcessManager.hpp>
+#include <system-x/kernel/ProcessManager.hpp>
 #include <system-x/machine/Config.hpp>
 #include <system-x/machine/Processor.hpp>
 
-namespace cmsx::os {
+namespace cmsx::kernel {
 
 std::unique_ptr<ProcessManager> ProcessManager::instance;
 
@@ -130,4 +130,4 @@ void DoneProcessManager()
     ProcessManager::Done();
 }
 
-} // namespace cmsx::os
+} // namespace cmsx::kernel

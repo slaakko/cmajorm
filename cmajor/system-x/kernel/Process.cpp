@@ -3,9 +3,9 @@
 // Distributed under the MIT license
 // =================================
 
-#include <system-x/os/Process.hpp>
+#include <system-x/kernel/Process.hpp>
 
-namespace cmsx::os {
+namespace cmsx::kernel {
 
 Process::Process(int32_t id_) : 
     id(id_), rv(static_cast<uint64_t>(-1)), state(ProcessState::idle), 
@@ -43,4 +43,4 @@ void Process::AddSystemTime(std::chrono::steady_clock::duration duration)
     systemTime = systemTime + duration;
 }
 
-} // namespace cmsx::os
+} // namespace cmsx::kernel

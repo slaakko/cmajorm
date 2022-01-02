@@ -125,13 +125,25 @@ void EmitFrameLocationOperand(const FrameLocation& frameLocation, cmsx::assemble
     instruction->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regFP)));
     if (frameLocation.IsWithinImmediateRange())
     {
-        instruction->AddOperand(cmsx::assembler::MakeConstantExpr(8 * frameLocation.index));
+        instruction->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint8_t>(8 * (frameLocation.index + 1))));
     }
     else
     {
         cmsx::assembler::Instruction* setIxInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
         setIxInst->AddOperand(cmsx::assembler::MakeGlobalRegOperand(cmsx::machine::regIX));
-        setIxInst->AddOperand(cmsx::assembler::MakeConstantExpr(8 * frameLocation.index));
+        uint64_t value = 8 * (frameLocation.index + 1);
+        if (value <= std::numeric_limits<uint16_t>::max())
+        {
+            setIxInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint16_t>(value)));
+        }
+        else if (value <= std::numeric_limits<uint32_t>::max())
+        {
+            setIxInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint32_t>(value)));
+        }
+        else
+        {
+            setIxInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint64_t>(value)));
+        }
         codeGen.Emit(setIxInst);
         instruction->AddOperand(cmsx::assembler::MakeGlobalRegOperand(cmsx::machine::regIX));
     }
@@ -142,7 +154,7 @@ void EmitArgLocationOperand(cmsx::assembler::Instruction* instruction, CodeGener
     instruction->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regFP)));
     cmsx::assembler::Instruction* setIxInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
     setIxInst->AddOperand(cmsx::assembler::MakeGlobalRegOperand(cmsx::machine::regIX));
-    cmsx::assembler::DecimalConstant* node = new cmsx::assembler::DecimalConstant(SourcePos(), 0);
+    cmsx::assembler::HexadecimalConstant* node = new cmsx::assembler::HexadecimalConstant(SourcePos(), 0);
     codeGen.RegAllocator()->GetFrame().CurrentCallFrame()->NextArgLocation(node);
     setIxInst->AddOperand(node);
     codeGen.Emit(setIxInst);
@@ -313,7 +325,7 @@ cmsx::assembler::Node* MakeRegOperand(Value* value, const Register& r, CodeGener
             }
             case ValueKind::nullValue:
             {
-                inst->AddOperand(cmsx::assembler::MakeConstantExpr(0));
+                inst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint64_t>(0)));
                 break;
             }
             default:
@@ -398,13 +410,13 @@ void EmitLoad(const FrameLocation& frameLocation, const Register& reg, CodeGener
     instruction->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regFP)));
     if (frameLocation.IsWithinImmediateRange())
     {
-        instruction->AddOperand(cmsx::assembler::MakeConstantExpr(8 * frameLocation.index));
+        instruction->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint8_t>(8 * (frameLocation.index + 1))));
     }
     else
     {
         cmsx::assembler::Instruction* setIxInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
         setIxInst->AddOperand(cmsx::assembler::MakeGlobalRegOperand(cmsx::machine::regIX));
-        setIxInst->AddOperand(cmsx::assembler::MakeConstantExpr(8 * frameLocation.index));
+        setIxInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint64_t>(8 * (frameLocation.index + 1))));
         codeGen.Emit(setIxInst);
         instruction->AddOperand(cmsx::assembler::MakeGlobalRegOperand(cmsx::machine::regIX));
     }
@@ -1412,6 +1424,8 @@ void EmitTrap(TrapInstruction& inst, CodeGenerator& codeGen)
     trapInst->AddOperand(MakeTrapOperand(inst.Op2(), codeGen));
     trapInst->AddOperand(MakeTrapOperand(inst.Op3(), codeGen));
     codeGen.Emit(trapInst);
+    Frame& frame = codeGen.RegAllocator()->GetFrame();
+    frame.AddCallFrame();
 }
 
 void EmitPrologue(CodeGenerator& codeGen)
@@ -1429,14 +1443,14 @@ void EmitPrologue(CodeGenerator& codeGen)
     {
         cmsx::assembler::Instruction* inclInst = new cmsx::assembler::Instruction(cmsx::machine::INCL);
         inclInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regSP)));
-        inclInst->AddOperand(cmsx::assembler::MakeConstantExpr(frame.Size()));
+        inclInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint16_t>(frame.Size())));
         codeGen.Emit(inclInst);
     }
     else
     {
         cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
         setInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regIX)));
-        setInst->AddOperand(cmsx::assembler::MakeConstantExpr(frame.Size()));
+        setInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint64_t>(frame.Size())));
         codeGen.Emit(setInst);
         cmsx::assembler::Instruction* addInst = new cmsx::assembler::Instruction(cmsx::machine::ADD);
         addInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regSP)));

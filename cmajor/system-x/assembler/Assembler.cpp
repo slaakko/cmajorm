@@ -100,6 +100,21 @@ void Assembler::Visit(HexadecimalConstant& node)
     value = cmsx::object::Value(node.Value());
 }
 
+void Assembler::Visit(ByteConstant& node)
+{
+    value = cmsx::object::Value(node.Value());
+}
+
+void Assembler::Visit(WydeConstant& node)
+{
+    value = cmsx::object::Value(node.Value());
+}
+
+void Assembler::Visit(TetraConstant& node)
+{
+    value = cmsx::object::Value(node.Value());
+}
+
 void Assembler::Visit(CharacterConstant& node)
 {
     value = cmsx::object::Value(static_cast<uint64_t>(node.Value()));

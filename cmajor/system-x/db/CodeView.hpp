@@ -65,7 +65,7 @@ public:
     CodeView(CodeViewCreateParams& createParams);
     void Reset();
     void SetMachine(cmsx::machine::Machine* machine_) override;
-    void SetProcess(cmsx::os::Process* process_) override;
+    void SetProcess(cmsx::kernel::Process* process_) override;
     void UpdateView() override;
     void NextLine() override;
     void PrevLine() override;
@@ -93,7 +93,7 @@ private:
     std::map<int64_t, CodeViewLine> lineMap;
     std::map <int64_t, int64_t> setAddressMap;
     cmsx::machine::Machine* machine;
-    cmsx::os::Process* process;
+    cmsx::kernel::Process* process;
     std::map<CodeViewItemKind, SolidBrush*> brushMap;
     std::map<CodeViewItemKind, Color> colorMap;
     std::vector<std::unique_ptr<SolidBrush>> brushes;

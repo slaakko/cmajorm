@@ -20,6 +20,7 @@ class TextFormatter : public BinaryFileFormatter
 {
 public:
     TextFormatter(cmsx::machine::Machine& machine, BinaryFile* file_);
+    const std::string& TextFilePath() const { return textFilePath; }
     void FormatCurrentAddress(uint64_t currentAddress) override;
     void FormatAssembledBytes(uint8_t opc, uint8_t x, uint8_t y, uint8_t z) override;
     void FormatLabel(uint64_t currentAddress) override;
@@ -35,11 +36,13 @@ public:
     void FormatAddress(uint64_t address) override;
     void FormatSetAddress(uint64_t saddr) override;
 private:
+    std::string textFilePath;
     std::ofstream file;
     CodeFormatter formatter;
 };
 
-TextFormatter::TextFormatter(cmsx::machine::Machine& machine, BinaryFile* file_) : BinaryFileFormatter(machine, file_), file(file_->FilePath() + ".txt"), formatter(file)
+TextFormatter::TextFormatter(cmsx::machine::Machine& machine, BinaryFile* file_) : 
+    BinaryFileFormatter(machine, file_), textFilePath(file_->FilePath() + ".txt"), file(textFilePath), formatter(file)
 {
 }
 
@@ -159,10 +162,11 @@ void TextFormatter::FormatSetAddress(uint64_t saddr)
     }
 }
 
-void WriteBinaryFileAsText(const std::string& binaryFileName, cmsx::machine::Machine& machine)
+void WriteBinaryFileAsText(const std::string& binaryFileName, cmsx::machine::Machine& machine, std::string& textFileName)
 {
     std::unique_ptr<BinaryFile> binaryFile(ReadBinaryFile(binaryFileName));
     TextFormatter formatter(machine, binaryFile.get());
+    textFileName = formatter.TextFilePath();
     formatter.Format();
 }
 

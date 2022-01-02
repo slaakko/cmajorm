@@ -3,12 +3,12 @@
 // Distributed under the MIT license
 // =================================
 
-#include <system-x/os/Load.hpp>
-#include <system-x/os/Process.hpp>
+#include <system-x/kernel/Load.hpp>
+#include <system-x/kernel/Process.hpp>
 #include <system-x/object/BinaryFile.hpp>
 #include <soulng/util/Util.hpp>
 
-namespace cmsx::os {
+namespace cmsx::kernel {
 
 void SetupCode(cmsx::object::ExecutableFile* executable, cmsx::machine::Memory& memory)
 {
@@ -143,13 +143,14 @@ void Load(Process* process, const std::vector<std::string>& args, const std::vec
             process->SetEntryPoint(entryPoint);
             machine.Regs().SetPC(static_cast<uint64_t>(entryPoint));
             int64_t mainFrame = cmsx::machine::stackSegmentBaseAddress;
-            int64_t mainArgAddr = mainFrame;
-            machine.Mem().WriteTetra(static_cast<uint64_t>(mainArgAddr), static_cast<uint32_t>(argCount), cmsx::machine::Protection::write);
+            int64_t mainArgAddr = mainFrame + 8;
+            machine.Mem().WriteOcta(static_cast<uint64_t>(mainArgAddr), static_cast<uint32_t>(argCount), cmsx::machine::Protection::write);
             mainArgAddr = mainArgAddr + 8;
             machine.Mem().WriteOcta(static_cast<uint64_t>(mainArgAddr), static_cast<uint64_t>(argsAddress), cmsx::machine::Protection::write);
             mainArgAddr = mainArgAddr + 8;
             machine.Mem().WriteOcta(static_cast<uint64_t>(mainArgAddr), static_cast<uint64_t>(envAddress), cmsx::machine::Protection::write);
             process->SetSymbolTable(executable->ReleaseSymbolTable());
+            machine.GetProcessor().EnableInterrupts();
         }
         else
         {
@@ -162,4 +163,4 @@ void Load(Process* process, const std::vector<std::string>& args, const std::vec
     }
 }
 
-} // namespace cmsx::os
+} // namespace cmsx::kernel

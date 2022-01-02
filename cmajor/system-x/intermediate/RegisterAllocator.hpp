@@ -13,7 +13,7 @@
 
 namespace cmsx::assembler {
 
-class DecimalConstant;
+class HexadecimalConstant;
 
 }  // namespace cmsx::assembler
 
@@ -47,7 +47,7 @@ struct CMSX_INTERMEDIATE_API FrameLocation
     FrameLocation() : index(-1) {}
     FrameLocation(int index_) : index(index_) {}
     bool Valid() const { return index != -1; }
-    bool IsWithinImmediateRange() const { return index >= 0 && index < 256 / 8; }
+    bool IsWithinImmediateRange() const { return index >= 0 && index < (256 - 8) / 8; }
     int index;
 };
 
@@ -57,10 +57,10 @@ public:
     ArgLocation(int index_);
 private:
     friend class CallFrame;
-    void SetConstant(cmsx::assembler::DecimalConstant* constant_);
+    void SetConstant(cmsx::assembler::HexadecimalConstant* constant_);
     void SetValue(uint64_t start);
     int index;
-    cmsx::assembler::DecimalConstant* constant;
+    cmsx::assembler::HexadecimalConstant* constant;
 };
 
 class CMSX_INTERMEDIATE_API CallFrame
@@ -69,7 +69,7 @@ public:
     CallFrame();
     CallFrame(const CallFrame&) = delete;
     CallFrame& operator=(const CallFrame&) = delete;
-    void NextArgLocation(cmsx::assembler::DecimalConstant* constant);
+    void NextArgLocation(cmsx::assembler::HexadecimalConstant* constant);
     int SaveNumLocals() const { return saveNumLocals; }
     void SetSaveNumLocals(int saveNumLocals_) { saveNumLocals = saveNumLocals_; }
     void Resolve(int frameSize);
@@ -83,8 +83,8 @@ class CMSX_INTERMEDIATE_API Frame
 public:
     Frame();
     FrameLocation NextFrameLocation() { return FrameLocation(nextFrameLocationIndex++); }
-    int Size() const { return nextFrameLocationIndex * 8; }
-    bool IsWithinWydeRange() const { return nextFrameLocationIndex * 8 < 65536; }
+    int Size() const { return (nextFrameLocationIndex + 1) * 8; }
+    bool IsWithinWydeRange() const { return Size() < 65536; }
     CallFrame* CurrentCallFrame() { return currentCallFrame.get(); }
     void ResetCallFrame();
     void AddCallFrame();

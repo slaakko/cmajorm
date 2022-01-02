@@ -301,7 +301,7 @@ void CodeView::SetMachine(cmsx::machine::Machine* machine_)
     machine = machine_;
 }
 
-void CodeView::SetProcess(cmsx::os::Process* process_)
+void CodeView::SetProcess(cmsx::kernel::Process* process_)
 {
     process = process_;
 }

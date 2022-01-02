@@ -18,7 +18,7 @@ class Visitor;
 
 enum class NodeKind : int
 {
-    decimalConstantNode, hexConstantNode, characterConstantNode, stringConstantNode, clsIdConstantNode, 
+    decimalConstantNode, hexConstantNode, byteConstantNode, wydeConstantNode, tetraConstantNode, characterConstantNode, stringConstantNode, clsIdConstantNode,
     localSymbolNode, globalSymbolNode, atNode, 
     unaryExprNode, binaryExprNode, parenExprNode, opCodeNode, operandListNode, instructionNode
 };

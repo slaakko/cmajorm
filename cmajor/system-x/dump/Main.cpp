@@ -79,7 +79,16 @@ int main(int argc, const char** argv)
         }
         for (const auto& fileName : fileNames)
         {
-            cmsx::object::WriteBinaryFileAsText(fileName, machine);
+            if (verbose)
+            {
+                std::cout << "> " << fileName << std::endl;
+            }
+            std::string textFileName;
+            cmsx::object::WriteBinaryFileAsText(fileName, machine, textFileName);
+            if (verbose)
+            {
+                std::cout << "==> " << textFileName << std::endl;
+            }
         }
     }
     catch (const std::exception& ex)

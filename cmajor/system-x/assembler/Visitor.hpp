@@ -11,6 +11,9 @@ namespace cmsx::assembler {
 
 class DecimalConstant;
 class HexadecimalConstant;
+class ByteConstant;
+class WydeConstant;
+class TetraConstant;
 class CharacterConstant;
 class StringConstant;
 class ClsIdConstant;
@@ -30,6 +33,9 @@ public:
     virtual ~Visitor();
     virtual void Visit(DecimalConstant& node) {}
     virtual void Visit(HexadecimalConstant& node) {}
+    virtual void Visit(ByteConstant& node) {}
+    virtual void Visit(WydeConstant& node) {}
+    virtual void Visit(TetraConstant& node) {}
     virtual void Visit(CharacterConstant& node) {}
     virtual void Visit(StringConstant& node) {}
     virtual void Visit(ClsIdConstant& node) {}

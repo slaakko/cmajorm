@@ -64,44 +64,13 @@ void RegisterView::SetMachine(cmsx::machine::Machine* machine_)
     machine = machine_;
 }
 
-void RegisterView::SetProcess(cmsx::os::Process* process_)
+void RegisterView::SetProcess(cmsx::kernel::Process* process_)
 {
 }
 
 void RegisterView::UpdateView()
 {
     Invalidate();
-}
-
-void RegisterView::NextLine()
-{
-}
-
-void RegisterView::PrevLine()
-{
-}
-
-void RegisterView::NextQuarter()
-{
-}
-void RegisterView::PrevQuarter()
-{
-}
-
-void RegisterView::NextPage()
-{
-}
-
-void RegisterView::PrevPage()
-{
-}
-
-void RegisterView::ToStart()
-{
-}
-
-void RegisterView::ToEnd()
-{
 }
 
 void RegisterView::OnPaint(PaintEventArgs& args)

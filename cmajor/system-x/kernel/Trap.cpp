@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <system-x/os/Trap.hpp>
+#include <system-x/kernel/Trap.hpp>
 #include <system-x/machine/Interrupt.hpp>
 #include <system-x/machine/Machine.hpp>
 #include <system-x/machine/Registers.hpp>
@@ -11,7 +11,7 @@
 #include <memory>
 #include <vector>
 
-namespace cmsx::os {
+namespace cmsx::kernel {
 
 using namespace soulng::util;
 
@@ -86,4 +86,4 @@ void DoneTrap()
     cmsx::machine::SetInterruptHandler(cmsx::machine::irq_software, nullptr);
 }
 
-} // namespace cmsx::os
+} // namespace cmsx::kernel

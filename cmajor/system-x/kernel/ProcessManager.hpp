@@ -3,16 +3,16 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMSX_OS_PROCESS_MANAGER_INCLUDED
-#define CMSX_OS_PROCESS_MANAGER_INCLUDED
-#include <system-x/os/Process.hpp>
+#ifndef CMSX_KERNEL_PROCESS_MANAGER_INCLUDED
+#define CMSX_KERNEL_PROCESS_MANAGER_INCLUDED
+#include <system-x/kernel/Process.hpp>
 #include <system-x/machine/Machine.hpp>
 
 #undef CreateProcess
 
-namespace cmsx::os {
+namespace cmsx::kernel {
 
-class CMSX_OS_API ProcessManager
+class CMSX_KERNEL_API ProcessManager
 {
 public:
     static void Init();
@@ -37,9 +37,9 @@ private:
     Process* currentProcess;
 };
 
-CMSX_OS_API void InitProcessManager();
-CMSX_OS_API void DoneProcessManager();
+CMSX_KERNEL_API void InitProcessManager();
+CMSX_KERNEL_API void DoneProcessManager();
 
-} // namespace cmsx::os
+} // namespace cmsx::kernel
 
-#endif // CMSX_OS_PROCESS_MANAGER_INCLUDED
+#endif // CMSX_KERNEL_PROCESS_MANAGER_INCLUDED

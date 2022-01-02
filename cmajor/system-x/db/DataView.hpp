@@ -19,14 +19,14 @@ public:
     virtual ~DataRange();
     cmsx::machine::Machine* GetMachine() const { return machine; }
     void SetMachine(cmsx::machine::Machine* machine_);
-    cmsx::os::Process* GetProcess() const { return process; }
-    void SetProcess(cmsx::os::Process* process_);
+    cmsx::kernel::Process* GetProcess() const { return process; }
+    void SetProcess(cmsx::kernel::Process* process_);
     virtual std::string Name() const = 0;
     virtual int64_t Start() const = 0;
     virtual int64_t Length() const = 0;
 private:
     cmsx::machine::Machine* machine;
-    cmsx::os::Process* process;
+    cmsx::kernel::Process* process;
 };
 
 class DataSegmentDataRange : public DataRange
@@ -76,7 +76,7 @@ public:
     const std::vector<std::unique_ptr<DataRange>>& Ranges() const { return ranges; }
     DataRange* GetDataRange(const std::string& rangeName) const;
     void SetMachine(cmsx::machine::Machine* machine);
-    void SetProcess(cmsx::os::Process* process);
+    void SetProcess(cmsx::kernel::Process* process);
 private:
     std::vector<std::unique_ptr<DataRange>> ranges;
     std::map<std::string, DataRange*> rangeMap;
@@ -107,7 +107,7 @@ class DataView : public Control, public DebugView
 public:
     DataView(DataViewCreateParams& createParams, DataRange* dataRange_);
     void SetMachine(cmsx::machine::Machine* machine_) override;
-    void SetProcess(cmsx::os::Process* process_) override;
+    void SetProcess(cmsx::kernel::Process* process_) override;
     void UpdateView() override;
     void NextLine() override;
     void PrevLine() override;

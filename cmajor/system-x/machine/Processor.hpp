@@ -28,6 +28,7 @@ public:
     void Run();
     void Exit(uint8_t exitCode_);
     uint8_t GetExitCode() const { return exitCode; }
+    void EnableInterrupts();
 private:
     Instruction* FetchInstruction(uint64_t& pc, uint8_t& x, uint8_t& y, uint8_t& z);
     void SetPC(Instruction* inst, uint64_t pc, uint64_t prevPC);

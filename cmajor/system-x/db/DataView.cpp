@@ -28,7 +28,7 @@ void DataRange::SetMachine(cmsx::machine::Machine* machine_)
     machine = machine_;
 }
 
-void DataRange::SetProcess(cmsx::os::Process* process_)
+void DataRange::SetProcess(cmsx::kernel::Process* process_)
 {
     process = process_;
 }
@@ -123,7 +123,7 @@ void DataRanges::SetMachine(cmsx::machine::Machine* machine)
     }
 }
 
-void DataRanges::SetProcess(cmsx::os::Process* process)
+void DataRanges::SetProcess(cmsx::kernel::Process* process)
 {
     for (auto& range : ranges)
     {
@@ -197,7 +197,7 @@ void DataView::SetMachine(cmsx::machine::Machine* machine_)
     dataRange->SetMachine(machine_);
 }
 
-void DataView::SetProcess(cmsx::os::Process* process_)
+void DataView::SetProcess(cmsx::kernel::Process* process_)
 {
     dataRange->SetProcess(process_);
 }

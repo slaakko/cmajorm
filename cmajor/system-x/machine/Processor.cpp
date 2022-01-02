@@ -132,4 +132,9 @@ void Processor::CheckInterrupts()
     }
 }
 
+void Processor::EnableInterrupts()
+{
+    machine.Regs().SetSpecial(rK, ALL_INTERRUPT_BITS);
+}
+
 } // cmsx::machine

@@ -3,23 +3,23 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMSX_OS_PROCESS_INCLUDED
-#define CMSX_OS_PROCESS_INCLUDED
-#include <system-x/os/Api.hpp>
+#ifndef CMSX_KERNEL_PROCESS_INCLUDED
+#define CMSX_KERNEL_PROCESS_INCLUDED
+#include <system-x/kernel/Api.hpp>
 #include <system-x/object/Symbol.hpp>
 #include <soulng/util/IntrusiveList.hpp>
 #include <chrono>
 #include <stdint.h>
 #include <string>
 
-namespace cmsx::os {
+namespace cmsx::kernel {
 
 enum class ProcessState
 {
     idle, running
 };
 
-class CMSX_OS_API Process : soulng::util::IntrusiveListNode<Process>
+class CMSX_KERNEL_API Process : soulng::util::IntrusiveListNode<Process>
 {
 public:
     Process(int32_t id_);
@@ -83,6 +83,6 @@ private:
     std::unique_ptr<cmsx::object::SymbolTable> symbolTable;
 };
 
-} // namespace cmsx::os
+} // namespace cmsx::kernel
 
-#endif // CMSX_OS_PROCESS_INCLUDED
+#endif // CMSX_KERNEL_PROCESS_INCLUDED

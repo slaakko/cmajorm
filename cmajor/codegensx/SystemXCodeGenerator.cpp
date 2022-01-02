@@ -102,7 +102,7 @@ void SystemXCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
         int optimizationLevel = GetOptimizationLevel();
         pass = "opt-" + std::to_string(optimizationLevel);
     }
-    cmsx::intermediate::PassManager::Instance().Run(boundCompileUnit.GetModule().LogStreamId(), &intermediateContext, pass, true);
+    cmsx::intermediate::PassManager::Instance().Run(boundCompileUnit.GetModule().LogStreamId(), &intermediateContext, pass, GetGlobalFlag(GlobalFlags::verbose));
     if (GetGlobalFlag(GlobalFlags::cpp))
     {
         cmsx::intermediate::GenerateCppCode(intermediateContext);
@@ -111,7 +111,7 @@ void SystemXCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
     {
         std::string objectFilePath = boundCompileUnit.ObjectFilePath();
         std::string assemblyFilePath = Path::ChangeExtension(objectFilePath, ".s");
-        cmsx::assembler::Assemble(boundCompileUnit.GetModule().LogStreamId(), assemblyFilePath, objectFilePath, true);
+        cmsx::assembler::Assemble(boundCompileUnit.GetModule().LogStreamId(), assemblyFilePath, objectFilePath, GetGlobalFlag(GlobalFlags::verbose));
     }
 
 /*

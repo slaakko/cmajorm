@@ -3,10 +3,10 @@
 // Distributed under the MIT license
 // =================================
 
-#include <system-x/os/TrapExit.hpp>
-#include <system-x/os/Trap.hpp>
+#include <system-x/kernel/TrapExit.hpp>
+#include <system-x/kernel/Trap.hpp>
 
-namespace cmsx::os {
+namespace cmsx::kernel {
 
 class TrapExitHandler : public TrapHandler
 {
@@ -31,4 +31,4 @@ void DoneTrapExit()
     SetTrapHandler(trap_exit, nullptr);
 }
 
-} // namespace cmsx::os
+} // namespace cmsx::kernel

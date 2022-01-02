@@ -14,6 +14,7 @@ class Machine;
 
 const uint8_t irq_software = 0;
 const uint64_t SOFTWARE_INTERRUPT_BIT = static_cast<uint64_t>(1) << irq_software;
+const uint64_t ALL_INTERRUPT_BITS = 0xFFFFFFFFFFFFFFFF;
 
 class CMSX_MACHINE_API InterruptHandler
 {

@@ -70,11 +70,27 @@ void Debugger::StepOver()
     {
         throw std::runtime_error("debugger not ready");
     }
-    uint64_t address = machine.Regs().GetPC() + 4;
-    breakpoints.insert(address);
-    state = DebuggerState::running;
-    commandAvailable = true;
-    Release();
+    uint64_t pc = machine.Regs().GetPC();
+    uint8_t opc = machine.Mem().ReadByte(pc, cmsx::machine::Protection::read);
+    switch (opc)
+    {
+        case cmsx::machine::CALL:
+        case cmsx::machine::CALLI:
+        {
+            uint64_t address = pc + 4;
+            breakpoints.insert(address);
+            state = DebuggerState::running;
+            commandAvailable = true;
+            Release();
+            break;
+        }
+        default:
+        {
+            lock.unlock();
+            SingleStep();
+            break;
+        }
+    }
 }
 
 void Debugger::Continue()
@@ -122,6 +138,8 @@ void Debugger::Release()
 void Debugger::WaitForCommand()
 {
     std::unique_lock<std::mutex> lock(mtx);
+    commandAvailable = false;
+    exiting = false;
     state = DebuggerState::waiting_for_command;
     NotifyReady();
     commandAvailableOrExitingVar.wait(lock, [this]{ return commandAvailable || exiting; });
