@@ -5,6 +5,7 @@
 
 #include <system-x/kernel/Load.hpp>
 #include <system-x/kernel/Process.hpp>
+#include <system-x/kernel/Trap.hpp>
 #include <system-x/object/BinaryFile.hpp>
 #include <soulng/util/Util.hpp>
 
@@ -150,6 +151,7 @@ void Load(Process* process, const std::vector<std::string>& args, const std::vec
             mainArgAddr = mainArgAddr + 8;
             machine.Mem().WriteOcta(static_cast<uint64_t>(mainArgAddr), static_cast<uint64_t>(envAddress), cmsx::machine::Protection::write);
             process->SetSymbolTable(executable->ReleaseSymbolTable());
+            AddTrapsToSymbolTable(*process->GetSymbolTable());
             machine.GetProcessor().EnableInterrupts();
         }
         else

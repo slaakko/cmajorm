@@ -208,6 +208,12 @@ Locations LinearScanRegisterAllocator::GetLocations(Instruction* inst) const
     return Locations::none;
 }
 
+void LinearScanRegisterAllocator::AddRegisterLocation(Instruction* inst, const Register& reg)
+{
+    locations[inst] = locations[inst] | Locations::reg;
+    registers[inst] = reg;
+}
+
 int LinearScanRegisterAllocator::LastActiveLocalReg() const
 {
     int lastActiveLocalReg = -1;

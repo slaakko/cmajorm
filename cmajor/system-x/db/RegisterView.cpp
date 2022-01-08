@@ -68,7 +68,7 @@ void RegisterView::SetProcess(cmsx::kernel::Process* process_)
 {
 }
 
-void RegisterView::UpdateView()
+void RegisterView::UpdateView(bool updateCurrentAddress)
 {
     Invalidate();
 }
@@ -103,21 +103,26 @@ void RegisterView::Paint(Graphics& graphics)
     PointF origin;
     float col1x = 21 * charWidth;
     float col2x = 2 * 21 * charWidth;
+    float col3x = 3 * 21 * charWidth;
     PrintReg(origin, graphics, "ax", "#" + ToHexString(machine->Regs().Get(cmsx::machine::regAX)));
     PrintReg(PointF(origin.X + col1x, origin.Y), graphics, "ex", "#" + ToHexString(machine->Regs().Get(cmsx::machine::regEX)));
     PrintReg(PointF(origin.X + col2x, origin.Y), graphics, "$0", "#" + ToHexString(machine->Regs().Get(0)));
+    PrintReg(PointF(origin.X + col3x, origin.Y), graphics, "$4", "#" + ToHexString(machine->Regs().Get(4)));
     origin.Y = origin.Y + lineHeight;
     PrintReg(origin, graphics, "bx", "#" + ToHexString(machine->Regs().Get(cmsx::machine::regBX)));
     PrintReg(PointF(origin.X + col1x, origin.Y), graphics, "ix", "#" + ToHexString(machine->Regs().Get(cmsx::machine::regIX)));
     PrintReg(PointF(origin.X + col2x, origin.Y), graphics, "$1", "#" + ToHexString(machine->Regs().Get(1)));
+    PrintReg(PointF(origin.X + col3x, origin.Y), graphics, "$5", "#" + ToHexString(machine->Regs().Get(5)));
     origin.Y = origin.Y + lineHeight;
     PrintReg(origin, graphics, "cx", "#" + ToHexString(machine->Regs().Get(cmsx::machine::regCX)));
     PrintReg(PointF(origin.X + col1x, origin.Y), graphics, "fp", "#" + ToHexString(machine->Regs().Get(cmsx::machine::regFP)));
     PrintReg(PointF(origin.X + col2x, origin.Y), graphics, "$2", "#" + ToHexString(machine->Regs().Get(2)));
+    PrintReg(PointF(origin.X + col3x, origin.Y), graphics, "$6", "#" + ToHexString(machine->Regs().Get(6)));
     origin.Y = origin.Y + lineHeight;
     PrintReg(origin, graphics, "dx", "#" + ToHexString(machine->Regs().Get(cmsx::machine::regDX)));
     PrintReg(PointF(origin.X + col1x, origin.Y), graphics, "sp", "#" + ToHexString(machine->Regs().Get(cmsx::machine::regSP)));
     PrintReg(PointF(origin.X + col2x, origin.Y), graphics, "$3", "#" + ToHexString(machine->Regs().Get(3)));
+    PrintReg(PointF(origin.X + col3x, origin.Y), graphics, "$7", "#" + ToHexString(machine->Regs().Get(7)));
 }
 
 void RegisterView::PrintReg(const PointF& origin, Graphics& graphics, const std::string& regName, const std::string& regValue)

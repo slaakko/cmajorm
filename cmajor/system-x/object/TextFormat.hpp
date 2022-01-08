@@ -11,6 +11,12 @@
 
 namespace cmsx::object {
 
+class SymbolTable;
+
+using TrapAdderFunc = void(*)(SymbolTable& symbolTable);
+
+CMSX_OBJECT_API void SetTrapAdderFunc(TrapAdderFunc trapAdderFunc);
+
 CMSX_OBJECT_API void WriteBinaryFileAsText(const std::string& binaryFileName, cmsx::machine::Machine& machine, std::string& textFileName);
 
 } // namespace cmsx::object

@@ -69,6 +69,7 @@ public:
     const std::vector<Instruction*>& GetInstructions(const LiveRange& range) const;
     RegisterAllocationAction Run(Instruction* inst) override;
     Locations GetLocations(Instruction* inst) const override;
+    virtual void AddRegisterLocation(Instruction* inst, const Register& reg) override;
     int LastActiveLocalReg() const override;
     const std::vector<SpillData>& GetSpillData() const override;
 private:

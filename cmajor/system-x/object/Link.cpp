@@ -8,12 +8,52 @@
 #include <system-x/object/BinaryFile.hpp>
 #include <system-x/machine/Memory.hpp>
 #include <soulng/util/Log.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Uuid.hpp>
+#include <soulng/util/Util.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include <stdexcept>
 
 namespace cmsx::object {
 
 using namespace soulng::util;
+
+std::string LinkCodeStr(LinkCode linkCode)
+{
+    switch (linkCode)
+    {
+        case LinkCode::once:
+        {
+            return "ONCE";
+        }
+        case LinkCode::forwardLongJump:
+        {
+            return "FORWARD_LONG_JUMP";
+        }
+        case LinkCode::forwardShortJump:
+        {
+            return "FORWARD_SHORT_JUMP";
+        }
+        case LinkCode::absoluteAddrValue:
+        {
+            return "ABSOLUTE_ADDR_VALUE";
+        }
+        case LinkCode::farOcta:
+        {
+            return "FAR_OCTA";
+        }
+        case LinkCode::clsid:
+        {
+            return "CLSID";
+        }
+        case LinkCode::end:
+        {
+            return "END";
+        }
+    }
+    return std::string();
+}
 
 LinkCommand::LinkCommand(LinkCode linkCode_, uint64_t address_) : linkCode(linkCode_), address(address_), id(-1)
 {
@@ -53,6 +93,11 @@ LinkCommand* LinkOnceCommand::Clone() const
     LinkCommand* command = new LinkOnceCommand();
     command->SetId(Id());
     return command;
+}
+
+std::string LinkOnceCommand::ToString() const 
+{
+    return LinkCodeStr(Code()) + "(address=#" + ToHexString(Address()) + ", id=" + std::to_string(Id()) + ")"; 
 }
 
 LinkForwardLongJumpCommand::LinkForwardLongJumpCommand() : LinkCommand(LinkCode::forwardLongJump), symbolIndex(-1)
@@ -108,6 +153,11 @@ LinkCommand* LinkForwardLongJumpCommand::Clone() const
     return command;
 }
 
+std::string LinkForwardLongJumpCommand::ToString() const
+{
+    return LinkCodeStr(Code()) + "(address=#" + ToHexString(Address()) + ", id=" + std::to_string(Id()) + ", symbol_index=" + std::to_string(symbolIndex) + ")";
+}
+
 LinkForwardShortJumpCommand::LinkForwardShortJumpCommand() : LinkCommand(LinkCode::forwardShortJump), symbolIndex(-1)
 {
 }
@@ -158,6 +208,11 @@ LinkCommand* LinkForwardShortJumpCommand::Clone() const
     LinkCommand* command = new LinkForwardShortJumpCommand(Address(), symbolIndex);
     command->SetId(Id());
     return command;
+}
+
+std::string LinkForwardShortJumpCommand::ToString() const
+{
+    return LinkCodeStr(Code()) + "(address=#" + ToHexString(Address()) + ", id=" + std::to_string(Id()) + ", symbol_index=" + std::to_string(symbolIndex) + ")";
 }
 
 LinkAbsoluteAddressCommand::LinkAbsoluteAddressCommand() : LinkCommand(LinkCode::absoluteAddrValue), symbolIndex(-1)
@@ -214,6 +269,11 @@ void LinkAbsoluteAddressCommand::Apply(ObjectFile* objectFile, uint64_t value)
     objectFile->GetCodeSection()->EmitShortOffset(Address() + 12, offset3);
 }
 
+std::string LinkAbsoluteAddressCommand::ToString() const
+{
+    return LinkCodeStr(Code()) + "(address=#" + ToHexString(Address()) + ", id=" + std::to_string(Id()) + ", symbol_index=" + std::to_string(symbolIndex) + ")";
+}
+
 LinkFarOctaCommand::LinkFarOctaCommand() : LinkCommand(LinkCode::farOcta), symbolIndex(-1)
 {
 }
@@ -244,6 +304,11 @@ LinkCommand* LinkFarOctaCommand::Clone() const
     LinkCommand* command = new LinkFarOctaCommand(Address(), symbolIndex);
     command->SetId(Id());
     return command;
+}
+
+std::string LinkFarOctaCommand::ToString() const
+{
+    return LinkCodeStr(Code()) + "(address=#" + ToHexString(Address()) + ", id=" + std::to_string(Id()) + ", symbol_index=" + std::to_string(symbolIndex) + ")";
 }
 
 LinkClsIdCommand::LinkClsIdCommand() : LinkCommand(LinkCode::clsid), typeId1(0), typeId2(0)
@@ -280,6 +345,14 @@ void LinkClsIdCommand::Apply(ObjectFile* objectFile, uint64_t value)
     objectFile->GetDataSection()->EmitOcta(Address(), value);
 }
 
+std::string LinkClsIdCommand::ToString() const
+{
+    boost::uuids::uuid id;
+    IntsToUuid(typeId1, typeId2, id);
+    std::string s = boost::uuids::to_string(id);
+    return LinkCodeStr(Code()) + "(address=#" + ToHexString(Address()) + ", id=" + std::to_string(Id()) + ", type_id=" + s + ")";
+}
+
 LinkEndCommamnd::LinkEndCommamnd() : LinkCommand(LinkCode::end, 0)
 {
 }
@@ -289,6 +362,11 @@ LinkCommand* LinkEndCommamnd::Clone() const
     LinkCommand* command = new LinkEndCommamnd();
     command->SetId(Id());
     return command;
+}
+
+std::string LinkEndCommamnd::ToString() const
+{
+    return LinkCodeStr(Code()) + "(address=#" + ToHexString(Address()) + ", id=" + std::to_string(Id()) + ")";
 }
 
 LinkCommand* MakeLinkCommand(LinkCode linkCode)
@@ -488,8 +566,10 @@ void ProcessInternalSymbol(Symbol* symbol, Symbol* parentSymbolClone, SymbolTabl
     if (process)
     {
         symbol->SetStart(symbol->GetSection()->BaseAddress() + symbol->GetValue().Val() - symbol->GetSection()->RemoveOffset());
+        uint64_t value = symbol->Start();
+        value = Align(value, symbol->Alignment());
+        symbol->SetStart(value);
         Symbol* clone = symbol->Clone();
-        // todo: add to data section;
         clone->SetParentIndex(parentSymbolClone->Index());
         executableSymbolTable.AddSymbol(clone);
     }
@@ -497,24 +577,36 @@ void ProcessInternalSymbol(Symbol* symbol, Symbol* parentSymbolClone, SymbolTabl
 
 void ProcessExternalSymbol(LinkTable& linkTable, Symbol* symbol, Symbol*& parentSymbolClone, SymbolTable& executableSymbolTable, std::vector<Symbol*>& linkSymbols)
 {
+    if (symbol->GetSection()->IsDataSection())
+    {
+        int x = 0;
+    }
     symbol->SetStart(symbol->GetSection()->BaseAddress() + symbol->GetValue().Val() - symbol->GetSection()->RemoveOffset());
+    uint64_t value = symbol->Start();
+    uint64_t alignedValue = Align(value, symbol->Alignment());
+    symbol->SetStart(alignedValue);
     Symbol* clone = symbol->Clone();
     clone->SetLinkage(Linkage::external);
     parentSymbolClone = clone;
-    // todo: add to  data section
     executableSymbolTable.AddSymbol(clone);
     linkTable.ExecuteLinkCommands(symbol->FullName(), symbol->Start());
     linkTable.AddCopyRange(CopyRange(symbol->GetSection(), symbol->GetSection()->CopyTargetSection(), symbol->GetValue().Val(), symbol->Length(), symbol->Alignment()));
-    symbol->GetSection()->SetCopyStartPos(symbol->GetValue().Val() + symbol->Length());
+    //symbol->GetSection()->SetCopyStartPos(symbol->GetValue().Val() + symbol->Length());
     linkSymbols.push_back(symbol);
 }
 
 void RemoveSymbol(Symbol* symbol)
 {
     symbol->SetLinkage(Linkage::remove);
-    symbol->GetSection()->SetCopyStartPos(symbol->GetValue().Val() + symbol->Length());
-    symbol->GetSection()->SetRemoveOffset(symbol->GetSection()->RemoveOffset() + symbol->Length());
-    symbol->GetSection()->SetDataLength(symbol->GetSection()->DataLength() - symbol->Length());
+    //symbol->GetSection()->SetCopyStartPos(symbol->GetValue().Val() + symbol->Length());
+    uint64_t length = symbol->Length();
+    if (symbol->GetSegment() == Segment::data)
+    {
+        length = Align(length, 8);
+    }
+    symbol->GetSection()->SetRemoveOffset(symbol->GetSection()->RemoveOffset() + length);
+    int64_t newLength = symbol->GetSection()->DataLength() - length;
+    symbol->GetSection()->SetDataLength(newLength);
 }
 
 void ProcessSymbol(LinkTable& linkTable, Symbol* symbol, SymbolTable& objectFileSymbolTable, SymbolTable& executableSymbolTable, ExecutableFile* executable, 
@@ -663,18 +755,20 @@ void ProcessLinkCommands(LinkTable& linkTable, Symbol* linkSymbol, ObjectFile* o
 
 void ProcessSymbols(LinkTable& linkTable, ObjectFile* objectFile, ExecutableFile* executable)
 {
+    if (objectFile->FileName() == "Memory.o")
+    {
+        int x = 0;
+    }
     SymbolTable& executableSymbolTable = executable->GetSymbolTable();
     SymbolTable& objectFileSymbolTable = objectFile->GetSymbolTable();
     Section* codeSection = objectFile->GetCodeSection();
-    codeSection->SetCopyStartPos(0);
+    //codeSection->SetCopyStartPos(0);
     codeSection->SetCopyTargetSection(executable->GetCodeSection());
     codeSection->SetRemoveOffset(0);
-    int64_t codeSectionLength = codeSection->DataLength();
     Section* dataSection = objectFile->GetDataSection();
-    dataSection->SetCopyStartPos(0);
+    //dataSection->SetCopyStartPos(0);
     dataSection->SetCopyTargetSection(executable->GetDataSection());
     dataSection->SetRemoveOffset(0);
-    int64_t dataSectionLength = dataSection->DataLength();
     std::vector<Symbol*> linkSymbols;
     Symbol* parentSymbolClone = nullptr;
     for (auto& symbol : objectFileSymbolTable.Symbols())
@@ -770,7 +864,7 @@ void CopyRanges(const std::vector<CopyRange>& copyRanges)
 
 void Link(int logStreamId, const std::string& executableFilePath, const std::vector<std::string>& binaryFileNames, const std::string& clsIdFileName, bool verbose)
 {
-    LinkTable linkTable;
+    LinkTable linkTable(clsIdFileName);
     std::unique_ptr<ExecutableFile> executable(new ExecutableFile(executableFilePath));
     executable->CreateSections();
     executable->GetSymbolTable().InstallDefaultSymbols();

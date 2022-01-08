@@ -80,6 +80,22 @@ void InstructionFormatter::FormatSetAddress(uint64_t saddr)
 {
 }
 
+void InstructionFormatter::FormatTrapName(uint8_t trap)
+{
+}
+
+void InstructionFormatter::FormatSpace()
+{
+}
+
+void InstructionFormatter::FormatChar(uint8_t x)
+{
+}
+
+void InstructionFormatter::FormatString(const std::string& s)
+{
+}
+
 void InstructionFormatter::Format(Trap& inst, uint8_t x, uint8_t y, uint8_t z)
 {
     FormatOpCode(GetOpCodeName(inst.OpCode()));
@@ -88,6 +104,7 @@ void InstructionFormatter::Format(Trap& inst, uint8_t x, uint8_t y, uint8_t z)
     FormatByteOperand(y);
     FormatComma();
     FormatByteOperand(z);
+    FormatTrapName(y);
 }
 
 void InstructionFormatter::Format(Swym& inst, uint8_t x, uint8_t y, uint8_t z)
@@ -243,6 +260,12 @@ void InstructionFormatter::Format(Ldou& inst, uint8_t x, uint8_t y, uint8_t z)
     FormatRegOperand(y);
     FormatComma();
     FormatRegOperand(z);
+    int64_t saddr = GetSetAddress(absoluteAddress - 4);
+    if (saddr >= dataSegmentBaseAddress && saddr < poolSegmentBaseAddress)
+    {
+        FormatColon();
+        FormatSetAddress(saddr);
+    }
 }
 
 void InstructionFormatter::Format(Ldoui& inst, uint8_t x, uint8_t y, uint8_t z)
@@ -253,6 +276,12 @@ void InstructionFormatter::Format(Ldoui& inst, uint8_t x, uint8_t y, uint8_t z)
     FormatRegOperand(y);
     FormatComma();
     FormatByteOperand(z);
+    int64_t saddr = GetSetAddress(absoluteAddress - 4);
+    if (saddr >= dataSegmentBaseAddress && saddr < poolSegmentBaseAddress)
+    {
+        FormatColon();
+        FormatSetAddress(saddr);
+    }
 }
 
 void InstructionFormatter::Format(Ldht& inst, uint8_t x, uint8_t y, uint8_t z)
@@ -1927,8 +1956,11 @@ void InstructionFormatter::Format(Call& inst, uint8_t x, uint8_t y, uint8_t z)
     FormatRegOperand(y);
     FormatComma();
     FormatRegOperand(z);
-    FormatColon();
-    FormatSetAddress(GetSetAddress(absoluteAddress - 4));
+    if (y == cmsx::machine::regEX)
+    {
+        FormatColon();
+        FormatSetAddress(GetSetAddress(absoluteAddress - 4));
+    }
 }
 
 void InstructionFormatter::Format(Calli& inst, uint8_t x, uint8_t y, uint8_t z)
@@ -1939,8 +1971,11 @@ void InstructionFormatter::Format(Calli& inst, uint8_t x, uint8_t y, uint8_t z)
     FormatRegOperand(y);
     FormatComma();
     FormatByteOperand(z);
-    FormatColon();
-    FormatSetAddress(GetSetAddress(absoluteAddress - 4));
+    if (y == cmsx::machine::regEX)
+    {
+        FormatColon();
+        FormatSetAddress(GetSetAddress(absoluteAddress - 4));
+    }
 }
 
 void InstructionFormatter::Format(Ret& inst, uint8_t x, uint8_t y, uint8_t z)

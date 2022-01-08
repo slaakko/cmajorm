@@ -233,6 +233,7 @@ void VerifierVisitor::CheckBinaryInstuction(BinaryInstruction* binaryInstruction
 
 void VerifierVisitor::Visit(Function& function)
 {
+    if (!function.IsDefined()) return;
     index = 0;
     numParams = 0;
     regNumber = 0;
@@ -240,7 +241,8 @@ void VerifierVisitor::Visit(Function& function)
     function.VisitBasicBlocks(*this);
     if (numParams != function.Arity())
     {
-        Error("code verification error: function '" + function.Name() + "' has wrong number of parameters", function.GetSourcePos(), GetContext());
+        Error("code verification error: function '" + function.Name() + "' has wrong number of parameters: " + std::to_string(numParams) + 
+            " parameters, function arity=" + std::to_string(function.Arity()), function.GetSourcePos(), GetContext());
     }
     function.SetNextRegNumber(regNumber);
 }

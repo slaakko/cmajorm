@@ -5,6 +5,17 @@
 
 namespace System
 {
+	private long pageSize = -1;
+	
+	internal nothrow long PageSize() 
+	{
+		if (pageSize == -1)
+		{
+			pageSize = memory_page_size();
+		}
+		return pageSize;
+	}
+	
     internal class Block
     {
         public nothrow Block() : next(this), size(0)
@@ -13,9 +24,13 @@ namespace System
         public Block* next;
         public long size;
     }
-
+	
     public nothrow void* malloc(long numBytes)
     {
+		if (numBytes <= 0)
+		{
+			return null;
+		}
         Block* block = Memory.AllocateBlock(numBytes);
         if (block == null)
         {
@@ -32,7 +47,7 @@ namespace System
         void* ptr = malloc(numBytes);
         if (ptr == null)
         {
-            ThrowSystemError();
+            exit(254);
         }
         else
         {
@@ -46,10 +61,13 @@ namespace System
         Memory.FreeBlock(block);
     }
 
+	public nothrow void DumpHeap()
+	{
+		Memory.Dump();
+	}
+
     internal static class Memory
     {
-        internal const long minBlockSize = 64 * 1024;
-    
         static nothrow Memory() : baseBlock(), free(&baseBlock)
         {
         }
@@ -114,22 +132,42 @@ namespace System
             }
             free = p;
         }
+		public static nothrow void Dump()
+		{
+			dump_heap(cast<ulong>(cast<void*>(free)));
+		}
         private static nothrow Block* AllocateMoreMemory(long numUnits)
         {
             long numBytes = numUnits * sizeof(Block);
-            if (numBytes < minBlockSize)
+			long pgsz = PageSize();
+			if (pgsz == -1)
+			{
+				return null;
+			}
+            if (numBytes < pgsz)
             {
-                numBytes = minBlockSize;
+                numBytes = pgsz;
             }
-            void* p = pool_end();
-            long r = set_pool_end(cast<void*>(cast<byte*>(p) + numBytes));
-            if (r == -1)
-            {
-                return null;
-            }
-            Block* u = cast<Block*>(p);
+			int numPages = cast<int>((numBytes - 1) / pgsz + 1);
+			long start = heap_start();
+			if (start == -1)
+			{
+				return null;
+			}
+			long length = heap_length();
+			if (length == -1)
+			{
+				return null;
+			}
+			long p = start + length;
+			long amountAllocated = allocate_memory_pages(numPages);
+			if (amountAllocated == -1)
+			{
+				return null;
+			}
+            Block* u = cast<Block*>(cast<void*>(cast<ulong>(p)));
             u->next = null;
-            u->size = numBytes / sizeof(Block);
+            u->size = amountAllocated;
             FreeBlock(u);
             return free;
         }

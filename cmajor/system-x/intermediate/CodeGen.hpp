@@ -58,6 +58,7 @@ class ULongValue;
 class FloatValue;
 class DoubleValue;
 class AddressValue;
+class SymbolValue;
 class StringValue;
 
 class CMSX_INTERMEDIATE_API CodeGenerator
@@ -74,6 +75,7 @@ public:
     virtual void EmitByte(uint8_t value) = 0;
     virtual void EmitSymbol(const std::string& name) = 0;
     virtual int ExitLabelId() const = 0;
+    virtual void EmitClsId(const std::string& typeId) = 0;
     virtual void Error(const std::string& message) = 0;
 };
 
@@ -134,7 +136,9 @@ CMSX_INTERMEDIATE_API void EmitFloat(FloatValue& value, CodeGenerator& codeGen);
 CMSX_INTERMEDIATE_API void EmitDouble(DoubleValue& value, CodeGenerator& codeGen);
 CMSX_INTERMEDIATE_API void EmitNull(CodeGenerator& codeGen);
 CMSX_INTERMEDIATE_API void EmitAddress(AddressValue& value, CodeGenerator& codeGen);
+CMSX_INTERMEDIATE_API void EmitSymbol(SymbolValue& value, CodeGenerator& codeGen);
 CMSX_INTERMEDIATE_API void EmitString(StringValue& value, CodeGenerator& codeGen);
+CMSX_INTERMEDIATE_API void EmitClsId(const std::string& typeId, CodeGenerator& codeGen);
 
 } // cmsx::intermediate
 

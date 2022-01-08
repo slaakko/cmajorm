@@ -62,9 +62,9 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 case 11:
                 case 12:
                 case 13:
-                case 15:
                 case 16:
                 case 17:
+                case 18:
                 {
                     return 5;
                 }
@@ -90,7 +90,7 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 {
                     return 10;
                 }
-                case 18:
+                case 15:
                 {
                     return 11;
                 }
@@ -506,26 +506,6 @@ int AssemblyLexer::NextState(int state, char32_t c)
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
-            int tokenId = GetTokenId(11);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            return -1;
-        }
-        case 16:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
             int tokenId = GetTokenId(10);
             if (tokenId == CONTINUE_TOKEN)
             {
@@ -542,7 +522,7 @@ int AssemblyLexer::NextState(int state, char32_t c)
             }
             return -1;
         }
-        case 15:
+        case 16:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -567,22 +547,22 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 case 11:
                 case 12:
                 case 13:
-                case 15:
                 case 16:
                 case 17:
-                case 20:
+                case 18:
+                case 21:
                 {
                     return 33;
                 }
-                case 19:
+                case 20:
                 {
                     return 34;
                 }
-                case 21:
+                case 22:
                 {
                     return 35;
                 }
-                case 22:
+                case 23:
                 {
                     return 36;
                 }
@@ -617,22 +597,22 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 case 11:
                 case 12:
                 case 13:
-                case 15:
                 case 16:
                 case 17:
-                case 20:
+                case 18:
+                case 21:
                 {
                     return 33;
                 }
-                case 19:
+                case 20:
                 {
                     return 34;
                 }
-                case 21:
+                case 22:
                 {
                     return 35;
                 }
-                case 22:
+                case 23:
                 {
                     return 36;
                 }
@@ -667,22 +647,22 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 case 11:
                 case 12:
                 case 13:
-                case 15:
                 case 16:
                 case 17:
-                case 20:
+                case 18:
+                case 21:
                 {
                     return 33;
                 }
-                case 19:
+                case 20:
                 {
                     return 34;
                 }
-                case 21:
+                case 22:
                 {
                     return 35;
                 }
-                case 22:
+                case 23:
                 {
                     return 36;
                 }
@@ -717,22 +697,22 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 case 11:
                 case 12:
                 case 13:
-                case 15:
                 case 16:
                 case 17:
-                case 20:
+                case 18:
+                case 21:
                 {
                     return 33;
                 }
-                case 19:
+                case 20:
                 {
                     return 34;
                 }
-                case 21:
+                case 22:
                 {
                     return 35;
                 }
-                case 22:
+                case 23:
                 {
                     return 36;
                 }
@@ -767,22 +747,22 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 case 11:
                 case 12:
                 case 13:
-                case 15:
                 case 16:
                 case 17:
-                case 20:
+                case 18:
+                case 21:
                 {
                     return 33;
                 }
-                case 19:
+                case 20:
                 {
                     return 34;
                 }
-                case 21:
+                case 22:
                 {
                     return 35;
                 }
-                case 22:
+                case 23:
                 {
                     return 36;
                 }
@@ -792,7 +772,7 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 14:
+        case 15:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -817,22 +797,22 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 case 11:
                 case 12:
                 case 13:
-                case 15:
                 case 16:
                 case 17:
-                case 20:
+                case 18:
+                case 21:
                 {
                     return 33;
                 }
-                case 19:
+                case 20:
                 {
                     return 34;
                 }
-                case 21:
+                case 22:
                 {
                     return 35;
                 }
-                case 22:
+                case 23:
                 {
                     return 36;
                 }
@@ -842,7 +822,7 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 13:
+        case 14:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -862,7 +842,7 @@ int AssemblyLexer::NextState(int state, char32_t c)
             }
             switch (i)
             {
-                case 20:
+                case 21:
                 {
                     return 37;
                 }
@@ -892,7 +872,7 @@ int AssemblyLexer::NextState(int state, char32_t c)
             }
             switch (i)
             {
-                case 20:
+                case 21:
                 {
                     return 37;
                 }
@@ -902,7 +882,7 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 12:
+        case 13:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -922,7 +902,7 @@ int AssemblyLexer::NextState(int state, char32_t c)
             }
             switch (i)
             {
-                case 20:
+                case 21:
                 {
                     return 38;
                 }
@@ -952,7 +932,7 @@ int AssemblyLexer::NextState(int state, char32_t c)
             }
             switch (i)
             {
-                case 20:
+                case 21:
                 {
                     return 38;
                 }
@@ -962,11 +942,31 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 11:
+        case 12:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
             int tokenId = GetTokenId(25);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            return -1;
+        }
+        case 11:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(11);
             if (tokenId == CONTINUE_TOKEN)
             {
                 token.id = tokenId;
@@ -1022,7 +1022,7 @@ int AssemblyLexer::NextState(int state, char32_t c)
             }
             switch (i)
             {
-                case 16:
+                case 17:
                 {
                     return 39;
                 }
@@ -1078,7 +1078,7 @@ int AssemblyLexer::NextState(int state, char32_t c)
         {
             switch (i)
             {
-                case 17:
+                case 18:
                 {
                     return 43;
                 }
@@ -1107,30 +1107,13 @@ int AssemblyLexer::NextState(int state, char32_t c)
             switch (i)
             {
                 case 15:
-                case 16:
-                case 17:
-                case 20:
                 {
                     return 45;
                 }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 45:
-        {
-            switch (i)
-            {
-                case 15:
                 case 16:
                 case 17:
-                case 20:
-                {
-                    return 45;
-                }
                 case 18:
+                case 21:
                 {
                     return 46;
                 }
@@ -1141,6 +1124,31 @@ int AssemblyLexer::NextState(int state, char32_t c)
             }
         }
         case 46:
+        {
+            switch (i)
+            {
+                case 15:
+                {
+                    return 45;
+                }
+                case 16:
+                case 17:
+                case 18:
+                case 21:
+                {
+                    return 46;
+                }
+                case 19:
+                {
+                    return 47;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 47:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -1159,6 +1167,31 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 token.match = prevMatch;
             }
             return -1;
+        }
+        case 45:
+        {
+            switch (i)
+            {
+                case 15:
+                {
+                    return 45;
+                }
+                case 16:
+                case 17:
+                case 18:
+                case 21:
+                {
+                    return 46;
+                }
+                case 19:
+                {
+                    return 47;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
         }
         case 8:
         {
@@ -1180,12 +1213,12 @@ int AssemblyLexer::NextState(int state, char32_t c)
             }
             switch (i)
             {
-                case 15:
                 case 16:
                 case 17:
-                case 20:
+                case 18:
+                case 21:
                 {
-                    return 47;
+                    return 48;
                 }
                 default:
                 {
@@ -1193,7 +1226,7 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 47:
+        case 48:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -1213,12 +1246,12 @@ int AssemblyLexer::NextState(int state, char32_t c)
             }
             switch (i)
             {
-                case 15:
                 case 16:
                 case 17:
-                case 20:
+                case 18:
+                case 21:
                 {
-                    return 47;
+                    return 48;
                 }
                 default:
                 {
@@ -1249,7 +1282,7 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 case 6:
                 case 7:
                 {
-                    return 48;
+                    return 49;
                 }
                 default:
                 {
@@ -1257,7 +1290,7 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 48:
+        case 49:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -1280,7 +1313,7 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 case 6:
                 case 7:
                 {
-                    return 48;
+                    return 49;
                 }
                 default:
                 {
@@ -1333,22 +1366,22 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 case 11:
                 case 12:
                 case 13:
-                case 15:
                 case 16:
                 case 17:
-                case 20:
+                case 18:
+                case 21:
                 {
                     return 33;
                 }
-                case 19:
+                case 20:
                 {
                     return 34;
                 }
-                case 21:
+                case 22:
                 {
                     return 35;
                 }
-                case 22:
+                case 23:
                 {
                     return 36;
                 }
@@ -1413,11 +1446,11 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 case 35:
                 case 36:
                 {
-                    return 49;
+                    return 50;
                 }
                 case 3:
                 {
-                    return 50;
+                    return 51;
                 }
                 default:
                 {
@@ -1425,7 +1458,7 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 50:
+        case 51:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -1445,13 +1478,13 @@ int AssemblyLexer::NextState(int state, char32_t c)
             }
             return -1;
         }
-        case 49:
+        case 50:
         {
             switch (i)
             {
                 case 3:
                 {
-                    return 50;
+                    return 51;
                 }
                 default:
                 {
@@ -1481,7 +1514,7 @@ int AssemblyLexer::NextState(int state, char32_t c)
             {
                 case 2:
                 {
-                    return 51;
+                    return 52;
                 }
                 case 3:
                 case 4:
@@ -1518,7 +1551,58 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 case 35:
                 case 36:
                 {
+                    return 53;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 53:
+        {
+            switch (i)
+            {
+                case 2:
+                {
                     return 52;
+                }
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 53;
                 }
                 default:
                 {
@@ -1527,57 +1611,6 @@ int AssemblyLexer::NextState(int state, char32_t c)
             }
         }
         case 52:
-        {
-            switch (i)
-            {
-                case 2:
-                {
-                    return 51;
-                }
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 52;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 51:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -1639,7 +1672,7 @@ int AssemblyLexer::NextState(int state, char32_t c)
             {
                 case 1:
                 {
-                    return 53;
+                    return 54;
                 }
                 default:
                 {
@@ -1647,7 +1680,7 @@ int AssemblyLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 53:
+        case 54:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;

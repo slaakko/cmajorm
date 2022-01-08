@@ -28,6 +28,7 @@ public:
     void EmitByte(uint8_t value) override;
     void EmitSymbol(const std::string& name) override;
     int ExitLabelId() const override;
+    void EmitClsId(const std::string& typeId) override;
     void WriteOutputFile();
     void Visit(GlobalVariable& globalVariable) override;
     void Visit(Function& function) override;

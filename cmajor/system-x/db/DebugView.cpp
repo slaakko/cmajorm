@@ -15,7 +15,7 @@ DebugView::~DebugView()
 {
 }
 
-void DebugView::UpdateView()
+void DebugView::UpdateView(bool updateCurrentAddress)
 {
 }
 
@@ -24,6 +24,10 @@ void DebugView::SetMachine(cmsx::machine::Machine* machine)
 }
 
 void DebugView::SetProcess(cmsx::kernel::Process* process)
+{
+}
+
+void DebugView::SetDebugger(Debugger* debugger)
 {
 }
 

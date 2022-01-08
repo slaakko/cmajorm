@@ -6,6 +6,7 @@
 #include <system-x/object/Archive.hpp>
 #include <system-x/object/BinaryFile.hpp>
 #include <soulng/util/Log.hpp>
+#include <boost/filesystem.hpp>
 
 namespace cmsx::object {
 
@@ -22,10 +23,17 @@ void CreateArchive(int logStreamId, const std::string& archiveFilePath, const st
         {
             LogMessage(logStreamId, "> " + objectFilePaths[i]);
         }
-        std::unique_ptr<BinaryFile> binaryFile(ReadBinaryFile(objectFilePaths[i]));
-        if (binaryFile->Kind() == BinaryFileKind::objectFile)
+        if (boost::filesystem::exists(objectFilePaths[i]))
         {
-            archiveFile->AddObjectFile(static_cast<ObjectFile*>(binaryFile.release()));
+            std::unique_ptr<BinaryFile> binaryFile(ReadBinaryFile(objectFilePaths[i]));
+            if (binaryFile->Kind() == BinaryFileKind::objectFile)
+            {
+                archiveFile->AddObjectFile(static_cast<ObjectFile*>(binaryFile.release()));
+            }
+            else
+            {
+                throw std::runtime_error("object file expected: " + objectFilePaths[i]);
+            }
         }
     }
     archiveFile->WriteFile();

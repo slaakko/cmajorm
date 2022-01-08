@@ -1665,13 +1665,7 @@ void* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
         }
         else if (GetBackEnd() == BackEnd::cmsx)
         {
-            uint64_t typeId1 = 0;
-            uint64_t typeId2 = 0;
-            std::string typeId;
-            for (uint8_t x : TypeId())
-            {
-                typeId.append(soulng::util::ToHexString(x));
-            }
+            std::string typeId = boost::uuids::to_string(TypeId());
             vmtArray.push_back(emitter.GetClsIdValue(typeId)); // 128-bit type id
             vmtArray.push_back(emitter.GetConversionValue(emitter.GetIrTypeForVoidPtrType(), className)); // class name pointer
             if (!implementedInterfaces.empty())

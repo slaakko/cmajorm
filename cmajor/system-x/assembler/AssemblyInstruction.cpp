@@ -113,7 +113,7 @@ void StructureInstruction::Assemble(Assembler& assembler)
     structureSymbol->SetStart(assembler.CurrentSection()->BaseAddress() + assembler.CurrentSection()->Address());
     structureSymbol->SetAlignment(8);
     assembler.SetParentIndex(structureSymbol->Index());
-    assembler.SetCurrentFunctionSymbol(structureSymbol);
+    assembler.SetCurrentStructureSymbol(structureSymbol);
 };
 
 class EndStructureInstruction : public AssemblyInstruction
@@ -245,9 +245,13 @@ void OctaInstruction::Assemble(Assembler& assembler)
                 {
                     assembler.EmitPureOctaValue("octa", value);
                 }
+                else if (value.IsTypeIdIndex())
+                {
+                    assembler.EmitClsIdCommmand(value.Val(), currentInst->GetSourcePos());
+                }
                 else
                 {
-                    assembler.Error(currentInst->GetOpCode()->Name() + " operand must be a symbol or pure", currentInst->GetSourcePos());
+                    assembler.Error(currentInst->GetOpCode()->Name() + " operand must be a symbol, pure or type id index", currentInst->GetSourcePos());
                 }
             }
         }
@@ -630,6 +634,7 @@ void NegateInstruction::Assemble(Assembler& assembler)
                     ++opc;
                 }
                 assembler.EmitOpCode(opc);
+                assembler.EmitRegisterValue("X", currentInst->Operands()[0]);
                 if (currentInst->Operands()[1].IsPureValue())
                 {
                     assembler.EmitPureByteValue("Y", currentInst->Operands()[1]);
@@ -658,18 +663,19 @@ void NegateInstruction::Assemble(Assembler& assembler)
                     ++opc;
                 }
                 assembler.EmitOpCode(opc);
+                assembler.EmitRegisterValue("X", currentInst->Operands()[0]);
                 assembler.EmitPureByteValue("Y", cmsx::object::Value(static_cast<uint64_t>(0)));
-                if (currentInst->Operands()[2].IsRegValue())
+                if (currentInst->Operands()[1].IsRegValue())
                 {
-                    assembler.EmitRegisterValue("Z", currentInst->Operands()[2]);
+                    assembler.EmitRegisterValue("Z", currentInst->Operands()[1]);
                 }
-                else if (currentInst->Operands()[2].IsPureValue())
+                else if (currentInst->Operands()[1].IsPureValue())
                 {
-                    assembler.EmitPureByteValue("Z", currentInst->Operands()[2]);
+                    assembler.EmitPureByteValue("Z", currentInst->Operands()[1]);
                 }
                 else
                 {
-                    assembler.Error(currentInst->GetOpCode()->Name() + " Z operand must be a register or pure", currentInst->GetSourcePos());
+                    assembler.Error(currentInst->GetOpCode()->Name() + " Z operand must be a register", currentInst->GetSourcePos());
                 }
             }
             else
@@ -1265,6 +1271,8 @@ AssemblyInstructionMap::AssemblyInstructionMap()
     MapInstruction(cmsx::assembler::ENDS, endStructInstruction);
     AssemblyInstruction* byteInstruction = AddInstruction(new ByteInstruction());
     MapInstruction(cmsx::assembler::BYTE, byteInstruction);
+    AssemblyInstruction* wydeInstruction = AddInstruction(new WydeInstruction());
+    MapInstruction(cmsx::assembler::WYDE, wydeInstruction);
     AssemblyInstruction* tetraInstruction = AddInstruction(new TetraInstruction());
     MapInstruction(cmsx::assembler::TETRA, tetraInstruction);
     AssemblyInstruction* octaInstruction = AddInstruction(new OctaInstruction());

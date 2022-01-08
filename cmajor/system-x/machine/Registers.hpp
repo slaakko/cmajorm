@@ -74,7 +74,7 @@ public:
             uint64_t rl = GetSpecial(rL);
             if (regNum >= rl)
             {
-                SetSpecial(rL, regNum + 1);
+                SetSpecial(rL, static_cast<uint64_t>(regNum + 1));
             }
             return localRegs[regNum];
         }
@@ -91,7 +91,7 @@ public:
             uint64_t rl = GetSpecial(rL);
             if (regNum >= rl)
             {
-                SetSpecial(rL, regNum + 1);
+                SetSpecial(rL, static_cast<uint64_t>(regNum + 1));
             }
             localRegs[regNum] = value;
         }

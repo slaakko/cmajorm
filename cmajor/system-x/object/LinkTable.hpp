@@ -7,6 +7,7 @@
 #define CMSX_OBJECT_LINK_TABLE_INCLUDED
 #include <system-x/object/CopyRange.hpp>
 #include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_hash.hpp>
 #include <memory>
 #include <map>
 #include <set>
@@ -48,7 +49,7 @@ private:
 class CMSX_OBJECT_API LinkTable
 {
 public:
-    LinkTable();
+    LinkTable(const std::string& classIdFilePath_);
     LinkTable(const LinkTable&) = delete;
     LinkTable& operator=(const LinkTable&) = delete;
     void AddUsedSymbolName(const std::string& symbolName);
@@ -64,10 +65,12 @@ public:
     void CheckUnresolvedSymbols(int logStreamId);
     const std::vector<CopyRange>& CopyRanges() const { return copyRanges; }
 private:
+    std::string classIdFilePath;
     std::set<std::string> usedSymbolNames;
     std::map<std::string, std::vector<UnprocessedSymbol>> unprocessedSymbolMap;
     std::vector<CopyRange> copyRanges;
     std::map<std::string, std::vector<UnprocessedLinkCommand>> unprocessedLinkCommandMap;
+    std::map<boost::uuids::uuid, uint64_t> classIdMap;
 };
 
 } // namespace cmsx::object

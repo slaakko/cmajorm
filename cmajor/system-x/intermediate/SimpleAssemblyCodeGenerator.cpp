@@ -23,6 +23,14 @@ void SimpleAssemblyCodeGenerator::WriteOutputFile()
 
 void SimpleAssemblyCodeGenerator::Visit(GlobalVariable& globalVariable)
 {
+    if (globalVariable.Once())
+    {
+        assemblyFile->GetLinkSection()->GetOrCreateLinkOnceObject()->AddLinkOnceSymbol(cmsx::assembler::MakeGlobalSymbol(globalVariable.Name()));
+    }
+    else
+    {
+        assemblyFile->GetLinkSection()->GetOrCreateExternObject()->AddExternSymbol(cmsx::assembler::MakeGlobalSymbol(globalVariable.Name()));
+    }
     emitSection = cmsx::assembler::AssemblySectionKind::data;
     cmsx::assembler::AssemblySection* dataSection = assemblyFile->GetDataSection();
     assemblyStructure = dataSection->CreateStructure(globalVariable.Name());
@@ -115,6 +123,16 @@ void SimpleAssemblyCodeGenerator::EmitSymbol(const std::string& name)
 int SimpleAssemblyCodeGenerator::ExitLabelId() const
 {
     return currentInst->Parent()->Parent()->LastBasicBlock()->Id() + 1;
+}
+
+void SimpleAssemblyCodeGenerator::EmitClsId(const std::string& typeId)
+{
+    if (!assemblyInst)
+    {
+        cmsx::assembler::Instruction* octaInst = new cmsx::assembler::Instruction(cmsx::assembler::OCTA);
+        Emit(octaInst);
+    }
+    assemblyInst->AddOperand(new cmsx::assembler::ClsIdConstant(SourcePos(), typeId));
 }
 
 void SimpleAssemblyCodeGenerator::Error(const std::string& message)
@@ -427,10 +445,23 @@ void SimpleAssemblyCodeGenerator::Visit(AddressValue& value)
 
 void SimpleAssemblyCodeGenerator::Visit(ArrayValue& value)
 {
-    assemblyInst = nullptr;
-    for (ConstantValue* elementValue : value.Elements())
+    if (value.GetType()->IsArrayType())
     {
-        elementValue->Accept(*this);
+        if (!assemblyInst)
+        {
+            ArrayType* arrayType = static_cast<ArrayType*>(value.GetType());
+            Type* elementType = arrayType->ElementType();
+            assemblyInst = elementType->MakeAssemblyInst(GetContext());
+            Emit(assemblyInst);
+        }
+        for (ConstantValue* elementValue : value.Elements())
+        {
+            elementValue->Accept(*this);
+        }
+    }
+    else
+    {
+        Error("error generating array value: array type expected");
     }
 }
 
@@ -450,22 +481,31 @@ void SimpleAssemblyCodeGenerator::Visit(StringValue& value)
 
 void SimpleAssemblyCodeGenerator::Visit(StringArrayValue& value)
 {
-
+    for (ConstantValue* elementValue : value.Strings())
+    {
+        assemblyInst = nullptr;
+        elementValue->Accept(*this);
+    }
 }
 
 void SimpleAssemblyCodeGenerator::Visit(ConversionValue& value)
 {
-
+    if (!assemblyInst)
+    {
+        assemblyInst = value.GetType()->MakeAssemblyInst(GetContext());
+        Emit(assemblyInst);
+    }
+    value.From()->Accept(*this);
 }
 
 void SimpleAssemblyCodeGenerator::Visit(ClsIdValue& value)
 {
-
+    cmsx::intermediate::EmitClsId(value.TypeId(), *this);
 }
 
 void SimpleAssemblyCodeGenerator::Visit(SymbolValue& value)
 {
-
+    cmsx::intermediate::EmitSymbol(value, *this);
 }
 
 } // cmsx::intermediate

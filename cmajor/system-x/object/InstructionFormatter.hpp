@@ -32,6 +32,10 @@ public:
     virtual void FormatWydeOperand(uint16_t wyde);
     virtual void FormatAddress(uint64_t address);
     virtual void FormatSetAddress(uint64_t saddr);
+    virtual void FormatTrapName(uint8_t trap);
+    virtual void FormatSpace();
+    virtual void FormatChar(uint8_t x);
+    virtual void FormatString(const std::string& s);
     void Format(Trap& inst, uint8_t x, uint8_t y, uint8_t z) override;
     void Format(Swym& inst, uint8_t x, uint8_t y, uint8_t z) override;
     void Format(Ldb& inst, uint8_t x, uint8_t y, uint8_t z) override;

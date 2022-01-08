@@ -202,7 +202,7 @@ void DataView::SetProcess(cmsx::kernel::Process* process_)
     dataRange->SetProcess(process_);
 }
 
-void DataView::UpdateView()
+void DataView::UpdateView(bool updateCurrentAddress)
 {
     Invalidate();
 }
@@ -268,6 +268,10 @@ void DataView::OnPaint(PaintEventArgs& args)
         args.graphics.Clear(BackgroundColor());
         if (!dataRange->GetMachine()) return;
         if (!dataRange->GetProcess()) return;
+        if (currentAddress > dataRange->Start() + dataRange->Length())
+        {
+            currentAddress = dataRange->Start();
+        }
         Measure(args.graphics);
         Paint(args.graphics);
         Control::OnPaint(args);

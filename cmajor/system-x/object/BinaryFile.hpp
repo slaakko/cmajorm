@@ -85,8 +85,8 @@ public:
     void SetPos(int64_t pos_) { pos = pos_; }
     int64_t DataLength() const { return dataLength; }
     void SetDataLength(int64_t dataLength_) { dataLength = dataLength_; }
-    int64_t CopyStartPos() const { return copyStartPos; }
-    void SetCopyStartPos(int64_t copyStartPos_) { copyStartPos = copyStartPos_; }
+    //int64_t CopyStartPos() const { return copyStartPos; }
+    //void SetCopyStartPos(int64_t copyStartPos_) { copyStartPos = copyStartPos_; }
     Section* CopyTargetSection() const { return copyTargetSection; }
     void SetCopyTargetSection(Section* copyTargetSection_) { copyTargetSection = copyTargetSection_; }
     int64_t RemoveOffset() const { return removeOffset; }
@@ -98,7 +98,7 @@ private:
     std::vector<uint8_t> data;
     int64_t pos;
     int64_t dataLength;
-    int64_t copyStartPos;
+    //int64_t copyStartPos;
     Section* copyTargetSection;
     int64_t removeOffset;
 };

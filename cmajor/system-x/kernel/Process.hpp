@@ -61,6 +61,8 @@ public:
     void AddUserTime(std::chrono::steady_clock::duration duration);
     std::chrono::steady_clock::duration SystemTime() const { return systemTime; }
     void AddSystemTime(std::chrono::steady_clock::duration duration);
+    uint8_t ExitCode() const { return exitCode; }
+    void SetExitCode(uint8_t exitCode_) { exitCode = exitCode_; }
 private:
     int32_t id;
     uint64_t rv;
@@ -78,6 +80,7 @@ private:
     int64_t heapStartAddress;
     int64_t heapLength;
     int64_t stackStartAddress;
+    uint8_t exitCode;
     std::chrono::steady_clock::duration userTime;
     std::chrono::steady_clock::duration systemTime;
     std::unique_ptr<cmsx::object::SymbolTable> symbolTable;

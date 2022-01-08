@@ -8,6 +8,9 @@
 #include <system-x/object/Link.hpp>
 #include <system-x/object/BinaryFile.hpp>
 #include <soulng/util/Log.hpp>
+#include <soulng/util/BufferedStream.hpp>
+#include <soulng/util/FileStream.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include <stdexcept>
 
 namespace cmsx::object {
@@ -22,8 +25,27 @@ UnprocessedSymbol::UnprocessedSymbol(Symbol* symbol_, LinkSection* linkSection_,
 {
 }
 
-LinkTable::LinkTable()
+LinkTable::LinkTable(const std::string& classIdFilePath_) : classIdFilePath(classIdFilePath_)
 {
+    if (!classIdFilePath.empty())
+    {
+        FileStream fileStream(classIdFilePath, OpenMode::read | OpenMode::binary);
+        BufferedStream bufferedStream(fileStream);
+        BinaryStreamReader reader(bufferedStream);
+        uint64_t n = reader.ReadULong();
+        for (uint64_t i = 0; i < n; ++i)
+        {
+            boost::uuids::uuid typeId;
+            reader.ReadUuid(typeId);
+            uint64_t classIdHigh = reader.ReadULong();
+            if (classIdHigh != 0)
+            {
+                throw std::runtime_error("too many classes for class ID to fit in 64-bit integer");
+            }
+            uint64_t classIdLow = reader.ReadULong();
+            classIdMap[typeId] = classIdLow;
+        }
+    }
 }
 
 void LinkTable::AddUsedSymbolName(const std::string& symbolName)
@@ -95,8 +117,15 @@ void LinkTable::AddCopyRange(const CopyRange& copyRange)
 
 uint64_t LinkTable::GetClassId(const boost::uuids::uuid& typeId) const
 {
-    // todo
-    return 0;
+    auto it = classIdMap.find(typeId);
+    if (it != classIdMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        throw std::runtime_error("class id for type id " + boost::uuids::to_string(typeId));
+    }
 }
 
 void LinkTable::AddLinkCommand(const std::string& symbolName, ObjectFile* objectFile, LinkCommand* linkCommand)

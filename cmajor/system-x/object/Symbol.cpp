@@ -6,8 +6,120 @@
 #include <system-x/object/Symbol.hpp>
 #include <system-x/object/BinaryFile.hpp>
 #include <system-x/machine/Registers.hpp>
+#include <soulng/util/TextUtils.hpp>
 
 namespace cmsx::object {
+
+std::string SegmentStr(Segment segment)
+{
+    switch (segment)
+    {
+        case Segment::text: return "text";
+        case Segment::data: return "data";
+        case Segment::pool: return "pool";
+        case Segment::stack: return "stack";
+        case Segment::unknown: return "unknown";
+    }
+    return std::string();
+}
+
+std::string LinkageStr(Linkage linkage)
+{
+    switch (linkage)
+    {
+        case Linkage::internal: return "internal";
+        case Linkage::external: return "external";
+        case Linkage::once: return "once";
+        case Linkage::remove: return "remove";
+        case Linkage::undefined: return "undefined";
+    }
+    return std::string();
+}
+
+std::string ValueFlagStr(ValueFlags flags)
+{
+    std::string s;
+    if (flags == ValueFlags::none)
+    {
+        s.append("none");
+    }
+    else
+    {
+        if ((flags & ValueFlags::undefined) != ValueFlags::none)
+        {
+            if (!s.empty())
+            {
+                s.append(" | ");
+            }
+            s.append("undefined");
+        }
+        if ((flags & ValueFlags::definition) != ValueFlags::none)
+        {
+            if (!s.empty())
+            {
+                s.append(" | ");
+            }
+            s.append("definition");
+        }
+        if ((flags & ValueFlags::reg) != ValueFlags::none)
+        {
+            if (!s.empty())
+            {
+                s.append(" | ");
+            }
+            s.append("reg");
+        }
+        if ((flags & ValueFlags::pure) != ValueFlags::none)
+        {
+            if (!s.empty())
+            {
+                s.append(" | ");
+            }
+            s.append("pure");
+        }
+        if ((flags & ValueFlags::address) != ValueFlags::none)
+        {
+            if (!s.empty())
+            {
+                s.append(" | ");
+            }
+            s.append("address");
+        }
+        if ((flags & ValueFlags::function) != ValueFlags::none)
+        {
+            if (!s.empty())
+            {
+                s.append(" | ");
+            }
+            s.append("function");
+        }
+        if ((flags & ValueFlags::structure) != ValueFlags::none)
+        {
+            if (!s.empty())
+            {
+                s.append(" | ");
+            }
+            s.append("structure");
+        }
+        if ((flags & ValueFlags::typeIdIndex) != ValueFlags::none)
+        {
+            if (!s.empty())
+            {
+                s.append(" | ");
+            }
+            s.append("type_id_index");
+        }
+        if ((flags & ValueFlags::used) != ValueFlags::none)
+        {
+            if (!s.empty())
+            {
+                s.append(" | ");
+            }
+            s.append("used");
+        }
+    }
+    return s;
+}
 
 Value::Value() : flags(ValueFlags::undefined), val(undefinedValue), symbol(nullptr)
 {
@@ -27,6 +139,27 @@ Value::Value(uint64_t val_, ValueFlags flags_, Symbol* symbol_) : flags(flags_),
 
 Value::Value(Symbol* symbol_) : flags(ValueFlags::undefined), val(undefinedValue), symbol(symbol_)
 {
+}
+
+std::string Value::ToString() const
+{
+    std::string symbolName = "none";
+    if (symbol)
+    {
+        symbolName = "'" + symbol->FullName() + "'";
+    }
+    return "(flags=" + ValueFlagStr(flags) + ", val=#" + ToHexString(val) + ", symbol=" + symbolName + ")";
+}
+
+std::string SymbolKindStr(SymbolKind symbolKind)
+{
+    switch (symbolKind)
+    {
+        case SymbolKind::none: return "none";
+        case SymbolKind::local: return "local";
+        case SymbolKind::global: return "global";
+    }
+    return std::string();
 }
 
 Symbol::Symbol() : 
@@ -194,6 +327,41 @@ void Symbol::SetValue(const Value& value_)
     value = value_;
 }
 
+void Symbol::Print(CodeFormatter& formatter)
+{
+    formatter.WriteLine(SymbolKindStr(kind) + " symbol index " + std::to_string(index) + ":");
+    formatter.IncIndent();
+    formatter.WriteLine("local name=" + localName);
+    formatter.WriteLine("full name=" + fullName);
+    formatter.WriteLine("segment=" + SegmentStr(segment));
+    formatter.WriteLine("linkage=" + LinkageStr(linkage));
+    if (section)
+    {
+        formatter.WriteLine("section=" + section->Name());
+    }
+    formatter.WriteLine("value=" + value.ToString());
+    formatter.WriteLine("start=#" + ToHexString(static_cast<uint64_t>(start)));
+    formatter.WriteLine("length=#" + ToHexString(static_cast<uint64_t>(length)));
+    formatter.WriteLine("parentIndex=" + std::to_string(parentIndex));
+    formatter.WriteLine("alignment=" + std::to_string(static_cast<int>(alignment)));
+    std::string linkCommandIdStr;
+    bool first = true;
+    for (int linkCommandId : linkCommandIds)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            linkCommandIdStr.append(", ");
+        }
+        linkCommandIdStr.append(std::to_string(linkCommandId));
+    }
+    formatter.WriteLine("link command ids: (" + linkCommandIdStr + ")");
+    formatter.DecIndent();
+}
+
 SymbolTable::SymbolTable()
 {
 }
@@ -267,16 +435,26 @@ Symbol* SymbolTable::GetSymbol(uint64_t address) const
     {
         return it->second;
     }
-    else
-    {
-        return nullptr;
-    }
+    return nullptr;
 }
 
 Symbol* SymbolTable::GetRegisterSymbol(uint8_t reg) const
 {
     auto it = registerMap.find(reg);
     if (it != registerMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+Symbol* SymbolTable::GetTrapSymbol(uint64_t trap) const
+{
+    auto it = trapMap.find(trap);
+    if (it != trapMap.cend())
     {
         return it->second;
     }
@@ -303,10 +481,15 @@ void SymbolTable::AddSymbol(Symbol* symbol, bool setIndex)
     {
         registerMap[static_cast<uint8_t>(symbol->GetValue().Val())] = symbol;
     }
-    if (!symbol->GetValue().GetFlag(ValueFlags::undefined))
+    if (symbol->GetSegment() == cmsx::object::Segment::text && !symbol->GetValue().GetFlag(ValueFlags::undefined))
     {
         valueMap[symbol->GetValue().Val()] = symbol;
     }
+}
+
+void SymbolTable::AddTrapSymbol(Symbol* trapSymbol)
+{
+    trapMap[trapSymbol->GetValue().Val()] = trapSymbol;
 }
 
 void SymbolTable::AddSymbolToAddressMap(Symbol* symbol, bool setStart)

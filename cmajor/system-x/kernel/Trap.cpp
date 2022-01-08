@@ -25,6 +25,7 @@ public:
     SoftwareInterruptHandler();
     void HandleInterrupt(cmsx::machine::Machine& machine) override;
     void SetTrapHandler(uint8_t trap, TrapHandler* handler);
+    TrapHandler* GetTrapHandler(uint8_t trap) const;
 private:
     std::vector<std::unique_ptr<TrapHandler>> trapHandlers;
 };
@@ -37,6 +38,11 @@ SoftwareInterruptHandler::SoftwareInterruptHandler()
 void SoftwareInterruptHandler::SetTrapHandler(uint8_t trap, TrapHandler* handler)
 {
     trapHandlers[trap].reset(handler);
+}
+
+TrapHandler* SoftwareInterruptHandler::GetTrapHandler(uint8_t trap) const
+{
+    return trapHandlers[trap].get();
 }
 
 void SoftwareInterruptHandler::HandleInterrupt(cmsx::machine::Machine& machine)
@@ -74,6 +80,23 @@ void SetTrapHandler(uint8_t trap, TrapHandler* handler)
 {
     SoftwareInterruptHandler* softwareInterruptHandler = static_cast<SoftwareInterruptHandler*>(cmsx::machine::GetInterruptHandler(cmsx::machine::irq_software));
     softwareInterruptHandler->SetTrapHandler(trap, handler);
+}
+
+void AddTrapsToSymbolTable(cmsx::object::SymbolTable& symbolTable)
+{
+    SoftwareInterruptHandler* softwareInterruptHandler = static_cast<SoftwareInterruptHandler*>(cmsx::machine::GetInterruptHandler(cmsx::machine::irq_software));
+    if (softwareInterruptHandler)
+    {
+        for (int i = 0; i< 256; ++i)
+        {
+            uint8_t trap = static_cast<uint8_t>(i);
+            TrapHandler* trapHandler = softwareInterruptHandler->GetTrapHandler(trap);
+            if (trapHandler)
+            {
+                symbolTable.AddTrapSymbol(new cmsx::object::Symbol(cmsx::object::SymbolKind::global, std::string(), trapHandler->TrapName(), cmsx::object::Value(trap)));
+            }
+        }
+    }
 }
 
 void InitTrap()

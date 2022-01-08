@@ -156,6 +156,7 @@ public:
     virtual const std::vector<SpillData>& GetSpillData() const = 0;
     virtual Locations GetLocations(Instruction* inst) const = 0;
     virtual Register GetRegister(Instruction* inst) const = 0;
+    virtual void AddRegisterLocation(Instruction* inst, const Register& reg) = 0;
     virtual Frame& GetFrame() = 0;
     virtual FrameLocation GetFrameLocation(Instruction* inst) const = 0;
     virtual int LastActiveLocalReg() const = 0;

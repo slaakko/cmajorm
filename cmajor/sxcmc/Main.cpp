@@ -84,7 +84,7 @@ void PrintHelp()
         "   default is debug\n" <<
         "--optimization-level=LEVEL (-O=LEVEL)\n" <<
         "   set optimization level to LEVEL=0-3\n" <<
-        "   defaults: debug=0, release=3\n" <<
+        "   defaults: debug=0, release=2\n" <<
         "--verbose (-v)\n" <<
         "   print verbose messages\n" <<
         "--quiet (-q)\n" <<

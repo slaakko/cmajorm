@@ -80,6 +80,7 @@ public:
     void EmitForwardShortJump(const std::string& paramName, uint8_t opcode, const cmsx::object::Value& registerValue, cmsx::object::Symbol* symbol);
     void EmitLongOffset(uint32_t offset);
     void EmitShortOffset(uint16_t offset);
+    void EmitClsIdCommmand(uint64_t typeIdIndex, const SourcePos& sourcePos);
 private:
     void VisitInstructions();
     void Resolve();
@@ -98,6 +99,7 @@ private:
     cmsx::object::Symbol* currentSymbol;
     cmsx::object::Symbol* currentFunctionSymbol;
     cmsx::object::Symbol* currentStructureSymbol;
+    std::vector<boost::uuids::uuid> typeIds;
     int64_t currentAlignment;
     bool inSpec;
     int parentIndex;

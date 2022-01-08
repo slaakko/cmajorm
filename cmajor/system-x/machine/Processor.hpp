@@ -26,8 +26,7 @@ public:
     Processor(Machine& machine_);
     void SetDebugger(Debugger* debugger_) { debugger = debugger_; }
     void Run();
-    void Exit(uint8_t exitCode_);
-    uint8_t GetExitCode() const { return exitCode; }
+    void Exit();
     void EnableInterrupts();
 private:
     Instruction* FetchInstruction(uint64_t& pc, uint8_t& x, uint8_t& y, uint8_t& z);
@@ -36,7 +35,6 @@ private:
     Machine& machine;
     Debugger* debugger;
     bool exiting;
-    uint8_t exitCode;
     std::chrono::steady_clock::time_point start;
     std::chrono::steady_clock::time_point end;
 };

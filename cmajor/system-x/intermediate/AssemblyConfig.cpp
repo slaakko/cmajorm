@@ -10,6 +10,7 @@
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/filesystem.hpp>
 
 namespace cmsx::intermediate {
 
@@ -34,7 +35,7 @@ public:
     int GetNumLocalRegs() const { return numLocalRegs; }
 private:
     AssemblyConfig();
-    void Read();
+    void Read(const std::string& assemblyConfigFilePath);
     static std::unique_ptr<AssemblyConfig> instance;
     int numLocalRegs;
 };
@@ -51,37 +52,53 @@ void AssemblyConfig::Done()
     instance.reset();
 }
 
-AssemblyConfig::AssemblyConfig() : numLocalRegs(0)
-{
-    Read();
-}
-
-void AssemblyConfig::Read()
+AssemblyConfig::AssemblyConfig() : numLocalRegs(8)
 {
     std::string assemblyConfigFilePath = Path::Combine(CmajorConfigDir(), "assembly-config.xml");
-    std::unique_ptr<sngxml::dom::Document> assemblyConfigDoc = sngxml::dom::ReadDocument(assemblyConfigFilePath);
-    std::unique_ptr<sngxml::xpath::XPathObject> localRegsObject = sngxml::xpath::Evaluate(U"/assembly-config/local-regs", assemblyConfigDoc.get());
-    if (localRegsObject->Type() == sngxml::xpath::XPathObjectType::nodeSet)
+    Read(assemblyConfigFilePath);
+    if (!boost::filesystem::exists(assemblyConfigFilePath))
     {
-        sngxml::xpath::XPathNodeSet* nodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(localRegsObject.get());
-        int n = nodeSet->Length();
-        if (n == 1)
+        sngxml::dom::Document assemblyConfigDoc;
+        sngxml::dom::Element* rootElement = new sngxml::dom::Element(U"assembly-config");
+        sngxml::dom::Element* localRegsElement = new sngxml::dom::Element(U"local-regs");
+        localRegsElement->SetAttribute(U"count", ToUtf32(std::to_string(numLocalRegs)));
+        rootElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(localRegsElement));
+        assemblyConfigDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(rootElement));
+        std::ofstream file(assemblyConfigFilePath);
+        CodeFormatter formatter(file);
+        formatter.SetIndentSize(1);
+        assemblyConfigDoc.Write(formatter);
+    }
+}
+
+void AssemblyConfig::Read(const std::string& assemblyConfigFilePath)
+{
+    if (boost::filesystem::exists(assemblyConfigFilePath))
+    {
+        std::unique_ptr<sngxml::dom::Document> assemblyConfigDoc = sngxml::dom::ReadDocument(assemblyConfigFilePath);
+        std::unique_ptr<sngxml::xpath::XPathObject> localRegsObject = sngxml::xpath::Evaluate(U"/assembly-config/local-regs", assemblyConfigDoc.get());
+        if (localRegsObject->Type() == sngxml::xpath::XPathObjectType::nodeSet)
         {
-            sngxml::dom::Node* node = (*nodeSet)[0];
-            if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
+            sngxml::xpath::XPathNodeSet* nodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(localRegsObject.get());
+            int n = nodeSet->Length();
+            if (n == 1)
             {
-                sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
-                std::u32string countAttribute = element->GetAttribute(U"count");
-                if (countAttribute.empty())
+                sngxml::dom::Node* node = (*nodeSet)[0];
+                if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
                 {
-                    throw std::runtime_error("assembly-config/local-regs element has no 'count' attribute");
+                    sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
+                    std::u32string countAttribute = element->GetAttribute(U"count");
+                    if (countAttribute.empty())
+                    {
+                        throw std::runtime_error("assembly-config/local-regs element has no 'count' attribute");
+                    }
+                    numLocalRegs = boost::lexical_cast<int>(ToUtf8(countAttribute));
                 }
-                numLocalRegs = boost::lexical_cast<int>(ToUtf8(countAttribute));
             }
-        }
-        else
-        {
-            throw std::runtime_error("one assembly-config/local-regs element expected");
+            else
+            {
+                throw std::runtime_error("one assembly-config/local-regs element expected");
+            }
         }
     }
 }

@@ -7,11 +7,11 @@ namespace System
 {
     public class Exception
     {
-        public nothrow Exception(const string& message_) : message(message_)
+        public nothrow Exception(const string& message_) : message(message_), stackTrace()
         {
         }
-        public virtual default ~Exception();
-        public nothrow const string& Message() const
+        public default virtual ~Exception();
+        public nothrow inline const string& Message() const
         {
             return message;
         }
@@ -32,10 +32,56 @@ namespace System
         private string message;
         private string stackTrace;
     }
-    
-    public void Throw(Exception* ex)
+
+    public class NullPointerException : Exception
     {
-        ex->SetStackTrace(GetStackTrace());
-        do_throw(ex, typeid(ex));
+        public nothrow NullPointerException() : base("null pointer exception")
+        {
+        }
+    }
+
+    public class IndexOutOfBoundsException : Exception
+    {
+        public nothrow IndexOutOfBoundsException() : base("index out of bounds")
+        {
+        }
+    }
+
+    public class InvalidParameterException : Exception
+    {
+        public nothrow InvalidParameterException() : base("invalid parameter")
+        {
+        }
+    }
+
+    public class PreconditionViolationException : Exception
+    {
+        public nothrow PreconditionViolationException() : base("precondition violation")
+        {
+        }
+    }
+
+    public void ThrowNullPointerException()
+    {
+        //throw NullPointerException();
+		exit(253);
+    }
+
+    public void ThrowIndexOutOfBoundsException()
+    {
+        //throw IndexOutOfBoundsException();
+		exit(252);
+    }
+
+    public void ThrowInvalidParameterException()
+    {
+        //throw InvalidParameterException();
+		exit(251);
+    }
+
+    public void ThrowPreconditionViolationException()
+    {
+        //throw PreconditionViolationException();
+		exit(250);
     }
 }

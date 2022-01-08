@@ -5,9 +5,12 @@
 
 namespace System
 {
-    public constexpr nothrow inline long Align(long n, long alignment)
+    public constexpr inline long Align(long n, long alignment)
     {
-        #assert(alignment > 0);
+        if (alignment <= 0)
+        {
+            ThrowInvalidParameterException();
+        }
         return (n + alignment - 1) & -alignment;
     }
 
@@ -24,7 +27,7 @@ namespace System
         }
         return len;
     }
-    
+
     public constexpr nothrow inline long StrLen(const wchar* s)
     {
         long len = 0;
@@ -38,7 +41,7 @@ namespace System
         }
         return len;
     }
-    
+
     public constexpr nothrow inline long StrLen(const uchar* s)
     {
         long len = 0;
@@ -53,35 +56,12 @@ namespace System
         return len;
     }
 
-    public nothrow inline void StrCopy(char* buf, const char* from)
+    public inline void StrCopy(char* buf, const char* from)
     {
-        #assert(buf != null);
-        if (from != null)
+        if (buf == null)
         {
-            while (*from != '\0')
-            {
-                *buf++ = *from++;
-            }
+            ThrowInvalidParameterException();
         }
-        *buf = '\0';
-    }
-    
-    public nothrow inline void StrCopy(wchar* buf, const wchar* from)
-    {
-        #assert(buf != null);
-        if (from != null)
-        {
-            while (*from != '\0')
-            {
-                *buf++ = *from++;
-            }
-        }
-        *buf = '\0';
-    }
-    
-    public nothrow inline void StrCopy(uchar* buf, const uchar* from)
-    {
-        #assert(buf != null);
         if (from != null)
         {
             while (*from != '\0')
@@ -92,10 +72,45 @@ namespace System
         *buf = '\0';
     }
 
-    public nothrow inline long StrCopy(char* buf, const char* from, long length)
+    public inline void StrCopy(wchar* buf, const wchar* from)
+    {
+        if (buf == null)
+        {
+            ThrowInvalidParameterException();
+        }
+        if (from != null)
+        {
+            while (*from != '\0')
+            {
+                *buf++ = *from++;
+            }
+        }
+        *buf = '\0';
+    }
+
+    public inline void StrCopy(uchar* buf, const uchar* from)
+    {
+        if (buf == null)
+        {
+            ThrowInvalidParameterException();
+        }
+        if (from != null)
+        {
+            while (*from != '\0')
+            {
+                *buf++ = *from++;
+            }
+        }
+        *buf = '\0';
+    }
+
+    public inline long StrCopy(char* buf, const char* from, long length)
     {
         long resultLen = 0;
-        #assert(buf != null);
+        if (buf == null)
+        {
+            ThrowInvalidParameterException();
+        }
         if (from != null)
         {
             while (resultLen < length)
@@ -112,10 +127,13 @@ namespace System
         return resultLen;
     }
 
-    public nothrow inline long StrCopy(wchar* buf, const wchar* from, long length)
+    public inline long StrCopy(wchar* buf, const wchar* from, long length)
     {
         long resultLen = 0;
-        #assert(buf != null);
+        if (buf == null)
+        {
+            ThrowInvalidParameterException();
+        }
         if (from != null)
         {
             while (resultLen < length)
@@ -132,10 +150,13 @@ namespace System
         return resultLen;
     }
 
-    public nothrow inline long StrCopy(uchar* buf, const uchar* from, long length)
+    public inline long StrCopy(uchar* buf, const uchar* from, long length)
     {
         long resultLen = 0;
-        #assert(buf != null);
+        if (buf == null)
+        {
+            ThrowInvalidParameterException();
+        }
         if (from != null)
         {
             while (resultLen < length)
@@ -174,31 +195,5 @@ namespace System
         {
             return 2 * Align(size, 4096);
         }
-    }
-    
-    public nothrow string GetStackTrace()
-    {
-        UniquePtr<byte> mem(cast<byte*>(MemAlloc(4096)));
-        if (stack_trace(mem.Get(), 4096) == 0)
-        {
-            string stackTrace;
-            byte* p = mem.Get();
-            while (*p != 0u)
-            {
-                stackTrace.Append(cast<char>(*p));
-                ++p;
-            }
-            return stackTrace;
-        }
-        return string();
-    }
-    
-    public nothrow void FailAssertion(const char* assertion, const char* function, const char* sourceFilePath, int lineNumber)
-    {
-        string msg = "assertion '";
-        msg.Append(assertion).Append("' failed in function '").Append(function).Append("' at ").Append(sourceFilePath).Append(':').Append(ToString(lineNumber)).Append('\n');
-        msg.Append(GetStackTrace());
-        write(2, msg.Chars(), msg.Length());
-        exit(1u);
     }
 }

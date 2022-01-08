@@ -62,11 +62,13 @@ protected:
     bool ProcessMessage(Message& msg) override;
     void OnMouseWheel(MouseWheelEventArgs& args) override;
 private:
+    void ToggleBreakpointClick();
     void SingleStepClick();
     void StepOverClick();
     void ContinueClick();
     void AboutClick();
     void OpenFileClick();
+    void CloseFileClick();
     void ResetClick();
     void StopClick();
     void ExitClick();
@@ -86,6 +88,7 @@ private:
     void PrevQuarterClick();
     void HomeClick();
     void EndClick();
+    void PrevAddressClick();
     void TopTabPageSelected();
     void TopTabPageRemoved(ControlEventArgs& controlEventArgs);
     void BottomTabPageSelected();
@@ -125,6 +128,7 @@ private:
     std::thread debuggerThread;
     cmsx::kernel::Process* process;
     cmajor::wing::MenuItem* openFileMenuItem;
+    cmajor::wing::MenuItem* closeFileMenuItem;
     cmajor::wing::MenuItem* exitMenuItem;
     cmajor::wing::SplitContainer* verticalSplitContainer;
     cmajor::wing::TabControl* topTabControl;
@@ -141,7 +145,10 @@ private:
     MenuItem* resetMenuItem;
     MenuItem* singleStepMenuItem;
     MenuItem* stepOverMenuItem;
+    MenuItem* toggleBreakpointMenuItem;
+    MenuItem* gotoPrevAddressMenuItem;
     DebuggingState state;
+    bool fileOpen;
 };
 
 } // namespace cmsx::db

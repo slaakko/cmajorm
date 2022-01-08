@@ -40,7 +40,7 @@ void AddSystemTime(std::chrono::steady_clock::duration systemTime)
     }
 }
 
-Processor::Processor(Machine& machine_) : machine(machine_), debugger(nullptr), exitCode(0), exiting(false), start(), end()
+Processor::Processor(Machine& machine_) : machine(machine_), debugger(nullptr), exiting(false), start(), end()
 {
 }
 
@@ -73,9 +73,8 @@ void Processor::Run()
     }
 }
 
-void Processor::Exit(uint8_t exitCode_)
+void Processor::Exit()
 {
-    exitCode = exitCode_;
     exiting = true;
 }
 

@@ -9,6 +9,7 @@
 #include <soulng/util/BufferedStream.hpp>
 #include <soulng/util/FileStream.hpp>
 #include <soulng/util/Path.hpp>
+#include <soulng/util/Uuid.hpp>
 #include <stdexcept>
 
 namespace cmsx::object {
@@ -109,7 +110,7 @@ Section* ReadSection(BinaryFile* file, BinaryStreamReader& reader)
 }
 
 Section::Section(SectionKind kind_, BinaryFile* file_) : 
-    kind(kind_), file(file_), baseAddress(0), pos(0), copyStartPos(0), copyTargetSection(nullptr), removeOffset(0), dataLength(0)
+    kind(kind_), file(file_), baseAddress(0), pos(0), copyTargetSection(nullptr), removeOffset(0), dataLength(0)
 {
 }
 
@@ -470,13 +471,13 @@ std::string Section::ReadString()
 
 void Section::EmitValue(const cmsx::object::Value& value)
 {
-    EmitByte(static_cast<uint8_t>(value.Flags()));
+    EmitWyde(static_cast<uint16_t>(value.Flags()));
     EmitOcta(value.Val());
 }
 
 Value Section::ReadValue()
 {
-    ValueFlags flags = static_cast<ValueFlags>(ReadByte());
+    ValueFlags flags = static_cast<ValueFlags>(ReadWyde());
     uint64_t val = ReadOcta();
     return Value(val, flags);
 }
@@ -581,8 +582,6 @@ void SymbolSection::EmitSymbolTable()
     {
         EmitSymbol(symbol.get());
     }
-    // todo: emit internal symbols;
-
 }
 
 void SymbolSection::EmitSymbol(Symbol* symbol)

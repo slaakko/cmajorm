@@ -108,7 +108,7 @@ public:
     DataView(DataViewCreateParams& createParams, DataRange* dataRange_);
     void SetMachine(cmsx::machine::Machine* machine_) override;
     void SetProcess(cmsx::kernel::Process* process_) override;
-    void UpdateView() override;
+    void UpdateView(bool updateCurrentAddress) override;
     void NextLine() override;
     void PrevLine() override;
     void NextQuarter() override;

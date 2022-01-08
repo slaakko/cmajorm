@@ -20,6 +20,7 @@ class SymbolSection;
 class LinkSection;
 class DebugSection;
 class SymbolTable;
+class Symbol;
 
 class CMSX_OBJECT_API BinaryFileFormatter : public InstructionFormatter
 {
@@ -28,6 +29,8 @@ public:
     BinaryFile* File() const { return file; }
     Section* CurrentSection() const { return currentSection; }
     virtual void Format();
+    virtual void FormatOcta(uint64_t octa);
+    virtual void FormatSymbol(Symbol* symbol);
     virtual void FormatSection(HeaderSection* section);
     virtual void FormatSection(CodeSection* section);
     virtual void FormatSection(DataSection* section);

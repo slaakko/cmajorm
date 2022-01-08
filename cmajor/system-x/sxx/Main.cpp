@@ -90,6 +90,7 @@ int main(int argc, const char** argv)
             throw std::runtime_error("no program set");
         }
         cmsx::machine::Machine machine;
+        cmsx::kernel::ProcessManager::Instance().SetMachine(&machine);
         cmsx::kernel::Process* process = cmsx::kernel::ProcessManager::Instance().CreateProcess();
         process->SetFilePath(args[0]);
         cmsx::kernel::Load(process, args, env, machine);
@@ -101,7 +102,12 @@ int main(int argc, const char** argv)
         machine.GetProcessor().Run();
         if (verbose)
         {
-            std::cout << "'" << args[0] << "' exited with code " << machine.GetProcessor().GetExitCode() << std::endl;
+            uint8_t exitCode = 255;
+            if (process)
+            {
+                exitCode = process->ExitCode();
+            }
+            std::cout << "'" << args[0] << "' exited with code " << exitCode << std::endl;
             std::cout << std::endl;
             std::chrono::steady_clock::duration userTime = process->UserTime();
             std::chrono::steady_clock::duration systemTime = process->SystemTime();

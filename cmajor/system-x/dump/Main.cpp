@@ -8,6 +8,8 @@
 #include <sngxml/xpath/InitDone.hpp>
 #include <system-x/machine/InitDone.hpp>
 #include <system-x/assembler/InitDone.hpp>
+#include <system-x/kernel/InitDone.hpp>
+#include <system-x/kernel/Trap.hpp>
 #include <soulng/util/Path.hpp>
 #include <iostream>
 #include <stdexcept>
@@ -21,14 +23,21 @@ void InitApplication()
     sngxml::xpath::Init();
     cmsx::machine::Init();
     cmsx::assembler::Init();
+    cmsx::kernel::Init();
 }
 
 void DoneApplication()
 {
+    cmsx::kernel::Done();
     cmsx::assembler::Done();
     cmsx::machine::Done();
     sngxml::xpath::Done();
     soulng::util::Done();
+}
+
+void TrapAdder(cmsx::object::SymbolTable& symbolTable)
+{
+    cmsx::kernel::AddTrapsToSymbolTable(symbolTable);
 }
 
 int main(int argc, const char** argv)
@@ -77,6 +86,7 @@ int main(int argc, const char** argv)
                 fileNames.push_back(GetFullPath(arg));
             }
         }
+        cmsx::object::SetTrapAdderFunc(TrapAdder);
         for (const auto& fileName : fileNames)
         {
             if (verbose)

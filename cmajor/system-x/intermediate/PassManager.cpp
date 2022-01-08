@@ -260,7 +260,7 @@ void PassManager::Run(int logStreamId, Context* context, const std::string& pass
     RunModuleAndCompositePasses(context, moduleAndCompositePasses);
     if (verbose)
     {
-        LogMessage(logStreamId, "==> " + context->FilePath());
+        LogMessage(logStreamId, "==> " + Path::ChangeExtension(context->FilePath(), ".s"));
     }
 }
 

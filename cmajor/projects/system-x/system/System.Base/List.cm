@@ -5,6 +5,7 @@
 
 using System;
 using System.Concepts;
+//using System.IO; TODO
 
 namespace System.Collections
 {
@@ -34,7 +35,10 @@ namespace System.Collections
         }
         public List(long n, const ValueType& value) : items(null), count(0), res(0) where T is Copyable
         {
-            #assert(n >= 0);
+            if (n < 0)
+            {
+                ThrowInvalidParameterException();
+            }
             count = n;
             Reserve(count);
             for (long i = 0; i < n; ++i)
@@ -68,7 +72,10 @@ namespace System.Collections
         }
         public void Resize(long newCount) where T is Movable
         {
-            #assert(newCount >= 0);
+            if (newCount < 0)
+            {
+                ThrowInvalidParameterException();
+            }
             if (newCount != count)
             {
                 if (newCount < count)
@@ -167,7 +174,10 @@ namespace System.Collections
         }
         public ValueType Remove(Iterator pos)
         {
-            #assert(pos >= Begin() && pos < End());
+            if (pos < Begin() || pos >= End())
+            {
+                ThrowInvalidParameterException();
+            }
             ValueType result = Rvalue(*pos);
             Move(pos + 1, End(), pos);
             --count;
@@ -181,21 +191,58 @@ namespace System.Collections
         }
         public ValueType RemoveLast()
         {
-            #assert(!IsEmpty());
+            if (IsEmpty())
+            {
+                ThrowPreconditionViolationException();
+            }
             --count;
             Iterator end = End();
             ValueType result = Rvalue(*end);
             destroy(end.Ptr());
             return result;
         }
-        public nothrow inline const ValueType& operator[](long index) const
+        public void Remove(const ValueType& item)
         {
-            #assert(index >= 0 && index < count);
+            Iterator i = Begin();
+            Iterator e = End();
+            Iterator p = i;
+            while (i != e)
+            {
+                if (*i == item)
+                {
+                    ++i;
+                }
+                else if (i != p)
+                {
+                    *p++ = *i++;
+                }
+                else
+                {
+                    ++i;
+                    ++p;
+                }
+            }
+            while (p != e)
+            {
+                destroy(p.Ptr());
+                --count;
+                ++p;
+            }
+        }
+        public inline const ValueType& operator[](long index) const
+        {
+            if (index < 0 || index >= count)
+            {
+                ThrowIndexOutOfBoundsException();
+            }
             return items[index];
         }
-        public nothrow inline ValueType& operator[](long index)
+        public inline ValueType& operator[](long index)
         {
-            #assert(index >= 0 && index < count);
+            if (index < 0 || index >= count)
+            {
+                ThrowIndexOutOfBoundsException();
+            }
             return items[index];
         }
         public nothrow inline Iterator Begin()
@@ -234,24 +281,36 @@ namespace System.Collections
             }
             return ConstIterator(null);
         }
-        public nothrow inline const ValueType& Front() const
+        public inline const ValueType& Front() const
         {
-            #assert(!IsEmpty());
+            if (IsEmpty())
+            {
+                ThrowPreconditionViolationException();
+            }
             return *Begin();
         }
-        public nothrow inline ValueType& Front()
+        public inline ValueType& Front()
         {
-            #assert(!IsEmpty());
+            if (IsEmpty())
+            {
+                ThrowPreconditionViolationException();
+            }
             return *Begin();
         }
-        public nothrow inline const ValueType& Back() const
+        public inline const ValueType& Back() const
         {
-            #assert(!IsEmpty());
+            if (IsEmpty())
+            {
+                ThrowPreconditionViolationException();
+            }
             return *(End() - 1);
         }
-        public nothrow inline ValueType& Back()
+        public inline ValueType& Back()
         {
-            #assert(!IsEmpty());
+            if (IsEmpty())
+            {
+                ThrowPreconditionViolationException();
+            }
             return *(End() - 1);
         }
         private void Grow(long minRes)
@@ -337,4 +396,26 @@ namespace System.Collections
             ++items;
         }
     }
+/*  TODO
+    [system_default]
+    public TextWriter& operator<<<T>(TextWriter& writer, const List<T>& list)
+    {
+        writer << "[";
+        bool first = true;
+        for (const T& element : list)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                writer << ", ";
+            }
+            writer << element;
+        }
+        writer << "]";
+        return writer;
+    }
+*/
 }

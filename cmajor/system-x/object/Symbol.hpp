@@ -6,6 +6,8 @@
 #ifndef CMSX_OBJECT_SYMBOL_INCLUDED
 #define CMSX_OBJECT_SYMBOL_INCLUDED
 #include <system-x/object/Api.hpp>
+#include <soulng/util/CodeFormatter.hpp>
+#include <boost/uuid/uuid.hpp>
 #include <map>
 #include <stdint.h>
 #include <string>
@@ -13,6 +15,8 @@
 #include <memory>
 
 namespace cmsx::object {
+
+using namespace soulng::util;
 
 const uint64_t undefinedValue = static_cast<uint64_t>(-1);
 
@@ -23,12 +27,16 @@ enum class Segment : uint8_t
     text = 0, data = 1, pool = 2, stack = 3, unknown = 0xFF
 };
 
+CMSX_OBJECT_API std::string SegmentStr(Segment segment);
+
 enum class Linkage : uint8_t
 {
     internal = 0, external = 1, once = 2, remove = 3, undefined = 0xFF
 };
 
-enum class ValueFlags : uint8_t
+CMSX_OBJECT_API std::string LinkageStr(Linkage linkage);
+
+enum class ValueFlags : uint16_t
 {
     none = 0,
     undefined = 1 << 0,
@@ -38,22 +46,25 @@ enum class ValueFlags : uint8_t
     address = 1 << 4,
     function = 1 << 5,
     structure = 1 << 6,
-    used = 1 << 7
+    typeIdIndex = 1 << 7,
+    used = 1 << 8
 };
+
+CMSX_OBJECT_API std::string ValueFlagStr(ValueFlags flags);
 
 CMSX_OBJECT_API inline ValueFlags operator|(ValueFlags left, ValueFlags right)
 {
-    return ValueFlags(uint8_t(left) | uint8_t(right));
+    return ValueFlags(uint16_t(left) | uint16_t(right));
 }
 
 CMSX_OBJECT_API inline ValueFlags operator&(ValueFlags left, ValueFlags right)
 {
-    return ValueFlags(uint8_t(left) & uint8_t(right));
+    return ValueFlags(uint16_t(left) & uint16_t(right));
 }
 
 CMSX_OBJECT_API inline ValueFlags operator~(ValueFlags flags)
 {
-    return ValueFlags(~uint8_t(flags));
+    return ValueFlags(~uint16_t(flags));
 }
 
 class Symbol;
@@ -72,11 +83,13 @@ public:
     void ResetFlag(ValueFlags flag) { flags = flags & ~flag; }
     bool IsRegValue() const { return flags == ValueFlags::reg; }
     bool IsPureValue() const { return flags == ValueFlags::pure; }
+    bool IsTypeIdIndex() const { return flags == ValueFlags::typeIdIndex; }
     bool IsSymbolValue() const { return symbol != nullptr; }
     uint64_t Val() const { return val; }
     void SetVal(uint64_t val_) { val = val_; }
     Symbol* GetSymbol() const { return symbol; }
     void SetSymbol(Symbol* symbol_) { symbol = symbol_; }
+    std::string ToString() const;
 private:
     ValueFlags flags;
     uint64_t val;
@@ -87,6 +100,8 @@ enum class SymbolKind : uint8_t
 {
     none, local, global
 };
+
+CMSX_OBJECT_API std::string SymbolKindStr(SymbolKind symbolKind);
 
 class CMSX_OBJECT_API Symbol
 {
@@ -130,6 +145,7 @@ public:
     const std::vector<int32_t>& LinkCommandIds() const { return linkCommandIds; }
     void SetLinkCommandIds(const std::vector<int32_t>& linkCommandIds_);
     Symbol* Clone() const;
+    void Print(CodeFormatter& formatter);
 private:
     SymbolKind kind;
     int index;
@@ -157,14 +173,17 @@ public:
     Symbol* GetSymbol(const std::string& name) const;
     Symbol* GetSymbol(uint64_t address) const;
     Symbol* GetRegisterSymbol(uint8_t reg) const;
+    Symbol* GetTrapSymbol(uint64_t trap) const;
     void AddSymbol(Symbol* symbol);
     void AddSymbol(Symbol* symbol, bool setIndex);
     void AddSymbolToAddressMap(Symbol* symbol, bool setStart);
+    void AddTrapSymbol(Symbol* trapSymbol);
     const std::vector<std::unique_ptr<Symbol>>& Symbols() const { return symbols; }
 private:
     std::vector<std::unique_ptr<Symbol>> symbols;
     std::map<std::string, Symbol*> table;
     std::map<uint8_t, Symbol*> registerMap;
+    std::map<uint64_t, Symbol*> trapMap;
     std::map<uint64_t, Symbol*> valueMap;
     std::map<uint64_t, Symbol*> addressMap;
 };

@@ -68,9 +68,10 @@ void MainDebuggerObserver::DebuggerProcessExit()
 
 MainWindow::MainWindow(const std::string& filePath_) : 
     Window(WindowCreateParams().Text("System X Debugger").BackgroundColor(GetColor("window.background")).WindowClassName("system.x.db.MainWindow")),
-    observer(this), filePath(filePath_), args(), env(), machine(nullptr), process(nullptr), codeView(nullptr), registerView(nullptr), 
-    dataView(nullptr), argsView(nullptr), envView(nullptr), heapView(nullptr), stackView(nullptr), logView(nullptr), currentTopView(nullptr), currentBottomView(nullptr),
-    waitingDebugger(false), startContinueMenuItem(nullptr), stopMenuItem(nullptr), resetMenuItem(nullptr), singleStepMenuItem(nullptr), stepOverMenuItem(nullptr)
+    observer(this), filePath(filePath_), args(), env(), machine(nullptr), process(nullptr), openFileMenuItem(nullptr), closeFileMenuItem(nullptr), exitMenuItem(nullptr), 
+    codeView(nullptr), registerView(nullptr), dataView(nullptr), argsView(nullptr), envView(nullptr), heapView(nullptr), stackView(nullptr), logView(nullptr), 
+    currentTopView(nullptr), currentBottomView(nullptr), waitingDebugger(false), startContinueMenuItem(nullptr), stopMenuItem(nullptr), resetMenuItem(nullptr), 
+    singleStepMenuItem(nullptr), stepOverMenuItem(nullptr), toggleBreakpointMenuItem(nullptr), fileOpen(false)
 {
     std::unique_ptr<MenuBar> menuBar(new MenuBar());
     std::unique_ptr<MenuItem> fileMenuItem(new MenuItem("&File"));
@@ -79,6 +80,11 @@ MainWindow::MainWindow(const std::string& filePath_) :
     openFileMenuItem->SetShortcut(Keys::controlModifier | Keys::o);
     openFileMenuItem->Click().AddHandler(this, &MainWindow::OpenFileClick);
     fileMenuItem->AddMenuItem(openFileMenuItemPtr.release());
+    std::unique_ptr<MenuItem> closeFileMenuItemPtr(new MenuItem("&Close"));
+    closeFileMenuItem = closeFileMenuItemPtr.get();
+    closeFileMenuItem->SetShortcut(Keys::controlModifier | Keys::f4);
+    closeFileMenuItem->Click().AddHandler(this, &MainWindow::CloseFileClick);
+    fileMenuItem->AddMenuItem(closeFileMenuItemPtr.release());
     std::unique_ptr<MenuItem> exitMenuItemPtr(new MenuItem("E&xit"));
     exitMenuItem = exitMenuItemPtr.get();
     exitMenuItem->SetShortcut(Keys::altModifier | Keys::f4);
@@ -157,7 +163,7 @@ MainWindow::MainWindow(const std::string& filePath_) :
 
     std::unique_ptr<MenuItem> resetMenuItemPtr(new MenuItem("&Reset Program To Start"));
     resetMenuItem = resetMenuItemPtr.get();
-    resetMenuItem->SetShortcut(Keys::controlModifier | Keys::f4);
+    resetMenuItem->SetShortcut(Keys::f4);
     resetMenuItem->Click().AddHandler(this, &MainWindow::ResetClick);
     debugMenuItem->AddMenuItem(resetMenuItemPtr.release());
 
@@ -172,7 +178,21 @@ MainWindow::MainWindow(const std::string& filePath_) :
     stepOverMenuItem->SetShortcut(Keys::f12);
     stepOverMenuItem->Click().AddHandler(this, &MainWindow::StepOverClick);
     debugMenuItem->AddMenuItem(stepOverMenuItemPtr.release());
+
+    std::unique_ptr<MenuItem> toggleBreakpointMenuItemPtr(new MenuItem("&Toggle Breakpoint"));;
+    toggleBreakpointMenuItem = toggleBreakpointMenuItemPtr.get();
+    toggleBreakpointMenuItem->SetShortcut(Keys::f9);
+    toggleBreakpointMenuItem->Click().AddHandler(this, &MainWindow::ToggleBreakpointClick);
+    debugMenuItem->AddMenuItem(toggleBreakpointMenuItemPtr.release());
+
+    std::unique_ptr<MenuItem> gotoPrevAddressMenuItemPtr(new MenuItem("&Goto Previous Address"));
+    gotoPrevAddressMenuItem = gotoPrevAddressMenuItemPtr.get();
+    gotoPrevAddressMenuItem->SetShortcut(Keys::left);
+    gotoPrevAddressMenuItem->Click().AddHandler(this, &MainWindow::PrevAddressClick);
+    debugMenuItem->AddMenuItem(gotoPrevAddressMenuItemPtr.release());
+
     menuBar->AddMenuItem(debugMenuItem.release());
+
 
     std::unique_ptr<MenuItem> helpMenuItem(new MenuItem("&Help"));
     std::unique_ptr<MenuItem> aboutMenuItemPtr(new MenuItem("&About..."));
@@ -312,6 +332,20 @@ void MainWindow::OnMouseWheel(MouseWheelEventArgs& args)
     args.handled = true;
 }
 
+void MainWindow::ToggleBreakpointClick()
+{
+    try
+    {
+        debugger->ToggleBreakpoint(codeView->CurrentAddress());
+        codeView->Reset();
+        codeView->UpdateView(false);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
 void MainWindow::SingleStepClick()
 {
     try
@@ -408,11 +442,29 @@ void MainWindow::OpenFileClick()
             this->filePath = GetFullPath(filePath);
             waitingDebugger = false;
             LoadProcess();
+            fileOpen = true;
         }
     }
     catch (const std::exception& ex)
     {
         waitingDebugger = false;
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::CloseFileClick()
+{
+    try
+    {
+        waitingDebugger = true;
+        StopDebugging(true);
+        WaitUntilDebuggingStoppedOrError();
+        waitingDebugger = false;
+        fileOpen = false;
+        SetState(DebuggingState::debuggerIdle);
+    }
+    catch (const std::exception& ex)
+    {
         ShowErrorMessageBox(Handle(), ex.what());
     }
 }
@@ -475,7 +527,7 @@ void MainWindow::ViewCodeClick()
         {
             tabPage->Select();
         }
-        codeView->UpdateView();
+        codeView->UpdateView(true);
     }
     else
     {
@@ -493,7 +545,7 @@ void MainWindow::ViewRegsClick()
         {
             tabPage->Select();
         }
-        registerView->UpdateView();
+        registerView->UpdateView(true);
     }
     else
     {
@@ -511,7 +563,7 @@ void MainWindow::ViewDataClick()
         {
             tabPage->Select();
         }
-        dataView->UpdateView();
+        dataView->UpdateView(true);
     }
     else
     {
@@ -529,7 +581,7 @@ void MainWindow::ViewArgsClick()
         {
             tabPage->Select();
         }
-        argsView->UpdateView();
+        argsView->UpdateView(true);
     }
     else
     {
@@ -547,7 +599,7 @@ void MainWindow::ViewEnvClick()
         {
             tabPage->Select();
         }
-        envView->UpdateView();
+        envView->UpdateView(true);
     }
     else
     {
@@ -565,7 +617,7 @@ void MainWindow::ViewHeapClick()
         {
             tabPage->Select();
         }
-        heapView->UpdateView();
+        heapView->UpdateView(true);
     }
     else
     {
@@ -583,7 +635,7 @@ void MainWindow::ViewStackClick()
         {
             tabPage->Select();
         }
-        stackView->UpdateView();
+        stackView->UpdateView(true);
     }
     else
     {
@@ -671,6 +723,14 @@ void MainWindow::EndClick()
     }
 }
 
+void MainWindow::PrevAddressClick()
+{
+    if (currentTopView == codeView)
+    {
+        codeView->GotoPrevAddress();
+    }
+}
+
 void MainWindow::TopTabPageSelected()
 {
     currentTopView->SetVisible(false);
@@ -700,7 +760,7 @@ void MainWindow::TopTabPageSelected()
         currentTopView = stackView;
     }
     currentTopView->SetVisible(true);
-    currentTopView->UpdateView();
+    currentTopView->UpdateView(true);
 }
 
 void MainWindow::TopTabPageRemoved(ControlEventArgs& controlEventArgs)
@@ -746,7 +806,7 @@ void MainWindow::BottomTabPageSelected()
         currentBottomView->SetVisible(false);
         currentBottomView = registerView;
         currentBottomView->SetVisible(true);
-        currentBottomView->UpdateView();
+        currentBottomView->UpdateView(true);
     }
 }
 
@@ -842,6 +902,10 @@ void MainWindow::StartDebugging()
     }
     debugger.reset(new Debugger(*machine));
     debugger->SetObserver(&observer);
+    for (auto view : views)
+    {
+        view->SetDebugger(debugger.get());
+    }
     debuggerThread = std::thread(RunDebugger, debugger.get(), machine.get());
 }
 
@@ -882,7 +946,7 @@ void MainWindow::UpdateViews()
     {
         if (view->IsVisible())
         {
-            view->UpdateView();
+            view->UpdateView(true);
         }
     }
 }
@@ -914,7 +978,7 @@ void MainWindow::CreateCodeView()
     {
         topTabControl->InsertTabPageBefore(tabPage.release(), static_cast<TabPage*>(topTabControl->TabPages().FirstChild()));
     }
-    codeView->UpdateView();
+    codeView->UpdateView(true);
 }
 
 void MainWindow::CreateRegisterView()
@@ -935,7 +999,7 @@ void MainWindow::CreateRegisterView()
     {
         bottomTabControl->InsertTabPageBefore(tabPage.release(), static_cast<TabPage*>(bottomTabControl->TabPages().FirstChild()));
     }
-    registerView->UpdateView();
+    registerView->UpdateView(true);
 }
 
 void MainWindow::CreateDataView()
@@ -956,7 +1020,7 @@ void MainWindow::CreateDataView()
     {
         topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage(topTabControl, "code"));
     }
-    dataView->UpdateView();
+    dataView->UpdateView(true);
 }
 
 void MainWindow::CreateArgsView()
@@ -977,7 +1041,7 @@ void MainWindow::CreateArgsView()
     {
         topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage(topTabControl, "data"));
     }
-    argsView->UpdateView();
+    argsView->UpdateView(true);
 }
 
 void MainWindow::CreateEnvView()
@@ -998,7 +1062,7 @@ void MainWindow::CreateEnvView()
     {
         topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage(topTabControl, "args"));
     }
-    envView->UpdateView();
+    envView->UpdateView(true);
 }
 
 void MainWindow::CreateHeapView()
@@ -1019,7 +1083,7 @@ void MainWindow::CreateHeapView()
     {
         topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage(topTabControl, "env"));
     }
-    heapView->UpdateView();
+    heapView->UpdateView(true);
 }
 
 void MainWindow::CreateStackView()
@@ -1040,7 +1104,7 @@ void MainWindow::CreateStackView()
     {
         topTabControl->InsertTabPageAfter(tabPage.release(), GetTabPageByNameOrFirstTabPage(topTabControl, "heap"));
     }
-    stackView->UpdateView();
+    stackView->UpdateView(true);
 }
 
 void MainWindow::CreateLogView()
@@ -1105,9 +1169,9 @@ void MainWindow::PrintError(const std::string& errorMessage)
 void MainWindow::PrintExit()
 {
     uint8_t exitCode = 255;
-    if (machine)
+    if (process)
     {
-        exitCode = machine->GetProcessor().GetExitCode();
+        exitCode = process->ExitCode();
     }
     ViewLogClick();
     logView->WriteLine("process exited with code " + std::to_string(static_cast<int>(exitCode)));
@@ -1121,6 +1185,9 @@ void MainWindow::SetState(DebuggingState state_)
     resetMenuItem->Disable();
     singleStepMenuItem->Disable();
     stepOverMenuItem->Disable();
+    toggleBreakpointMenuItem->Disable();
+    gotoPrevAddressMenuItem->Disable();
+    closeFileMenuItem->Disable();
     switch (state)
     {
         case DebuggingState::debuggerBusy:
@@ -1135,16 +1202,30 @@ void MainWindow::SetState(DebuggingState state_)
             resetMenuItem->Enable();
             singleStepMenuItem->Enable();
             stepOverMenuItem->Enable();
+            toggleBreakpointMenuItem->Enable();
+            gotoPrevAddressMenuItem->Enable();
+            if (fileOpen)
+            {
+                closeFileMenuItem->Enable();
+            }
             break;
         }
         case DebuggingState::debuggerError:
         {
             resetMenuItem->Enable();
+            if (fileOpen)
+            {
+                closeFileMenuItem->Enable();
+            }
             break;
         }
         case DebuggingState::debuggerExit:
         {
             resetMenuItem->Enable();
+            if (fileOpen)
+            {
+                closeFileMenuItem->Enable();
+            }
             break;
         }
     }

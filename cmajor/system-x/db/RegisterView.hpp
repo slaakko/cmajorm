@@ -34,7 +34,7 @@ public:
     RegisterView(RegisterViewCreateParams& createParams);
     void SetMachine(cmsx::machine::Machine* machine_) override;
     void SetProcess(cmsx::kernel::Process* process_) override;
-    void UpdateView() override;
+    void UpdateView(bool updateCurrentAddress) override;
 protected:
     void OnPaint(PaintEventArgs& args) override;
 private:

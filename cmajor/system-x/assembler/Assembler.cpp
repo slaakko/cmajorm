@@ -9,9 +9,12 @@
 #include <system-x/assembler/Expression.hpp>
 #include <system-x/machine/OpCode.hpp>
 #include <system-x/object/Link.hpp>
+#include <system-x/machine/Memory.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <soulng/util/Uuid.hpp>
 
 namespace cmsx::assembler {
 
@@ -25,6 +28,8 @@ Assembler::Assembler(soulng::lexer::Lexer* lexer_, const std::string& assemblyFi
 {
     objectFile->CreateSections();
     objectFile->GetSymbolTable().InstallDefaultSymbols();
+    objectFile->GetCodeSection()->SetBaseAddress(cmsx::machine::textSegmentBaseAddress);
+    objectFile->GetDataSection()->SetBaseAddress(cmsx::machine::dataSegmentBaseAddress);
 }
 
 void Assembler::Assemble()
@@ -122,12 +127,25 @@ void Assembler::Visit(CharacterConstant& node)
 
 void Assembler::Visit(StringConstant& node)
 {
-    // todo
+    if (currentSection->IsDataSection())
+    {
+        std::string s = ToUtf8(node.Value());
+        for (char c : s)
+        {
+            currentSection->EmitByte(static_cast<uint8_t>(c));
+        }
+    }
+    else
+    {
+        // todo: debug section
+    }
 }
 
 void Assembler::Visit(ClsIdConstant& node)
 {
-    // todo
+    boost::uuids::uuid typeId = boost::lexical_cast<boost::uuids::uuid>(node.TypeId());
+    value = cmsx::object::Value(static_cast<uint64_t>(typeIds.size()), cmsx::object::ValueFlags::typeIdIndex);
+    typeIds.push_back(typeId);
 }
 
 void Assembler::Visit(UnaryExpression& node)
@@ -918,10 +936,9 @@ Node* Assembler::MakeClsIdConstant(const SourcePos& sourcePos, const std::u32str
 {
     try
     {
-        // todo: check this
         std::u32string::size_type start = s.find(U'(');
         std::u32string::size_type end = s.find(U')');
-        std::string typeId = ToUtf8(s.substr(start + 1, end - start + 1));
+        std::string typeId = ToUtf8(s.substr(start + 1, end - (start + 1)));
         return new ClsIdConstant(sourcePos, typeId);
     }
     catch (const std::exception& ex)
@@ -1071,7 +1088,7 @@ void Assembler::EmitSymbolOcta(const cmsx::object::Value& symbolValue)
     if (symbolValue.IsSymbolValue())
     {
         cmsx::object::Symbol* symbol = symbolValue.GetSymbol();
-        cmsx::object::LinkFarOctaCommand* linkCommand = new cmsx::object::LinkFarOctaCommand(objectFile->GetDataSection()->Address(), currentSymbol->Index());
+        cmsx::object::LinkFarOctaCommand* linkCommand = new cmsx::object::LinkFarOctaCommand(objectFile->GetDataSection()->Address(), symbol->Index());
         int32_t linkCommandId = objectFile->GetLinkSection()->AddLinkCommand(linkCommand, true);
         if (currentStructureSymbol)
         {
@@ -1232,6 +1249,28 @@ void Assembler::EmitLongOffset(uint32_t offset)
 void Assembler::EmitShortOffset(uint16_t offset)
 {
     currentSection->EmitShortOffset(offset);
+}
+
+void Assembler::EmitClsIdCommmand(uint64_t typeIdIndex, const SourcePos& sourcePos)
+{
+    if (typeIdIndex >= 0 && typeIdIndex < typeIds.size())
+    {
+        boost::uuids::uuid typeId = typeIds[typeIdIndex];
+        uint64_t t1;
+        uint64_t t2;
+        UuidToInts(typeId, t1, t2);
+        cmsx::object::LinkClsIdCommand* linkCommand = new cmsx::object::LinkClsIdCommand(objectFile->GetDataSection()->Address(), t1, t2);
+        int32_t linkCommandId = objectFile->GetLinkSection()->AddLinkCommand(linkCommand, true);
+        if (currentStructureSymbol)
+        {
+            currentStructureSymbol->AddLinkCommandId(linkCommandId);
+        }
+        objectFile->GetDataSection()->EmitOcta(static_cast<uint64_t>(cmsx::object::undefinedValue));
+    }
+    else
+    {
+        Error("invalid type id index " + std::to_string(typeIdIndex), sourcePos);
+    }
 }
 
 } // namespace cmsx::assembler

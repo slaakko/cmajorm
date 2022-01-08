@@ -41,6 +41,8 @@ public:
     void WaitForCommand();
     void AddBreakpoint(uint64_t address);
     void RemoveBreakpoint(uint64_t address);
+    bool HasBreakpoint(uint64_t address) const;
+    void ToggleBreakpoint(uint64_t address);
     void Intercept() override;
     void ProcessExit() override;
 private:

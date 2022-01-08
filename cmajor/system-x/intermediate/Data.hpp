@@ -38,6 +38,7 @@ public:
     ValueKind Kind() const { return kind; }
     std::string KindStr() const;
     Type* GetType() const { return type; }
+    void SetType(Type* type_) { type = type_; }
 private:
     SourcePos sourcePos;
     ValueKind kind;

@@ -24,10 +24,13 @@ void Assemble(int logStreamId, const std::string& assemblyFilePath, const std::s
         LogMessage(logStreamId, "> " + assemblyFilePath);
     }
     std::u32string assemblyContent = ToUtf32(ReadFile(assemblyFilePath));
-    AssemblyLexer lexer(assemblyContent, assemblyFilePath, 0);
-    Assembler assembler(&lexer, assemblyFilePath, objectFilePath);
-    AssemblyParser::Parse(lexer, &assembler);
-    assembler.Assemble();
+    if (!assemblyContent.empty())
+    {
+        AssemblyLexer lexer(assemblyContent, assemblyFilePath, 0);
+        Assembler assembler(&lexer, assemblyFilePath, objectFilePath);
+        AssemblyParser::Parse(lexer, &assembler);
+        assembler.Assemble();
+    }
     if (verbose)
     {
         LogMessage(logStreamId, "==> " + objectFilePath);

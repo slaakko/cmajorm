@@ -10,9 +10,12 @@
 #include <system-x/machine/OpCode.hpp>
 #include <system-x/machine/Registers.hpp>
 #include <system-x/assembler/Constant.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <stdexcept>
 
 namespace cmsx::intermediate {
+
+using namespace soulng::util;
 
 CodeGenerator::~CodeGenerator()
 {
@@ -249,6 +252,14 @@ cmsx::assembler::Node* MakeRegOperand(Value* value, const Register& r, CodeGener
         {
             codeGen.Error("error making reg operand: instruction for reg value not set");
         }
+    }
+    else if (value->IsAddressValue())
+    {
+        AddressValue* v = static_cast<AddressValue*>(value);
+        cmsx::assembler::Instruction* ldouInst = new cmsx::assembler::Instruction(cmsx::machine::LDOU);
+        ldouInst->AddOperand(MakeRegOperand(r));
+        ldouInst->AddOperand(cmsx::assembler::MakeGlobalSymbol(v->Value()->Name()));
+        codeGen.Emit(ldouInst);
     }
     else
     {
@@ -622,7 +633,7 @@ void EmitNot(NotInstruction& inst, CodeGenerator& codeGen)
     cmsx::assembler::Instruction* zszInst = new cmsx::assembler::Instruction(cmsx::machine::ZSZ);
     zszInst->AddOperand(MakeRegOperand(reg));
     zszInst->AddOperand(operandReg);
-    zszInst->AddOperand(cmsx::assembler::MakeConstantExpr(1));
+    zszInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint8_t>(1)));
     codeGen.Emit(zszInst);
 }
 
@@ -656,10 +667,6 @@ void EmitNeg(NegInstruction& inst, CodeGenerator& codeGen)
     if (machineInst == cmsx::machine::FSUB)
     {
         negInst->AddOperand(cmsx::assembler::MakeConstantExpr(0.0));
-    }
-    else
-    {
-        negInst->AddOperand(cmsx::assembler::MakeConstantExpr(0));
     }
     negInst->AddOperand(operandReg);
     codeGen.Emit(negInst);
@@ -925,7 +932,7 @@ void EmitEqual(EqualInstruction& inst, CodeGenerator& codeGen)
     cmsx::assembler::Instruction* zszInst = new cmsx::assembler::Instruction(cmsx::machine::ZSZ);
     zszInst->AddOperand(MakeRegOperand(reg));
     zszInst->AddOperand(MakeRegOperand(reg));
-    zszInst->AddOperand(cmsx::assembler::MakeConstantExpr(1));
+    zszInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint8_t>(1)));
     codeGen.Emit(zszInst);
 }
 
@@ -985,7 +992,7 @@ void EmitLess(LessInstruction& inst, CodeGenerator& codeGen)
     cmsx::assembler::Instruction* zsnInst = new cmsx::assembler::Instruction(cmsx::machine::ZSN);
     zsnInst->AddOperand(MakeRegOperand(reg));
     zsnInst->AddOperand(MakeRegOperand(reg));
-    zsnInst->AddOperand(cmsx::assembler::MakeConstantExpr(1));
+    zsnInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint8_t>(1)));
     codeGen.Emit(zsnInst);
 }
 
@@ -1347,11 +1354,11 @@ void EmitProcedureCall(ProcedureCallInstruction& inst, CodeGenerator& codeGen)
     {
         codeGen.Error("error emitting procedure call: reg not valid");
     }
-    int saveNumLocals = 0;
+    uint8_t saveNumLocals = 0;
     int lastActiveLocalReg = codeGen.RegAllocator()->LastActiveLocalReg();
     if (lastActiveLocalReg != -1)
     {
-        saveNumLocals = lastActiveLocalReg + 1;
+        saveNumLocals = static_cast<uint8_t>(lastActiveLocalReg + 1);
     }
     cmsx::assembler::Instruction* callInst = new cmsx::assembler::Instruction(cmsx::machine::CALL);
     Frame& frame = codeGen.RegAllocator()->GetFrame();
@@ -1369,7 +1376,7 @@ void EmitFunctionCall(FunctionCallInstruction& inst, CodeGenerator& codeGen)
     {
         codeGen.Error("error emitting function call: reg not valid");
     }
-    int saveNumLocals = 0;
+    uint8_t saveNumLocals = 0;
     int lastActiveLocalReg = codeGen.RegAllocator()->LastActiveLocalReg();
     if (lastActiveLocalReg != -1)
     {
@@ -1426,6 +1433,7 @@ void EmitTrap(TrapInstruction& inst, CodeGenerator& codeGen)
     codeGen.Emit(trapInst);
     Frame& frame = codeGen.RegAllocator()->GetFrame();
     frame.AddCallFrame();
+    codeGen.RegAllocator()->AddRegisterLocation(&inst, GetGlobalRegister(cmsx::machine::regAX));
 }
 
 void EmitPrologue(CodeGenerator& codeGen)
@@ -1543,13 +1551,60 @@ void EmitAddress(AddressValue& value, CodeGenerator& codeGen)
     codeGen.EmitSymbol(value.Value()->Name());
 }
 
+void EmitSymbol(SymbolValue& value, CodeGenerator& codeGen)
+{
+    codeGen.EmitSymbol(value.Symbol());
+}
+
 void EmitString(StringValue& value, CodeGenerator& codeGen)
 {
+    int state = 0;
+    std::string hex;
     for (char c : value.Value())
     {
-        codeGen.EmitByte(static_cast<uint8_t>(c));
+        switch (state)
+        {
+            case 0:
+            {
+                if (c == '\\')
+                {
+                    hex.clear();
+                    state = 1;
+                }
+                else
+                {
+                    codeGen.EmitByte(static_cast<uint8_t>(c));
+                }
+                break;
+            }
+            case 1:
+            {
+                hex.append(1, c);
+                state = 2;
+                break;
+            }
+            case 2:
+            {
+                hex.append(1, c);
+                codeGen.EmitByte(ParseHexByte(hex));
+                state = 0;
+                break;
+            }
+        }
     }
-    codeGen.EmitByte(0);
+    if (state == 1)
+    {
+        codeGen.Error("error emitting string: two hex characters expected");
+    }
+    else if (state == 2)
+    {
+        codeGen.Error("error emitting string: one hex character expected");
+    }
+}
+
+void EmitClsId(const std::string& typeId, CodeGenerator& codeGen)
+{
+    codeGen.EmitClsId(typeId);
 }
 
 } // cmsx::intermediate

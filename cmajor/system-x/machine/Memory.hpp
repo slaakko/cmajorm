@@ -69,6 +69,7 @@ public:
     void WriteOcta(uint64_t virtualAddress, uint64_t value, Protection protection);
     uint64_t AllocateTranslationMap();
     void FreeMemory(uint64_t rv);
+    void AllocateRange(uint64_t start, uint64_t length);
 private:
     uint64_t AllocatePage();
     void FreeMemoryUnlocked(uint64_t rv);

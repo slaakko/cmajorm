@@ -151,6 +151,12 @@ void Type::Resolve(Types* types, Context* context)
 {
 }
 
+cmsx::assembler::Instruction* Type::MakeAssemblyInst(Context* context) const
+{
+    Error("no assembly instruction for this type", sourcePos, context);
+    return nullptr;
+}
+
 VoidType::VoidType() : Type(SourcePos(), TypeKind::fundamentalType, voidTypeId)
 {
 }
@@ -159,36 +165,81 @@ BoolType::BoolType() : Type(SourcePos(), TypeKind::fundamentalType, boolTypeId)
 {
 }
 
+cmsx::assembler::Instruction* BoolType::MakeAssemblyInst(Context* context) const
+{
+    return new cmsx::assembler::Instruction(cmsx::assembler::BYTE);
+}
+
 SByteType::SByteType() : Type(SourcePos(), TypeKind::fundamentalType, sbyteTypeId)
 {
+}
+
+cmsx::assembler::Instruction* SByteType::MakeAssemblyInst(Context* context) const
+{
+    return new cmsx::assembler::Instruction(cmsx::assembler::BYTE);
 }
 
 ByteType::ByteType() : Type(SourcePos(), TypeKind::fundamentalType, byteTypeId)
 {
 }
 
+cmsx::assembler::Instruction* ByteType::MakeAssemblyInst(Context* context) const
+{
+    return new cmsx::assembler::Instruction(cmsx::assembler::BYTE);
+}
+
 ShortType::ShortType() : Type(SourcePos(), TypeKind::fundamentalType, shortTypeId)
 {
+}
+
+cmsx::assembler::Instruction* ShortType::MakeAssemblyInst(Context* context) const
+{
+    return new cmsx::assembler::Instruction(cmsx::assembler::WYDE);
 }
 
 UShortType::UShortType() : Type(SourcePos(), TypeKind::fundamentalType, ushortTypeId)
 {
 }
 
+cmsx::assembler::Instruction* UShortType::MakeAssemblyInst(Context* context) const
+{
+    return new cmsx::assembler::Instruction(cmsx::assembler::WYDE);
+}
+
 IntType::IntType() : Type(SourcePos(), TypeKind::fundamentalType, intTypeId)
 {
+}
+
+cmsx::assembler::Instruction* IntType::MakeAssemblyInst(Context* context) const
+{
+    return new cmsx::assembler::Instruction(cmsx::assembler::TETRA);
 }
 
 UIntType::UIntType() : Type(SourcePos(), TypeKind::fundamentalType, uintTypeId)
 {
 }
 
+cmsx::assembler::Instruction* UIntType::MakeAssemblyInst(Context* context) const
+{
+    return new cmsx::assembler::Instruction(cmsx::assembler::TETRA);
+}
+
 LongType::LongType() : Type(SourcePos(), TypeKind::fundamentalType, longTypeId)
 {
 }
 
+cmsx::assembler::Instruction* LongType::MakeAssemblyInst(Context* context) const
+{
+    return new cmsx::assembler::Instruction(cmsx::assembler::OCTA);
+}
+
 ULongType::ULongType() : Type(SourcePos(), TypeKind::fundamentalType, ulongTypeId)
 {
+}
+
+cmsx::assembler::Instruction* ULongType::MakeAssemblyInst(Context* context) const
+{
+    return new cmsx::assembler::Instruction(cmsx::assembler::OCTA);
 }
 
 FloatType::FloatType() : Type(SourcePos(), TypeKind::fundamentalType, floatTypeId)
@@ -371,6 +422,11 @@ PointerType::PointerType(const SourcePos& sourcePos_, int32_t typeId_, int8_t po
 std::string PointerType::Name() const
 {
     return baseTypeRef.GetType()->Name() + "*";
+}
+
+cmsx::assembler::Instruction* PointerType::MakeAssemblyInst(Context* context) const
+{
+    return new cmsx::assembler::Instruction(cmsx::assembler::OCTA);
 }
 
 Types::Types() : context(nullptr)

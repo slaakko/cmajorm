@@ -20,6 +20,8 @@ enum class LinkCode : uint8_t
     once = 0, forwardLongJump = 1, forwardShortJump = 2, absoluteAddrValue = 3, farOcta = 4, clsid = 5, end = 6
 };
 
+std::string LinkCodeStr(LinkCode linkCode);
+
 class ObjectFile;
 
 class CMSX_OBJECT_API LinkCommand
@@ -29,6 +31,7 @@ public:
     LinkCommand(LinkCode linkCode_, uint64_t address_);
     virtual ~LinkCommand();
     virtual LinkCommand* Clone() const = 0;
+    virtual std::string ToString() const = 0;
     virtual void Emit(LinkSection* linkSection);
     virtual void Read(LinkSection* linkSection);
     virtual void Apply(ObjectFile* objectFile, uint64_t value);
@@ -47,6 +50,7 @@ class CMSX_OBJECT_API LinkOnceCommand : public LinkCommand
 public:
     LinkOnceCommand();
     LinkCommand* Clone() const override;
+    std::string ToString() const override;
 };
 
 class CMSX_OBJECT_API LinkForwardLongJumpCommand : public LinkCommand
@@ -59,6 +63,7 @@ public:
     void Apply(ObjectFile* objectFile, uint64_t value) override;
     int32_t SymbolIndex() const { return symbolIndex; }
     LinkCommand* Clone() const override;
+    std::string ToString() const override;
 private:
     int32_t symbolIndex;
 };
@@ -73,6 +78,7 @@ public:
     void Apply(ObjectFile* objectFile, uint64_t value) override;
     int32_t SymbolIndex() const { return symbolIndex; }
     LinkCommand* Clone() const override;
+    std::string ToString() const override;
 private:
     int32_t symbolIndex;
 };
@@ -87,6 +93,7 @@ public:
     void Apply(ObjectFile* objectFile, uint64_t value) override;
     int32_t SymbolIndex() const { return symbolIndex; }
     LinkCommand* Clone() const override;
+    std::string ToString() const override;
 private:
     int32_t symbolIndex;
 };
@@ -101,6 +108,7 @@ public:
     void Apply(ObjectFile* objectFile, uint64_t value) override;
     int32_t SymbolIndex() const { return symbolIndex; }
     LinkCommand* Clone() const override;
+    std::string ToString() const override;
 private:
     int32_t symbolIndex;
 };
@@ -116,6 +124,7 @@ public:
     uint64_t TypeId1() const { return typeId1; }
     uint64_t TypeId2() const { return typeId2; }
     LinkCommand* Clone() const override;
+    std::string ToString() const override;
 private:
     uint64_t typeId1;
     uint64_t typeId2;
@@ -126,6 +135,7 @@ class CMSX_OBJECT_API LinkEndCommamnd : public LinkCommand
 public:
     LinkEndCommamnd();
     LinkCommand* Clone() const override;
+    std::string ToString() const override;
 };
 
 CMSX_OBJECT_API LinkCommand* MakeLinkCommand(LinkCode linkCode);

@@ -10,14 +10,17 @@
 
 namespace cmsx::db {
 
+    class Debugger;
+
 class DebugView
 {
 public: 
     DebugView();
     virtual ~DebugView();
-    virtual void UpdateView();
+    virtual void UpdateView(bool updateCurrentAddress);
     virtual void SetMachine(cmsx::machine::Machine* machine);
     virtual void SetProcess(cmsx::kernel::Process* process);
+    virtual void SetDebugger(Debugger* debugger);
     virtual void WriteLine(const std::string& logMessage);
     virtual void Clear();
     virtual void ToStart();

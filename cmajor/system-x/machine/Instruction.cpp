@@ -2026,7 +2026,7 @@ void Zsz::Execute(Machine& machine, uint8_t x, uint8_t y, uint8_t z)
     if (yy == 0)
     {
         uint64_t zz = machine.Regs().Get(z);
-        uint64_t xx = zz;
+        xx = zz;
     }
     machine.Regs().Set(x, xx);
 }
@@ -2047,7 +2047,7 @@ void Zszi::Execute(Machine& machine, uint8_t x, uint8_t y, uint8_t z)
     if (yy == 0)
     {
         uint64_t zz = z;
-        uint64_t xx = zz;
+        xx = zz;
     }
     machine.Regs().Set(x, xx);
 }
@@ -2194,7 +2194,7 @@ void Zsnz::Execute(Machine& machine, uint8_t x, uint8_t y, uint8_t z)
     if (yy != 0)
     {
         uint64_t zz = machine.Regs().Get(z);
-        uint64_t xx = zz;
+        xx = zz;
     }
     machine.Regs().Set(x, xx);
 }
@@ -2215,7 +2215,7 @@ void Zsnzi::Execute(Machine& machine, uint8_t x, uint8_t y, uint8_t z)
     if (yy != 0)
     {
         uint64_t zz = z;
-        uint64_t xx = zz;
+        xx = zz;
     }
     machine.Regs().Set(x, xx);
 }

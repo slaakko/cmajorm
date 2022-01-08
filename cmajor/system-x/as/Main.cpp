@@ -104,7 +104,7 @@ int main(int argc, const char** argv)
         }
         for (const std::string& fileName : fileNames)
         {
-            cmsx::assembler::Assemble(-1, fileName, Path::ChangeExtension(fileName, ".o"), true);
+            cmsx::assembler::Assemble(-1, fileName, Path::ChangeExtension(fileName, ".o"), verbose);
         }
     }
     catch (const std::exception& ex)

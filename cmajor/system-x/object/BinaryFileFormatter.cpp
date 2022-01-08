@@ -15,12 +15,47 @@ BinaryFileFormatter::BinaryFileFormatter(cmsx::machine::Machine& machine_, Binar
 void BinaryFileFormatter::Format()
 {
     FormatSection(file->GetHeaderSection());
-    FormatSection(file->GetCodeSection());
-    FormatSection(file->GetDataSection());
-    FormatSection(file->GetSymbolSection());
-    FormatSection(file->GetLinkSection());
-    FormatSection(file->GetDebugSection());
-    FormatSymbolTable(file->GetSymbolTable());
+    CodeSection* codeSection = file->GetCodeSection();
+    if (codeSection && codeSection->Length() > 0)
+    {
+        FormatSection(codeSection);
+        FormatEol();
+    }
+    DataSection* dataSection = file->GetDataSection();
+    if (dataSection && dataSection->Length() > 0)
+    {
+        FormatSection(dataSection);
+        FormatEol();
+    }
+    SymbolSection* symbolSection = file->GetSymbolSection();
+    if (symbolSection && symbolSection->Length() > 0) 
+    {
+        FormatSection(symbolSection);
+        FormatEol();
+    }
+    LinkSection* linkSection = file->GetLinkSection();
+    if (linkSection && linkSection->Length() > 0)
+    {
+        FormatSection(linkSection);
+        FormatEol();
+    }
+    DebugSection* debugSection = file->GetDebugSection();
+    if (debugSection && debugSection->Length() > 0)
+    {
+        FormatSection(debugSection);
+        FormatEol();
+    }
+    SymbolTable& symbolTable = file->GetSymbolTable();
+    FormatSymbolTable(symbolTable);
+    FormatEol();
+}
+
+void BinaryFileFormatter::FormatOcta(uint64_t octa)
+{
+}
+
+void BinaryFileFormatter::FormatSymbol(Symbol* symbol)
+{
 }
 
 void BinaryFileFormatter::FormatSection(HeaderSection* section)
@@ -48,16 +83,36 @@ void BinaryFileFormatter::FormatSection(CodeSection* section)
 void BinaryFileFormatter::FormatSection(DataSection* section)
 {
     currentSection = section;
+    int64_t baseAddress = currentSection->BaseAddress();
+    int64_t n = currentSection->Length();
+    int64_t address = 0;
+    while (address < n)
+    {
+        uint64_t octa = section->GetOcta(address);
+        FormatCurrentAddress(baseAddress + address);
+        FormatOcta(octa);
+        FormatEol();
+        address += 8;
+    }
 }
 
 void BinaryFileFormatter::FormatSection(SymbolSection* section)
 {
     currentSection = section;
+    for (const auto& symbol : section->File()->GetSymbolTable().Symbols())
+    {
+        FormatSymbol(symbol.get());
+    }
 }
 
 void BinaryFileFormatter::FormatSection(LinkSection* section)
 {
     currentSection = section;
+    for (const auto& linkCommand : section->LinkCommands())
+    {
+        FormatString(linkCommand->ToString());
+        FormatEol();
+    }
 }
 
 void BinaryFileFormatter::FormatSection(DebugSection* section)

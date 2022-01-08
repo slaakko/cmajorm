@@ -5,6 +5,7 @@
 
 #include <system-x/db/Debugger.hpp>
 #include <system-x/machine/Machine.hpp>
+#include <system-x/kernel/ProcessManager.hpp>
 
 namespace cmsx::db {
 
@@ -47,7 +48,12 @@ void Debugger::Stop()
 {
     std::unique_lock<std::mutex> lock(mtx);
     exiting = true;
-    machine.GetProcessor().Exit(exit_code_stop);
+    cmsx::kernel::Process* currentProcess = cmsx::kernel::ProcessManager::Instance().CurrentProcess();
+    if (currentProcess)
+    {
+        currentProcess->SetExitCode(exit_code_stop);
+    }
+    machine.GetProcessor().Exit();
     Release();
 }
 
@@ -172,6 +178,32 @@ void Debugger::RemoveBreakpoint(uint64_t address)
 {
     std::unique_lock<std::mutex> lock(mtx);
     breakpoints.erase(address);
+}
+
+bool Debugger::HasBreakpoint(uint64_t address)  const
+{
+    auto it = breakpoints.find(address);
+    if (it != breakpoints.cend())
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+void Debugger::ToggleBreakpoint(uint64_t address)
+{
+    if (HasBreakpoint(address))
+    {
+        RemoveBreakpoint(address);
+    }
+    else
+    {
+        AddBreakpoint(address);
+    }
+
 }
 
 } // namespace cmsx::db

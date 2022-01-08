@@ -1050,35 +1050,16 @@ int IntermediateCodeLexer::NextState(int state, char32_t c)
         {
             switch (i)
             {
+                case 18:
+                {
+                    return 41;
+                }
                 case 20:
                 case 21:
                 case 22:
                 case 23:
                 case 24:
                 case 25:
-                {
-                    return 41;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 41:
-        {
-            switch (i)
-            {
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                {
-                    return 41;
-                }
-                case 11:
                 {
                     return 42;
                 }
@@ -1089,6 +1070,33 @@ int IntermediateCodeLexer::NextState(int state, char32_t c)
             }
         }
         case 42:
+        {
+            switch (i)
+            {
+                case 18:
+                {
+                    return 41;
+                }
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                {
+                    return 42;
+                }
+                case 11:
+                {
+                    return 43;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 43:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -1107,6 +1115,33 @@ int IntermediateCodeLexer::NextState(int state, char32_t c)
                 token.match = prevMatch;
             }
             return -1;
+        }
+        case 41:
+        {
+            switch (i)
+            {
+                case 18:
+                {
+                    return 41;
+                }
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                {
+                    return 42;
+                }
+                case 11:
+                {
+                    return 43;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
         }
         case 32:
         {
@@ -1219,7 +1254,7 @@ int IntermediateCodeLexer::NextState(int state, char32_t c)
                 }
                 case 25:
                 {
-                    return 43;
+                    return 44;
                 }
                 default:
                 {
@@ -1227,7 +1262,7 @@ int IntermediateCodeLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 43:
+        case 44:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -1258,7 +1293,7 @@ int IntermediateCodeLexer::NextState(int state, char32_t c)
                 }
                 case 25:
                 {
-                    return 43;
+                    return 44;
                 }
                 default:
                 {
@@ -1302,20 +1337,6 @@ int IntermediateCodeLexer::NextState(int state, char32_t c)
             {
                 case 15:
                 {
-                    return 44;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 44:
-        {
-            switch (i)
-            {
-                case 25:
-                {
                     return 45;
                 }
                 default:
@@ -1325,6 +1346,20 @@ int IntermediateCodeLexer::NextState(int state, char32_t c)
             }
         }
         case 45:
+        {
+            switch (i)
+            {
+                case 25:
+                {
+                    return 46;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 46:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -1346,7 +1381,7 @@ int IntermediateCodeLexer::NextState(int state, char32_t c)
             {
                 case 25:
                 {
-                    return 45;
+                    return 46;
                 }
                 default:
                 {
@@ -1518,7 +1553,7 @@ int IntermediateCodeLexer::NextState(int state, char32_t c)
             {
                 case 2:
                 {
-                    return 46;
+                    return 47;
                 }
                 case 3:
                 case 4:
@@ -1554,7 +1589,57 @@ int IntermediateCodeLexer::NextState(int state, char32_t c)
                 case 34:
                 case 35:
                 {
+                    return 48;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 48:
+        {
+            switch (i)
+            {
+                case 2:
+                {
                     return 47;
+                }
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                {
+                    return 48;
                 }
                 default:
                 {
@@ -1563,56 +1648,6 @@ int IntermediateCodeLexer::NextState(int state, char32_t c)
             }
         }
         case 47:
-        {
-            switch (i)
-            {
-                case 2:
-                {
-                    return 46;
-                }
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                {
-                    return 47;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 46:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;

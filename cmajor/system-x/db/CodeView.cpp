@@ -5,6 +5,7 @@
 // =================================
 
 #include <system-x/db/CodeView.hpp>
+#include <system-x/db/Debugger.hpp>
 #include <system-x/object/InstructionFormatter.hpp>
 #include <system-x/object/Symbol.hpp>
 #include <system-x/machine/OpCode.hpp>
@@ -35,7 +36,7 @@ void CodeViewLine::AddItem(CodeViewItem&& item)
 class CodeViewLineBuilder : public cmsx::object::InstructionFormatter
 {
 public:
-    CodeViewLineBuilder(cmsx::machine::Machine& machine_, cmsx::object::SymbolTable& symbolTable_);
+    CodeViewLineBuilder(cmsx::machine::Machine& machine_, cmsx::object::SymbolTable& symbolTable_, Debugger* debugger_);
     void FormatCurrentAddress(uint64_t currentAddress) override;
     void FormatAssembledBytes(uint8_t opc, uint8_t x, uint8_t y, uint8_t z) override;
     void FormatLabel(uint64_t currentAddress) override;
@@ -49,20 +50,30 @@ public:
     void FormatWydeOperand(uint16_t wyde) override;
     void FormatAddress(uint64_t address) override;
     void FormatSetAddress(uint64_t saddr) override;
+    void FormatTrapName(uint8_t trap) override;
     CodeViewLine GetLine() { return std::move(line); }
 private:
     cmsx::object::SymbolTable& symbolTable;
+    Debugger* debugger;
     CodeViewLine line;
 };
 
-CodeViewLineBuilder::CodeViewLineBuilder(cmsx::machine::Machine& machine_, cmsx::object::SymbolTable& symbolTable_) : InstructionFormatter(machine_), symbolTable(symbolTable_)
+CodeViewLineBuilder::CodeViewLineBuilder(cmsx::machine::Machine& machine_, cmsx::object::SymbolTable& symbolTable_, Debugger* debugger_) : 
+    InstructionFormatter(machine_), symbolTable(symbolTable_), debugger(debugger_)
 {
 }
 
 void CodeViewLineBuilder::FormatCurrentAddress(uint64_t currentAddress)
 {
     line.AddItem(CodeViewItem(CodeViewItemKind::currentAddress, ToUtf32("#" + ToHexString(currentAddress))));
-    line.AddItem(CodeViewItem(CodeViewItemKind::space, ToUtf32(" ")));
+    if (debugger && debugger->HasBreakpoint(currentAddress))
+    {
+        line.AddItem(CodeViewItem(CodeViewItemKind::breakpoint, ToUtf32(" * ")));
+    }
+    else
+    {
+        line.AddItem(CodeViewItem(CodeViewItemKind::breakpoint, ToUtf32("   ")));
+    }
 }
 
 void CodeViewLineBuilder::FormatAssembledBytes(uint8_t opc, uint8_t x, uint8_t y, uint8_t z)
@@ -181,6 +192,16 @@ void CodeViewLineBuilder::FormatSetAddress(uint64_t saddr)
     }
 }
 
+void CodeViewLineBuilder::FormatTrapName(uint8_t trap)
+{
+    cmsx::object::Symbol* symbol = symbolTable.GetTrapSymbol(trap);
+    if (symbol)
+    {
+        FormatColon();
+        line.AddItem(CodeViewItem(CodeViewItemKind::label, ToUtf32("[" + symbol->FullName() + "]")));
+    }
+}
+
 std::string DefaultCodeViewFontFamilyName()
 {
     return "Cascadia Mono";
@@ -204,6 +225,11 @@ Color DefaultPCBackgroundColor()
 Color DefaultCurrentAddressColor()
 {
     return Color(43, 145, 175);
+}
+
+Color DefaultBreakpointColor()
+{
+    return Color::Red;
 }
 
 Color DefaultPCColor()
@@ -268,10 +294,11 @@ CodeViewCreateParams& CodeViewCreateParams::Defaults()
 }
 
 CodeView::CodeView(CodeViewCreateParams& createParams) : 
-    Control(createParams.controlCreateParams), machine(nullptr), process(nullptr), lineHeight(0), charWidth(0), viewHeight(0), numLines(0), currentAddress(0)
+    Control(createParams.controlCreateParams), machine(nullptr), process(nullptr), debugger(nullptr), lineHeight(0), charWidth(0), viewHeight(0), numLines(0), 
+    currentLineNumber(0), currentAddress(0)
 {
-    //SetMinWidth(16);
-    //SetMinHeight(16);
+    SetMinWidth(16);
+    SetMinHeight(16);
     std::u16string fontFamilyName = ToUtf16(createParams.fontFamilyName);
     SetFont(Font(FontFamily((const WCHAR*)fontFamilyName.c_str()), createParams.fontSize, FontStyle::FontStyleRegular, Unit::UnitPoint));
     SetDoubleBuffered();
@@ -281,6 +308,7 @@ CodeView::CodeView(CodeViewCreateParams& createParams) :
     colorMap[CodeViewItemKind::pc_background] = DefaultPCBackgroundColor();
     colorMap[CodeViewItemKind::space] = DefaultPunctuationColor();
     colorMap[CodeViewItemKind::currentAddress] = DefaultCurrentAddressColor();
+    colorMap[CodeViewItemKind::breakpoint] = DefaultBreakpointColor();
     colorMap[CodeViewItemKind::assembledByte] = DefaultAssembledByteColor();
     colorMap[CodeViewItemKind::label] = DefaultLabelColor();
     colorMap[CodeViewItemKind::opCode] = DefaultOpCodeColor();
@@ -306,9 +334,14 @@ void CodeView::SetProcess(cmsx::kernel::Process* process_)
     process = process_;
 }
 
-void CodeView::UpdateView()
+void CodeView::SetDebugger(Debugger* debugger_) 
 {
-    if (machine)
+    debugger = debugger_;
+}
+
+void CodeView::UpdateView(bool updateCurrentAddress)
+{
+    if (machine && updateCurrentAddress)
     {
         currentAddress = machine->Regs().GetPC();
     }
@@ -369,6 +402,16 @@ void CodeView::ToEnd()
     Invalidate();
 }
 
+void CodeView::GotoPrevAddress()
+{
+    if (!currentAddressStack.empty())
+    {
+        currentAddress = currentAddressStack.top();
+        currentAddressStack.pop();
+        UpdateView(false);
+    }
+}
+
 void CodeView::OnPaint(PaintEventArgs& args)
 {
     try
@@ -394,6 +437,55 @@ void CodeView::OnPaint(PaintEventArgs& args)
     }
 }
 
+void CodeView::OnMouseDown(MouseEventArgs& args)
+{
+    try
+    {
+        Control::OnMouseDown(args);
+        if (args.clicks == 1 && args.buttons == MouseButtons::lbutton)
+        {
+            int64_t clickAddress = ClickAddress(args.location);
+            if (clickAddress >= process->CodeStartAddress() && clickAddress < process->CodeStartAddress() + process->CodeLength())
+            {
+                const CodeViewItem* item = ClickItem(args.location, clickAddress);
+                if (item)
+                {
+                    if (item->kind == CodeViewItemKind::currentAddress || item->kind == CodeViewItemKind::breakpoint)
+                    {
+                        debugger->ToggleBreakpoint(clickAddress);
+                        Reset();
+                        UpdateView(false);
+                    }
+                    else if (item->kind == CodeViewItemKind::address)
+                    {
+                        int64_t address = static_cast<int64_t>(ParseHexULong(ToUtf8(item->text.substr(1))));
+                        if (address >= process->CodeStartAddress() && address < process->CodeStartAddress() + process->CodeLength())
+                        {
+                            currentAddressStack.push(currentAddress);
+                            currentAddress = address;
+                            UpdateView(false);
+                        }
+                    }
+                    else
+                    {
+                        currentAddressStack.push(currentAddress);
+                        currentAddress = clickAddress;
+                        UpdateView(false);
+                    }
+                }
+            }
+        }
+        else if (args.clicks == 1 && args.buttons == MouseButtons::rbutton)
+        {
+            GotoPrevAddress();
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(nullptr, ex.what());
+    }
+}
+
 void CodeView::Measure(Graphics& graphics)
 {
     PointF origin;
@@ -410,7 +502,7 @@ void CodeView::FetchAddressRange(int64_t startAddress, int64_t instructionCount)
 {
     cmsx::machine::Memory& mem = machine->Mem();
     int64_t address = startAddress;
-    CodeViewLineBuilder lineBuilder(*machine, *process->GetSymbolTable());
+    CodeViewLineBuilder lineBuilder(*machine, *process->GetSymbolTable(), debugger);
     while (instructionCount > 0)
     {
         if (address >= process->CodeStartAddress() && address < process->CodeStartAddress() + process->CodeLength())
@@ -496,6 +588,48 @@ Brush& CodeView::GetItemBrush(CodeViewItemKind itemKind)
     {
         throw std::runtime_error("color for item kind " + std::to_string(static_cast<int>(itemKind)) + " not found");
     }
+}
+
+int64_t CodeView::ClickAddress(const Point& loc) const
+{
+    float dy = loc.Y - (lineHeight * (numLines / 2));
+    int lineNumber = -1;
+    if (dy >= 0)
+    {
+        lineNumber = dy / lineHeight;
+    }
+    else
+    {
+        lineNumber = dy / lineHeight - 1;
+    }
+    int64_t da = lineNumber * 4;
+    int64_t clickAddress = da + currentAddress;
+    return clickAddress;
+}
+
+const CodeViewItem* CodeView::ClickItem(const Point& loc, int64_t clickAddress) const
+{
+    if (clickAddress >= process->CodeStartAddress() && clickAddress  < process->CodeStartAddress() + process->CodeLength())
+    {
+        auto it = lineMap.find(clickAddress);
+        if (it != lineMap.cend())
+        {
+            const CodeViewLine& line = it->second;
+            int dx = loc.X / charWidth;
+            for (const CodeViewItem& item : line.Items())
+            {
+                if (dx < item.text.length())
+                {
+                    return &item;
+                }
+                else
+                {
+                    dx -= item.text.length();
+                }
+            }
+        }
+    }
+    return nullptr;
 }
 
 } // namespace cmsx::db

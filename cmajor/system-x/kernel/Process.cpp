@@ -11,7 +11,7 @@ Process::Process(int32_t id_) :
     id(id_), rv(static_cast<uint64_t>(-1)), state(ProcessState::idle), 
     entryPoint(-1), codeStartAddress(-1), codeLength(0), dataStartAddress(-1), dataLength(0), 
     argumentsStartAddress(-1), argumentsLength(0), environmentStartAddress(-1), environmentLength(0), heapStartAddress(-1), heapLength(0), stackStartAddress(-1),
-    userTime(0), systemTime(0)
+    userTime(0), systemTime(0), exitCode(0)
 {
 }
 

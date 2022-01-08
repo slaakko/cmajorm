@@ -1309,8 +1309,21 @@ void BasicBlock::AddInstruction(Instruction* instruction, MetadataRef* metadataR
 
 void BasicBlock::InsertFront(Instruction* instruction)
 {
-    instructions.InsertBefore(instruction, instructions.FirstChild());
-    // todo
+    if (instructions.IsEmpty())
+    {
+        instructions.AddChild(instruction);
+    }
+    else
+    {
+        instructions.InsertBefore(instruction, instructions.FirstChild());
+    }
+    if (instruction->IsValueInstruction())
+    {
+        ValueInstruction* valueInstruction = static_cast<ValueInstruction*>(instruction);
+        Function* function = Parent();
+        Context* context = function->Parent()->GetContext();
+        function->MapInstruction(valueInstruction->Result()->Reg(), valueInstruction, context);
+    }
 }
 
 void BasicBlock::AddSuccessor(BasicBlock* successor)

@@ -1,0 +1,18 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+#ifndef CMSX_KERNEL_HEAP_INCLUDED
+#define CMSX_KERNEL_HEAP_INCLUDED
+#include <system-x/kernel/Api.hpp>
+#include <system-x/machine/Memory.hpp>
+#include <stdint.h>
+
+namespace cmsx::kernel {
+
+CMSX_KERNEL_API void DumpHeap(cmsx::machine::Memory& memory, uint64_t freeAddr);
+
+} // namespace cmsx::kernel
+
+#endif // CMSX_KERNEL_HEAP_INCLUDED

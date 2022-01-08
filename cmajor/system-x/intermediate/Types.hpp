@@ -6,6 +6,7 @@
 #ifndef CMSX_INTERMEDIATE_TYPES_INCLUDED
 #define CMSX_INTERMEDIATE_TYPES_INCLUDED
 #include <system-x/intermediate/Api.hpp>
+#include <system-x/assembler/Instruction.hpp>
 #include <soulng/lexer/SourcePos.hpp>
 #include <boost/lexical_cast.hpp>
 #include <map>
@@ -113,6 +114,7 @@ public:
     virtual bool IsWeakType() const { return true; }
     virtual void Add(Types* types, Context* context);
     virtual void Resolve(Types* types, Context* context);
+    virtual cmsx::assembler::Instruction* MakeAssemblyInst(Context* context) const;
     const SourcePos& GetSourcePos() const { return sourcePos; }
     int32_t Id() const { return id; }
 private:
@@ -136,6 +138,7 @@ public:
     std::string Name() const override { return "bool"; }
     int64_t Size() const override { return 1; }
     int64_t Alignment() const override { return 1; }
+    cmsx::assembler::Instruction* MakeAssemblyInst(Context* context) const override;
 };
 
 class CMSX_INTERMEDIATE_API SByteType : public Type
@@ -145,6 +148,7 @@ public:
     std::string Name() const override { return "sbyte"; }
     int64_t Size() const override { return 1; }
     int64_t Alignment() const override { return 1; }
+    cmsx::assembler::Instruction* MakeAssemblyInst(Context* context) const override;
 };
 
 class CMSX_INTERMEDIATE_API ByteType : public Type
@@ -154,6 +158,7 @@ public:
     std::string Name() const override { return "byte"; }
     int64_t Size() const override { return 1; }
     int64_t Alignment() const override { return 1; }
+    cmsx::assembler::Instruction* MakeAssemblyInst(Context* context) const override;
 };
 
 class CMSX_INTERMEDIATE_API ShortType : public Type
@@ -163,6 +168,7 @@ public:
     std::string Name() const override { return "short"; }
     int64_t Size() const override { return 2; }
     int64_t Alignment() const override { return 2; }
+    cmsx::assembler::Instruction* MakeAssemblyInst(Context* context) const override;
 };
 
 class CMSX_INTERMEDIATE_API UShortType : public Type
@@ -172,6 +178,7 @@ public:
     std::string Name() const override { return "ushort"; }
     int64_t Size() const override { return 2; }
     int64_t Alignment() const override { return 2; }
+    cmsx::assembler::Instruction* MakeAssemblyInst(Context* context) const override;
 };
 
 class CMSX_INTERMEDIATE_API IntType : public Type
@@ -181,6 +188,7 @@ public:
     std::string Name() const override { return "int"; }
     int64_t Size() const override { return 4; }
     int64_t Alignment() const override { return 4; }
+    cmsx::assembler::Instruction* MakeAssemblyInst(Context* context) const override;
 };
 
 class CMSX_INTERMEDIATE_API UIntType : public Type
@@ -190,6 +198,7 @@ public:
     std::string Name() const override { return "uint"; }
     int64_t Size() const override { return 4; }
     int64_t Alignment() const override { return 4; }
+    cmsx::assembler::Instruction* MakeAssemblyInst(Context* context) const override;
 };
 
 class CMSX_INTERMEDIATE_API LongType : public Type
@@ -199,6 +208,7 @@ public:
     std::string Name() const override { return "long"; }
     int64_t Size() const override { return 8; }
     int64_t Alignment() const override { return 8; }
+    cmsx::assembler::Instruction* MakeAssemblyInst(Context* context) const override;
 };
 
 class CMSX_INTERMEDIATE_API ULongType : public Type
@@ -208,6 +218,7 @@ public:
     std::string Name() const override { return "ulong"; }
     int64_t Size() const override { return 8; }
     int64_t Alignment() const override { return 8; }
+    cmsx::assembler::Instruction* MakeAssemblyInst(Context* context) const override;
 };
 
 class CMSX_INTERMEDIATE_API FloatType : public Type
@@ -322,6 +333,7 @@ public:
     const TypeRef& BaseTypeRef() const { return baseTypeRef; }
     TypeRef& BaseTypeRef() { return baseTypeRef; }
     Type* BaseType() const { return baseTypeRef.GetType(); }
+    cmsx::assembler::Instruction* MakeAssemblyInst(Context* context) const override;
 private:
     int8_t pointerCount;
     TypeRef baseTypeRef;

@@ -3,9 +3,40 @@
 // Distributed under the MIT license
 // =================================
 
-public const byte sys_exit = 0u;
+public const byte trap_exit = 0u;
+public const byte trap_memory_page_size = 1u;
+public const byte trap_heap_start = 2u;
+public const byte trap_heap_length = 3u;
+public const byte trap_allocate_memory_pages = 4u;
+public const byte trap_dump_heap = 5u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
-    trap(0u, sys_exit, 0u, exitCode);
+	run_at_exits();
+    trap(0u, trap_exit, 0u, exitCode);
+}
+
+public cdecl nothrow long memory_page_size()
+{
+	return cast<long>(trap(0u, trap_memory_page_size, 0u));
+}
+
+public cdecl nothrow long heap_start()
+{
+	return cast<long>(trap(0u, trap_heap_start, 0u));
+}
+
+public cdecl nothrow long heap_length()
+{
+	return cast<long>(trap(0u, trap_heap_length, 0u));
+}
+
+public cdecl nothrow long allocate_memory_pages(int numPages)
+{
+	return cast<long>(trap(0u, trap_allocate_memory_pages, 0u, numPages));
+}
+
+public cdecl nothrow void dump_heap(ulong free)
+{
+	trap(0u, trap_dump_heap, 0u, free);
 }
