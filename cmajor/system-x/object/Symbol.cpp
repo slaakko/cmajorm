@@ -464,6 +464,19 @@ Symbol* SymbolTable::GetTrapSymbol(uint64_t trap) const
     }
 }
 
+Symbol* SymbolTable::GetSpecialRegisterSymbol(uint8_t specialRegNumber) const
+{
+    auto it = valueMap.find(specialRegNumber);
+    if (it != valueMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
 void SymbolTable::AddSymbol(Symbol* symbol)
 {
     AddSymbol(symbol, true);
@@ -481,7 +494,7 @@ void SymbolTable::AddSymbol(Symbol* symbol, bool setIndex)
     {
         registerMap[static_cast<uint8_t>(symbol->GetValue().Val())] = symbol;
     }
-    if (symbol->GetSegment() == cmsx::object::Segment::text && !symbol->GetValue().GetFlag(ValueFlags::undefined))
+    if (!symbol->GetValue().GetFlag(ValueFlags::undefined))
     {
         valueMap[symbol->GetValue().Val()] = symbol;
     }

@@ -14,12 +14,10 @@ void Init()
 {
     InitAssemblyConfig();
     InitPassManager();
-    InitRegisterAllocator();
 }
 
 void Done()
 {
-    DoneRegisterAllocator();
     DoneAssemblyConfig();
     DonePassManager();
 }

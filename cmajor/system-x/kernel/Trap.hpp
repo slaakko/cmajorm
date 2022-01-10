@@ -17,6 +17,7 @@ const uint8_t trap_heap_start = 2;
 const uint8_t trap_heap_length = 3;
 const uint8_t trap_allocate_memory_pages = 4;
 const uint8_t trap_dump_heap = 5;
+const uint8_t trap_random_seed = 6;
 
 class CMSX_KERNEL_API TrapHandler
 {

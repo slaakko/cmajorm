@@ -4,6 +4,7 @@
 // =================================
 
 #include <system-x/intermediate/RegisterAllocator.hpp>
+#include <system-x/intermediate/Context.hpp>
 #include <system-x/intermediate/AssemblyConfig.hpp>
 #include <system-x/assembler/Constant.hpp>
 #include <system-x/machine/Registers.hpp>
@@ -46,9 +47,39 @@ void CallFrame::Resolve(int frameSize)
     }
 }
 
-Frame::Frame() : nextFrameLocationIndex(0)
+Frame::Frame() 
 {
     ResetCallFrame();
+}
+
+FrameLocation Frame::GetFrameLocation(int64_t size)
+{
+    if (frameLocations.empty())
+    {
+        FrameLocation frameLocation(0, 8, size);
+        frameLocations.push_back(frameLocation);
+        return frameLocation;
+    }
+    else
+    {
+        const FrameLocation& last = frameLocations.back();
+        FrameLocation frameLocation(frameLocations.size(), last.offset + last.size, size);
+        frameLocations.push_back(frameLocation);
+        return frameLocation;
+    }
+}
+
+int64_t Frame::Size() const
+{
+    if (frameLocations.empty())
+    {
+        return 8;
+    }
+    else
+    {
+        const FrameLocation& last = frameLocations.back();
+        return last.offset + last.size;
+    }
 }
 
 void Frame::ResetCallFrame()
@@ -69,18 +100,6 @@ void Frame::ResolveCallFrames()
     {
         callFrame->Resolve(frameSize);
     }
-}
-
-std::unique_ptr<RegisterPool> RegisterPool::instance;
-
-void RegisterPool::Init()
-{
-    instance.reset(new RegisterPool());
-}
-
-void RegisterPool::Done()
-{
-    instance.reset();
 }
 
 RegisterPool::RegisterPool() : localRegisterCount(GetNumLocalRegs())
@@ -132,24 +151,14 @@ RegisterAllocator::~RegisterAllocator()
 {
 }
 
-Register GetGlobalRegister(uint8_t registerNumber)
+Register GetGlobalRegister(Context* context, uint8_t registerNumber)
 {
-    return RegisterPool::Instance().GetGlobalRegister(registerNumber);
+    return context->GetRegisterPool().GetGlobalRegister(registerNumber); 
 }
 
-Register GetLocalRegister()
+Register GetLocalRegister(Context* context)
 {
-    return RegisterPool::Instance().GetLocalRegister();
-}
-
-void InitRegisterAllocator()
-{
-    RegisterPool::Init();
-}
-
-void DoneRegisterAllocator()
-{
-    RegisterPool::Done();
+    return context->GetRegisterPool().GetLocalRegister();
 }
 
 } // cmsx::intermediate

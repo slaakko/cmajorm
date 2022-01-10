@@ -44,11 +44,13 @@ CMSX_INTERMEDIATE_API inline Locations operator~(Locations locs)
 
 struct CMSX_INTERMEDIATE_API FrameLocation
 {
-    FrameLocation() : index(-1) {}
-    FrameLocation(int index_) : index(index_) {}
+    FrameLocation() : index(-1), offset(0), size(0) {}
+    FrameLocation(int index_, int offset_, int size_) : index(index_), offset(offset_), size(size_) {}
     bool Valid() const { return index != -1; }
-    bool IsWithinImmediateRange() const { return index >= 0 && index < (256 - 8) / 8; }
+    bool IsWithinImmediateRange() const { return offset >= 0 && offset < 256; }
     int index;
+    int64_t offset;
+    int64_t size;
 };
 
 class CMSX_INTERMEDIATE_API ArgLocation
@@ -82,15 +84,15 @@ class CMSX_INTERMEDIATE_API Frame
 {
 public:
     Frame();
-    FrameLocation NextFrameLocation() { return FrameLocation(nextFrameLocationIndex++); }
-    int Size() const { return (nextFrameLocationIndex + 1) * 8; }
+    FrameLocation GetFrameLocation(int64_t size);
+    int64_t Size() const;
     bool IsWithinWydeRange() const { return Size() < 65536; }
     CallFrame* CurrentCallFrame() { return currentCallFrame.get(); }
     void ResetCallFrame();
     void AddCallFrame();
     void ResolveCallFrames();
 private:
-    int nextFrameLocationIndex;
+    std::vector<FrameLocation> frameLocations;
     std::unique_ptr<CallFrame> currentCallFrame;
     std::vector<std::unique_ptr<CallFrame>> callFrames;
 };
@@ -121,17 +123,13 @@ CMSX_INTERMEDIATE_API inline bool operator<(const Register& left, const Register
 class CMSX_INTERMEDIATE_API RegisterPool
 {
 public:
-    static void Init();
-    static void Done();
-    static RegisterPool& Instance() { return *instance; }
+    RegisterPool();
     void AddLocalRegister(const Register& reg);
     Register GetLocalRegister();
     Register GetGlobalRegister(uint8_t number);
     int LocalRegisterCount() const { return localRegisterCount; }
     int NumFreeLocalRegisters() const { return localRegisterPool.size(); }
 private:
-    RegisterPool();
-    static std::unique_ptr<RegisterPool> instance;
     int localRegisterCount;
     std::set<Register> localRegisterPool;
     std::map<uint8_t, Register> globalRegisterMap;
@@ -162,11 +160,8 @@ public:
     virtual int LastActiveLocalReg() const = 0;
 };
 
-Register GetGlobalRegister(uint8_t registerNumber);
-Register GetLocalRegister();
-
-CMSX_INTERMEDIATE_API void InitRegisterAllocator();
-CMSX_INTERMEDIATE_API void DoneRegisterAllocator();
+Register GetGlobalRegister(Context* context, uint8_t registerNumber);
+Register GetLocalRegister(Context* context);
 
 } // cmsx::intermediate
 

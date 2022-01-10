@@ -197,10 +197,10 @@ void TextFormatter::FormatUndefined()
 
 void TextFormatter::FormatSpecialReg(uint8_t reg)
 {
-    Symbol* registerSymbol = File()->GetSymbolTable().GetRegisterSymbol(reg);
-    if (registerSymbol)
+    Symbol* specialRegisterSymbol = File()->GetSymbolTable().GetSpecialRegisterSymbol(reg);
+    if (specialRegisterSymbol)
     {
-        formatter.Write(registerSymbol->FullName());
+        formatter.Write(specialRegisterSymbol->FullName());
     }
 }
 

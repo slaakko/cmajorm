@@ -11,8 +11,14 @@
 #include <chrono>
 #include <stdint.h>
 #include <string>
+#include <list>
+#include <boost/pool/pool_alloc.hpp>
 
 namespace cmsx::kernel {
+
+class Process;
+
+using ProcessList = std::list<Process*, boost::fast_pool_allocator<Process*>>;
 
 enum class ProcessState
 {

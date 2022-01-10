@@ -125,16 +125,16 @@ FrameLocation GetFrameLocation(Value* value, CodeGenerator& codeGen)
 
 void EmitFrameLocationOperand(const FrameLocation& frameLocation, cmsx::assembler::Instruction* instruction, CodeGenerator& codeGen)
 {
-    instruction->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regFP)));
+    instruction->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regFP)));
     if (frameLocation.IsWithinImmediateRange())
     {
-        instruction->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint8_t>(8 * (frameLocation.index + 1))));
+        instruction->AddOperand(cmsx::assembler::MakeConstantExpr(frameLocation.offset));
     }
     else
     {
         cmsx::assembler::Instruction* setIxInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
         setIxInst->AddOperand(cmsx::assembler::MakeGlobalRegOperand(cmsx::machine::regIX));
-        uint64_t value = 8 * (frameLocation.index + 1);
+        uint64_t value = frameLocation.offset;
         if (value <= std::numeric_limits<uint16_t>::max())
         {
             setIxInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint16_t>(value)));
@@ -154,7 +154,7 @@ void EmitFrameLocationOperand(const FrameLocation& frameLocation, cmsx::assemble
 
 void EmitArgLocationOperand(cmsx::assembler::Instruction* instruction, CodeGenerator& codeGen)
 {
-    instruction->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regFP)));
+    instruction->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regFP)));
     cmsx::assembler::Instruction* setIxInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
     setIxInst->AddOperand(cmsx::assembler::MakeGlobalRegOperand(cmsx::machine::regIX));
     cmsx::assembler::HexadecimalConstant* node = new cmsx::assembler::HexadecimalConstant(SourcePos(), 0);
@@ -185,10 +185,10 @@ void EmitPtrOperand(Value* value, cmsx::assembler::Instruction* instruction, Cod
         AddressValue* addressValue = static_cast<AddressValue*>(value);
         GlobalVariable* globalVar = addressValue->Value();
         cmsx::assembler::Instruction* ldouInst = new cmsx::assembler::Instruction(cmsx::machine::LDOU);
-        ldouInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regAX)));
+        ldouInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
         ldouInst->AddOperand(cmsx::assembler::MakeGlobalSymbol(globalVar->Name()));
         codeGen.Emit(ldouInst);
-        instruction->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regAX)));
+        instruction->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
         return;
     }
     if (inst)
@@ -200,7 +200,7 @@ void EmitPtrOperand(Value* value, cmsx::assembler::Instruction* instruction, Cod
         }
         else
         {
-            cmsx::assembler::Node* operand = MakeRegOperand(value, GetGlobalRegister(cmsx::machine::regAX), codeGen);
+            cmsx::assembler::Node* operand = MakeRegOperand(value, GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen);
             instruction->AddOperand(operand);
         }
     }
@@ -418,16 +418,16 @@ void EmitLoad(const FrameLocation& frameLocation, const Register& reg, CodeGener
     }
     cmsx::assembler::Instruction* instruction = new cmsx::assembler::Instruction(cmsx::machine::LDOU);
     instruction->AddOperand(MakeRegOperand(reg));
-    instruction->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regFP)));
+    instruction->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regFP)));
     if (frameLocation.IsWithinImmediateRange())
     {
-        instruction->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint8_t>(8 * (frameLocation.index + 1))));
+        instruction->AddOperand(cmsx::assembler::MakeConstantExpr(frameLocation.offset));
     }
     else
     {
         cmsx::assembler::Instruction* setIxInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
         setIxInst->AddOperand(cmsx::assembler::MakeGlobalRegOperand(cmsx::machine::regIX));
-        setIxInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint64_t>(8 * (frameLocation.index + 1))));
+        setIxInst->AddOperand(cmsx::assembler::MakeConstantExpr(frameLocation.offset));
         codeGen.Emit(setIxInst);
         instruction->AddOperand(cmsx::assembler::MakeGlobalRegOperand(cmsx::machine::regIX));
     }
@@ -604,7 +604,7 @@ void EmitStore(StoreInstruction& inst, CodeGenerator& codeGen)
         codeGen.Error("error emitting store: invalid machine instruction");
     }
     cmsx::assembler::Instruction* instruction = new cmsx::assembler::Instruction(machineInst);
-    instruction->AddOperand(MakeRegOperand(inst.GetValue(), GetGlobalRegister(cmsx::machine::regAX), codeGen));
+    instruction->AddOperand(MakeRegOperand(inst.GetValue(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen));
     EmitPtrOperand(inst.GetPtr(), instruction, codeGen);
     codeGen.Emit(instruction);
 }
@@ -618,7 +618,7 @@ void EmitSignExtension(SignExtendInstruction& inst, CodeGenerator& codeGen)
         codeGen.Error("error emitting sign extension: reg not valid");
     }
     instruction->AddOperand(MakeRegOperand(reg));
-    instruction->AddOperand(MakeRegOperand(inst.Operand(), GetGlobalRegister(cmsx::machine::regAX), codeGen));
+    instruction->AddOperand(MakeRegOperand(inst.Operand(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen));
     codeGen.Emit(instruction);
 }
 
@@ -629,7 +629,7 @@ void EmitNot(NotInstruction& inst, CodeGenerator& codeGen)
     {
         codeGen.Error("error emitting not: reg not valid");
     }
-    cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(cmsx::machine::regAX), codeGen);
+    cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen);
     cmsx::assembler::Instruction* zszInst = new cmsx::assembler::Instruction(cmsx::machine::ZSZ);
     zszInst->AddOperand(MakeRegOperand(reg));
     zszInst->AddOperand(operandReg);
@@ -644,7 +644,7 @@ void EmitNeg(NegInstruction& inst, CodeGenerator& codeGen)
     {
         codeGen.Error("error emitting neg: reg not valid");
     }
-    cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(cmsx::machine::regAX), codeGen);
+    cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen);
     int machineInst = -1;
     switch (inst.Result()->GetType()->Id())
     {
@@ -680,9 +680,9 @@ void EmitZeroExtension(ZeroExtendInstruction& inst, CodeGenerator& codeGen)
     {
         codeGen.Error("error emitting zero extension: reg not valid");
     }
-    cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(cmsx::machine::regAX), codeGen);
+    cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen);
     cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
-    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regBX)));
+    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regBX)));
     cmsx::assembler::Node* maskOperand = nullptr;
     switch (inst.Result()->GetType()->Id())
     {
@@ -725,7 +725,7 @@ void EmitZeroExtension(ZeroExtendInstruction& inst, CodeGenerator& codeGen)
     cmsx::assembler::Instruction* andInst = new cmsx::assembler::Instruction(cmsx::machine::AND);
     andInst->AddOperand(MakeRegOperand(reg));
     andInst->AddOperand(operandReg);
-    andInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regBX)));
+    andInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regBX)));
     codeGen.Emit(andInst);
 }
 
@@ -733,14 +733,14 @@ void EmitSwitch(SwitchInstruction& inst, CodeGenerator& codeGen)
 {
     for (const auto& caseTarget : inst.CaseTargets())
     {
-        cmsx::assembler::Node* caseReg = MakeRegOperand(caseTarget.caseValue, GetGlobalRegister(cmsx::machine::regCX), codeGen);
+        cmsx::assembler::Node* caseReg = MakeRegOperand(caseTarget.caseValue, GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regCX), codeGen);
         cmsx::assembler::Instruction* cmpInst = new cmsx::assembler::Instruction(cmsx::machine::CMP);
-        cmpInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regAX)));
-        cmpInst->AddOperand(MakeRegOperand(inst.Cond(), GetGlobalRegister(cmsx::machine::regBX), codeGen));
+        cmpInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
+        cmpInst->AddOperand(MakeRegOperand(inst.Cond(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regBX), codeGen));
         cmpInst->AddOperand(caseReg);
         codeGen.Emit(cmpInst);
         cmsx::assembler::Instruction* branchInst = new cmsx::assembler::Instruction(cmsx::machine::BZ);
-        branchInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regAX)));
+        branchInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
         branchInst->AddOperand(cmsx::assembler::MakeLocalSymbol(caseTarget.targetBlock->Id()));
         codeGen.Emit(branchInst);
     }
@@ -864,14 +864,14 @@ void EmitBinOpInst(BinaryInstruction& inst, CodeGenerator& codeGen)
         codeGen.Error("error emitting binary operator: reg not valid");
     }
     instruction->AddOperand(MakeRegOperand(reg));
-    instruction->AddOperand(MakeRegOperand(inst.Left(), GetGlobalRegister(cmsx::machine::regAX), codeGen));
-    instruction->AddOperand(MakeRegOperand(inst.Right(), GetGlobalRegister(cmsx::machine::regBX), codeGen));
+    instruction->AddOperand(MakeRegOperand(inst.Left(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen));
+    instruction->AddOperand(MakeRegOperand(inst.Right(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regBX), codeGen));
     codeGen.Emit(instruction);
     if (mod)
     {
         cmsx::assembler::Instruction* remInst = new cmsx::assembler::Instruction(cmsx::machine::GET);
         remInst->AddOperand(MakeRegOperand(reg));
-        remInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::rR)));
+        remInst->AddOperand(cmsx::assembler::MakeConstantExpr(cmsx::machine::rR));
         codeGen.Emit(remInst);
     }
 }
@@ -926,8 +926,8 @@ void EmitEqual(EqualInstruction& inst, CodeGenerator& codeGen)
         codeGen.Error("error emitting equal: reg not valid");
     }
     cmpInst->AddOperand(MakeRegOperand(reg));
-    cmpInst->AddOperand(MakeRegOperand(inst.Left(), GetGlobalRegister(cmsx::machine::regAX), codeGen));
-    cmpInst->AddOperand(MakeRegOperand(inst.Right(), GetGlobalRegister(cmsx::machine::regBX), codeGen));
+    cmpInst->AddOperand(MakeRegOperand(inst.Left(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen));
+    cmpInst->AddOperand(MakeRegOperand(inst.Right(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regBX), codeGen));
     codeGen.Emit(cmpInst);
     cmsx::assembler::Instruction* zszInst = new cmsx::assembler::Instruction(cmsx::machine::ZSZ);
     zszInst->AddOperand(MakeRegOperand(reg));
@@ -986,8 +986,8 @@ void EmitLess(LessInstruction& inst, CodeGenerator& codeGen)
         codeGen.Error("error emitting less: reg not valid");
     }
     cmpInst->AddOperand(MakeRegOperand(reg));
-    cmpInst->AddOperand(MakeRegOperand(inst.Left(), GetGlobalRegister(cmsx::machine::regAX), codeGen));
-    cmpInst->AddOperand(MakeRegOperand(inst.Right(), GetGlobalRegister(cmsx::machine::regBX), codeGen));
+    cmpInst->AddOperand(MakeRegOperand(inst.Left(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen));
+    cmpInst->AddOperand(MakeRegOperand(inst.Right(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regBX), codeGen));
     codeGen.Emit(cmpInst);
     cmsx::assembler::Instruction* zsnInst = new cmsx::assembler::Instruction(cmsx::machine::ZSN);
     zsnInst->AddOperand(MakeRegOperand(reg));
@@ -1006,7 +1006,7 @@ void EmitJmp(JmpInstruction& inst, CodeGenerator& codeGen)
 void EmitBranch(BranchInstruction& inst, CodeGenerator& codeGen)
 {
     cmsx::assembler::Instruction* branchInst = new cmsx::assembler::Instruction(cmsx::machine::BNZ);
-    branchInst->AddOperand(MakeRegOperand(inst.Cond(), GetGlobalRegister(cmsx::machine::regAX), codeGen));
+    branchInst->AddOperand(MakeRegOperand(inst.Cond(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen));
     branchInst->AddOperand(cmsx::assembler::MakeLocalSymbol(inst.TrueTargetLabelId()));
     codeGen.Emit(branchInst);
     cmsx::assembler::Instruction* jmpInst = new cmsx::assembler::Instruction(cmsx::machine::JMP);
@@ -1017,8 +1017,8 @@ void EmitBranch(BranchInstruction& inst, CodeGenerator& codeGen)
 void EmitNop(NoOperationInstruction& inst, CodeGenerator& codeGen)
 {
     cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
-    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regAX)));
-    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regAX)));
+    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
+    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
     codeGen.Emit(setInst);
 }
 
@@ -1027,11 +1027,11 @@ void EmitElemAddr(ElemAddrInstruction& inst, CodeGenerator& codeGen)
     ElemAddrKind elemAddrKind = inst.GetElemAddrKind(codeGen.Ctx());
     if (elemAddrKind == ElemAddrKind::array)
     {
-        cmsx::assembler::Node* indexReg = MakeRegOperand(inst.Index(), GetGlobalRegister(cmsx::machine::regBX), codeGen);
+        cmsx::assembler::Node* indexReg = MakeRegOperand(inst.Index(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regBX), codeGen);
         int64_t indexFactor = GetElementSize(inst.Ptr()->GetType(), codeGen);
         bool indexTypeIsUnsignedType = inst.Index()->GetType()->IsUnsignedType();
         cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
-        setInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regAX)));
+        setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
         if (indexTypeIsUnsignedType)
         {
             setInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint64_t>(indexFactor)));
@@ -1047,8 +1047,8 @@ void EmitElemAddr(ElemAddrInstruction& inst, CodeGenerator& codeGen)
             machineMulInst = cmsx::machine::MULU;
         }
         cmsx::assembler::Instruction* mulInst = new cmsx::assembler::Instruction(machineMulInst);
-        mulInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regIX)));
-        mulInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regAX)));
+        mulInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regIX)));
+        mulInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
         mulInst->AddOperand(indexReg);
         codeGen.Emit(mulInst);
     }
@@ -1057,7 +1057,7 @@ void EmitElemAddr(ElemAddrInstruction& inst, CodeGenerator& codeGen)
         int64_t index = GetIndex(inst.Index(), codeGen);
         int64_t offset = GetOffset(inst.Ptr()->GetType(), index, codeGen);
         cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
-        setInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regIX)));
+        setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regIX)));
         setInst->AddOperand(cmsx::assembler::MakeConstantExpr(offset));
         codeGen.Emit(setInst);
     }
@@ -1078,20 +1078,20 @@ void EmitElemAddr(ElemAddrInstruction& inst, CodeGenerator& codeGen)
     }
     else if (elemAddrKind == ElemAddrKind::structure)
     {
-        cmsx::assembler::Node* operand = MakeRegOperand(inst.Ptr(), GetGlobalRegister(cmsx::machine::regAX), codeGen);
+        cmsx::assembler::Node* operand = MakeRegOperand(inst.Ptr(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen);
         ldaInst->AddOperand(operand);
     }
-    ldaInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regIX)));
+    ldaInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regIX)));
     codeGen.Emit(ldaInst);
 }
 
 void EmitPtrOffset(PtrOffsetInstruction& inst, CodeGenerator& codeGen)
 {
-    cmsx::assembler::Node* offsetReg = MakeRegOperand(inst.Offset(), GetGlobalRegister(cmsx::machine::regBX), codeGen);
+    cmsx::assembler::Node* offsetReg = MakeRegOperand(inst.Offset(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regBX), codeGen);
     int64_t offsetFactor = GetPointeeSize(inst.Ptr()->GetType(), codeGen);
     bool offsetTypeIsUnsignedType = inst.Ptr()->GetType()->RemovePointer(inst.GetSourcePos(), codeGen.Ctx())->IsUnsignedType();
     cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
-    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regAX)));
+    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
     if (offsetTypeIsUnsignedType)
     {
         setInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint64_t>(offsetFactor)));
@@ -1107,8 +1107,8 @@ void EmitPtrOffset(PtrOffsetInstruction& inst, CodeGenerator& codeGen)
         machineMulInst = cmsx::machine::MULU;
     }
     cmsx::assembler::Instruction* mulInst = new cmsx::assembler::Instruction(machineMulInst);
-    mulInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regIX)));
-    mulInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regAX)));
+    mulInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regIX)));
+    mulInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
     mulInst->AddOperand(offsetReg);
     codeGen.Emit(mulInst);
     cmsx::assembler::Instruction* ldaInst = new cmsx::assembler::Instruction(cmsx::assembler::LDA);
@@ -1118,9 +1118,9 @@ void EmitPtrOffset(PtrOffsetInstruction& inst, CodeGenerator& codeGen)
         codeGen.Error("error emitting ptroffset: reg not valid");
     }
     ldaInst->AddOperand(MakeRegOperand(reg));
-    cmsx::assembler::Node* operand = MakeRegOperand(inst.Ptr(), GetGlobalRegister(cmsx::machine::regAX), codeGen);
+    cmsx::assembler::Node* operand = MakeRegOperand(inst.Ptr(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen);
     ldaInst->AddOperand(operand);
-    ldaInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regIX)));
+    ldaInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regIX)));
     codeGen.Emit(ldaInst);
 }
 
@@ -1134,9 +1134,9 @@ void EmitPtrDiff(PtrDiffInstruction& inst, CodeGenerator& codeGen)
         codeGen.Error("error emitting ptrdiff: reg not valid");
     }
     diff->AddOperand(MakeRegOperand(reg));
-    cmsx::assembler::Node* leftOperand = MakeRegOperand(inst.LeftPtr(), GetGlobalRegister(cmsx::machine::regAX), codeGen);
+    cmsx::assembler::Node* leftOperand = MakeRegOperand(inst.LeftPtr(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen);
     diff->AddOperand(leftOperand);
-    cmsx::assembler::Node* rightOperand = MakeRegOperand(inst.RightPtr(), GetGlobalRegister(cmsx::machine::regBX), codeGen);
+    cmsx::assembler::Node* rightOperand = MakeRegOperand(inst.RightPtr(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regBX), codeGen);
     diff->AddOperand(rightOperand);
     codeGen.Emit(diff);
     cmsx::assembler::Instruction* scaledDiff = new cmsx::assembler::Instruction(cmsx::machine::DIV);
@@ -1153,7 +1153,7 @@ void EmitBitcast(BitcastInstruction& inst, CodeGenerator& codeGen)
     {
         codeGen.Error("error emitting bitcast: reg not valid");
     }
-    cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(cmsx::machine::regAX), codeGen);
+    cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen);
     cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
     setInst->AddOperand(MakeRegOperand(reg));
     setInst->AddOperand(operandReg);
@@ -1167,7 +1167,7 @@ void EmitPtrToInt(PtrToIntInstruction& inst, CodeGenerator& codeGen)
     {
         codeGen.Error("error emitting ptrtoint: reg not valid");
     }
-    cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(cmsx::machine::regAX), codeGen);
+    cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen);
     cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
     setInst->AddOperand(MakeRegOperand(reg));
     setInst->AddOperand(operandReg);
@@ -1181,7 +1181,7 @@ void EmitIntToPtr(IntToPtrInstruction& inst, CodeGenerator& codeGen)
     {
         codeGen.Error("error emitting inttoptr: reg not valid");
     }
-    cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(cmsx::machine::regAX), codeGen);
+    cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen);
     cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
     setInst->AddOperand(MakeRegOperand(reg));
     setInst->AddOperand(operandReg);
@@ -1195,7 +1195,7 @@ void EmitFloatToInt(FloatToIntInstruction& inst, CodeGenerator& codeGen)
     {
         codeGen.Error("error emitting floattoint: reg not valid");
     }
-    cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(cmsx::machine::regAX), codeGen);
+    cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen);
     int machineInst = -1;
     if (inst.Result()->GetType()->IsUnsignedType())
     {
@@ -1218,7 +1218,7 @@ void EmitIntToFloat(IntToFloatInstruction& inst, CodeGenerator& codeGen)
     {
         codeGen.Error("error emitting inttofloat: reg not valid");
     }
-    cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(cmsx::machine::regAX), codeGen);
+    cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen);
     int machineInst = -1;
     if (inst.Operand()->GetType()->IsUnsignedType())
     {
@@ -1263,9 +1263,9 @@ void EmitTruncate(TruncateInstruction& inst, CodeGenerator& codeGen)
     {
         codeGen.Error("error emitting truncate: reg not valid");
     }
-    cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(cmsx::machine::regAX), codeGen);
+    cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen);
     cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
-    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regBX)));
+    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regBX)));
     cmsx::assembler::Node* maskOperand = nullptr;
     switch (inst.Result()->GetType()->Id())
     {
@@ -1308,7 +1308,7 @@ void EmitTruncate(TruncateInstruction& inst, CodeGenerator& codeGen)
     cmsx::assembler::Instruction* andInst = new cmsx::assembler::Instruction(cmsx::machine::AND);
     andInst->AddOperand(MakeRegOperand(reg));
     andInst->AddOperand(operandReg);
-    andInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regBX)));
+    andInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regBX)));
     codeGen.Emit(andInst);
 }
 
@@ -1390,7 +1390,7 @@ void EmitFunctionCall(FunctionCallInstruction& inst, CodeGenerator& codeGen)
     codeGen.Emit(callInst);
     cmsx::assembler::Instruction* setRetValInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
     setRetValInst->AddOperand(MakeRegOperand(reg));
-    setRetValInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regAX)));
+    setRetValInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
     codeGen.Emit(setRetValInst);
     frame.AddCallFrame();
 }
@@ -1400,8 +1400,8 @@ void EmitRet(RetInstruction& inst, CodeGenerator& codeGen)
     if (inst.ReturnValue())
     {
         cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
-        setInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regAX)));
-        setInst->AddOperand(MakeRegOperand(inst.ReturnValue(), GetGlobalRegister(cmsx::machine::regAX), codeGen));
+        setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
+        setInst->AddOperand(MakeRegOperand(inst.ReturnValue(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen));
         codeGen.Emit(setInst);
     }
     int targetLabelId = codeGen.ExitLabelId();
@@ -1422,8 +1422,8 @@ void EmitTrap(TrapInstruction& inst, CodeGenerator& codeGen)
         Value* arg = inst.Args()[i];
         cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
         uint8_t reg = cmsx::machine::regAX + i;
-        setInst->AddOperand(MakeRegOperand(GetGlobalRegister(reg)));
-        setInst->AddOperand(MakeRegOperand(arg, GetGlobalRegister(reg), codeGen));
+        setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), reg)));
+        setInst->AddOperand(MakeRegOperand(arg, GetGlobalRegister(codeGen.Ctx(), reg), codeGen));
         codeGen.Emit(setInst);
     }
     cmsx::assembler::Instruction* trapInst = new cmsx::assembler::Instruction(cmsx::machine::TRAP);
@@ -1433,37 +1433,37 @@ void EmitTrap(TrapInstruction& inst, CodeGenerator& codeGen)
     codeGen.Emit(trapInst);
     Frame& frame = codeGen.RegAllocator()->GetFrame();
     frame.AddCallFrame();
-    codeGen.RegAllocator()->AddRegisterLocation(&inst, GetGlobalRegister(cmsx::machine::regAX));
+    codeGen.RegAllocator()->AddRegisterLocation(&inst, GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX));
 }
 
 void EmitPrologue(CodeGenerator& codeGen)
 {
     cmsx::assembler::Instruction* stoInst = new cmsx::assembler::Instruction(cmsx::machine::STO);
-    stoInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regFP)));
-    stoInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regSP)));
+    stoInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regFP)));
+    stoInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regSP)));
     codeGen.Emit(stoInst);
     cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
-    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regFP)));
-    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regSP)));
+    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regFP)));
+    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regSP)));
     codeGen.Emit(setInst);
     Frame& frame = codeGen.RegAllocator()->GetFrame();
     if (frame.IsWithinWydeRange())
     {
         cmsx::assembler::Instruction* inclInst = new cmsx::assembler::Instruction(cmsx::machine::INCL);
-        inclInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regSP)));
+        inclInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regSP)));
         inclInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint16_t>(frame.Size())));
         codeGen.Emit(inclInst);
     }
     else
     {
         cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
-        setInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regIX)));
+        setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regIX)));
         setInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint64_t>(frame.Size())));
         codeGen.Emit(setInst);
         cmsx::assembler::Instruction* addInst = new cmsx::assembler::Instruction(cmsx::machine::ADD);
-        addInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regSP)));
-        addInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regSP)));
-        addInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regIX)));
+        addInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regSP)));
+        addInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regSP)));
+        addInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regIX)));
         codeGen.Emit(addInst);
     }
     frame.ResolveCallFrames();
@@ -1473,12 +1473,12 @@ void EmitEpilogue(CodeGenerator& codeGen)
 {
     cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
     setInst->SetLabel(cmsx::assembler::MakeLocalSymbol(codeGen.ExitLabelId()));
-    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regSP)));
-    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regFP)));
+    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regSP)));
+    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regFP)));
     codeGen.Emit(setInst);
     cmsx::assembler::Instruction* ldoInst = new cmsx::assembler::Instruction(cmsx::machine::LDO);
-    ldoInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regFP)));
-    ldoInst->AddOperand(MakeRegOperand(GetGlobalRegister(cmsx::machine::regSP)));
+    ldoInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regFP)));
+    ldoInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regSP)));
     codeGen.Emit(ldoInst);
     cmsx::assembler::Instruction* retInst = new cmsx::assembler::Instruction(cmsx::machine::RET);
     codeGen.Emit(retInst);

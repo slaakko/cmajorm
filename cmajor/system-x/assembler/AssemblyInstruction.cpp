@@ -539,10 +539,13 @@ void RegisterInstruction::Assemble(Assembler& assembler)
             int opc = currentInst->GetOpCode()->Value();
             if (opc == cmsx::machine::DIVU)
             {
-                assembler.EmitOpCode(cmsx::machine::PUTI);
+                assembler.EmitOpCode(cmsx::machine::SETL);
+                assembler.EmitRegisterValue("ex", cmsx::object::Value(cmsx::machine::regEX, cmsx::object::ValueFlags::reg));
+                assembler.EmitPureWydeValue("zero", cmsx::object::Value(static_cast<uint64_t>(0)));
+                assembler.EmitOpCode(cmsx::machine::PUT);
                 assembler.EmitPureByteValue("X", cmsx::object::Value(static_cast<uint64_t>(cmsx::machine::rD)));
                 assembler.EmitPureByteValue("Y", cmsx::object::Value(static_cast<uint64_t>(0)));
-                assembler.EmitPureByteValue("Z", cmsx::object::Value(static_cast<uint64_t>(0))); // Z = 0
+                assembler.EmitRegisterValue("ex", cmsx::object::Value(cmsx::machine::regEX, cmsx::object::ValueFlags::reg));
             }
             if (n == 2)
             {

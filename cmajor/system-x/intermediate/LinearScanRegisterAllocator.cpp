@@ -4,9 +4,13 @@
 // =================================
 
 #include <system-x/intermediate/LinearScanRegisterAllocator.hpp>
+#include <system-x/intermediate/Context.hpp>
 #include <system-x/intermediate/Error.hpp>
+#include <soulng/util/Util.hpp>
 
 namespace cmsx::intermediate {
+
+using namespace soulng::util;
 
 LiveRange GetLiveRange(Instruction* inst)
 {
@@ -29,7 +33,7 @@ LiveRange GetLiveRange(Instruction* inst)
     }
 }
 
-LinearScanRegisterAllocator::LinearScanRegisterAllocator(Function& function) : frame(), liveRanges(), active(), frameLocations(), registers()
+LinearScanRegisterAllocator::LinearScanRegisterAllocator(Function& function, Context* context_) : frame(), liveRanges(), active(), frameLocations(), registers(), context(context_)
 {
     ComputeLiveRanges(function);
 }
@@ -50,7 +54,7 @@ void LinearScanRegisterAllocator::AddFreeRegToPool(Instruction* inst)
     Register reg = GetRegister(inst);
     if (reg.Valid())
     {
-        RegisterPool::Instance().AddLocalRegister(reg);
+        context->GetRegisterPool().AddLocalRegister(reg);
         RemoveRegister(inst);
     }
 }
@@ -66,7 +70,7 @@ void LinearScanRegisterAllocator::RemoveFromActive(const LiveRange& range)
 
 bool LinearScanRegisterAllocator::NoFreeRegs() const
 {
-    return RegisterPool::Instance().NumFreeLocalRegisters() == 0;
+    return context->GetRegisterPool().NumFreeLocalRegisters() == 0;
 }
 
 Register LinearScanRegisterAllocator::GetRegister(Instruction* inst) const
@@ -102,7 +106,7 @@ FrameLocation LinearScanRegisterAllocator::GetFrameLocation(Instruction* inst) c
 
 void LinearScanRegisterAllocator::AllocateRegister(Instruction* inst)
 {
-    registers[inst] = RegisterPool::Instance().GetLocalRegister();
+    registers[inst] = context->GetRegisterPool().GetLocalRegister();
     LiveRange range = GetLiveRange(inst);
     active.insert(range);
     locations[inst] = locations[inst] | Locations::reg;
@@ -110,8 +114,29 @@ void LinearScanRegisterAllocator::AllocateRegister(Instruction* inst)
 
 void LinearScanRegisterAllocator::AllocateFrameLocation(Instruction* inst)
 {
-    frameLocations[inst] = frame.NextFrameLocation();
-    locations[inst] = locations[inst] | Locations::frame;
+    if (inst->IsParamInstruction())
+    {
+        ParamInstruction* paramInst = static_cast<ParamInstruction*>(inst);
+        int64_t size = Align(paramInst->GetType()->Size(), 8); 
+        if (size != 8)
+        {
+            int x = 0;
+        }
+        frameLocations[paramInst] = frame.GetFrameLocation(size);
+        locations[paramInst] = locations[paramInst] | Locations::frame;
+    }
+    else if (inst->IsLocalInstruction())
+    {
+        LocalInstruction* localInst = static_cast<LocalInstruction*>(inst);
+        int64_t size = Align(localInst->LocalType()->Size(), 8);
+        frameLocations[localInst] = frame.GetFrameLocation(size);
+        locations[localInst] = locations[localInst] | Locations::frame;
+    }
+    else
+    {
+        frameLocations[inst] = frame.GetFrameLocation(8);
+        locations[inst] = locations[inst] | Locations::frame;
+    }
 }
 
 void LinearScanRegisterAllocator::Spill(Instruction* inst)
@@ -259,9 +284,9 @@ const std::vector<SpillData>& LinearScanRegisterAllocator::GetSpillData() const
     return spillDataVec;
 }
 
-std::unique_ptr<LinearScanRegisterAllocator> LinearScanRegisterAllocation(Function& function)
+std::unique_ptr<LinearScanRegisterAllocator> LinearScanRegisterAllocation(Function& function, Context* context)
 {
-    std::unique_ptr<LinearScanRegisterAllocator> registerAllocator(new LinearScanRegisterAllocator(function));
+    std::unique_ptr<LinearScanRegisterAllocator> registerAllocator(new LinearScanRegisterAllocator(function, context));
     return registerAllocator;
 }
 

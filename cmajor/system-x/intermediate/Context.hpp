@@ -10,9 +10,12 @@
 #include <system-x/intermediate/Data.hpp>
 #include <system-x/intermediate/Code.hpp>
 #include <system-x/intermediate/Metadata.hpp>
+#include <system-x/intermediate/RegisterAllocator.hpp>
 #include <soulng/lexer/Lexer.hpp>
 
 namespace cmsx::intermediate {
+
+class RegisterPool;
 
 class CMSX_INTERMEDIATE_API Context
 {
@@ -71,6 +74,8 @@ public:
     MetadataString* CreateMetadataString(const std::string& value);
     MetadataRef* CreateMetadataRef(const SourcePos& sourcePos, int32_t nodeId);
     void ResolveMetadataReferences();
+    RegisterPool& GetRegisterPool() { return registerPool; }
+    void ResetRegisterPool();
 private:
     std::u32string content;
     std::unique_ptr<soulng::lexer::Lexer> lexer;
@@ -79,6 +84,7 @@ private:
     Data data;
     Code code;
     Metadata metadata;
+    RegisterPool registerPool;
 };
 
 } // cmsx::intermediate

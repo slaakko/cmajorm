@@ -151,10 +151,10 @@ void CodeViewLineBuilder::FormatUndefined()
 
 void CodeViewLineBuilder::FormatSpecialReg(uint8_t reg)
 {
-    cmsx::object::Symbol* registerSymbol = symbolTable.GetRegisterSymbol(reg);
-    if (registerSymbol)
+    cmsx::object::Symbol* specialRegisterSymbol = symbolTable.GetSpecialRegisterSymbol(reg);
+    if (specialRegisterSymbol)
     {
-        line.AddItem(CodeViewItem(CodeViewItemKind::reg, ToUtf32(registerSymbol->FullName())));
+        line.AddItem(CodeViewItem(CodeViewItemKind::reg, ToUtf32(specialRegisterSymbol->FullName())));
     }
 }
 

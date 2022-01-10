@@ -9,6 +9,7 @@ public const byte trap_heap_start = 2u;
 public const byte trap_heap_length = 3u;
 public const byte trap_allocate_memory_pages = 4u;
 public const byte trap_dump_heap = 5u;
+public const byte trap_random_seed = 6u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -39,4 +40,9 @@ public cdecl nothrow long allocate_memory_pages(int numPages)
 public cdecl nothrow void dump_heap(ulong free)
 {
 	trap(0u, trap_dump_heap, 0u, free);
+}
+
+public cdecl nothrow uint random_seed()
+{
+	return cast<uint>(trap(0u, trap_random_seed, 0u));
 }

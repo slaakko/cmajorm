@@ -5,8 +5,20 @@ class Foo
 	public virtual ~Foo() {}
 }
 
+class Bar : Foo
+{
+}
+
 void main()
 {
-	Foo* foo = new Foo();
-	delete foo;
+	Bar* bar = new Bar();
+	if (bar is Foo*)
+	{
+		exit(1u);
+	}
+	else
+	{
+		exit(2u);
+	}
+	delete bar;
 }

@@ -5,6 +5,7 @@
 
 #include <system-x/intermediate/SimpleAssemblyCodeGenerator.hpp>
 #include <system-x/intermediate/LinearScanRegisterAllocator.hpp>
+#include <system-x/intermediate/Context.hpp>
 #include <system-x/intermediate/Error.hpp>
 #include <system-x/assembler/Constant.hpp>
 
@@ -157,8 +158,8 @@ void SimpleAssemblyCodeGenerator::Visit(Function& function)
         assemblyFile->GetLinkSection()->GetOrCreateExternObject()->AddExternSymbol(cmsx::assembler::MakeGlobalSymbol(function.Name()));
     }
     emitSection = cmsx::assembler::AssemblySectionKind::code;
-    RegisterPool::Init();
-    std::unique_ptr<RegisterAllocator> linearScanRregisterAllocator = LinearScanRegisterAllocation(function);
+    Ctx()->ResetRegisterPool();
+    std::unique_ptr<RegisterAllocator> linearScanRregisterAllocator = LinearScanRegisterAllocation(function, Ctx());
     registerAllocator = linearScanRregisterAllocator.get();
     assemblyFunction = assemblyFile->CreateFunction(function.Name());
     function.VisitBasicBlocks(*this);

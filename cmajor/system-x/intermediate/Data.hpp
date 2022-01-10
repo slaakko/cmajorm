@@ -38,7 +38,7 @@ public:
     ValueKind Kind() const { return kind; }
     std::string KindStr() const;
     Type* GetType() const { return type; }
-    void SetType(Type* type_) { type = type_; }
+    virtual void SetType(Type* type_);
 private:
     SourcePos sourcePos;
     ValueKind kind;
@@ -184,6 +184,7 @@ class CMSX_INTERMEDIATE_API ArrayValue : public ConstantValue
 public:
     ArrayValue(const SourcePos& sourcePos_, const std::vector<ConstantValue*>& elements_);
     const std::vector<ConstantValue*>& Elements() const { return elements; }
+    void SetType(Type* type) override;
     void Accept(Visitor& visitor) override;
 private:
     std::vector<ConstantValue*> elements;
@@ -194,6 +195,7 @@ class CMSX_INTERMEDIATE_API StructureValue : public ConstantValue
 public:
     StructureValue(const SourcePos& sourcePos_, const std::vector<ConstantValue*>& fieldValues_);
     const std::vector<ConstantValue*>& FieldValues() const { return fieldValues; }
+    void SetType(Type* type) override;
     void Accept(Visitor& visitor) override;
 private:
     std::vector<ConstantValue*> fieldValues;

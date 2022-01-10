@@ -35,6 +35,7 @@ private:
     int32_t nextProcessId;
     std::vector<std::unique_ptr<Process>> processTable;
     Process* currentProcess;
+    ProcessList runnableProcesses;
 };
 
 CMSX_KERNEL_API void InitProcessManager();

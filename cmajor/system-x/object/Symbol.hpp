@@ -174,6 +174,7 @@ public:
     Symbol* GetSymbol(uint64_t address) const;
     Symbol* GetRegisterSymbol(uint8_t reg) const;
     Symbol* GetTrapSymbol(uint64_t trap) const;
+    Symbol* GetSpecialRegisterSymbol(uint8_t specialRegNumber) const;
     void AddSymbol(Symbol* symbol);
     void AddSymbol(Symbol* symbol, bool setIndex);
     void AddSymbolToAddressMap(Symbol* symbol, bool setStart);

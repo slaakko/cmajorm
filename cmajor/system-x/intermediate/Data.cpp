@@ -101,6 +101,18 @@ int64_t Value::GetIntegerValue() const
     }
 }
 
+void Value::SetType(Type* type_)
+{
+    if (!type)
+    {
+        type = type_;
+    }
+    if (type != type_)
+    {
+        throw std::runtime_error("type conflict");
+    }
+}
+
 std::string Value::KindStr() const
 {
     return valueKindStr[static_cast<int>(kind)];
@@ -233,6 +245,23 @@ ArrayValue::ArrayValue(const SourcePos& sourcePos_, const std::vector<ConstantVa
 {
 }
 
+void ArrayValue::SetType(Type* type)
+{
+    ConstantValue::SetType(type);
+    if (type->IsArrayType())
+    {
+        ArrayType* arrayType = static_cast<ArrayType*>(type);
+        for (auto& element : elements)
+        {
+            element->SetType(arrayType->ElementType());
+        }
+    }
+    else
+    {
+        throw std::runtime_error("array type expected");
+    }
+}
+
 void ArrayValue::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
@@ -241,6 +270,25 @@ void ArrayValue::Accept(Visitor& visitor)
 StructureValue::StructureValue(const SourcePos& sourcePos_, const std::vector<ConstantValue*>& fieldValues_) :
     ConstantValue(sourcePos_, ValueKind::structureValue, nullptr), fieldValues(fieldValues_)
 {
+}
+
+void StructureValue::SetType(Type* type)
+{
+    ConstantValue::SetType(type);
+    if (type->IsStructureType())
+    {
+        StructureType* structureType = static_cast<StructureType*>(type);
+        int n = fieldValues.size();
+        for (int i = 0; i < n; ++i)
+        {
+            ConstantValue* fieldValue = fieldValues[i];
+            fieldValue->SetType(structureType->FieldType(i));
+        }
+    }
+    else
+    {
+        throw std::runtime_error("structure type expected");
+    }
 }
 
 void StructureValue::Accept(Visitor& visitor)
@@ -315,10 +363,17 @@ Data::Data() : context(nullptr)
 
 void Data::AddGlobalVariable(const SourcePos& sourcePos, Type* type, const std::string& variableName, ConstantValue* initializer, bool once, Context* context)
 {
-    GlobalVariable* globalVariable = new GlobalVariable(sourcePos, type, variableName, initializer, once);
-    values.push_back(std::unique_ptr<Value>(globalVariable));
-    globalVariableMap[variableName] = globalVariable;
-    globalVariables.push_back(globalVariable);
+    try
+    {
+        GlobalVariable* globalVariable = new GlobalVariable(sourcePos, type, variableName, initializer, once);
+        values.push_back(std::unique_ptr<Value>(globalVariable));
+        globalVariableMap[variableName] = globalVariable;
+        globalVariables.push_back(globalVariable);
+    }
+    catch (const std::exception& ex)
+    {
+        Error("error adding global variable: " + std::string(ex.what()), sourcePos, context);
+    }
 }
 
 ConstantValue* Data::GetTrueValue(const Types& types)
@@ -512,7 +567,6 @@ ConstantValue* Data::MakeConversionValue(const SourcePos& sourcePos, Type* type,
 
 ConstantValue* Data::MakeClsIdValue(const SourcePos& sourcePos, Type* type, const std::string& clsIdStr)
 {
-    // clsid(x)
     std::string typeId = clsIdStr.substr(6, clsIdStr.length() - 6 - 1);
     ClsIdValue* clsIdValue = new ClsIdValue(sourcePos, type, typeId);
     values.push_back(std::unique_ptr<Value>(clsIdValue));
@@ -521,7 +575,6 @@ ConstantValue* Data::MakeClsIdValue(const SourcePos& sourcePos, Type* type, cons
 
 ConstantValue* Data::MakeSymbolValue(const SourcePos& sourcePos, Type* type, const std::string& symbol)
 {
-    // @xxx
     SymbolValue* symbolValue = new SymbolValue(sourcePos, type, symbol);
     values.push_back(std::unique_ptr<Value>(symbolValue));
     return symbolValue;
@@ -598,7 +651,7 @@ ConstantValue* Data::MakeNumericLiteral(const SourcePos& sourcePos, Type* type, 
             {
                 Error("error making literal: range error: uint value expected", sourcePos, context);
             }
-            return GetIntValue(static_cast<uint32_t>(value), types);
+            return GetUIntValue(static_cast<uint32_t>(value), types);
         }
         case longTypeId:
         {

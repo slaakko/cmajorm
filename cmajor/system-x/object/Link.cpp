@@ -591,14 +591,16 @@ void ProcessExternalSymbol(LinkTable& linkTable, Symbol* symbol, Symbol*& parent
     executableSymbolTable.AddSymbol(clone);
     linkTable.ExecuteLinkCommands(symbol->FullName(), symbol->Start());
     linkTable.AddCopyRange(CopyRange(symbol->GetSection(), symbol->GetSection()->CopyTargetSection(), symbol->GetValue().Val(), symbol->Length(), symbol->Alignment()));
-    //symbol->GetSection()->SetCopyStartPos(symbol->GetValue().Val() + symbol->Length());
     linkSymbols.push_back(symbol);
 }
 
 void RemoveSymbol(Symbol* symbol)
 {
+    if (symbol->GetSection()->IsDataSection())
+    {
+        int x = 0;
+    }
     symbol->SetLinkage(Linkage::remove);
-    //symbol->GetSection()->SetCopyStartPos(symbol->GetValue().Val() + symbol->Length());
     uint64_t length = symbol->Length();
     if (symbol->GetSegment() == Segment::data)
     {
@@ -755,18 +757,12 @@ void ProcessLinkCommands(LinkTable& linkTable, Symbol* linkSymbol, ObjectFile* o
 
 void ProcessSymbols(LinkTable& linkTable, ObjectFile* objectFile, ExecutableFile* executable)
 {
-    if (objectFile->FileName() == "Memory.o")
-    {
-        int x = 0;
-    }
     SymbolTable& executableSymbolTable = executable->GetSymbolTable();
     SymbolTable& objectFileSymbolTable = objectFile->GetSymbolTable();
     Section* codeSection = objectFile->GetCodeSection();
-    //codeSection->SetCopyStartPos(0);
     codeSection->SetCopyTargetSection(executable->GetCodeSection());
     codeSection->SetRemoveOffset(0);
     Section* dataSection = objectFile->GetDataSection();
-    //dataSection->SetCopyStartPos(0);
     dataSection->SetCopyTargetSection(executable->GetDataSection());
     dataSection->SetRemoveOffset(0);
     std::vector<Symbol*> linkSymbols;

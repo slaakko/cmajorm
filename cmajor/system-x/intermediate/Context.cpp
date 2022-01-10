@@ -300,4 +300,9 @@ void Context::ResolveMetadataReferences()
     metadata.ResolveMetadataReferences(this);
 }
 
+void Context::ResetRegisterPool()
+{
+    registerPool = RegisterPool();
+}
+
 } // cmsx::intermediate

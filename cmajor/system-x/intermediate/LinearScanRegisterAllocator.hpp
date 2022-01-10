@@ -51,7 +51,7 @@ CMSX_INTERMEDIATE_API LiveRange GetLiveRange(Instruction* inst);
 class CMSX_INTERMEDIATE_API LinearScanRegisterAllocator : public RegisterAllocator
 {
 public:
-    LinearScanRegisterAllocator(Function& function);
+    LinearScanRegisterAllocator(Function& function, Context* context_);
     void AddLiveRange(const LiveRange& liveRange, Instruction* inst);
     void AddFreeRegToPool(Instruction* inst);
     void RemoveFromActive(const LiveRange& range);
@@ -84,9 +84,10 @@ private:
     std::map<LiveRange, std::vector<Instruction*>> rangeInstructionMap;
     std::map<Instruction*, Locations> locations;
     std::vector<SpillData> spillDataVec;
+    Context* context;
 };
 
-CMSX_INTERMEDIATE_API std::unique_ptr<LinearScanRegisterAllocator> LinearScanRegisterAllocation(Function& function);
+CMSX_INTERMEDIATE_API std::unique_ptr<LinearScanRegisterAllocator> LinearScanRegisterAllocation(Function& function, Context* context);
 
 } // cmsx::intermediate
 
