@@ -3210,7 +3210,8 @@ void Sflotu::Execute(Processor& processor, uint8_t x, uint8_t y, uint8_t z)
 {
     uint64_t zz = processor.Regs().Get(z);
     float value = static_cast<float>(zz);
-    uint32_t vv = *static_cast<uint32_t*>(static_cast<void*>(&value));
+    double d = value;
+    uint64_t vv = *static_cast<uint64_t*>(static_cast<void*>(&d));
     uint64_t xx = vv;
     processor.Regs().Set(x, xx);
 }
@@ -3228,7 +3229,8 @@ void Sflotui::Execute(Processor& processor, uint8_t x, uint8_t y, uint8_t z)
 {
     uint64_t zz = z;
     float value = static_cast<float>(zz);
-    uint32_t vv = *static_cast<uint32_t*>(static_cast<void*>(&value));
+    double d = value;
+    uint64_t vv = *static_cast<uint64_t*>(static_cast<void*>(&d));
     uint64_t xx = vv;
     processor.Regs().Set(x, xx);
 }
