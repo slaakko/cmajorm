@@ -6,10 +6,12 @@
 #include <system-x/db/MainWindow.hpp>
 #include <system-x/db/AboutDialog.hpp>
 #include <system-x/kernel/Load.hpp>
+#include <system-x/kernel/Kernel.hpp>
 #include <system-x/kernel/ProcessManager.hpp>
 #include <wing/Theme.hpp>
 #include <wing/PaddedControl.hpp>
 #include <wing/BorderedControl.hpp>
+#include <wing/ScrollableControl.hpp>
 #include <wing/Dialog.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Unicode.hpp>
@@ -71,7 +73,7 @@ MainWindow::MainWindow(const std::string& filePath_) :
     observer(this), filePath(filePath_), args(), env(), machine(nullptr), process(nullptr), openFileMenuItem(nullptr), closeFileMenuItem(nullptr), exitMenuItem(nullptr), 
     codeView(nullptr), registerView(nullptr), dataView(nullptr), argsView(nullptr), envView(nullptr), heapView(nullptr), stackView(nullptr), logView(nullptr), 
     currentTopView(nullptr), currentBottomView(nullptr), waitingDebugger(false), startContinueMenuItem(nullptr), stopMenuItem(nullptr), resetMenuItem(nullptr), 
-    singleStepMenuItem(nullptr), stepOverMenuItem(nullptr), toggleBreakpointMenuItem(nullptr), fileOpen(false)
+    singleStepMenuItem(nullptr), stepOverMenuItem(nullptr), toggleBreakpointMenuItem(nullptr), fileOpen(false), console(nullptr)
 {
     std::unique_ptr<MenuBar> menuBar(new MenuBar());
     std::unique_ptr<MenuItem> fileMenuItem(new MenuItem("&File"));
@@ -260,6 +262,9 @@ MainWindow::MainWindow(const std::string& filePath_) :
 
     SetState(DebuggingState::debuggerIdle);
 
+    consoleFile.reset(new cmsx::guicon::ConsoleFile());
+    cmsx::kernel::SetConsoleFiles(consoleFile.get(), consoleFile.get());
+
     if (!filePath.empty())
     {
         LoadProcess();
@@ -342,7 +347,7 @@ void MainWindow::ToggleBreakpointClick()
     }
     catch (const std::exception& ex)
     {
-        ShowErrorMessageBox(Handle(), ex.what());
+        PrintError(ex.what());
     }
 }
 
@@ -362,7 +367,7 @@ void MainWindow::SingleStepClick()
     }
     catch (const std::exception& ex)
     {
-        ShowErrorMessageBox(Handle(), ex.what());
+        PrintError(ex.what());
     }
 }
 
@@ -382,7 +387,7 @@ void MainWindow::StepOverClick()
     }
     catch (const std::exception& ex)
     {
-        ShowErrorMessageBox(Handle(), ex.what());
+        PrintError(ex.what());
     }
 }
 
@@ -402,7 +407,7 @@ void MainWindow::ContinueClick()
     }
     catch (const std::exception& ex)
     {
-        ShowErrorMessageBox(Handle(), ex.what());
+        PrintError(ex.what());
     }
 }
 
@@ -437,7 +442,6 @@ void MainWindow::OpenFileClick()
             if (state == DebuggingState::debuggerWaitingForCommand)
             {
                 StopDebugging(true);
-                WaitUntilDebuggingStoppedOrError();
             }
             this->filePath = GetFullPath(filePath);
             waitingDebugger = false;
@@ -458,7 +462,6 @@ void MainWindow::CloseFileClick()
     {
         waitingDebugger = true;
         StopDebugging(true);
-        WaitUntilDebuggingStoppedOrError();
         waitingDebugger = false;
         fileOpen = false;
         SetState(DebuggingState::debuggerIdle);
@@ -478,10 +481,9 @@ void MainWindow::ResetClick()
             throw std::runtime_error("no executable file open");
         }
         waitingDebugger = true;
-        if (state == DebuggingState::debuggerWaitingForCommand)
+        if (state == DebuggingState::debuggerWaitingForCommand || state == DebuggingState::debuggerExit)
         {
             StopDebugging(true);
-            WaitUntilDebuggingStoppedOrError();
         }
         waitingDebugger = false;
         LoadProcess();
@@ -500,8 +502,7 @@ void MainWindow::StopClick()
         waitingDebugger = true;
         if (state == DebuggingState::debuggerWaitingForCommand)
         {
-            StopDebugging(false);
-            WaitUntilDebuggingStoppedOrError();
+            StopDebugging(true);
         }
         waitingDebugger = false;
     }
@@ -828,13 +829,13 @@ void MainWindow::LoadProcess()
 {
     SetState(DebuggingState::debuggerBusy);
     machine.reset(new cmsx::machine::Machine());
-    cmsx::kernel::ProcessManager::Instance().SetMachine(machine.get());
+    cmsx::kernel::Kernel::Instance().SetMachine(machine.get()); 
+    cmsx::kernel::Kernel::Instance().Start();
     process = cmsx::kernel::ProcessManager::Instance().CreateProcess();
     process->SetFilePath(filePath);
     args.clear();
     args.push_back(filePath);
     cmsx::kernel::Load(process, args, env, *machine);
-    cmsx::kernel::ProcessManager::Instance().SetCurrentProcess(process);
     dataRanges.SetMachine(machine.get());
     dataRanges.SetProcess(process);
     if (codeView)
@@ -882,6 +883,19 @@ void MainWindow::LoadProcess()
     }
     ViewCodeClick();
     ViewRegsClick();
+    if (!console)
+    {
+        console = new cmajor::wing::Console(cmajor::wing::ConsoleCreateParams().Defaults());
+        console->SetFlag(ControlFlags::scrollSubject);
+        console->SetDoubleBuffered();
+        console->ConsoleInputReady().AddHandler(this, &MainWindow::ConsoleInputReady);
+        consoleFile->SetConsole(console);
+        cmajor::wing::ScrollableControl* scrollableConsole = new ScrollableControl(ScrollableControlCreateParams(console).SetDock(Dock::fill));
+        cmajor::wing::TabPage* consoleTabPage = new cmajor::wing::TabPage("Console", "console");
+        consoleTabPage->AddChild(scrollableConsole);
+        bottomTabControl->AddTabPage(consoleTabPage);
+    }
+    ViewRegsClick();
     StartDebugging();
 }
 
@@ -900,7 +914,7 @@ void MainWindow::StartDebugging()
     {
         debuggerThread.join();
     }
-    debugger.reset(new Debugger(*machine));
+    debugger.reset(new Debugger(machine.get(), process));
     debugger->SetObserver(&observer);
     for (auto view : views)
     {
@@ -927,8 +941,16 @@ void MainWindow::StopDebugging(bool unloadProcess)
             cmsx::kernel::ProcessManager::Instance().DeleteProcess(process->Id());
             process = nullptr;
         }
-        machine.reset();
-        cmsx::kernel::ProcessManager::Instance().SetMachine(nullptr);
+        if (machine)
+        {
+            machine->Exit();
+        }
+        cmsx::kernel::Kernel::Instance().Stop();
+        if (machine)
+        {
+            machine.reset();
+        }
+        cmsx::kernel::Kernel::Instance().SetMachine(nullptr);
         dataRanges.SetMachine(nullptr);
         dataRanges.SetProcess(nullptr);
         for (auto& view : views)
@@ -938,6 +960,7 @@ void MainWindow::StopDebugging(bool unloadProcess)
         }
         UpdateViews();
     }
+    SetState(DebuggingState::debuggerExit);
 }
 
 void MainWindow::UpdateViews()
@@ -1229,6 +1252,10 @@ void MainWindow::SetState(DebuggingState state_)
             break;
         }
     }
+}
+
+void MainWindow::ConsoleInputReady()
+{
 }
 
 } // namespace cmsx::db

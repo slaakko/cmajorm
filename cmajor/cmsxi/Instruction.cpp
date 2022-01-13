@@ -689,6 +689,7 @@ void NoOperationInstruction::Write(CodeFormatter& formatter, Function& function,
     WriteMetadataRef(formatter);
 }
 
+/*
 SaveInstruction::SaveInstruction() : Instruction()
 {
 }
@@ -697,5 +698,6 @@ void SaveInstruction::Write(CodeFormatter& formatter, Function& function, Contex
 {
     formatter.Write("save");
 }
+*/
 
 } // namespace cmsxi

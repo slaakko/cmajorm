@@ -4,11 +4,21 @@
 // =================================
 
 #include <system-x/machine/Machine.hpp>
+#include <system-x/machine/Config.hpp>
 
 namespace cmsx::machine {
 
-Machine::Machine() : processor(*this), memory(*this), insts()
+Machine::Machine() : clock(), scheduler(nullptr), processors(), memory(*this), insts(), exiting(false)
 {
+    clock.SetMachine(this);
+    int numProcessors = NumProcessors();
+    processors.resize(numProcessors);
+    for (int i = 0; i < numProcessors; ++i)
+    {
+        Processor& processor = processors[i];
+        processor.SetId(i);
+        processor.SetMachine(this);
+    }
     instructions.resize(256);
     for (int i = 0; i < 256; ++i)
     {
@@ -242,9 +252,45 @@ Machine::Machine() : processor(*this), memory(*this), insts()
     }
 }
 
+Machine::~Machine()
+{
+}
+
 void Machine::SetInstruction(Instruction* inst)
 {
     instructions[inst->OpCode()].reset(inst);
+}
+
+void Machine::Start()
+{
+    for (auto& processor : processors)
+    {
+        processor.Start();
+    }
+    for (auto& processor : processors)
+    {
+        processor.EnableInterrupts();
+    }
+    clock.Start();
+}
+
+void Machine::Exit()
+{
+    exiting = true;
+    clock.Stop();
+    scheduler->Stop();
+    for (auto& processor : processors)
+    {
+        processor.Stop();
+    }
+}
+
+void Machine::CheckExceptions()
+{
+    for (auto& processor : processors)
+    {
+        processor.CheckException();
+    }
 }
 
 } // cmsx::machine

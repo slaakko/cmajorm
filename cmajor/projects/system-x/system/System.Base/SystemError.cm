@@ -5,17 +5,13 @@
 
 namespace System
 {
-    public const int EFAIL = 1;
-    public const int EBADF = 2;
-    public const int EMEM = 3;
-    public const int RLIMITEXCEEDED = 4;
-    public const int EINVAL = 5;
-    public const int ENOTSUPPORTED = 6;
-    public const int EIO = 7;
-    public const int EPERM = 8;
-    public const int EEXIST = 9;
-    public const int ENOENT = 10;
-    public const int ERANGE = 11;
+	public const int EFAIL = 1;
+	public const int EBADF = 2;
+	public const int EPARAM = 3;
+	public const int EMEMORYACCESS = 4;
+	public const int ENOTFOUND = 5;
+	public const int EALREADYEXISTS = 6;
+	public const int ELIMITEXCEEDED = 7;
 
     public class SystemError : Exception
     {
@@ -27,9 +23,10 @@ namespace System
     
     public SystemError GetSystemError()
     {
+/*	
         int errorCode;
-        UniquePtr<byte> buffer(cast<byte*>(MemAlloc(4096)));
-        get_system_error(&errorCode, buffer.Get(), 4096);
+        UniquePtr<byte> buffer(cast<byte*>(MemAlloc(1024)));
+        get_system_error(&errorCode, buffer.Get(), 1024);
         string errorMessage;
         byte* p = buffer.Get();
         while (*p != 0u)
@@ -37,11 +34,15 @@ namespace System
             errorMessage.Append(cast<char>(*p));
             ++p;
         }
+*/		
+		int errorCode = EFAIL;
+		string errorMessage = "GetSystemError not implemented yet";
         return SystemError(errorCode, errorMessage);
     }
     
     public void ThrowSystemError()
     {
-        throw GetSystemError();
+        //throw GetSystemError(); TODO
+		exit(1u);
     }
 }

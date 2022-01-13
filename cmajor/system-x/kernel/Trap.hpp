@@ -18,12 +18,18 @@ const uint8_t trap_heap_length = 3;
 const uint8_t trap_allocate_memory_pages = 4;
 const uint8_t trap_dump_heap = 5;
 const uint8_t trap_random_seed = 6;
+const uint8_t trap_write = 7;
+const uint8_t trap_get_current_time_point = 8;
+const uint8_t trap_sleep = 9;
+const uint8_t trap_get_current_date = 10;
+const uint8_t trap_get_current_date_time = 11;
+const uint8_t trap_pow = 12;
 
 class CMSX_KERNEL_API TrapHandler
 {
 public:
     virtual ~TrapHandler();
-    virtual uint64_t HandleTrap(cmsx::machine::Machine& machine, uint64_t ax, uint64_t bx, uint64_t cx, uint64_t dx) = 0;
+    virtual uint64_t HandleTrap(cmsx::machine::Processor& processor) = 0;
     virtual std::string TrapName() const = 0;
 };
 

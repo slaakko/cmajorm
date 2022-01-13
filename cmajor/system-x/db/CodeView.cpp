@@ -1,5 +1,4 @@
 // =================================
-// =================================
 // Copyright (c) 2022 Seppo Laakko
 // Distributed under the MIT license
 // =================================
@@ -341,65 +340,101 @@ void CodeView::SetDebugger(Debugger* debugger_)
 
 void CodeView::UpdateView(bool updateCurrentAddress)
 {
-    if (machine && updateCurrentAddress)
+    if (machine && process && updateCurrentAddress)
     {
-        currentAddress = machine->Regs().GetPC();
+        cmsx::machine::Processor* processor = process->GetProcessor();
+        if (processor)
+        {
+            currentAddress = processor->Regs().GetPC();
+        }
     }
     Invalidate();
 }
 
 void CodeView::NextLine()
 {
-    int64_t addr = std::min(currentAddress + static_cast<int64_t>(4), process->CodeStartAddress() + process->CodeLength());
-    currentAddress = addr;
-    Invalidate();
+    cmsx::kernel::Region textRegion = process->GetRegionTable().GetRegion(cmsx::kernel::RegionId::text);
+    if (textRegion.Valid())
+    {
+        int64_t addr = std::min(currentAddress + static_cast<int64_t>(4), textRegion.Start() + textRegion.Length());
+        currentAddress = addr;
+        Invalidate();
+    }
 }
 
 void CodeView::PrevLine()
 {
-    int64_t addr = std::max(currentAddress - static_cast<int64_t>(4), process->CodeStartAddress());
-    currentAddress = addr;
-    Invalidate();
+    cmsx::kernel::Region textRegion = process->GetRegionTable().GetRegion(cmsx::kernel::RegionId::text);
+    if (textRegion.Valid())
+    {
+        int64_t addr = std::min(currentAddress - static_cast<int64_t>(4), textRegion.Start());
+        currentAddress = addr;
+        Invalidate();
+    }
 }
 
 void CodeView::NextQuarter()
 {
-    int64_t addr = std::min(currentAddress + static_cast<int64_t>(4) * 4, process->CodeStartAddress() + process->CodeLength());
-    currentAddress = addr;
-    Invalidate();
+    cmsx::kernel::Region textRegion = process->GetRegionTable().GetRegion(cmsx::kernel::RegionId::text);
+    if (textRegion.Valid())
+    {
+        int64_t addr = std::min(currentAddress + static_cast<int64_t>(4) * 4, textRegion.Start() + textRegion.Length());
+        currentAddress = addr;
+        Invalidate();
+    }
 }
 
 void CodeView::PrevQuarter()
 {
-    int64_t addr = std::max(currentAddress - static_cast<int64_t>(4) * 4, process->CodeStartAddress());
-    currentAddress = addr;
+    cmsx::kernel::Region textRegion = process->GetRegionTable().GetRegion(cmsx::kernel::RegionId::text);
+    if (textRegion.Valid())
+    {
+        int64_t addr = std::max(currentAddress - static_cast<int64_t>(4) * 4, textRegion.Start());
+        currentAddress = addr;
+    }
     Invalidate();
 }
 
 void CodeView::NextPage()
 {
-    int64_t addr = std::min(currentAddress + static_cast<int64_t>(4) * numLines, process->CodeStartAddress() + process->CodeLength());
-    currentAddress = addr;
-    Invalidate();
+    cmsx::kernel::Region textRegion = process->GetRegionTable().GetRegion(cmsx::kernel::RegionId::text);
+    if (textRegion.Valid())
+    {
+        int64_t addr = std::min(currentAddress + static_cast<int64_t>(4) * numLines, textRegion.Start() + textRegion.Length());
+        currentAddress = addr;
+        Invalidate();
+    }
 }
 
 void CodeView::PrevPage()
 {
-    int64_t addr = std::max(currentAddress - static_cast<int64_t>(4) * numLines, process->CodeStartAddress());
-    currentAddress = addr;
-    Invalidate();
+    cmsx::kernel::Region textRegion = process->GetRegionTable().GetRegion(cmsx::kernel::RegionId::text);
+    if (textRegion.Valid())
+    {
+        int64_t addr = std::max(currentAddress - static_cast<int64_t>(4) * numLines, textRegion.Start());
+        currentAddress = addr;
+        Invalidate();
+    }
 }
 
 void CodeView::ToStart()
 {
-    currentAddress = process->CodeStartAddress();
-    Invalidate();
+    cmsx::kernel::Region textRegion = process->GetRegionTable().GetRegion(cmsx::kernel::RegionId::text);
+    if (textRegion.Valid())
+    {
+        currentAddress = textRegion.Start();
+        Invalidate();
+    }
 }
 
 void CodeView::ToEnd()
 {
-    currentAddress = process->CodeStartAddress() + process->CodeLength();
-    Invalidate();
+    cmsx::kernel::Region textRegion = process->GetRegionTable().GetRegion(cmsx::kernel::RegionId::text);
+    if (textRegion.Valid())
+    {
+        currentAddress = textRegion.Start() + textRegion.Length();
+        Invalidate();
+    }
 }
 
 void CodeView::GotoPrevAddress()
@@ -423,8 +458,9 @@ void CodeView::OnPaint(PaintEventArgs& args)
         Measure(args.graphics);
         if (numLines > 0)
         {
-            int64_t startAddress = process->CodeStartAddress();
-            int64_t endAddress = std::min(currentAddress + static_cast<int64_t>(4) * (numLines / 2), process->CodeStartAddress() + process->CodeLength());
+            cmsx::kernel::Region textRegion = process->GetRegionTable().GetRegion(cmsx::kernel::RegionId::text);
+            int64_t startAddress = textRegion.Start();
+            int64_t endAddress = std::min(currentAddress + static_cast<int64_t>(4) * (numLines / 2), textRegion.Start() + textRegion.Length());
             int64_t instructionCount = (endAddress - startAddress) >> 2;
             FetchAddressRange(startAddress, instructionCount);
             PaintLines(args.graphics, currentAddress);
@@ -441,11 +477,12 @@ void CodeView::OnMouseDown(MouseEventArgs& args)
 {
     try
     {
+        cmsx::kernel::Region textRegion = process->GetRegionTable().GetRegion(cmsx::kernel::RegionId::text);
         Control::OnMouseDown(args);
         if (args.clicks == 1 && args.buttons == MouseButtons::lbutton)
         {
             int64_t clickAddress = ClickAddress(args.location);
-            if (clickAddress >= process->CodeStartAddress() && clickAddress < process->CodeStartAddress() + process->CodeLength())
+            if (clickAddress >= textRegion.Start() && clickAddress < textRegion.Start() + textRegion.Length())
             {
                 const CodeViewItem* item = ClickItem(args.location, clickAddress);
                 if (item)
@@ -459,7 +496,7 @@ void CodeView::OnMouseDown(MouseEventArgs& args)
                     else if (item->kind == CodeViewItemKind::address)
                     {
                         int64_t address = static_cast<int64_t>(ParseHexULong(ToUtf8(item->text.substr(1))));
-                        if (address >= process->CodeStartAddress() && address < process->CodeStartAddress() + process->CodeLength())
+                        if (address >= textRegion.Start() && address < textRegion.Start() + textRegion.Length())
                         {
                             currentAddressStack.push(currentAddress);
                             currentAddress = address;
@@ -500,19 +537,21 @@ void CodeView::Measure(Graphics& graphics)
 
 void CodeView::FetchAddressRange(int64_t startAddress, int64_t instructionCount)
 {
+    cmsx::kernel::Region textRegion = process->GetRegionTable().GetRegion(cmsx::kernel::RegionId::text);
     cmsx::machine::Memory& mem = machine->Mem();
     int64_t address = startAddress;
     CodeViewLineBuilder lineBuilder(*machine, *process->GetSymbolTable(), debugger);
     while (instructionCount > 0)
     {
-        if (address >= process->CodeStartAddress() && address < process->CodeStartAddress() + process->CodeLength())
+        if (address >= textRegion.Start() && address < textRegion.Start() + textRegion.Length())
         {
             if (lineMap.find(address) == lineMap.cend())
             {
-                uint8_t opc = mem.ReadByte(static_cast<uint64_t>(address), cmsx::machine::Protection::execute);
-                uint8_t x = mem.ReadByte(static_cast<uint64_t>(address + 1), cmsx::machine::Protection::execute);
-                uint8_t y = mem.ReadByte(static_cast<uint64_t>(address + 2), cmsx::machine::Protection::execute);
-                uint8_t z = mem.ReadByte(static_cast<uint64_t>(address + 3), cmsx::machine::Protection::execute);
+                uint64_t rv = process->RV();
+                uint8_t opc = mem.ReadByte(rv, static_cast<uint64_t>(address), cmsx::machine::Protection::execute);
+                uint8_t x = mem.ReadByte(rv, static_cast<uint64_t>(address + 1), cmsx::machine::Protection::execute);
+                uint8_t y = mem.ReadByte(rv, static_cast<uint64_t>(address + 2), cmsx::machine::Protection::execute);
+                uint8_t z = mem.ReadByte(rv, static_cast<uint64_t>(address + 3), cmsx::machine::Protection::execute);
                 lineBuilder.FormatInstruction(address, &setAddressMap, opc, x, y, z);
                 CodeViewLine line = lineBuilder.GetLine();
                 lineMap[address] = line;
@@ -525,7 +564,9 @@ void CodeView::FetchAddressRange(int64_t startAddress, int64_t instructionCount)
 
 void CodeView::PaintLines(Graphics& graphics, int64_t curAddr)
 {
-    int64_t pc = machine->Regs().GetPC();
+    cmsx::machine::Processor* processor = process->GetProcessor();
+    if (!processor) return;
+    int64_t pc = processor->Regs().GetPC();
     float center = viewHeight / 2.0f;
     float y = center - (numLines / 2.0f) * lineHeight;
     PointF origin(0, y);
@@ -609,7 +650,8 @@ int64_t CodeView::ClickAddress(const Point& loc) const
 
 const CodeViewItem* CodeView::ClickItem(const Point& loc, int64_t clickAddress) const
 {
-    if (clickAddress >= process->CodeStartAddress() && clickAddress  < process->CodeStartAddress() + process->CodeLength())
+    cmsx::kernel::Region textRegion = process->GetRegionTable().GetRegion(cmsx::kernel::RegionId::text);
+    if (clickAddress >= textRegion.Start() && clickAddress < textRegion.Start() + textRegion.Length())
     {
         auto it = lineMap.find(clickAddress);
         if (it != lineMap.cend())

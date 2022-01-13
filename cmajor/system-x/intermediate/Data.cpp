@@ -349,7 +349,10 @@ void SymbolValue::Accept(Visitor& visitor)
 GlobalVariable::GlobalVariable(const SourcePos& sourcePos_, Type* type_, const std::string& name_, ConstantValue* initializer_, bool once_) :
     Value(sourcePos_, ValueKind::globalVariable, type_), name(name_), initializer(initializer_), once(once_)
 {
-    initializer->SetType(GetType());
+    if (initializer)
+    {
+        initializer->SetType(GetType());
+    }
 }
 
 void GlobalVariable::Accept(Visitor& visitor)

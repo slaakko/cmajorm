@@ -6,100 +6,101 @@
 #include <system-x/kernel/Load.hpp>
 #include <system-x/kernel/Process.hpp>
 #include <system-x/kernel/Trap.hpp>
+#include <system-x/kernel/Scheduler.hpp>
 #include <system-x/object/BinaryFile.hpp>
 #include <soulng/util/Util.hpp>
 
 namespace cmsx::kernel {
 
-void SetupCode(cmsx::object::ExecutableFile* executable, cmsx::machine::Memory& memory)
+void SetupCode(cmsx::object::ExecutableFile* executable, cmsx::machine::Memory& memory, uint64_t rv)
 {
     cmsx::object::CodeSection* codeSection = executable->GetCodeSection();
     int64_t codeSectionBaseAddress = codeSection->BaseAddress();
     for (int64_t i = 0; i < codeSection->Length(); ++i)
     {
         uint8_t value = codeSection->GetByte(i);
-        memory.WriteByte(static_cast<uint64_t>(codeSectionBaseAddress + i), value, cmsx::machine::Protection::write);
+        memory.WriteByte(rv, static_cast<uint64_t>(codeSectionBaseAddress + i), value, cmsx::machine::Protection::write);
     }
 }
 
-void SetupData(cmsx::object::ExecutableFile* executable, cmsx::machine::Memory& memory)
+void SetupData(cmsx::object::ExecutableFile* executable, cmsx::machine::Memory& memory, uint64_t rv)
 {
     cmsx::object::DataSection* dataSection = executable->GetDataSection();
     int64_t dataSectionBaseAddress = dataSection->BaseAddress();
     for (int64_t i = 0; i < dataSection->Length(); ++i)
     {
         uint8_t value = dataSection->GetByte(i);
-        memory.WriteByte(static_cast<uint64_t>(dataSectionBaseAddress + i), value, cmsx::machine::Protection::write);
+        memory.WriteByte(rv, static_cast<uint64_t>(dataSectionBaseAddress + i), value, cmsx::machine::Protection::write);
     }
 }
 
-void SetupStack(cmsx::machine::Memory& memory)
+void SetupStack(cmsx::machine::Memory& memory, uint64_t rv)
 {
     int64_t stackStart = cmsx::machine::stackSegmentBaseAddress;
-    memory.WriteOcta(static_cast<uint64_t>(stackStart), 0, cmsx::machine::Protection::write);
+    memory.WriteOcta(rv, static_cast<uint64_t>(stackStart), 0, cmsx::machine::Protection::write);
 }
 
-int64_t WriteString(const std::string& s, int64_t address, cmsx::machine::Memory& memory)
+int64_t WriteString(const std::string& s, int64_t address, cmsx::machine::Memory& memory, uint64_t rv)
 {
     for (char c : s)
     {
-        memory.WriteByte(static_cast<uint64_t>(address), static_cast<uint8_t>(c), cmsx::machine::Protection::write);
+        memory.WriteByte(rv, static_cast<uint64_t>(address), static_cast<uint8_t>(c), cmsx::machine::Protection::write);
         ++address;
     }
-    memory.WriteByte(static_cast<uint64_t>(address), static_cast<uint8_t>(0), cmsx::machine::Protection::write);
+    memory.WriteByte(rv, static_cast<uint64_t>(address), static_cast<uint8_t>(0), cmsx::machine::Protection::write);
     ++address;
     return address;
 }
 
-int64_t SetupArgs(int64_t address, const std::vector<std::string>& args, cmsx::machine::Memory& memory)
+int64_t SetupArgs(int64_t address, const std::vector<std::string>& args, cmsx::machine::Memory& memory, uint64_t rv)
 {
     int64_t start = address;
     for (int32_t i = 0; i < args.size(); ++i)
     {
-        memory.WriteOcta(static_cast<uint64_t>(address), 0, cmsx::machine::Protection::write);
+        memory.WriteOcta(rv, static_cast<uint64_t>(address), 0, cmsx::machine::Protection::write);
         address = address + 8;
     }
-    memory.WriteOcta(static_cast<uint64_t>(address), 0, cmsx::machine::Protection::write);
+    memory.WriteOcta(rv, static_cast<uint64_t>(address), 0, cmsx::machine::Protection::write);
     address = address + 8;
     std::vector<uint64_t> argAddresses;
     for (int32_t i = 0; i < args.size(); ++i)
     {
         argAddresses.push_back(static_cast<uint64_t>(address));
         const std::string& arg = args[i];
-        address = WriteString(arg, address, memory);
+        address = WriteString(arg, address, memory, rv);
     }
     int64_t end = address;
     address = start;
     for (int32_t i = 0; i < argAddresses.size(); ++i)
     {
-        memory.WriteOcta(static_cast<uint64_t>(address), argAddresses[i], cmsx::machine::Protection::write);
+        memory.WriteOcta(rv, static_cast<uint64_t>(address), argAddresses[i], cmsx::machine::Protection::write);
         address = address + 8;
     }
     return end;
 }
 
-int64_t SetupEnv(int64_t address, const std::vector<std::string>& env, cmsx::machine::Memory& memory)
+int64_t SetupEnv(int64_t address, const std::vector<std::string>& env, cmsx::machine::Memory& memory, uint64_t rv)
 {
     int64_t start = address;
     for (int i = 0; i < env.size(); ++i)
     {
-        memory.WriteOcta(static_cast<uint64_t>(address), 0, cmsx::machine::Protection::write);
+        memory.WriteOcta(rv, static_cast<uint64_t>(address), 0, cmsx::machine::Protection::write);
         address = address + 8;
     }
-    memory.WriteOcta(static_cast<uint64_t>(address), 0, cmsx::machine::Protection::write);
+    memory.WriteOcta(rv, static_cast<uint64_t>(address), 0, cmsx::machine::Protection::write);
     address = address + 8;
     std::vector<uint64_t> envAddresses;
     for (int i = 0; i < env.size(); ++i)
     {
         envAddresses.push_back(static_cast<uint64_t>(address));
         const std::string& e = env[i];
-        address = WriteString(e, address, memory);
+        address = WriteString(e, address, memory, rv);
     }
     int64_t end = address;
     address = start;
     for (int64_t i = 0; i < envAddresses.size(); ++i)
     {
-        memory.WriteOcta(static_cast<uint64_t>(address), envAddresses[i], cmsx::machine::Protection::write);
+        memory.WriteOcta(rv, static_cast<uint64_t>(address), envAddresses[i], cmsx::machine::Protection::write);
         address = address + 8;
     }
     return end;
@@ -107,6 +108,7 @@ int64_t SetupEnv(int64_t address, const std::vector<std::string>& env, cmsx::mac
 
 void Load(Process* process, const std::vector<std::string>& args, const std::vector<std::string>& env, cmsx::machine::Machine& machine)
 {
+    cmsx::machine::Registers regs;
     uint64_t rv = machine.Mem().AllocateTranslationMap();
     process->SetRV(rv);
     int argCount = args.size();
@@ -114,27 +116,29 @@ void Load(Process* process, const std::vector<std::string>& args, const std::vec
     if (binaryFile->Kind() == cmsx::object::BinaryFileKind::executableFile)
     {
         cmsx::object::ExecutableFile* executable = static_cast<cmsx::object::ExecutableFile*>(binaryFile.get());
-        process->SetCodeStartAddress(executable->GetCodeSection()->BaseAddress());
-        process->SetCodeLength(executable->GetCodeSection()->Length());
-        machine.Regs().SetSpecial(cmsx::machine::rV, process->RV());
-        machine.Regs().Set(cmsx::machine::regSP, cmsx::machine::stackSegmentBaseAddress);
-        SetupCode(executable, machine.Mem());
-        process->SetDataStartAddress(executable->GetDataSection()->BaseAddress());
-        process->SetDataLength(executable->GetDataSection()->Length());
-        SetupData(executable, machine.Mem());
-        SetupStack(machine.Mem());
-        process->SetStackStartAddress(cmsx::machine::stackSegmentBaseAddress);
+        regs.Set(cmsx::machine::regSP, cmsx::machine::stackSegmentBaseAddress);
+        SetupCode(executable, machine.Mem(), rv);
+        Region textRegion(RegionId::text, executable->GetCodeSection()->BaseAddress(), executable->GetCodeSection()->Length());
+        process->GetRegionTable().AddRegion(textRegion);
+        Region dataRegion(RegionId::data, executable->GetDataSection()->BaseAddress(), executable->GetDataSection()->Length());
+        SetupData(executable, machine.Mem(), rv);
+        process->GetRegionTable().AddRegion(dataRegion);
+        SetupStack(machine.Mem(), rv);
+        Region stackRegion(RegionId::stack, cmsx::machine::stackSegmentBaseAddress, 8);
+        process->GetRegionTable().AddRegion(stackRegion);
         int64_t poolSegmentBaseAddress = cmsx::machine::poolSegmentBaseAddress;
         int64_t address = poolSegmentBaseAddress;
         int64_t argsAddress = soulng::util::Align(address, 8);
         process->SetArgumentsStartAddress(argsAddress);
-        address = SetupArgs(argsAddress, args, machine.Mem());
+        address = SetupArgs(argsAddress, args, machine.Mem(), rv);
         process->SetArgumentsLength(address - argsAddress);
         int64_t envAddress = soulng::util::Align(address, 8);
         process->SetEnvironmentStartAddress(envAddress);
-        address = SetupEnv(envAddress, env, machine.Mem());
+        address = SetupEnv(envAddress, env, machine.Mem(), rv);
         process->SetEnvironmentLength(address - envAddress);
         address = soulng::util::Align(address, 4096);
+        Region poolRegion(RegionId::pool, poolSegmentBaseAddress, address - poolSegmentBaseAddress);
+        process->GetRegionTable().AddRegion(poolRegion);
         process->SetHeapStartAddress(address);
         process->SetHeapLength(0);
         cmsx::object::Symbol* main = executable->GetSymbolTable().GetSymbol("Main");
@@ -142,26 +146,29 @@ void Load(Process* process, const std::vector<std::string>& args, const std::vec
         {
             int64_t entryPoint = main->Start();
             process->SetEntryPoint(entryPoint);
-            machine.Regs().SetPC(static_cast<uint64_t>(entryPoint));
+            regs.SetPC(static_cast<uint64_t>(entryPoint));
             int64_t mainFrame = cmsx::machine::stackSegmentBaseAddress;
             int64_t mainArgAddr = mainFrame + 8;
-            machine.Mem().WriteOcta(static_cast<uint64_t>(mainArgAddr), static_cast<uint32_t>(argCount), cmsx::machine::Protection::write);
+            machine.Mem().WriteOcta(rv, static_cast<uint64_t>(mainArgAddr), static_cast<uint32_t>(argCount), cmsx::machine::Protection::write);
             mainArgAddr = mainArgAddr + 8;
-            machine.Mem().WriteOcta(static_cast<uint64_t>(mainArgAddr), static_cast<uint64_t>(argsAddress), cmsx::machine::Protection::write);
+            machine.Mem().WriteOcta(rv, static_cast<uint64_t>(mainArgAddr), static_cast<uint64_t>(argsAddress), cmsx::machine::Protection::write);
             mainArgAddr = mainArgAddr + 8;
-            machine.Mem().WriteOcta(static_cast<uint64_t>(mainArgAddr), static_cast<uint64_t>(envAddress), cmsx::machine::Protection::write);
+            machine.Mem().WriteOcta(rv, static_cast<uint64_t>(mainArgAddr), static_cast<uint64_t>(envAddress), cmsx::machine::Protection::write);
+            mainArgAddr = mainArgAddr + 8;
             process->SetSymbolTable(executable->ReleaseSymbolTable());
             AddTrapsToSymbolTable(*process->GetSymbolTable());
-            machine.GetProcessor().EnableInterrupts();
+            regs.Set(cmsx::machine::regSP, cmsx::machine::stackSegmentBaseAddress);
+            process->SaveContext(machine, regs);
+            Scheduler::Instance().AddRunnableProcess(process);
         }
         else
         {
-            throw std::runtime_error("error loading file '" + process->FilePath() + "': 'Main' entry point not found");
+            throw SystemError(ENOTFOUND, "error loading file '" + process->FilePath() + "': 'Main' entry point not found");
         }
     }
     else
     {
-        throw std::runtime_error("error loading file '" + process->FilePath() + "': executable file expected");
+        throw SystemError(EFAIL, "error loading file '" + process->FilePath() + "': executable file expected");
     }
 }
 

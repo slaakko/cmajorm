@@ -10,17 +10,19 @@
 
 namespace cmsx::machine {
 
-class Machine;
+class Processor;
 
 const uint8_t irq_software = 0;
+const uint8_t irq_clock = 1;
 const uint64_t SOFTWARE_INTERRUPT_BIT = static_cast<uint64_t>(1) << irq_software;
+const uint64_t CLOCK_INTERRUPT_BIT = static_cast<uint64_t>(1) << irq_clock;
 const uint64_t ALL_INTERRUPT_BITS = 0xFFFFFFFFFFFFFFFF;
 
 class CMSX_MACHINE_API InterruptHandler
 {
 public:
     virtual ~InterruptHandler();
-    virtual void HandleInterrupt(Machine& machine) = 0;
+    virtual void HandleInterrupt(Processor& processor) = 0;
 };
 
 CMSX_MACHINE_API void SetInterruptHandler(uint8_t irq, InterruptHandler* handler);

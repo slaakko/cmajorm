@@ -718,7 +718,7 @@ void EmitZeroExtension(ZeroExtendInstruction& inst, CodeGenerator& codeGen)
     }
     if (!maskOperand)
     {
-        codeGen.Error("error emitting truncate: invalid result type");
+        codeGen.Error("error emitting zero extension: invalid result type");
     }
     setInst->AddOperand(maskOperand);
     codeGen.Emit(setInst);
@@ -846,6 +846,7 @@ void EmitBinOpInst(BinaryInstruction& inst, CodeGenerator& codeGen)
                 machineInst = unsignedMachineInst;
                 break;
             }
+            case floatTypeId:
             case doubleTypeId:
             {
                 machineInst = floatingMachineInst;
@@ -1265,6 +1266,13 @@ void EmitTruncate(TruncateInstruction& inst, CodeGenerator& codeGen)
     }
     cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen);
     cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
+    if (inst.Operand()->GetType()->Id() == doubleTypeId && inst.Result()->GetType()->Id() == floatTypeId)
+    {
+        setInst->AddOperand(MakeRegOperand(reg));
+        setInst->AddOperand(operandReg);
+        codeGen.Emit(setInst);
+        return;
+    }
     setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regBX)));
     cmsx::assembler::Node* maskOperand = nullptr;
     switch (inst.Result()->GetType()->Id())
@@ -1421,7 +1429,7 @@ void EmitTrap(TrapInstruction& inst, CodeGenerator& codeGen)
     {
         Value* arg = inst.Args()[i];
         cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
-        uint8_t reg = cmsx::machine::regAX + i;
+        uint8_t reg = cmsx::machine::regAX - i;
         setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), reg)));
         setInst->AddOperand(MakeRegOperand(arg, GetGlobalRegister(codeGen.Ctx(), reg), codeGen));
         codeGen.Emit(setInst);

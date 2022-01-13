@@ -742,7 +742,7 @@ void FloatingRoundingInstruction::Assemble(Assembler& assembler)
         int opc = currentInst->GetOpCode()->Value();
         if (n == 2)
         {
-            assembler.EmitOpCode(static_cast<uint8_t>(opc + 1));
+            assembler.EmitOpCode(static_cast<uint8_t>(opc));
         }
         else if (n == 3)
         {
@@ -758,10 +758,6 @@ void FloatingRoundingInstruction::Assemble(Assembler& assembler)
             {
                 assembler.Error(currentInst->GetOpCode()->Name() + " Z operand must be a register or pure", currentInst->GetSourcePos());
             }
-        }
-        else
-        {
-            assembler.Error(currentInst->GetOpCode()->Name() + " needs two or three operands", currentInst->GetSourcePos());
         }
         if (currentInst->Operands()[0].IsRegValue())
         {
@@ -792,7 +788,7 @@ void FloatingRoundingInstruction::Assemble(Assembler& assembler)
         }
         if (n == 2)
         {
-            assembler.EmitPureByteValue("Z", cmsx::object::Value(static_cast<uint64_t>(0)));
+            assembler.EmitRegisterValue("Z", currentInst->Operands()[1]);
         }
         else if (n == 3)
         {

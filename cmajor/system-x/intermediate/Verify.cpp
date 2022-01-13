@@ -65,6 +65,7 @@ private:
     void CheckBinaryInstructionTypes(BinaryInstruction& inst);
     void CheckBooleanInstructionTypes(BinaryInstruction& inst);
     void CheckArithmeticType(Type* type, const std::string& typeDescription, const SourcePos& sourcePos);
+    void CheckArithmeticOrBooleanType(Type* type, const std::string& typeDescription, const SourcePos& sourcePos);
     void CheckArithmeticOrPointerType(Type* type, const std::string& typeDescription, const SourcePos& sourcePos);
     void CheckIntegerType(Type* type, const std::string& typeDescription, const SourcePos& sourcePos);
     void CheckIntegerOrBooleanType(Type* type, const std::string& typeDescription, const SourcePos& sourcePos);
@@ -127,6 +128,14 @@ void VerifierVisitor::CheckArithmeticType(Type* type, const std::string& typeDes
     if (!type->IsArithmeticType())
     {
         Error("type check error: arithmetic type expected, note: " + typeDescription + " is '" + type->Name() + "'", sourcePos, GetContext());
+    }
+}
+
+void VerifierVisitor::CheckArithmeticOrBooleanType(Type* type, const std::string& typeDescription, const SourcePos& sourcePos)
+{
+    if (!type->IsArithmeticType() && !type->IsBooleanType())
+    {
+        Error("type check error: arithmetic or Boolean type expected, note: " + typeDescription + " is '" + type->Name() + "'", sourcePos, GetContext());
     }
 }
 
@@ -467,8 +476,8 @@ void VerifierVisitor::Visit(ZeroExtendInstruction& inst)
 
 void VerifierVisitor::Visit(TruncateInstruction& inst)
 {
-    CheckIntegerType(inst.Operand()->GetType(), "operand type", inst.GetSourcePos());
-    CheckIntegerOrBooleanType(inst.Result()->GetType(), "result type", inst.GetSourcePos());
+    CheckArithmeticType(inst.Operand()->GetType(), "operand type", inst.GetSourcePos());
+    CheckArithmeticOrBooleanType(inst.Result()->GetType(), "result type", inst.GetSourcePos());
     if (inst.Result()->GetType()->Size() >= inst.Operand()->GetType()->Size() && !inst.Result()->GetType()->IsBooleanType())
     {
         Error("code verification error: result type width expected to be less than operand type width", inst.GetSourcePos(), GetContext());

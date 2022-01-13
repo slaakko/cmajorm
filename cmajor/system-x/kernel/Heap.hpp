@@ -6,12 +6,12 @@
 #ifndef CMSX_KERNEL_HEAP_INCLUDED
 #define CMSX_KERNEL_HEAP_INCLUDED
 #include <system-x/kernel/Api.hpp>
-#include <system-x/machine/Memory.hpp>
+#include <system-x/machine/Processor.hpp>
 #include <stdint.h>
 
 namespace cmsx::kernel {
 
-CMSX_KERNEL_API void DumpHeap(cmsx::machine::Memory& memory, uint64_t freeAddr);
+CMSX_KERNEL_API void DumpHeap(cmsx::machine::Processor& processor, uint64_t freeAddr);
 
 } // namespace cmsx::kernel
 

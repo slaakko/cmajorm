@@ -16,7 +16,7 @@ enum class ConsoleColor : uint8_t
     darkGray = 8u, blue = 9u, green = 10u, cyan = 11u, red = 12u, magenta = 13u, yellow = 14u, white = 15u
 };
 
-Color GetColor(ConsoleColor consoleColor);
+WING_API Color GetColor(ConsoleColor consoleColor);
 
 } } // cmajor::wing
 

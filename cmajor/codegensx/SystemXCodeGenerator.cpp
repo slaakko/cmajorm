@@ -238,22 +238,6 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
         emitter->SetIrObject(localVariable, allocaInst);
         lastAlloca = allocaInst;
     }
-    bool byValueComplexParams = false;
-    for (int i = 0; i < np; ++i)
-    {
-        ParameterSymbol* parameter = functionSymbol->Parameters()[i];
-        if (parameter->GetType()->IsClassTypeSymbol() ||
-            (parameter->GetType()->GetSymbolType() == SymbolType::classDelegateTypeSymbol) ||
-            (parameter->GetType()->GetSymbolType() == SymbolType::interfaceTypeSymbol))
-        {
-            byValueComplexParams = true;
-            break;
-        }
-    }
-    if (byValueComplexParams)
-    {
-        emitter->CreateSave();
-    }
     for (int i = 0; i < np; ++i)
     {
         void* arg = emitter->GetFunctionArgument(function, i);

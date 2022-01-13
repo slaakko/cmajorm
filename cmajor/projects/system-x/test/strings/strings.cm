@@ -1,0 +1,19 @@
+using System;
+
+string MakeString()
+{
+	string s;
+	uint n = 16 * (RandomNumber(16) + 1);
+	for (uint i = 0; i < n; ++i)
+	{
+		byte x = cast<byte>(i);
+		s.Append(ToHexString(x));
+	}
+	return s;
+}
+
+void main()
+{
+	string a = MakeString();
+	write(1, a.Chars(), a.Length());
+}

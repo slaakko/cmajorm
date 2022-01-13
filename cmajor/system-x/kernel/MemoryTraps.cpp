@@ -13,11 +13,11 @@ namespace cmsx::kernel {
 class TrapMemoryPageSizeHandler : public TrapHandler
 {
 public:
-    uint64_t HandleTrap(cmsx::machine::Machine& machine, uint64_t ax, uint64_t bx, uint64_t cx, uint64_t dx) override;
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
     std::string TrapName() const { return "trap_memory_page_size"; }
 };
 
-uint64_t TrapMemoryPageSizeHandler::HandleTrap(cmsx::machine::Machine& machine, uint64_t ax, uint64_t bx, uint64_t cx, uint64_t dx)
+uint64_t TrapMemoryPageSizeHandler::HandleTrap(cmsx::machine::Processor& processor)
 {
     uint64_t memoryPageSize = cmsx::machine::pageSize;
     return memoryPageSize;
@@ -26,80 +26,76 @@ uint64_t TrapMemoryPageSizeHandler::HandleTrap(cmsx::machine::Machine& machine, 
 class TrapHeapStartHandler : public TrapHandler
 {
 public:
-    uint64_t HandleTrap(cmsx::machine::Machine& machine, uint64_t ax, uint64_t bx, uint64_t cx, uint64_t dx) override;
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
     std::string TrapName() const { return "trap_heap_start"; }
 };
 
-uint64_t TrapHeapStartHandler::HandleTrap(cmsx::machine::Machine& machine, uint64_t ax, uint64_t bx, uint64_t cx, uint64_t dx)
+uint64_t TrapHeapStartHandler::HandleTrap(cmsx::machine::Processor& processor)
 {
-    Process* currentProcess = ProcessManager::Instance().CurrentProcess();
-    if (currentProcess)
-    {
-        return static_cast<uint64_t>(currentProcess->HeapStartAddress());
-    }
-    else
-    {
-        return static_cast<uint64_t>(-1);
-    }
+    cmsx::machine::Process* currentProcess = processor.CurrentProcess();
+    return static_cast<uint64_t>(currentProcess->HeapStartAddress());
 }
 
 class TrapHeapLengthHandler : public TrapHandler
 {
 public:
-    uint64_t HandleTrap(cmsx::machine::Machine& machine, uint64_t ax, uint64_t bx, uint64_t cx, uint64_t dx) override;
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
     std::string TrapName() const { return "trap_heap_length"; }
 };
 
-uint64_t TrapHeapLengthHandler::HandleTrap(cmsx::machine::Machine& machine, uint64_t ax, uint64_t bx, uint64_t cx, uint64_t dx)
+uint64_t TrapHeapLengthHandler::HandleTrap(cmsx::machine::Processor& processor)
 {
-    Process* currentProcess = ProcessManager::Instance().CurrentProcess();
-    if (currentProcess)
-    {
-        return static_cast<uint64_t>(currentProcess->HeapLength());
-    }
-    else
-    {
-        return static_cast<uint64_t>(-1);
-    }
+    cmsx::machine::Process* currentProcess = processor.CurrentProcess();
+    return static_cast<uint64_t>(currentProcess->HeapLength());
 }
 
 class TrapAllocateMemoryPagesHandler : public TrapHandler
 {
 public:
-    uint64_t HandleTrap(cmsx::machine::Machine& machine, uint64_t ax, uint64_t bx, uint64_t cx, uint64_t dx) override;
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
     std::string TrapName() const { return "trap_allocate_memory_pages"; }
 };
 
-uint64_t TrapAllocateMemoryPagesHandler::HandleTrap(cmsx::machine::Machine& machine, uint64_t ax, uint64_t bx, uint64_t cx, uint64_t dx)
+uint64_t TrapAllocateMemoryPagesHandler::HandleTrap(cmsx::machine::Processor& processor)
 {
-    Process* currentProcess = ProcessManager::Instance().CurrentProcess();
-    if (currentProcess)
+    try
     {
-        int32_t numPages = static_cast<int32_t>(ax);
+        uint64_t rv = processor.Regs().GetSpecial(cmsx::machine::rV);
+        cmsx::machine::Process* currentProcess = processor.CurrentProcess();
+        int32_t numPages = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
         if (numPages >= 0)
         {
             int64_t amountAllocated = cmsx::machine::pageSize * numPages;
             int64_t start = currentProcess->HeapStartAddress();
             int64_t length = currentProcess->HeapLength() + amountAllocated;
-            machine.Mem().AllocateRange(start, length);
+            processor.GetMachine()->Mem().AllocateRange(rv, start, length);
             currentProcess->SetHeapLength(length);
             return static_cast<uint64_t>(amountAllocated);
         }
+        else
+        {
+            throw SystemError(EPARAM, "invalid number of pages");
+        }
     }
-    return static_cast<uint64_t>(-1);
+    catch (const SystemError& error)
+    {
+        Process* currentProcess = static_cast<Process*>(processor.CurrentProcess());
+        currentProcess->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
 }
 
 class TrapDumpHeapHandler : public TrapHandler
 {
 public:
-    uint64_t HandleTrap(cmsx::machine::Machine& machine, uint64_t ax, uint64_t bx, uint64_t cx, uint64_t dx) override;
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
     std::string TrapName() const { return "trap_dump_heap"; }
 };
 
-uint64_t TrapDumpHeapHandler::HandleTrap(cmsx::machine::Machine& machine, uint64_t ax, uint64_t bx, uint64_t cx, uint64_t dx)
+uint64_t TrapDumpHeapHandler::HandleTrap(cmsx::machine::Processor& processor)
 {
-    uint64_t freeAddr = ax;
-    DumpHeap(machine.Mem(), freeAddr);
+    uint64_t freeAddr = processor.Regs().Get(cmsx::machine::regAX);
+    DumpHeap(processor, freeAddr);
     return 0;
 }
 

@@ -6,6 +6,8 @@
 #define _CRT_RAND_S
 #include <system-x/kernel/TrapRandom.hpp>
 #include <system-x/kernel/Trap.hpp>
+#include <system-x/kernel/Error.hpp>
+#include <system-x/kernel/Process.hpp>
 #include <stdlib.h>
 
 namespace cmsx::kernel {
@@ -13,19 +15,31 @@ namespace cmsx::kernel {
 class TrapRandomSeedHandler : public TrapHandler
 {
 public:
-    uint64_t HandleTrap(cmsx::machine::Machine& machine, uint64_t ax, uint64_t bx, uint64_t cx, uint64_t dx) override;
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
     std::string TrapName() const { return "trap_random_seed"; }
 };
 
-uint64_t TrapRandomSeedHandler::HandleTrap(cmsx::machine::Machine& machine, uint64_t ax, uint64_t bx, uint64_t cx, uint64_t dx)
+uint64_t TrapRandomSeedHandler::HandleTrap(cmsx::machine::Processor& processor)
 {
-    unsigned int seed = 0;
-    errno_t error = rand_s(&seed);
-    if (error != 0)
+    try
     {
+        unsigned int seed = 0;
+        errno_t error = rand_s(&seed);
+        if (error == 0)
+        {
+            return static_cast<uint64_t>(seed);
+        }
+        else
+        {
+            throw SystemError(EFAIL, "rand_s failed");
+        }
+    }
+    catch (const SystemError& error)
+    {
+        Process* process = static_cast<Process*>(processor.CurrentProcess());
+        process->SetError(error);
         return static_cast<uint64_t>(-1);
     }
-    return static_cast<uint64_t>(seed);
 }
 
 void InitTrapRandom()

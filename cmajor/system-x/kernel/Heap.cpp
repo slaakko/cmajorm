@@ -32,11 +32,11 @@ void Print(uint64_t a, uint64_t x, const std::string& name, CodeFormatter& forma
     formatter.WriteLine("#" + ToHexString(a) + ": " + name + ": #" + ToHexString(x));
 }
 
-void DumpHeap(cmsx::machine::Memory& memory, uint64_t freeAddr)
+void DumpHeap(cmsx::machine::Processor& processor, uint64_t freeAddr)
 {
     std::ofstream file(HeapLogFilePath());
     CodeFormatter formatter(file);
-    Process* currentProcess = ProcessManager::Instance().CurrentProcess();
+    cmsx::machine::Process* currentProcess = processor.CurrentProcess();
     if (currentProcess)
     {
         int64_t heapStart = currentProcess->HeapStartAddress();
@@ -44,14 +44,15 @@ void DumpHeap(cmsx::machine::Memory& memory, uint64_t freeAddr)
         int64_t heapLength = currentProcess->HeapLength();
         formatter.WriteLine("heap length: #" + ToHexString(static_cast<uint64_t>(heapLength)));
     }
-    uint64_t next = memory.ReadOcta(freeAddr, cmsx::machine::Protection::read);
+    uint64_t rv = processor.Regs().GetSpecial(cmsx::machine::rV);
+    uint64_t next = processor.GetMachine()->Mem().ReadOcta(rv, freeAddr, cmsx::machine::Protection::read);
     Print(freeAddr, next, "next", formatter);
-    uint64_t size = memory.ReadOcta(freeAddr + 8, cmsx::machine::Protection::read);
+    uint64_t size = processor.GetMachine()->Mem().ReadOcta(rv, freeAddr + 8, cmsx::machine::Protection::read);
     Print(freeAddr + 8, size, "size", formatter);
     while (next != freeAddr)
     {
-        uint64_t n = memory.ReadOcta(next, cmsx::machine::Protection::read);
-        uint64_t s = memory.ReadOcta(next + 8, cmsx::machine::Protection::read);
+        uint64_t n = processor.GetMachine()->Mem().ReadOcta(rv, next, cmsx::machine::Protection::read);
+        uint64_t s = processor.GetMachine()->Mem().ReadOcta(rv, next + 8, cmsx::machine::Protection::read);
         Print(next, n, "next", formatter);
         Print(next + 8, s, "size", formatter);
         next = n;

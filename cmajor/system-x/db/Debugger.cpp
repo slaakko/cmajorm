@@ -13,8 +13,15 @@ DebuggerObserver::~DebuggerObserver()
 {
 }
 
-Debugger::Debugger(cmsx::machine::Machine& machine_) : machine(machine_), state(DebuggerState::idle), exiting(false), commandAvailable(false), observer(nullptr)
+Debugger::Debugger(cmsx::machine::Machine* machine_, cmsx::kernel::Process* process_) : 
+    machine(machine_), 
+    process(process_), 
+    observer(nullptr), 
+    state(DebuggerState::idle), 
+    exiting(false), 
+    commandAvailable(false)
 {
+    process->SetDebugger(this);
 }
 
 void Debugger::SetObserver(DebuggerObserver* observer_)
@@ -30,9 +37,8 @@ void Debugger::Run()
         {
             throw std::runtime_error("debugger not ready");
         }
-        machine.GetProcessor().SetDebugger(this);
         state = DebuggerState::started;
-        machine.GetProcessor().Run();
+        machine->Start();
     }
     catch (const std::exception& ex)
     {
@@ -47,19 +53,16 @@ void Debugger::Run()
 void Debugger::Stop()
 {
     std::unique_lock<std::mutex> lock(mtx);
+    machine->SetExiting();
     exiting = true;
-    cmsx::kernel::Process* currentProcess = cmsx::kernel::ProcessManager::Instance().CurrentProcess();
-    if (currentProcess)
-    {
-        currentProcess->SetExitCode(exit_code_stop);
-    }
-    machine.GetProcessor().Exit();
+    process->SetExitCode(exit_code_stop);
     Release();
 }
 
 void Debugger::SingleStep()
 {
     std::unique_lock<std::mutex> lock(mtx);
+    machine->CheckExceptions();
     if (state != DebuggerState::waiting_for_command)
     {
         throw std::runtime_error("debugger not ready");
@@ -72,12 +75,15 @@ void Debugger::SingleStep()
 void Debugger::StepOver()
 {
     std::unique_lock<std::mutex> lock(mtx);
+    machine->CheckExceptions();
     if (state != DebuggerState::waiting_for_command)
     {
         throw std::runtime_error("debugger not ready");
     }
-    uint64_t pc = machine.Regs().GetPC();
-    uint8_t opc = machine.Mem().ReadByte(pc, cmsx::machine::Protection::read);
+    cmsx::machine::Processor* processor = process->GetProcessor();
+    uint64_t pc = processor->Regs().GetPC();
+    uint64_t rv = processor->Regs().GetSpecial(cmsx::machine::rV);
+    uint8_t opc = machine->Mem().ReadByte(rv, pc, cmsx::machine::Protection::read);
     switch (opc)
     {
         case cmsx::machine::CALL:
@@ -102,6 +108,7 @@ void Debugger::StepOver()
 void Debugger::Continue()
 {
     std::unique_lock<std::mutex> lock(mtx);
+    machine->CheckExceptions();
     if (state != DebuggerState::waiting_for_command)
     {
         throw std::runtime_error("debugger not ready");
@@ -125,7 +132,8 @@ void Debugger::Intercept()
         {
             if (!breakpoints.empty())
             {
-                uint64_t pc = machine.Regs().GetPC();
+                cmsx::machine::Processor* processor = process->GetProcessor();
+                uint64_t pc = processor->Regs().GetPC();
                 if (breakpoints.find(pc) != breakpoints.cend())
                 {
                     WaitForCommand();
@@ -203,7 +211,6 @@ void Debugger::ToggleBreakpoint(uint64_t address)
     {
         AddBreakpoint(address);
     }
-
 }
 
 } // namespace cmsx::db

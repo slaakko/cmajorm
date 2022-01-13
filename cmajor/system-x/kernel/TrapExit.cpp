@@ -12,19 +12,15 @@ namespace cmsx::kernel {
 class TrapExitHandler : public TrapHandler
 {
 public:
-    uint64_t HandleTrap(cmsx::machine::Machine& machine, uint64_t ax, uint64_t bx, uint64_t cx, uint64_t dx) override;
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
     std::string TrapName() const { return "trap_exit"; }
 };
 
-uint64_t TrapExitHandler::HandleTrap(cmsx::machine::Machine& machine, uint64_t ax, uint64_t bx, uint64_t cx, uint64_t dx)
+uint64_t TrapExitHandler::HandleTrap(cmsx::machine::Processor& processor)
 {
-    uint8_t exitCode = static_cast<uint8_t>(ax);
-    Process* currentProces = ProcessManager::Instance().CurrentProcess();
-    if (currentProces)
-    {
-        currentProces->SetExitCode(exitCode);
-    }
-    machine.GetProcessor().Exit();
+    uint8_t exitCode = static_cast<uint8_t>(processor.Regs().Get(cmsx::machine::regAX));
+    cmsx::machine::Process* currentProcess = processor.CurrentProcess();
+    currentProcess->Exit(exitCode);
     return 0;
 }
 

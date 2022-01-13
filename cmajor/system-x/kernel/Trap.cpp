@@ -4,6 +4,7 @@
 // =================================
 
 #include <system-x/kernel/Trap.hpp>
+#include <system-x/kernel/Error.hpp>
 #include <system-x/machine/Interrupt.hpp>
 #include <system-x/machine/Machine.hpp>
 #include <system-x/machine/Registers.hpp>
@@ -23,7 +24,7 @@ class SoftwareInterruptHandler : public cmsx::machine::InterruptHandler
 {
 public:
     SoftwareInterruptHandler();
-    void HandleInterrupt(cmsx::machine::Machine& machine) override;
+    void HandleInterrupt(cmsx::machine::Processor& processor) override;
     void SetTrapHandler(uint8_t trap, TrapHandler* handler);
     TrapHandler* GetTrapHandler(uint8_t trap) const;
 private:
@@ -45,9 +46,9 @@ TrapHandler* SoftwareInterruptHandler::GetTrapHandler(uint8_t trap) const
     return trapHandlers[trap].get();
 }
 
-void SoftwareInterruptHandler::HandleInterrupt(cmsx::machine::Machine& machine)
+void SoftwareInterruptHandler::HandleInterrupt(cmsx::machine::Processor& processor)
 {
-    uint64_t trap = machine.Regs().GetSpecial(cmsx::machine::rX);
+    uint64_t trap = processor.Regs().GetSpecial(cmsx::machine::rX);
     uint8_t trapZ = static_cast<uint8_t>(trap);
     trap = trap >> 8;
     uint8_t trapY = static_cast<uint8_t>(trap);
@@ -58,21 +59,17 @@ void SoftwareInterruptHandler::HandleInterrupt(cmsx::machine::Machine& machine)
         TrapHandler* trapHandler = trapHandlers[trapY].get();
         if (trapHandler)
         {
-            uint64_t ax = machine.Regs().Get(cmsx::machine::regAX);
-            uint64_t bx = machine.Regs().Get(cmsx::machine::regBX);
-            uint64_t cx = machine.Regs().Get(cmsx::machine::regCX);
-            uint64_t dx = machine.Regs().Get(cmsx::machine::regDX);
-            ax = trapHandler->HandleTrap(machine, ax, bx, cx, dx);
-            machine.Regs().Set(cmsx::machine::regAX, ax);
+            uint64_t ax = trapHandler->HandleTrap(processor);
+            processor.Regs().Set(cmsx::machine::regAX, ax);
         }
         else
         {
-            throw std::runtime_error("no handler for TRAP #" + ToHexString(trapY));
+            throw SystemError(ENOTFOUND, "no handler for TRAP #" + ToHexString(trapY));
         }
     }
     else
     {
-        throw std::runtime_error("invalid TRAP #" + ToHexString(trap));
+        throw SystemError(EFAIL, "invalid TRAP #" + ToHexString(trap));
     }
 }
 

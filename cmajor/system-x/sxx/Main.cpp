@@ -4,7 +4,9 @@
 // =================================
 
 #include <system-x/machine/Machine.hpp>
+#include <system-x/sxx/Console.hpp>
 #include <system-x/kernel/Load.hpp>
+#include <system-x/kernel/Kernel.hpp>
 #include <system-x/kernel/ProcessManager.hpp>
 #include <soulng/util/InitDone.hpp>
 #include <sngxml/xpath/InitDone.hpp>
@@ -33,11 +35,44 @@ void DoneApplication()
     soulng::util::Done();
 }
 
+class ProcessObserver : public cmsx::machine::ProcessObserver
+{
+public:
+    ProcessObserver();
+    void ProcessStateChanged(cmsx::machine::Process* process) override;
+    void WaitProcessExit();
+private:
+    std::mutex mtx;
+    std::condition_variable processExitEvent;
+    bool exit;
+};
+
+ProcessObserver::ProcessObserver() : exit(false)
+{
+}
+
+void ProcessObserver::ProcessStateChanged(cmsx::machine::Process* process)
+{
+    if (process->State() == cmsx::machine::ProcessState::zombie)
+    {
+        exit = true;
+        processExitEvent.notify_one();
+    }
+}
+
+void ProcessObserver::WaitProcessExit()
+{
+    std::unique_lock<std::mutex> lock(mtx);
+    processExitEvent.wait(lock, [this] { return exit; });
+}
+
 int main(int argc, const char** argv)
 {
     try
     {
         InitApplication();
+        sxx::Console console;
+        cmsx::kernel::SetConsoleFiles(&console, &console);
         std::vector<std::string> args;
         std::vector<std::string> env;
         bool programFileSeen = false;
@@ -89,17 +124,20 @@ int main(int argc, const char** argv)
         {
             throw std::runtime_error("no program set");
         }
+        ProcessObserver observer;
         cmsx::machine::Machine machine;
-        cmsx::kernel::ProcessManager::Instance().SetMachine(&machine);
+        cmsx::kernel::Kernel::Instance().SetMachine(&machine);
+        cmsx::kernel::Kernel::Instance().Start();
         cmsx::kernel::Process* process = cmsx::kernel::ProcessManager::Instance().CreateProcess();
         process->SetFilePath(args[0]);
+        process->SetObserver(&observer);
         cmsx::kernel::Load(process, args, env, machine);
-        cmsx::kernel::ProcessManager::Instance().SetCurrentProcess(process);
         if (verbose)
         {
             std::cout << "running '" << args[0] << "'..." << std::endl;;
         }
-        machine.GetProcessor().Run();
+        machine.Start();
+        observer.WaitProcessExit();
         if (verbose)
         {
             uint8_t exitCode = 255;
@@ -107,7 +145,7 @@ int main(int argc, const char** argv)
             {
                 exitCode = process->ExitCode();
             }
-            std::cout << "'" << args[0] << "' exited with code " << exitCode << std::endl;
+            std::cout << "'" << args[0] << "' exited with code " << static_cast<int>(exitCode) << std::endl;
             std::cout << std::endl;
             std::chrono::steady_clock::duration userTime = process->UserTime();
             std::chrono::steady_clock::duration systemTime = process->SystemTime();
@@ -119,6 +157,8 @@ int main(int argc, const char** argv)
             std::cout << "total time:  " << DurationStr(totalTime) << std::endl;
         }
         cmsx::kernel::ProcessManager::Instance().DeleteProcess(process->Id());
+        cmsx::kernel::Kernel::Instance().Stop();
+        machine.Exit();
     }
     catch (const std::exception& ex)
     {

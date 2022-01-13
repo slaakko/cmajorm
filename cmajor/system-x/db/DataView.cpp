@@ -35,12 +35,14 @@ void DataRange::SetProcess(cmsx::kernel::Process* process_)
 
 int64_t DataSegmentDataRange::Start() const
 {
-    return GetProcess()->DataStartAddress();
+    cmsx::kernel::Region dataRegion = GetProcess()->GetRegionTable().GetRegion(cmsx::kernel::RegionId::data);
+    return dataRegion.Start();
 }
 
 int64_t DataSegmentDataRange::Length() const
 {
-    return GetProcess()->DataLength();
+    cmsx::kernel::Region dataRegion = GetProcess()->GetRegionTable().GetRegion(cmsx::kernel::RegionId::data);
+    return dataRegion.Length();
 }
 
 int64_t ArgumentsDataRange::Start() const
@@ -80,7 +82,7 @@ int64_t StackDataRange::Start() const
 
 int64_t StackDataRange::Length() const
 {
-    return GetMachine()->Regs().Get(cmsx::machine::regSP) - Start();
+    return GetProcess()->GetProcessor()->Regs().Get(cmsx::machine::regSP) - Start();
 }
 
 DataRanges::DataRanges()
@@ -293,13 +295,14 @@ void DataView::Measure(Graphics& graphics)
 
 void DataView::Paint(Graphics& graphics)
 {
+    uint64_t rv = dataRange->GetProcess()->RV();
     int64_t start = currentAddress;
     PointF origin;
     int64_t n = (dataRange->Start() + dataRange->Length()) - start;
     for (int64_t i = 0; i < n; i += 8)
     {
         int64_t address = start + i;
-        uint64_t value = dataRange->GetMachine()->Mem().ReadOcta(address, cmsx::machine::Protection::read);
+        uint64_t value = dataRange->GetMachine()->Mem().ReadOcta(rv, address, cmsx::machine::Protection::read);
         PrintValue(origin, graphics, address, value, addressBrush, octaBrush, byteBrush, charBrush);
         origin.Y = origin.Y + lineHeight;
     }

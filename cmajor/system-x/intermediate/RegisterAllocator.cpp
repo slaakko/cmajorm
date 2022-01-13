@@ -5,7 +5,7 @@
 
 #include <system-x/intermediate/RegisterAllocator.hpp>
 #include <system-x/intermediate/Context.hpp>
-#include <system-x/intermediate/AssemblyConfig.hpp>
+#include <system-x/machine/Config.hpp>
 #include <system-x/assembler/Constant.hpp>
 #include <system-x/machine/Registers.hpp>
 #include <stdexcept>
@@ -102,7 +102,7 @@ void Frame::ResolveCallFrames()
     }
 }
 
-RegisterPool::RegisterPool() : localRegisterCount(GetNumLocalRegs())
+RegisterPool::RegisterPool() : localRegisterCount(cmsx::machine::NumLocalRegs())
 {
     for (int i = 0; i < localRegisterCount; ++i)
     {

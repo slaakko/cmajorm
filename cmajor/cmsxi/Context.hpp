@@ -106,7 +106,7 @@ public:
     Instruction* CreateSwitch(Value* cond, BasicBlock* defaultDest);
     Instruction* CreateTrap(const std::vector<Value*>& args);
     Instruction* CreateNop();
-    Instruction* CreateSave();
+    //Instruction* CreateSave();
     GlobalVariable* GetOrInsertGlobal(const std::string& name, Type* type);
     GlobalVariable* CreateGlobalStringPtr(const std::string& stringValue);
     void SetCompileUnitId(const std::string& compileUnitId_);

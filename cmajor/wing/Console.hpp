@@ -60,13 +60,14 @@ public:
     ConsoleInputReadyEvent& ConsoleInputReady() { return consoleInputReady; }
     bool Eof() const { return eof; }
     const std::u32string& InputLine() const { return inputLine; }
+    void OutputChar(ConsoleColor textColor, ConsoleColor backColor, int handle, char32_t c);
+    void OutputLines();
 protected:
     void PaintContent(Graphics& graphics, const Rect& clipRect) override;
     void OnKeyDown(KeyEventArgs& args) override;
     void OnKeyPress(KeyPressEventArgs& args) override;
     virtual void OnConsoleInputReady();
 private:
-    void OutputChar(ConsoleColor textColor, ConsoleColor backColor, int handle, char32_t c);
     void AddColor(ConsoleColor color, std::vector<ColorCount>& colorLine);
     void PaintLineBackground(Graphics& graphics, const std::vector<ColorCount>& backColorLine, const PointF& origin);
     void DrawLineText(Graphics& graphics, const std::u32string& line, const std::vector<ColorCount>& textColorLine, const PointF& origin);

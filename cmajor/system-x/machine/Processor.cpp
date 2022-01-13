@@ -11,101 +11,108 @@
 
 namespace cmsx::machine {
 
-AddDurationFunc addUserTimeFunction;
-AddDurationFunc addSystemTimeFunction;
-
-void SetAddUserTimeFunc(AddDurationFunc addUserTimeFunc)
+ProcessObserver::~ProcessObserver()
 {
-    addUserTimeFunction = addUserTimeFunc;
 }
 
-void SetAddSystemTimeFunc(AddDurationFunc addSystemTimeFunc)
+Process::~Process()
 {
-    addSystemTimeFunction = addSystemTimeFunc;
 }
 
-void AddUserTime(std::chrono::steady_clock::duration userTime)
+Scheduler::~Scheduler()
 {
-    if (addUserTimeFunction)
-    {
-        addUserTimeFunction(userTime);
-    }
 }
 
-void AddSystemTime(std::chrono::steady_clock::duration systemTime)
+Processor::Processor() : id(0), machine(nullptr), currentProcess(nullptr)
 {
-    if (addSystemTimeFunction)
-    {
-        addSystemTimeFunction(systemTime);
-    }
 }
 
-Processor::Processor(Machine& machine_) : machine(machine_), debugger(nullptr), exiting(false), start(), end()
+void RunProcessor(Processor* processor)
 {
+    processor->Run();
+}
+
+void Processor::Start()
+{
+    thread = std::thread(RunProcessor, this);
+}
+
+void Processor::Stop()
+{
+    thread.join();
 }
 
 void Processor::Run()
 {
-    start = std::chrono::steady_clock::now();
-    uint64_t pc = machine.Regs().GetPC();
-    while (!exiting)
+    try
     {
-        if (debugger)
+        while (!machine->Exiting())
         {
-            debugger->Intercept();
-            if (exiting) break;
+            Scheduler* scheduler = machine->GetScheduler();
+            currentProcess = scheduler->GetRunnableProcess();
+            if (!currentProcess)
+            {
+                break;
+            }
+            start = std::chrono::steady_clock::now();
+            currentProcess->RestoreContext(*machine, registers);
+            currentProcess->SetRunning(this);
+            uint64_t pc = registers.GetPC();
+            while (currentProcess && currentProcess->State() == ProcessState::running)
+            {
+                Debugger* debugger = currentProcess->GetDebugger();
+                if (debugger)
+                {
+                    debugger->Intercept();
+                }
+                if (machine->Exiting()) break;
+                uint64_t prevPC = pc;
+                uint8_t x = 0;
+                uint8_t y = 0;
+                uint8_t z = 0;
+                Instruction* inst = FetchInstruction(pc, x, y, z);
+                inst->Execute(*this, x, y, z);
+                SetPC(inst, pc, prevPC);
+                CheckInterrupts();
+                pc = registers.GetPC();
+            }
         }
-        uint64_t prevPC = pc;
-        uint8_t x = 0;
-        uint8_t y = 0;
-        uint8_t z = 0;
-        Instruction* inst = FetchInstruction(pc, x, y, z);
-        inst->Execute(machine, x, y, z);
-        SetPC(inst, pc, prevPC);
-        CheckInterrupts();
-        pc = machine.Regs().GetPC();
     }
-    end = std::chrono::steady_clock::now();
-    AddUserTime(end - start);
-    if (debugger)
+    catch (const std::exception&)
     {
-        debugger->ProcessExit();
+        exception = std::current_exception();
     }
-}
-
-void Processor::Exit()
-{
-    exiting = true;
 }
 
 Instruction* Processor::FetchInstruction(uint64_t& pc, uint8_t& x, uint8_t& y, uint8_t& z)
 {
-    Memory& mem = machine.Mem();
-    uint8_t opCode = mem.ReadByte(pc, Protection::execute);
+    Memory& mem = machine->Mem();
+    uint64_t rv = registers.GetSpecial(rV);
+    uint8_t opCode = mem.ReadByte(rv, pc, Protection::execute);
     ++pc;
-    x = mem.ReadByte(pc, Protection::execute);
+    x = mem.ReadByte(rv, pc, Protection::execute);
     ++pc;
-    y = mem.ReadByte(pc, Protection::execute);
+    y = mem.ReadByte(rv, pc, Protection::execute);
     ++pc;
-    z = mem.ReadByte(pc, Protection::execute);
+    z = mem.ReadByte(rv, pc, Protection::execute);
     ++pc;
-    Instruction* inst = machine.GetInstruction(opCode);
+    Instruction* inst = machine->GetInstruction(opCode);
     return inst;
 }
 
 void Processor::SetPC(Instruction* inst, uint64_t pc, uint64_t prevPC)
 {
-    uint64_t regsPC = machine.Regs().GetPC();
+    uint64_t regsPC = registers.GetPC();
     if (!inst->IsJumpInstruction() && regsPC == prevPC)
     {
-        machine.Regs().SetPC(pc);
+        registers.SetPC(pc);
     }
-    machine.Regs().SetSpecial(rW, prevPC);
+    registers.SetSpecial(rW, prevPC);
 }
 
 void Processor::CheckInterrupts()
 {
-    uint64_t interruptBits = machine.Regs().GetInterruptBits();
+    uint64_t interruptBits = registers.GetInterruptBits();
     if (interruptBits)
     {
         for (int irq = 0; irq < 64; ++irq)
@@ -116,11 +123,17 @@ void Processor::CheckInterrupts()
                 InterruptHandler* handler = GetInterruptHandler(irq);
                 if (handler)
                 {
-                    std::chrono::steady_clock::time_point stop = std::chrono::steady_clock::now();
-                    AddUserTime(stop - start);
-                    handler->HandleInterrupt(machine);
-                    start = std::chrono::steady_clock::now();
-                    AddSystemTime(start - stop);
+                    stop = std::chrono::steady_clock::now();
+                    if (currentProcess)
+                    {
+                        currentProcess->AddUserTime(stop - start);
+                    }
+                    handler->HandleInterrupt(*this);
+                    if (currentProcess)
+                    {
+                        start = std::chrono::steady_clock::now();
+                        currentProcess->AddSystemTime(start - stop);
+                    }
                 }
                 else
                 {
@@ -133,7 +146,24 @@ void Processor::CheckInterrupts()
 
 void Processor::EnableInterrupts()
 {
-    machine.Regs().SetSpecial(rK, ALL_INTERRUPT_BITS);
+    registers.SetSpecial(rK, ALL_INTERRUPT_BITS);
+}
+
+void Processor::ResetCurrentProcess()
+{
+    start = std::chrono::steady_clock::now();
+    currentProcess->AddSystemTime(start - stop);
+    currentProcess->SaveContext(*machine, registers);
+    currentProcess->ResetProcessor();
+    currentProcess = nullptr;
+}
+
+void Processor::CheckException()
+{
+    if (exception)
+    {
+        std::rethrow_exception(exception);
+    }
 }
 
 } // cmsx::machine

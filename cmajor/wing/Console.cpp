@@ -138,6 +138,7 @@ Console::Console(ConsoleCreateParams& createParams) :
     eof(false),
     startInputCol(1)
 {
+    SetFixed();
     SetReadOnly();
     SetPadding(padding);
     ColorCharOutputMethod outputMethod;
@@ -166,16 +167,7 @@ void Console::Write(int handle, const std::string& text)
             throw std::runtime_error("console: invalid handle value " + std::to_string(handle) + " (must be 1 or 2)");
         }
     }
-    if (!Lines().empty())
-    {
-        int line = Lines().size();
-        int col = Lines().back()->length() + 1;
-        SetCaretLineCol(line, col);
-        SetTextExtent();
-        ScrollToCaret();
-        SetChanged();
-        Invalidate();
-    }
+    OutputLines();
 }
 
 void Console::StartReadLine()
@@ -346,6 +338,20 @@ void Console::OutputChar(ConsoleColor textColor, ConsoleColor backColor, int han
     }
 }
 
+void Console::OutputLines()
+{
+    if (!Lines().empty())
+    {
+        int line = Lines().size();
+        int col = Lines().back()->length();
+        SetCaretLineCol(line, col);
+        SetTextExtent();
+        ScrollToCaret();
+        SetChanged();
+        Invalidate();
+    }
+}
+
 void Console::AddColor(ConsoleColor color, std::vector<ColorCount>& colorLine)
 {
     if (colorLine.empty() || color != colorLine.back().color)
@@ -409,6 +415,13 @@ void Console::InsertChar(char32_t ch)
         inputLine.append(1, ch);
     }
     std::vector<std::unique_ptr<std::u32string>>& lines = Lines();
+    if (lines.empty())
+    {
+        AddLine(std::u32string());
+        std::vector<ColorCount> colorLine;
+        textColorLines.push_back(colorLine);
+        backColorLines.push_back(colorLine);
+    }
     std::u32string line = *lines[caretLine - 1];
     if (caretCol < line.length())
     {

@@ -41,7 +41,8 @@ private:
     void Measure(Graphics& graphics);
     void Paint(Graphics& graphics);
     void PrintReg(const PointF& origin, Graphics& graphics, const std::string& regName, const std::string& regValue);
-    cmsx::machine::Machine* machine;
+    //cmsx::machine::Machine* machine;
+    cmsx::kernel::Process* process;
     cmajor::wing::StringFormat stringFormat;
     float lineHeight;
     float charWidth;

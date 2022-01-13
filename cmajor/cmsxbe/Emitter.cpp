@@ -258,8 +258,7 @@ void* Emitter::CreateDefaultIrValueForULong()
 
 void* Emitter::CreateDefaultIrValueForFloat()
 {
-    return context->GetDefaultDoubleValue(); // float literals represented in MMIX internally as doubles
-    //return context->GetDefaultFloatValue();
+    return context->GetDefaultFloatValue();
 }
 
 void* Emitter::CreateDefaultIrValueForDouble()
@@ -359,8 +358,7 @@ void* Emitter::CreateIrValueForULong(uint64_t value)
 
 void* Emitter::CreateIrValueForFloat(float value)
 {
-    return context->GetDoubleValue(value); // float literals represented in MMIX internally as doubles
-    //return context->GetFloatValue(value);
+    return context->GetFloatValue(value);
 }
 
 void* Emitter::CreateIrValueForDouble(double value)
@@ -889,7 +887,7 @@ void* Emitter::CreateTrunc(void* operand, void* destinationType)
 
 void* Emitter::CreateFPTrunc(void* operand, void* destinationType)
 {
-    return context->CreateBitCast(static_cast<cmsxi::Value*>(operand), static_cast<cmsxi::Type*>(destinationType));
+    return context->CreateTruncate(static_cast<cmsxi::Value*>(operand), static_cast<cmsxi::Type*>(destinationType));
 }
 
 void* Emitter::CreateBitCast(void* operand, void* destinationType)
@@ -963,7 +961,8 @@ void* Emitter::CreateNop()
 
 void* Emitter::CreateSave()
 {
-    return context->CreateSave();
+    //return context->CreateSave();
+    return nullptr;
 }
 
 void* Emitter::CreateBeginTry()

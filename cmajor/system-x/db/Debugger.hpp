@@ -6,6 +6,8 @@
 #ifndef CMSX_DB_DEBUGGER_INCLUDED
 #define CMSX_DB_DEBUGGER_INCLUDED
 #include <system-x/machine/Debugger.hpp>
+#include <system-x/machine/Machine.hpp>
+#include <system-x/kernel/Process.hpp>
 #include <condition_variable>
 #include <set>
 
@@ -30,7 +32,7 @@ public:
 class Debugger : public cmsx::machine::Debugger
 {
 public:
-    Debugger(cmsx::machine::Machine& machine_);
+    Debugger(cmsx::machine::Machine* machine_, cmsx::kernel::Process* process_);
     void SetObserver(DebuggerObserver* observer_);
     void Run();
     void Stop();
@@ -47,7 +49,8 @@ public:
     void ProcessExit() override;
 private:
     void NotifyReady();
-    cmsx::machine::Machine& machine;
+    cmsx::machine::Machine* machine;
+    cmsx::kernel::Process* process;
     DebuggerObserver* observer;
     DebuggerState state;
     std::mutex mtx;

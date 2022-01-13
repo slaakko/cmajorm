@@ -22,11 +22,12 @@ public:
     ProcessManager& operator=(const ProcessManager&) = delete;
     ~ProcessManager();
     void SetMachine(cmsx::machine::Machine* machine_);
+    cmsx::machine::Machine* GetMachine() const { return machine; }
+    void Start();
+    void Stop();
     Process* CreateProcess();
     Process* GetProcess(int32_t pid) const;
     void DeleteProcess(int32_t pid);
-    Process* CurrentProcess() const { return currentProcess; }
-    void SetCurrentProcess(Process* currentProcess_) { currentProcess = currentProcess_; }
 private:
     ProcessManager();
     static std::unique_ptr<ProcessManager> instance;
@@ -34,8 +35,6 @@ private:
     int maxProcs;
     int32_t nextProcessId;
     std::vector<std::unique_ptr<Process>> processTable;
-    Process* currentProcess;
-    ProcessList runnableProcesses;
 };
 
 CMSX_KERNEL_API void InitProcessManager();
