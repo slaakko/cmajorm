@@ -1057,7 +1057,7 @@ void SystemXCodeGenerator::Visit(BoundCatchStatement& boundCatchStatement)
 
 void SystemXCodeGenerator::Visit(BoundRethrowStatement& boundRethrowStatement)
 {
-    // TODO???
+/*  TODO
     if (generateLineNumbers)
     {
         emitter->SetCurrentSourceSpan(boundRethrowStatement.GetSpan().line, 0, 0);
@@ -1070,6 +1070,7 @@ void SystemXCodeGenerator::Visit(BoundRethrowStatement& boundRethrowStatement)
     void* callee = emitter->GetOrInsertFunction("do_resume", resumeFunctionType, false);
     emitter->CreateCall(callee, std::vector<void*>());
     emitter->CreateRetVoid();
+*/
 }
 
 void SystemXCodeGenerator::Visit(BoundParameter& boundParameter)
@@ -1513,6 +1514,8 @@ void SystemXCodeGenerator::CreateCleanup()
 
 void SystemXCodeGenerator::GenerateCodeForCleanups()
 {
+//  TODO!!!!
+/*
     for (const std::unique_ptr<Cleanup>& cleanup : cleanups)
     {
         emitter->SetCurrentBasicBlock(cleanup->cleanupBlock);
@@ -1525,6 +1528,7 @@ void SystemXCodeGenerator::GenerateCodeForCleanups()
         emitter->CreateCall(callee, std::vector<void*>());
         emitter->CreateRetVoid();
     }
+*/
 }
 
 } } // namespace cmajor::codegensx

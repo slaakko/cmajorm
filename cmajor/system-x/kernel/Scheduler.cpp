@@ -50,6 +50,7 @@ void Scheduler::AddRunnableProcess(cmsx::machine::Process* runnableProcess)
     {
         runnableProcess->SetState(cmsx::machine::ProcessState::runnable);
         runnableProcesses.push_back(runnableProcess);
+        queueNotEmptyOrExiting.notify_all();
     }
 }
 
@@ -77,7 +78,8 @@ ClockInterruptHandler::ClockInterruptHandler()
 
 void ClockInterruptHandler::HandleInterrupt(cmsx::machine::Processor& processor)
 {
-    if (processor.CurrentProcess() && processor.CurrentProcess()->State() != cmsx::machine::ProcessState::zombie)
+    cmsx::machine::Process* currentProcess = processor.CurrentProcess();
+    if (currentProcess && currentProcess->State() != cmsx::machine::ProcessState::zombie && currentProcess->State() != cmsx::machine::ProcessState::asleep)
     {
         Scheduler::Instance().AddRunnableProcess(processor.CurrentProcess());
         processor.ResetCurrentProcess();

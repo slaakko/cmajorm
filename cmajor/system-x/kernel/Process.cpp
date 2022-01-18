@@ -23,6 +23,10 @@ void Process::SetState(cmsx::machine::ProcessState state_)
     if (state != state_)
     {
         state = state_;
+        if (state == cmsx::machine::ProcessState::asleep)
+        {
+            sleepStartTime = std::chrono::steady_clock::now();
+        }
         if (observer)
         {
             observer->ProcessStateChanged(this);
@@ -64,6 +68,12 @@ void Process::RemoveFromParent()
 void Process::AddUserTime(std::chrono::steady_clock::duration duration)
 {
     userTime = userTime + duration;
+}
+
+void Process::AddSleepTime()
+{
+    std::chrono::steady_clock::time_point sleepEndTime = std::chrono::steady_clock::now();
+    sleepTime = sleepTime + (sleepEndTime - sleepStartTime);
 }
 
 void Process::AddSystemTime(std::chrono::steady_clock::duration duration)

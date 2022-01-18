@@ -1,10 +1,11 @@
 using System;
+using System.Collections;
 
 string MakeString()
 {
 	string s;
-	uint n = 16 * (RandomNumber(16) + 1);
-	for (uint i = 0; i < n; ++i)
+	uint n = 16u * (RandomNumber(16u) + 1u);
+	for (uint i = 0u; i < n; ++i)
 	{
 		byte x = cast<byte>(i);
 		s.Append(ToHexString(x));
@@ -14,6 +15,42 @@ string MakeString()
 
 void main()
 {
-	string a = MakeString();
-	write(1, a.Chars(), a.Length());
+	List<string> list;
+	list.Resize(100);
+	for (int i = 0; i < 1000; ++i)
+	{
+		uint c = RandomNumber(3u);
+		switch (c)
+		{
+			case 0u:
+			{
+				uint x = RandomNumber(100u);
+				list[x] = MakeString();
+				break;
+			}
+			case 1u:
+			{
+				uint x = RandomNumber(100u);
+				list[x].Clear();
+				break;
+			}
+			case 2u:
+			{
+				uint x = RandomNumber(100u);
+				uint y = RandomNumber(100u);
+				uint z = RandomNumber(100u);
+				list[z] = list[x] + list[y];
+				break;
+			}
+		}
+	}
+	for (int i = 0; i < 100; ++i)
+	{
+		if (i < list.Count())
+		{
+			string s = ToString(list[i].Length());
+			s.Append("\n");
+			write(1, s.Chars(), s.Length());
+		}
+	}
 }

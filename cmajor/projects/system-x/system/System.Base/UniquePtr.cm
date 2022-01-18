@@ -79,22 +79,34 @@ namespace System
         }
         public inline nothrow T* operator->()
         {
-            #assert(ptr != null);
+            if (ptr == null)
+            {
+                ThrowNullPointerException();
+            }
             return ptr;
         }
         public inline nothrow const T* operator->() const
         {
-            #assert(ptr != null);
+            if (ptr == null)
+            {
+                ThrowNullPointerException();
+            }
             return ptr;
         }
         public inline nothrow T& operator*()
         {
-            #assert(ptr != null);
+            if (ptr == null)
+            {
+                ThrowNullPointerException();
+            }
             return *ptr;
         }
         public inline nothrow const T& operator*() const
         {
-            #assert(ptr != null);
+            if (ptr == null)
+            {
+                ThrowNullPointerException();
+            }
             return *ptr;
         }
         public nothrow void Swap(Self& that)

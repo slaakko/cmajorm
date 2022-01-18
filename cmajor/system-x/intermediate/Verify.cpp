@@ -72,6 +72,7 @@ private:
     void CheckFloatingPointType(Type* type, const std::string& typeDescription, const SourcePos& sourcePos);
     void CheckPointerType(Type* type, const std::string& typeDescription, const SourcePos& sourcePos);
     void CheckArithmeticPointerOrBooleanType(Type* type, const std::string& typeDescription, const SourcePos& sourcePos);
+    void CheckArithmeticPointerFunctionOrBooleanType(Type* type, const std::string& typeDescription, const SourcePos& sourcePos);
     void CheckRegValue(Value* value, const SourcePos& sourcePos);
     void CheckValueInstruction(ValueInstruction* valueInstruction);
     void CheckUnaryInstuction(UnaryInstruction* unaryInstruction);
@@ -184,6 +185,14 @@ void VerifierVisitor::CheckArithmeticPointerOrBooleanType(Type* type, const std:
     if (!type->IsBooleanType() && !type->IsArithmeticType() && !type->IsPointerType())
     {
         Error("type check exception: Boolean, arithmetic or pointer type expected, note: " + typeDescription + " is '" + type->Name() + "'", sourcePos, GetContext());
+    }
+}
+
+void VerifierVisitor::CheckArithmeticPointerFunctionOrBooleanType(Type* type, const std::string& typeDescription, const SourcePos& sourcePos)
+{
+    if (!type->IsBooleanType() && !type->IsArithmeticType() && !type->IsPointerType() && !type->IsFunctionType())
+    {
+        Error("type check exception: Boolean, arithmetic, pointer or function type expected, note: " + typeDescription + " is '" + type->Name() + "'", sourcePos, GetContext());
     }
 }
 
@@ -489,8 +498,8 @@ void VerifierVisitor::Visit(TruncateInstruction& inst)
 
 void VerifierVisitor::Visit(BitcastInstruction& inst)
 {
-    CheckArithmeticPointerOrBooleanType(inst.Operand()->GetType(), "operand type", inst.GetSourcePos());
-    CheckArithmeticPointerOrBooleanType(inst.Result()->GetType(), "operand type", inst.GetSourcePos());
+    CheckArithmeticPointerFunctionOrBooleanType(inst.Operand()->GetType(), "operand type", inst.GetSourcePos());
+    CheckArithmeticPointerFunctionOrBooleanType(inst.Result()->GetType(), "result type", inst.GetSourcePos());
     if (inst.Result()->GetType()->Size() != inst.Operand()->GetType()->Size())
     {
         Error("code verification error: result type width expected to be same as operand type width", inst.GetSourcePos(), GetContext());
@@ -709,7 +718,7 @@ void VerifierVisitor::Visit(ElemAddrInstruction& inst)
         if (inst.Index()->IsIntegerValue())
         {
             int64_t index = inst.Index()->GetIntegerValue();
-            if (index < 0 || index >= arrayType->ElementCount())
+            if (index < 0 || index > arrayType->ElementCount())
             {
                 Error("code verification error: invalid index", inst.GetSourcePos(), GetContext());
             }

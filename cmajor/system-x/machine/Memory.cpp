@@ -269,6 +269,7 @@ void Memory::FreeMemory(uint64_t rv)
 
 void Memory::AllocateRange(uint64_t rv, uint64_t start, uint64_t length)
 {
+    if (length == 0) return;
     std::lock_guard<std::recursive_mutex> lock(machine.Lock());
     if (rv >= maxProcs)
     {
@@ -282,8 +283,8 @@ void Memory::AllocateRange(uint64_t rv, uint64_t start, uint64_t length)
     }
     auto& translationMap = *translationMapPtr;
     int64_t s = MakePageNumber(start);
-    int64_t e = MakePageNumber(start + length);
-    int64_t n = e - s + 1;
+    int64_t e = 1 + MakePageNumber(start + length - 1);
+    int64_t n = e - s;
     for (int64_t i = 0; i < n; ++i)
     {
         int64_t pageNumber = s + i;
@@ -298,6 +299,7 @@ void Memory::AllocateRange(uint64_t rv, uint64_t start, uint64_t length)
 
 void Memory::FreeRange(uint64_t rv, uint64_t start, uint64_t length)
 {
+    if (length == 0) return;
     std::lock_guard<std::recursive_mutex> lock(machine.Lock());
     if (rv >= maxProcs)
     {
@@ -311,8 +313,8 @@ void Memory::FreeRange(uint64_t rv, uint64_t start, uint64_t length)
     }
     auto& translationMap = *translationMapPtr;
     int64_t s = MakePageNumber(start);
-    int64_t e = MakePageNumber(start + length);
-    int64_t n = e - s + 1;
+    int64_t e = 1 + MakePageNumber(start + length - 1);
+    int64_t n = e - s;
     for (int64_t i = 0; i < n; ++i)
     {
         int64_t pageNumber = s + i;
@@ -328,6 +330,7 @@ void Memory::FreeRange(uint64_t rv, uint64_t start, uint64_t length)
 
 void Memory::CopyRange(uint64_t fromRV, uint64_t toRV, uint64_t start, uint64_t length)
 {
+    if (length == 0) return;
     std::lock_guard<std::recursive_mutex> lock(machine.Lock());
     auto& fromTranslationMapPtr = translationMaps[fromRV];
     if (!fromTranslationMapPtr)
@@ -342,8 +345,8 @@ void Memory::CopyRange(uint64_t fromRV, uint64_t toRV, uint64_t start, uint64_t 
     }
     auto& toTranslationMap = *toTranslationMapPtr;
     int64_t s = MakePageNumber(start);
-    int64_t e = MakePageNumber(start + length);
-    int64_t n = e - s + 1;
+    int64_t e = 1 + MakePageNumber(start + length - 1);
+    int64_t n = e - s;
     for (int64_t i = 0; i < n; ++i)
     {
         int64_t pageNumber = s + i;
@@ -363,6 +366,7 @@ void Memory::CopyRange(uint64_t fromRV, uint64_t toRV, uint64_t start, uint64_t 
 
 void Memory::ShareRange(uint64_t fromRV, uint64_t toRV, uint64_t start, uint64_t length)
 {
+    if (length == 0) return;
     std::lock_guard<std::recursive_mutex> lock(machine.Lock());
     auto& fromTranslationMapPtr = translationMaps[fromRV];
     if (!fromTranslationMapPtr)
@@ -377,8 +381,8 @@ void Memory::ShareRange(uint64_t fromRV, uint64_t toRV, uint64_t start, uint64_t
     }
     auto& toTranslationMap = *toTranslationMapPtr;
     int64_t s = MakePageNumber(start);
-    int64_t e = MakePageNumber(start + length);
-    int64_t n = e - s + 1;
+    int64_t e = 1 + MakePageNumber(start + length - 1);
+    int64_t n = e - s;
     for (int64_t i = 0; i < n; ++i)
     {
         int64_t pageNumber = s + i;

@@ -290,6 +290,11 @@ void SetInstruction::Assemble(Assembler& assembler)
             {
                 assembler.EmitSetPureRegValue(currentInst->Operands()[0], currentInst->Operands()[1]);
             }
+            else if (currentInst->Operands()[1].IsSymbolValue())
+            {
+                cmsx::object::Symbol* symbol = currentInst->Operands()[1].GetSymbol();
+                assembler.EmitAbsoluteRegisterValue("X", currentInst->Operands()[0], symbol);
+            }
             else
             {
                 assembler.Error(currentInst->GetOpCode()->Name() + " Y operand must be a register or pure value", currentInst->GetSourcePos());

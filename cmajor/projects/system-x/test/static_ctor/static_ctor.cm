@@ -1,0 +1,29 @@
+using System;
+
+class Foo
+{
+	public static Foo() : instance(new Foo())
+	{
+	}
+	public ~Foo()
+	{
+		string s = "~Foo called!\n";
+		write(1, s.Chars(), s.Length());
+	}
+	public static Foo& Instance() { return *instance; }
+	public void Print()
+	{
+		string s = ToString(x) + "\n";
+		write(1, s.Chars(), s.Length());
+	}
+	private Foo() : x(10)
+	{
+	}
+	private static UniquePtr<Foo> instance;
+	private int x;
+}
+
+void main()
+{
+	Foo.Instance().Print();
+}

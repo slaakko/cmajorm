@@ -1,0 +1,18 @@
+using System;
+
+void main()
+{
+	Date d = GetCurrentDate();
+	string sd = d.ToString() + "\n";
+	write(1, sd.Chars(), sd.Length());
+	DateTime dt = GetCurrentDateTime();
+	string dts = dt.ToString() + "\n";
+	write(1, dts.Chars(), dts.Length());
+    TimePoint start = System.Now();
+    Duration fiveSecs = Duration.FromSeconds(5);
+    sleep(fiveSecs.Rep());
+    TimePoint end = System.Now();
+    Duration dur = end - start;
+    string s = DurationStr(dur) + "\n";
+    write(1, s.Chars(), s.Length());
+}

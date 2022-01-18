@@ -148,6 +148,10 @@ const SourcePos& SimpleAssemblyCodeGenerator::GetSourcePos() const
 
 void SimpleAssemblyCodeGenerator::Visit(Function& function)
 {
+    if (function.Name() == "static_constructor_BinaryPropertyTable_D16E19032F35A54747EE26AEB0C5AC73FF4B29D8")
+    {
+        int x = 0;
+    }
     if (!function.IsDefined()) return;
     if (function.GetFlag(FunctionFlags::once))
     {

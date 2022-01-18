@@ -1,0 +1,48 @@
+using System;
+
+class Node
+{
+	public Node(const Pair<int, int>& value_) : value(value_)
+	{
+	}
+	public Pair<int, int>& Value()
+	{
+		return value;
+	}
+	private Pair<int, int> value;
+}
+
+class Iterator
+{
+	public Iterator(Node* node_) : node(node_)
+	{
+	}
+	public Pair<int, int>* operator->() 
+	{
+		return &(node->Value());
+	}
+	public Node* node;
+}
+
+Pair<Iterator, bool> Foo(const Iterator& it)
+{
+	Pair<Iterator, bool> p(it, true);
+	return p;
+}
+
+Node MakeNode(int x, int y)
+{
+	Pair<int, int> node(x, y);
+	return node;
+}
+
+void main()
+{
+	Node n = MakeNode(1, 10);
+	Iterator it(&n);
+	Pair<Iterator, bool> ib = Foo(it);
+	Iterator iterator = ib.first;
+	int x = iterator->second;
+	string s = ToString(x);
+	write(1, s.Chars(), s.Length());
+}

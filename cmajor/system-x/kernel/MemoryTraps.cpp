@@ -58,19 +58,27 @@ public:
 
 uint64_t TrapAllocateMemoryPagesHandler::HandleTrap(cmsx::machine::Processor& processor)
 {
+    Process* currentProcess = static_cast<Process*>(processor.CurrentProcess());
     try
     {
-        uint64_t rv = processor.Regs().GetSpecial(cmsx::machine::rV);
-        cmsx::machine::Process* currentProcess = processor.CurrentProcess();
+        uint64_t rv = currentProcess->RV();
         int32_t numPages = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
         if (numPages >= 0)
         {
-            int64_t amountAllocated = cmsx::machine::pageSize * numPages;
-            int64_t start = currentProcess->HeapStartAddress();
-            int64_t length = currentProcess->HeapLength() + amountAllocated;
-            processor.GetMachine()->Mem().AllocateRange(rv, start, length);
-            currentProcess->SetHeapLength(length);
-            return static_cast<uint64_t>(amountAllocated);
+            int64_t amountToAllocate = cmsx::machine::pageSize * numPages;
+            int64_t currentLength = currentProcess->HeapLength();
+            int64_t currentEnd = currentProcess->HeapStartAddress() + currentLength;
+            uint64_t newEnd = static_cast<uint64_t>(currentEnd) + static_cast<uint64_t>(amountToAllocate);
+            if (newEnd >= cmsx::machine::poolSegmentBaseAddress && newEnd < cmsx::machine::stackSegmentBaseAddress)
+            {
+                processor.GetMachine()->Mem().AllocateRange(rv, currentEnd, amountToAllocate);
+                currentProcess->SetHeapLength(currentLength + amountToAllocate);
+                return static_cast<uint64_t>(amountToAllocate);
+            }
+            else
+            {
+                throw SystemError(ELIMITEXCEEDED, "out of memory");
+            }
         }
         else
         {
@@ -79,7 +87,6 @@ uint64_t TrapAllocateMemoryPagesHandler::HandleTrap(cmsx::machine::Processor& pr
     }
     catch (const SystemError& error)
     {
-        Process* currentProcess = static_cast<Process*>(processor.CurrentProcess());
         currentProcess->SetError(error);
         return static_cast<uint64_t>(-1);
     }
@@ -95,7 +102,10 @@ public:
 uint64_t TrapDumpHeapHandler::HandleTrap(cmsx::machine::Processor& processor)
 {
     uint64_t freeAddr = processor.Regs().Get(cmsx::machine::regAX);
-    DumpHeap(processor, freeAddr);
+    int32_t tag = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regBX));
+    uint64_t ptr = processor.Regs().Get(cmsx::machine::regCX);
+    uint64_t size = processor.Regs().Get(cmsx::machine::regDX);
+    DumpHeap(processor, freeAddr, tag, ptr, size);
     return 0;
 }
 

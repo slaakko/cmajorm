@@ -12,14 +12,14 @@
 
 namespace cmsx::kernel {
 
-class TrapGetCurrentTimePointHandler : public TrapHandler
+class TrapCurrentTimePointHandler : public TrapHandler
 {
 public:
     uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
-    std::string TrapName() const { return "trap_get_current_time_point"; }
+    std::string TrapName() const { return "trap_current_time_point"; }
 };
 
-uint64_t TrapGetCurrentTimePointHandler::HandleTrap(cmsx::machine::Processor& processor)
+uint64_t TrapCurrentTimePointHandler::HandleTrap(cmsx::machine::Processor& processor)
 {
     Process* process = static_cast<Process*>(processor.CurrentProcess());
     try
@@ -49,6 +49,7 @@ uint64_t TrapSleepHandler::HandleTrap(cmsx::machine::Processor& processor)
         std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
         std::chrono::steady_clock::duration duration(static_cast<int64_t>(processor.Regs().Get(cmsx::machine::regAX)));
         std::chrono::steady_clock::time_point dueTime = now + duration;
+        processor.ResetCurrentProcess();
         Alarm alarm(process, dueTime);
         Clock::Instance().Schedule(alarm);
         return 0;
@@ -60,14 +61,14 @@ uint64_t TrapSleepHandler::HandleTrap(cmsx::machine::Processor& processor)
     }
 }
 
-class TrapGetCurrentDateHandler : public TrapHandler
+class TrapCurrentDateHandler : public TrapHandler
 {
 public:
     uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
-    std::string TrapName() const { return "trap_get_current_date"; }
+    std::string TrapName() const { return "trap_current_date"; }
 };
 
-uint64_t TrapGetCurrentDateHandler::HandleTrap(cmsx::machine::Processor& processor)
+uint64_t TrapCurrentDateHandler::HandleTrap(cmsx::machine::Processor& processor)
 {
     Process* process = static_cast<Process*>(processor.CurrentProcess());
     try
@@ -99,14 +100,14 @@ uint64_t TrapGetCurrentDateHandler::HandleTrap(cmsx::machine::Processor& process
     }
 }
 
-class TrapGetCurrentDateTimeHandler : public TrapHandler
+class TrapCurrentDateTimeHandler : public TrapHandler
 {
 public:
     uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
-    std::string TrapName() const { return "trap_get_current_date_time"; }
+    std::string TrapName() const { return "trap_current_date_time"; }
 };
 
-uint64_t TrapGetCurrentDateTimeHandler::HandleTrap(cmsx::machine::Processor& processor)
+uint64_t TrapCurrentDateTimeHandler::HandleTrap(cmsx::machine::Processor& processor)
 {
     Process* process = static_cast<Process*>(processor.CurrentProcess());
     try
@@ -145,18 +146,18 @@ uint64_t TrapGetCurrentDateTimeHandler::HandleTrap(cmsx::machine::Processor& pro
 
 void InitTimeTraps()
 {
-    SetTrapHandler(trap_get_current_time_point, new TrapGetCurrentTimePointHandler());
+    SetTrapHandler(trap_current_time_point, new TrapCurrentTimePointHandler());
     SetTrapHandler(trap_sleep, new TrapSleepHandler());
-    SetTrapHandler(trap_get_current_date, new TrapGetCurrentDateHandler());
-    SetTrapHandler(trap_get_current_date_time, new TrapGetCurrentDateTimeHandler());
+    SetTrapHandler(trap_current_date, new TrapCurrentDateHandler());
+    SetTrapHandler(trap_current_date_time, new TrapCurrentDateTimeHandler());
 }
 
 void DoneTimeTraps()
 {
-    SetTrapHandler(trap_get_current_date_time, nullptr);
-    SetTrapHandler(trap_get_current_date, nullptr);
+    SetTrapHandler(trap_current_date_time, nullptr);
+    SetTrapHandler(trap_current_date, nullptr);
     SetTrapHandler(trap_sleep, nullptr);
-    SetTrapHandler(trap_get_current_time_point, nullptr);
+    SetTrapHandler(trap_current_time_point, nullptr);
 }
 
 } // namespace cmsx::kernel

@@ -41,7 +41,7 @@ namespace System.Unicode
                     }
                     else
                     {
-                        ThrowUnicodeException("invalid UTF-8 sequence");
+                        throw UnicodeException("invalid UTF-8 sequence");
                     }
                     break;
                 }
@@ -52,7 +52,7 @@ namespace System.Unicode
                     byte b1 = bytes[1];
                     if ((b1 & 0xC0u) != 0x80u)
                     {
-                        ThrowUnicodeException("invalid UTF-8 sequence");
+                        throw UnicodeException("invalid UTF-8 sequence");
                     }
                     byte shift = 0u;
                     for (byte i = 0u; i < 6u; ++i)
@@ -87,7 +87,7 @@ namespace System.Unicode
                     byte b2 = bytes[2];
                     if ((b2 & 0xC0u) != 0x80u)
                     {
-                        ThrowUnicodeException("invalid UTF-8 sequence");
+                        throw UnicodeException("invalid UTF-8 sequence");
                     }
                     byte shift = 0u;
                     for (byte i = 0u; i < 6u; ++i)
@@ -100,7 +100,7 @@ namespace System.Unicode
                     byte b1 = bytes[1];
                     if ((b1 & 0xC0u) != 0x80u)
                     {
-                        ThrowUnicodeException("invalid UTF-8 sequence");
+                        throw UnicodeException("invalid UTF-8 sequence");
                     }
                     for (byte i = 0u; i < 6u; ++i)
                     {
@@ -140,7 +140,7 @@ namespace System.Unicode
                     byte b3 = bytes[3];
                     if ((b3 & 0xC0u) != 0x80u)
                     {
-                        ThrowUnicodeException("invalid UTF-8 sequence");
+                        throw UnicodeException("invalid UTF-8 sequence");
                     }
                     byte shift = 0u;
                     for (byte i = 0u; i < 6u; ++i)
@@ -153,7 +153,7 @@ namespace System.Unicode
                     byte b2 = bytes[2];
                     if ((b2 & 0xC0u) != 0x80u)
                     {
-                        ThrowUnicodeException("invalid UTF-8 sequence");
+                        throw UnicodeException("invalid UTF-8 sequence");
                     }
                     for (byte i = 0u; i < 6u; ++i)
                     {
@@ -165,7 +165,7 @@ namespace System.Unicode
                     byte b1 = bytes[1];
                     if ((b1 & 0xC0u) != 0x80u)
                     {
-                        ThrowUnicodeException("invalid UTF-8 sequence");
+                        throw UnicodeException("invalid UTF-8 sequence");
                     }
                     for (byte i = 0u; i < 6u; ++i)
                     {

@@ -1,0 +1,35 @@
+using System;
+using System.Collections;
+
+string MakeString()
+{
+	string s;
+	uint n = 16u * (RandomNumber(16u) + 1u);
+	for (uint i = 0u; i < n; ++i)
+	{
+		byte x = cast<byte>(i);
+		s.Append(ToHexString(x));
+	}
+	return s;
+}
+
+void PrintStrings(const Set<string>& s)
+{
+	for (const string& x : s)
+	{
+		write(1, x.Chars(), x.Length());
+		write(1, "\n", 1);
+	}
+}
+
+void main()
+{
+	Set<string> s;
+	int n = 100;
+	for (int i = 0; i < n; ++i)
+	{
+		string x = MakeString();
+		s.Insert(x);
+	}
+	PrintStrings(s);
+}

@@ -289,7 +289,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Add(Types* types, Context* context) override;
     void Resolve(Types* types, Context* context) override;
-    int64_t Size() const override { return elementCount * ElementType()->Size(); }
+    int64_t Size() const override;
     int64_t Alignment() const override { return 8; }
     std::string Name() const override { return "array " + std::to_string(Id()); }
     bool IsWeakType() const override;
@@ -310,8 +310,8 @@ public:
     void Resolve(Types* types, Context* context) override;
     bool IsWeakType() const override;
     int Arity() const { return paramTypeRefs.size(); }
-    int64_t Size() const override { return -1; } 
-    int64_t Alignment() const override { return -1; }
+    int64_t Size() const override { return 8; }
+    int64_t Alignment() const override { return 8; }
     std::string Name() const override { return "function " + std::to_string(Id()); }
     const TypeRef& ReturnTypeRef() const { return returnTypeRef;  }
     Type* ReturnType() const { return returnTypeRef.GetType(); }

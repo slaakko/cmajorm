@@ -1,0 +1,84 @@
+using System;
+
+public class Empty
+{
+	public void Write()
+	{
+		string s = "empty\n";
+		write(1, s.Chars(), s.Length());
+	}
+}
+
+public class Data
+{
+	public void Write()
+	{
+		string s = "data\n";
+		write(1, s.Chars(), s.Length());
+		s = ToString(x) + "\n";
+		write(1, s.Chars(), s.Length());
+		s = ToString(y) + "\n";
+		write(1, s.Chars(), s.Length());
+	}
+	public int x;
+	public int y;
+}
+
+public class Base
+{
+	public default virtual ~Base();
+	public virtual void Write()
+	{
+		string s = "base\n";
+		write(1, s.Chars(), s.Length());
+		s = ToString(x) + "\n";
+		write(1, s.Chars(), s.Length());
+		s = ToString(y) + "\n";
+		write(1, s.Chars(), s.Length());
+	}
+	public int x;
+	public int y;
+}
+
+public class DerivedClass : Base
+{
+	public override void Write()
+	{
+		string s = "derived\n";
+		write(1, s.Chars(), s.Length());
+		s = ToString(x) + "\n";
+		write(1, s.Chars(), s.Length());
+		s = ToString(y) + "\n";
+		write(1, s.Chars(), s.Length());
+		s = ToString(z) + "\n";
+		write(1, s.Chars(), s.Length());
+	}
+	public int z;
+}
+
+void main()
+{
+	Empty* empty = new Empty();
+	string emptySize = "empty size: " + ToString(sizeof(Empty)) + "\n";
+	write(1, emptySize.Chars(), emptySize.Length());
+	empty->Write();
+	Data* data = new Data();
+	string dataSize = "data size: " + ToString(sizeof(Data)) + "\n";
+	write(1, dataSize.Chars(), dataSize.Length());
+	data->x = 1;
+	data->y = 2;
+	data->Write();
+	Base* bse = new Base();
+	string baseSize = "base size: " + ToString(sizeof(Base)) + "\n";
+	write(1, baseSize.Chars(), baseSize.Length());
+	bse->x = 10;
+	bse->y = 20;
+	bse->Write();
+	DerivedClass* derived = new DerivedClass();
+	string derivedSize = "derived size: " + ToString(sizeof(DerivedClass)) + "\n";
+	write(1, derivedSize.Chars(), derivedSize.Length());
+	derived->x = 100;
+	derived->y = 200;
+	derived->z = 300;
+	derived->Write();
+}

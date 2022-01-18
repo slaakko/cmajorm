@@ -52,6 +52,7 @@ public:
     void SetSymbolTable(cmsx::object::SymbolTable* symbolTable_);
     void RemoveFromParent();
     std::chrono::steady_clock::duration UserTime() const { return userTime; }
+    std::chrono::steady_clock::duration SleepTime() const { return sleepTime; }
     std::chrono::steady_clock::duration SystemTime() const { return systemTime; }
     uint8_t ExitCode() const { return exitCode; }
     void SetExitCode(uint8_t exitCode_) { exitCode = exitCode_; }
@@ -63,8 +64,9 @@ public:
     void SetObserver(cmsx::machine::ProcessObserver* observer_) override;
     cmsx::machine::Debugger* GetDebugger() const override;
     void SetDebugger(cmsx::machine::Debugger* debugger_) override;
-    cmsx::machine::Processor* GetProcessor() const { return processor; }
+    cmsx::machine::Processor* GetProcessor() const override { return processor; }
     void AddUserTime(std::chrono::steady_clock::duration duration) override;
+    void AddSleepTime() override;
     void AddSystemTime(std::chrono::steady_clock::duration duration) override;
     RegionTable& GetRegionTable() { return regionTable; }
     ProcessFileTable& GetFileTable() { return fileTable; }
@@ -88,7 +90,9 @@ private:
     int64_t heapLength;
     int64_t stackStartAddress;
     uint8_t exitCode;
+    std::chrono::steady_clock::time_point sleepStartTime;
     std::chrono::steady_clock::duration userTime;
+    std::chrono::steady_clock::duration sleepTime;
     std::chrono::steady_clock::duration systemTime;
     std::unique_ptr<cmsx::object::SymbolTable> symbolTable;
     cmsx::machine::Debugger* debugger;

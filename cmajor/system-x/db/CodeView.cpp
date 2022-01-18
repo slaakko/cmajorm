@@ -367,7 +367,7 @@ void CodeView::PrevLine()
     cmsx::kernel::Region textRegion = process->GetRegionTable().GetRegion(cmsx::kernel::RegionId::text);
     if (textRegion.Valid())
     {
-        int64_t addr = std::min(currentAddress - static_cast<int64_t>(4), textRegion.Start());
+        int64_t addr = std::max(currentAddress - static_cast<int64_t>(4), textRegion.Start());
         currentAddress = addr;
         Invalidate();
     }

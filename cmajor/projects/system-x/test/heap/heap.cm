@@ -1,0 +1,75 @@
+using System;
+using System.Collections;
+
+void Alloc(List<byte*>& a, uint index, ulong n, string& s)
+{
+	if (a[index] != null)
+	{
+		Free(a, index, s);
+	}
+	//dump_heap(FreeAddr(), 0, 0u, n);
+	s.Clear();
+	s.Append("alloc ");
+    s.Append(ToString(index));
+	s.Append("\n");
+	write(1, s.Chars(), s.Length());
+	byte* ptr = cast<byte*>(MemAlloc(cast<long>(n)));
+	ulong addr = cast<ulong>(cast<void*>(ptr));
+	a[index] = ptr;
+	//dump_heap(FreeAddr(), 1, addr, 0u);
+}
+
+void Free(List<byte*>& a, uint index, string& s)
+{
+	byte* p = a[index];
+	if (p != null)
+	{
+		ulong addr = cast<ulong>(cast<void*>(p));
+		//dump_heap(FreeAddr(), 2, addr, 0u);
+		s.Clear();
+		s.Append("free ");
+		s.Append(ToString(index));
+		s.Append("\n");
+		write(1, s.Chars(), s.Length());
+		MemFree(p);
+		a[index] = null;
+		//dump_heap(FreeAddr(), 3, 0u, 0u);
+	}
+}
+
+void Test(List<byte*>& a, uint maxSize, uint blocks, int i, string& s)
+{
+	uint c = RandomNumber(2u);
+	uint index = RandomNumber(blocks);
+	switch (c)
+	{
+		case 0u:
+		{
+			uint n = RandomNumber(maxSize);
+			Alloc(a, index, n, s);
+			break;
+		}
+		case 1u:
+		{
+			Free(a, index, s);
+			break;
+		}
+	}
+}
+
+void main()
+{
+	string s;
+	s.Reserve(256);
+	InitRand(0u);
+	uint maxSize = 8192u;
+	uint blocks = 32u;
+	List<byte*> a;
+	//dump_heap(FreeAddr(), 4, 0u, 0u);
+	a.Resize(blocks);
+	//dump_heap(FreeAddr(), 5, 0u, 0u);
+	for (int i = 0; i < 10000; ++i)
+	{
+		Test(a, maxSize, blocks, i, s);
+	}
+}

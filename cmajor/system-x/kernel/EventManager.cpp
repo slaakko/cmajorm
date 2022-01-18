@@ -62,6 +62,7 @@ void EventManager::Wakeup(Event evnt)
 
 void Sleep(Event evnt, cmsx::machine::Process* process)
 {
+    process->GetProcessor()->ResetCurrentProcess();
     EventManager::Instance().SleepOn(evnt, process);
 }
 

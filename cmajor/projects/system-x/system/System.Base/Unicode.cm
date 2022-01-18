@@ -5,7 +5,7 @@
 
 using System;
 using System.Collections;
-using System.IO;
+// using System.IO;
 
 namespace System.Unicode
 {
@@ -18,17 +18,28 @@ namespace System.Unicode
     
     public void ThrowUnicodeException(const string& message)
     {
-        throw UnicodeException(message);
+        //throw UnicodeException(message);
+		exit(250);
     }
     
-    public nothrow string PathToUnicodeDirectory()
+    public string PathToUnicodeDirectory()
     {
-        return "/mnt/cmajor/unicode";
+/*		TODO
+        string cmajorRoot = RtGetEnvironmentVariable("CMAJOR_ROOT");
+        if (cmajorRoot.IsEmpty())
+        {
+            ThrowUnicodeException("CMAJOR_ROOT environment variable not set (set it to /path/to/cmajor directory)");
+            return string();
+        }
+        return Path.Combine(cmajorRoot, "unicode");
+*/
+		return string();
     }
     
-    public nothrow string PathToUcdBinFile()
-    {
-        return Path.Combine(PathToUnicodeDirectory(), "cmajor_ucd.bin");
+    public string PathToUcdBinFile()
+    {        
+        // return Path.Combine(PathToUnicodeDirectory(), "cmajor_ucd.bin"); TODO
+		return string();
     }
     
     public string MakeCanonicalPropertyName(const string& s)
@@ -166,7 +177,7 @@ namespace System.Unicode
             }
             return null;
         }
-        private void AddBinProperty1()
+        private BinaryPropertyTable() : binaryProperties(), binaryPropertyIdMap(), shortNameMap(), longNameMap()
         {
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.asciiHexDigit, "AHex", "Ascii Hex Digit"));
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.alphabetic, "Alpha", "Alphabetic"));
@@ -185,9 +196,6 @@ namespace System.Unicode
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.dash, "Dash", "Dash"));
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.deprecated, "Dep", "Deprecated"));
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.defaultIgnorableCodePoint, "DI", "Default Ignorable Code Point"));
-        }
-        private void AddBinProperty2()
-        {
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.diacritic, "Dia", "Diacritic"));
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.extender, "Ext", "Extender"));
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.graphemeBase, "Gr Base", "Grapheme Base"));
@@ -203,9 +211,6 @@ namespace System.Unicode
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.joinControl, "Join C", "Join Control"));
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.logicalOrderException, "LOE", "Logical Order Exception"));
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.lowercase, "Lower", "Lowercase"));
-        }
-        private void AddBinProperty3()
-        {
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.math, "Math", "Math"));
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.noncharacterCodePoint, "NChar", "Noncharacter Code Point"));
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.otherAlphabetic, "OAlpha", "Other Alphabetic"));
@@ -222,9 +227,6 @@ namespace System.Unicode
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.quotationMark, "QMark", "Quotation Mark"));
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.radical, "Radical", "Radical"));
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.softDotted, "SD", "Soft Dotted"));
-        }
-        private void AddBinProperty4()
-        {
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.sentenceterminal, "STerm", "Sentence Terminal"));
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.terminalPunctuation, "Term", "Terminal Punctuation"));
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.unifiedIdeograph, "UIdeo", "Unified Ideograph"));
@@ -237,13 +239,6 @@ namespace System.Unicode
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.expandsOnNFD, "XO NFD", "Expands On NFD"));
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.expandsOnNFKC, "XO NFKC", "Expands On NFKC"));
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.expandsOnNFKD, "XO NFKD", "Expands On NFKD"));
-        }
-        private BinaryPropertyTable() : binaryProperties(), binaryPropertyIdMap(), shortNameMap(), longNameMap()
-        {
-            AddBinProperty1();
-            AddBinProperty2();
-            AddBinProperty3();
-            AddBinProperty4();
             for (BinaryProperty* binaryProperty : binaryProperties)
             {
                 binaryPropertyIdMap[cast<uint>(cast<byte>(binaryProperty->Id()))] = binaryProperty;
@@ -270,12 +265,12 @@ namespace System.Unicode
         return BinaryPropertyTable.Instance().GetBinaryProperty(id);
     }
 
-    public const BinaryProperty* GetBinaryPropertyByShortName(string shortName)
+    public const BinaryProperty* GetBinaryPropertyByShortName(const string& shortName)
     {
         return BinaryPropertyTable.Instance().GetBinaryPropertyByShortName(shortName);
     }
 
-    public const BinaryProperty* GetBinaryPropertyByLongName(string longName)
+    public const BinaryProperty* GetBinaryPropertyByLongName(const string& longName)
     {
         return BinaryPropertyTable.Instance().GetBinaryPropertyByLongName(longName);
     }
@@ -383,7 +378,7 @@ namespace System.Unicode
             }
             return null;
         }
-        private void AddBlocks1()
+        private BlockTable() : blocks(), blockIdMap(), shortNameMap(), longNameMap()
         {
             blocks.Add(new Block(BlockId.ascii, "ASCII", "Basic Latin", cast<uchar>(0x0000u), cast<uchar>(0x007Fu)));
             blocks.Add(new Block(BlockId.latin1Sup, "Latin 1 Sup", "Latin-1 Supplement", cast<uchar>(0x0080u), cast<uchar>(0x00FFu)));
@@ -400,9 +395,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.arabic, "Arabic", "Arabic", cast<uchar>(0x0600u), cast<uchar>(0x06FFu)));
             blocks.Add(new Block(BlockId.syriac, "Syriac", "Syriac", cast<uchar>(0x0700u), cast<uchar>(0x074Fu)));
             blocks.Add(new Block(BlockId.arabicSup, "Arabic Sup", "Arabic Supplement", cast<uchar>(0x0750u), cast<uchar>(0x077Fu)));
-        }
-        private void AddBlocks2()
-        {
             blocks.Add(new Block(BlockId.thaana, "Thaana", "Thaana", cast<uchar>(0x0780u), cast<uchar>(0x07BFu)));
             blocks.Add(new Block(BlockId.nko, "Nko", "Nko", cast<uchar>(0x07C0u), cast<uchar>(0x07FFu)));
             blocks.Add(new Block(BlockId.samaritan, "Samaritan", "Samaritan", cast<uchar>(0x0800u), cast<uchar>(0x083Fu)));
@@ -418,9 +410,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.telugu, "Telugu", "Telugu", cast<uchar>(0x0C00u), cast<uchar>(0x0C7Fu)));
             blocks.Add(new Block(BlockId.kannada, "Kannada", "Kannada", cast<uchar>(0x0C80u), cast<uchar>(0x0CFFu)));
             blocks.Add(new Block(BlockId.malayalam, "Malayalam", "Malayalam", cast<uchar>(0x0D00u), cast<uchar>(0x0D7Fu)));
-        }
-        private void AddBlocks3()
-        {
             blocks.Add(new Block(BlockId.sinhala, "Sinhala", "Sinhala", cast<uchar>(0x0D80u), cast<uchar>(0x0DFFu)));
             blocks.Add(new Block(BlockId.thai, "Thai", "Thai", cast<uchar>(0x0E00u), cast<uchar>(0x0E7Fu)));
             blocks.Add(new Block(BlockId.lao, "Lao", "Lao", cast<uchar>(0x0E80u), cast<uchar>(0x0EFFu)));
@@ -433,9 +422,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.cherokee, "Cherokee", "Cherokee", cast<uchar>(0x13A0u), cast<uchar>(0x13FFu)));
             blocks.Add(new Block(BlockId.ucas, "UCAS", "Unified Canadian Aboriginal Syllabics", cast<uchar>(0x1400u), cast<uchar>(0x167Fu)));
             blocks.Add(new Block(BlockId.ogham, "Ogham", "Ogham", cast<uchar>(0x1680u), cast<uchar>(0x169Fu)));
-        }
-        private void AddBlocks4()
-        {
             blocks.Add(new Block(BlockId.runic, "Runic", "Runic", cast<uchar>(0x16A0u), cast<uchar>(0x16FFu)));
             blocks.Add(new Block(BlockId.tagalog, "Tagalog", "Tagalog", cast<uchar>(0x1700u), cast<uchar>(0x171Fu)));
             blocks.Add(new Block(BlockId.hanunoo, "Hanunoo", "Hanunoo", cast<uchar>(0x1720u), cast<uchar>(0x173Fu)));
@@ -450,9 +436,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.khmerSymbols, "Khmer Symbols", "Khmer Symbols", cast<uchar>(0x19E0u), cast<uchar>(0x19FFu)));
             blocks.Add(new Block(BlockId.buginese, "Buginese", "Buginese", cast<uchar>(0x1A00u), cast<uchar>(0x1A1Fu)));
             blocks.Add(new Block(BlockId.taiTham, "Tai Tham", "Tai Tham", cast<uchar>(0x1A20u), cast<uchar>(0x1AAFu)));
-        }
-        private void AddBlocks5()
-        {
             blocks.Add(new Block(BlockId.diacriticalsExt, "Diacriticals Ext", "Combining Diacritical Marks Extended", cast<uchar>(0x1AB0u), cast<uchar>(0x1AFFu)));
             blocks.Add(new Block(BlockId.balinese, "Balinese", "Balinese", cast<uchar>(0x1B00u), cast<uchar>(0x1B7Fu)));
             blocks.Add(new Block(BlockId.sundanese, "Sundanese", "Sundanese", cast<uchar>(0x1B80u), cast<uchar>(0x1BBFu)));
@@ -466,9 +449,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.phoneticExt, "Phonetic Ext", "Phonetic Extensions", cast<uchar>(0x1D00u), cast<uchar>(0x1D7Fu)));
             blocks.Add(new Block(BlockId.phoneticExtSup, "Phonetic Ext Sup", "Phonetic Extensions Supplement", cast<uchar>(0x1D80u), cast<uchar>(0x1DBFu)));
             blocks.Add(new Block(BlockId.diacriticalsSup, "Diacriticals Sup", "Combining Diacritical Marks Supplement", cast<uchar>(0x1DC0u), cast<uchar>(0x1DFFu)));
-        }
-        private void AddBlocks6()
-        {
             blocks.Add(new Block(BlockId.latinExtAdditional, "Latin Ext Additional", "Latin Extended Additional", cast<uchar>(0x1E00u), cast<uchar>(0x1EFFu)));
             blocks.Add(new Block(BlockId.greekExt, "Greek Ext", "Greek Extended", cast<uchar>(0x1F00u), cast<uchar>(0x1FFFu)));
             blocks.Add(new Block(BlockId.punctuation, "Punctuation", "General Punctuation", cast<uchar>(0x2000u), cast<uchar>(0x206Fu)));
@@ -484,9 +464,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.ocr, "OCR", "Optical Character Regognition", cast<uchar>(0x2440u), cast<uchar>(0x245Fu)));
             blocks.Add(new Block(BlockId.enclosedAlphanum, "Enclosed Alphanum", "Enclosed Alphanumerics", cast<uchar>(0x2460u), cast<uchar>(0x24FFu)));
             blocks.Add(new Block(BlockId.boxDrawing, "Box Drawing", "Box Drawing", cast<uchar>(0x2500u), cast<uchar>(0x257Fu)));
-        }
-        private void AddBlocks7()
-        {
             blocks.Add(new Block(BlockId.blockElements, "Block Elements", "Block Elements", cast<uchar>(0x2580u), cast<uchar>(0x259Fu)));
             blocks.Add(new Block(BlockId.geometricShapes, "Geometric Shapes", "Geometric Shapes", cast<uchar>(0x25A0u), cast<uchar>(0x25FFu)));
             blocks.Add(new Block(BlockId.miscSymbols, "Misc Symbols", "Miscellaneous Symbols", cast<uchar>(0x2600u), cast<uchar>(0x26FFu)));
@@ -500,9 +477,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.miscArrows, "Misc Arrows", "Miscellaneous Symbols and Arrows", cast<uchar>(0x2B00u), cast<uchar>(0x2BFFu)));
             blocks.Add(new Block(BlockId.glagolitic, "Glagolitic", "Glagolitic", cast<uchar>(0x2C00u), cast<uchar>(0x2C5Fu)));
             blocks.Add(new Block(BlockId.latinExtC, "Latin Ext C", "Latin Extended-C", cast<uchar>(0x2C60u), cast<uchar>(0x2C7Fu)));
-        }
-        private void AddBlocks8()
-        {
             blocks.Add(new Block(BlockId.coptic, "Coptic", "Coptic", cast<uchar>(0x2C80u), cast<uchar>(0x2CFFu)));
             blocks.Add(new Block(BlockId.georgianSup, "Georgian Sup", "Georgian Supplement", cast<uchar>(0x2D00u), cast<uchar>(0x2D2Fu)));
             blocks.Add(new Block(BlockId.tifinagh, "Tifinagh", "Tifinagh", cast<uchar>(0x2D30u), cast<uchar>(0x2D7Fu)));
@@ -517,9 +491,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.katakana, "Katakana", "Katakana", cast<uchar>(0x30A0u), cast<uchar>(0x30FFu)));
             blocks.Add(new Block(BlockId.bopomofo, "Bopomofo", "Bopomofo", cast<uchar>(0x3100u), cast<uchar>(0x312Fu)));
             blocks.Add(new Block(BlockId.compatJamo, "Compat Jamo", "Hangul Compatibility Jamo", cast<uchar>(0x3130u), cast<uchar>(0x318Fu)));
-        }
-        private void AddBlocks9()
-        {
             blocks.Add(new Block(BlockId.kanbun, "Kanbun", "Kanbun", cast<uchar>(0x3190u), cast<uchar>(0x319Fu)));
             blocks.Add(new Block(BlockId.bopomofoExt, "Bopomofo Ext", "Bopomofo Extended", cast<uchar>(0x31A0u), cast<uchar>(0x31BFu)));
             blocks.Add(new Block(BlockId.cjkStrokes, "CJK Strokes", "CJK Strokes", cast<uchar>(0x31C0u), cast<uchar>(0x31EFu)));
@@ -534,9 +505,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.lisu, "Lisu", "Lisu", cast<uchar>(0xA0D0u), cast<uchar>(0xA4FFu)));
             blocks.Add(new Block(BlockId.vai, "Vai", "Vai", cast<uchar>(0xA500u), cast<uchar>(0xA63Fu)));
             blocks.Add(new Block(BlockId.cyrillicExtB, "Cyrillic Ext B", "Cyrillic Extended-B", cast<uchar>(0xA640u), cast<uchar>(0xA69Fu)));
-        }
-        private void AddBlocks10()
-        {
             blocks.Add(new Block(BlockId.bamum, "Bamum", "Bamum", cast<uchar>(0xA6A0u), cast<uchar>(0xA6FFu)));
             blocks.Add(new Block(BlockId.modifierToneLetters, "Modifier Tone Letters", "Modifier Tone Letters", cast<uchar>(0xA700u), cast<uchar>(0xA71Fu)));
             blocks.Add(new Block(BlockId.latinExtD, "Latin Ext D", "Latin Extended-D", cast<uchar>(0xA720u), cast<uchar>(0xA7FFu)));
@@ -549,9 +517,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.rejang, "Rejang", "Rejang", cast<uchar>(0xA930u), cast<uchar>(0xA95Fu)));
             blocks.Add(new Block(BlockId.jamoExtA, "Jamo Ext A", "Hangul Jamo Extended-A", cast<uchar>(0xA960u), cast<uchar>(0xA97Fu)));
             blocks.Add(new Block(BlockId.javanese, "Javanese", "Javanese", cast<uchar>(0xA980u), cast<uchar>(0xA9DFu)));
-        }
-        private void AddBlocks11()
-        {
             blocks.Add(new Block(BlockId.myanmarExtB, "Myanmar Ext B", "Myanmar Extended - B", cast<uchar>(0xA9E0u), cast<uchar>(0xA9FFu)));
             blocks.Add(new Block(BlockId.cham, "Cham","Cham", cast<uchar>(0xAA00u), cast<uchar>(0xAA5Fu)));
             blocks.Add(new Block(BlockId.myanmarExtA, "Myanmar Ext A", "Myanmar Extended-A", cast<uchar>(0xAA60u), cast<uchar>(0xAA7Fu)));
@@ -565,9 +530,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.jamoExtB, "Jamo Ext B", "Hangul Jamo Extended-B", cast<uchar>(0xD7B0u), cast<uchar>(0xD7FFu)));
             blocks.Add(new Block(BlockId.highSurrogates, "High Surrogates", "High Surrogates", cast<uchar>(0xD800u), cast<uchar>(0xDB7Fu)));
             blocks.Add(new Block(BlockId.highPuSurrogates,  "High PU Surrogates", "High Private Use Surrogates", cast<uchar>(0xDB80u), cast<uchar>(0xDBFFu)));
-        }
-        private void AddBlocks12()
-        {
             blocks.Add(new Block(BlockId.lowSurrogates, "Low Surrogates", "Low Surrogates", cast<uchar>(0xDC00u), cast<uchar>(0xDFFFu)));
             blocks.Add(new Block(BlockId.pua, "PUA", "Private Use Area", cast<uchar>(0xE000u), cast<uchar>(0xF8FFu)));
             blocks.Add(new Block(BlockId.cjkCompatIdeographs, "CJK Compat Ideographs", "CJK Compatibility Ideographs", cast<uchar>(0xF900u), cast<uchar>(0xFAFFu)));
@@ -581,9 +543,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.arabicPfB, "Arabic PF B", "Arabic Presentation Forms-B", cast<uchar>(0xFE70u), cast<uchar>(0xFEFFu)));
             blocks.Add(new Block(BlockId.halfAndFullForms, "Half And Full Forms", "Halfwidth and Fullwidth Forms", cast<uchar>(0xFF00u), cast<uchar>(0xFFEFu)));
             blocks.Add(new Block(BlockId.specials, "Specials", "Specials", cast<uchar>(0xFFF0u), cast<uchar>(0xFFFFu)));
-        }
-        private void AddBlocks13()
-        {
             blocks.Add(new Block(BlockId.linearBSyllabary, "Linear B Syllabary", "Linear B Syllabary", cast<uchar>(0x10000u), cast<uchar>(0x1007Fu)));
             blocks.Add(new Block(BlockId.linearBIdeograms, "Linear B Ideograms", "Linear B Ideograms", cast<uchar>(0x10080u), cast<uchar>(0x100FFu)));
             blocks.Add(new Block(BlockId.aegeanNumbers, "Aegean Numbers", "Aegean Numbers", cast<uchar>(0x10100u), cast<uchar>(0x1013Fu)));
@@ -598,9 +557,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.oldPermic, "Old Permic", "Old Permic", cast<uchar>(0x10350u), cast<uchar>(0x1037Fu)));
             blocks.Add(new Block(BlockId.ugaritic, "Ugaritic", "Ugaritic", cast<uchar>(0x10380u), cast<uchar>(0x1039Fu)));
             blocks.Add(new Block(BlockId.oldPersian, "Old Persian", "Old Persian", cast<uchar>(0x103A0u), cast<uchar>(0x103DFu)));
-        }
-        private void AddBlocks14()
-        {
             blocks.Add(new Block(BlockId.deseret, "Deseret", "Deseret", cast<uchar>(0x10400u), cast<uchar>(0x1044Fu)));
             blocks.Add(new Block(BlockId.shavian, "Shavian", "Shavian", cast<uchar>(0x10450u), cast<uchar>(0x1047Fu)));
             blocks.Add(new Block(BlockId.osmanya, "Osmanya", "Osmanya", cast<uchar>(0x10480u), cast<uchar>(0x104AFu)));
@@ -615,9 +571,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.hatran, "Hatran", "Hatran", cast<uchar>(0x108E0u), cast<uchar>(0x108FFu)));
             blocks.Add(new Block(BlockId.phoenician, "Phoenician", "Phoenician", cast<uchar>(0x10900u), cast<uchar>(0x1091Fu)));
             blocks.Add(new Block(BlockId.lydian, "Lydian", "Lydian", cast<uchar>(0x10920u), cast<uchar>(0x1093Fu)));
-        }
-        private void AddBlocks15()
-        {
             blocks.Add(new Block(BlockId.meroiticHieroglyphs, "Meroitic Hieroglyphs", "Meroitic Hieroglyphs", cast<uchar>(0x10980u), cast<uchar>(0x1099Fu)));
             blocks.Add(new Block(BlockId.meroiticCursive, "Meroitic Cursive", "Meroitic Cursive", cast<uchar>(0x109A0u), cast<uchar>(0x109FFu)));
             blocks.Add(new Block(BlockId.kharoshthi, "Kharoshthi", "Kharoshthi", cast<uchar>(0x10A00u), cast<uchar>(0x10A5Fu)));
@@ -631,9 +584,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.oldTurkic, "Old Turkic", "Old Turkic", cast<uchar>(0x10C00u), cast<uchar>(0x10C4Fu)));
             blocks.Add(new Block(BlockId.oldHungarian, "Old Hungarian", "Old Hungarian", cast<uchar>(0x10C80u), cast<uchar>(0x10CFFu)));
             blocks.Add(new Block(BlockId.hanifiRohingya, "Hanifi Rohingya", "Hanifi Rohingya", cast<uchar>(0x10D00u), cast<uchar>(0x10D3Fu)));
-        }
-        private void AddBlocks16()
-        {
             blocks.Add(new Block(BlockId.rumi, "Rumi", "Rumi Numeral Symbols", cast<uchar>(0x10E60u), cast<uchar>(0x10E7Fu)));
             blocks.Add(new Block(BlockId.oldSogdian, "Old Sogdian", "Old Sogdian", cast<uchar>(0x10F00u), cast<uchar>(0x10F2Fu)));
             blocks.Add(new Block(BlockId.sogdian, "Sogdian", "Sogdian", cast<uchar>(0x10F30u), cast<uchar>(0x10F6Fu)));
@@ -648,9 +598,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.khojki, "Khojki", "Khojki", cast<uchar>(0x11200u), cast<uchar>(0x1124Fu)));
             blocks.Add(new Block(BlockId.multani, "Multani", "Multani", cast<uchar>(0x11280u), cast<uchar>(0x112AFu)));
             blocks.Add(new Block(BlockId.khudawadi, "Khudawadi", "Khudawadi", cast<uchar>(0x112B0u), cast<uchar>(0x112FFu)));
-        }
-        private void AddBlocks17()
-        {
             blocks.Add(new Block(BlockId.grantha, "Grantha", "Grantha", cast<uchar>(0x11300u), cast<uchar>(0x1137Fu)));
             blocks.Add(new Block(BlockId.newa, "Newa", "Newa", cast<uchar>(0x11400u), cast<uchar>(0x1147Fu)));
             blocks.Add(new Block(BlockId.tirhuta, "Tirhuta", "Tirhuta", cast<uchar>(0x11480u), cast<uchar>(0x114DFu)));
@@ -665,9 +612,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.zanabazarSquare, "Zanabazar Square", "Zanabazar Square", cast<uchar>(0x11A00u), cast<uchar>(0x11A4FFu)));
             blocks.Add(new Block(BlockId.soyombo, "Soyombo", "Soyombo", cast<uchar>(0x11A50u), cast<uchar>(0x11AAFu)));
             blocks.Add(new Block(BlockId.pauCinHau, "Pau Cin Hau", "Pau Cin Hau", cast<uchar>(0x11AC0u), cast<uchar>(0x11AFFu)));
-        }
-        private void AddBlocks18()
-        {
             blocks.Add(new Block(BlockId.bhaisuki, "Bhaiksuki", "Bhaiksuki", cast<uchar>(0x11C00u), cast<uchar>(0x11C6Fu)));
             blocks.Add(new Block(BlockId.marchen, "Marchen", "Marchen", cast<uchar>(0x11C70u), cast<uchar>(0x11CBFu)));
             blocks.Add(new Block(BlockId.masaramGondi, "Masaram Gondi", "Masaram Gondi", cast<uchar>(0x11D00), cast<uchar>(0x11D5F)));
@@ -683,9 +627,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.bamumSup, "Bamum Sup", "Bamum Supplement", cast<uchar>(0x16800u), cast<uchar>(0x16A3Fu)));
             blocks.Add(new Block(BlockId.mro, "Mro", "Mro", cast<uchar>(0x16A40u), cast<uchar>(0x16A6Fu)));
             blocks.Add(new Block(BlockId.bassaVah, "Bassa Vah", "Bassa Vah", cast<uchar>(0x16AD0u), cast<uchar>(0x16AFFu)));
-        }
-        private void AddBlocks19()
-        {
             blocks.Add(new Block(BlockId.pahawhHmong, "Pahawh Hmong", "Pahawh Hmong", cast<uchar>(0x16B00u), cast<uchar>(0x16B8Fu)));
             blocks.Add(new Block(BlockId.medefaidrin, "Medefaidrin", "Medefaidrin", cast<uchar>(0x16E40u), cast<uchar>(0x16E9Fu)));
             blocks.Add(new Block(BlockId.miao, "Miao", "Miao", cast<uchar>(0x16F00u), cast<uchar>(0x16F9Fu)));
@@ -693,15 +634,12 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.tangut, "Tangut", "Tangut", cast<uchar>(0x17000u), cast<uchar>(0x187FFu)));
             blocks.Add(new Block(BlockId.tangutComponents, "Tangut Components", "Tangut Components", cast<uchar>(0x18800u), cast<uchar>(0x18AFFu)));
             blocks.Add(new Block(BlockId.kanaSup, "Kana Sup", "Kana Supplement", cast<uchar>(0x1B000u), cast<uchar>(0x1B0FFu)));
-            blocks.Add(new Block(BlockId.kanaExtA, "Kana Ext A", "Kana Extended-A", cast<uchar>(0x1B100u), cast<uchar>(0x1B12Fu))); 
+            blocks.Add(new Block(BlockId.kanaExtA, "Kana Ext A", "Kana Extended-A", cast<uchar>(0x1B100u), cast<uchar>(0x1B12Fu)));
             blocks.Add(new Block(BlockId.smallKanaExt, "Small Kana Ext", "Small Kana Extension", cast<uchar>(0x1B130), cast<uchar>(0x1B16F))); // 12.0
             blocks.Add(new Block(BlockId.nushu, "Nushu", "Nushu", cast<uchar>(0x1B170u), cast<uchar>(0x1B2FFu))); 
             blocks.Add(new Block(BlockId.duployan, "Duployan", "Duployan", cast<uchar>(0x1BC00u), cast<uchar>(0x1BC9Fu)));
             blocks.Add(new Block(BlockId.shorthandFormatControls, "Shorthand Format Controls", "Shorthand Format Controls", cast<uchar>(0x1BCA0u), cast<uchar>(0x1BCAFu)));
             blocks.Add(new Block(BlockId.byzantineMusic, "Byzantine Music", "Byzantine Musical Symbols", cast<uchar>(0x1D000u), cast<uchar>(0x1D0FFu)));
-        }
-        private void AddBlocks20()
-        {
             blocks.Add(new Block(BlockId.music, "Music", "Musical Symbols", cast<uchar>(0x1D100u), cast<uchar>(0x1D1FFu)));
             blocks.Add(new Block(BlockId.ancientGreekMusic, "Ancient Greek Music", "Ancient Greek Musical Notation", cast<uchar>(0x1D200u), cast<uchar>(0x1D24Fu)));
             blocks.Add(new Block(BlockId.mayanNumerals, "Mayan Numerals", "Mayan Numerals", cast<uchar>(0x1D2E0u), cast<uchar>(0x1D2FFu)));
@@ -716,9 +654,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.adlam, "Adlam", "Adlam", cast<uchar>(0x1E900u), cast<uchar>(0x1E95Fu)));
             blocks.Add(new Block(BlockId.indicSiyaqNumbers, "Indic Siyaq Numbers", "Indic Siyaq Numbers", cast<uchar>(0x1EC70), cast<uchar>(0x1ECBF)));
             blocks.Add(new Block(BlockId.ottomanSiyaqNumbers, "Ottoman Siyaq Numbers", "Ottoman Siyaq Numbers", cast<uchar>(0x1ED00), cast<uchar>(0x1ED4F))); // 12.0
-        }
-        private void AddBlocks21()
-        {
             blocks.Add(new Block(BlockId.arabicMath, "Arabic Math", "Arabic Mathematical Alphabetic Symbols", cast<uchar>(0x1EE00u), cast<uchar>(0x1EEFFu)));
             blocks.Add(new Block(BlockId.mahjong, "Mahjong", "Mahjong Tiles", cast<uchar>(0x1F000u), cast<uchar>(0x1F02Fu)));
             blocks.Add(new Block(BlockId.domino, "Domino", "Domino Tiles", cast<uchar>(0x1F030u), cast<uchar>(0x1F09Fu)));
@@ -732,9 +667,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.alchemical, "Alchemical", "Alchemical Symbols", cast<uchar>(0x1F700u), cast<uchar>(0x1F77Fu)));
             blocks.Add(new Block(BlockId.geometricShapesExt, "Geometric Shapes Ext", "Geometric Shapes Extended", cast<uchar>(0x1F780u), cast<uchar>(0x1F7FFu)));
             blocks.Add(new Block(BlockId.supArrowsC, "Sup Arrows C", "Supplemental Arrows-C", cast<uchar>(0x1F800u), cast<uchar>(0x1F8FFu)));
-        }
-        private void AddBlocks22()
-        {
             blocks.Add(new Block(BlockId.supSymbolsAndPictographs, "Sup Symbols And Pictographs", "Supplemental Symbols and Pictographs", cast<uchar>(0x1F900u), cast<uchar>(0x1F9FFu)));
             blocks.Add(new Block(BlockId.chessSymbols, "Chess Symbols", "Chess Symbols", cast<uchar>(0x1FA00u), cast<uchar>(0x1FA6Fu)));
             blocks.Add(new Block(BlockId.symbolsAndPictographsExtA, "Symbols And Pictographs Ext A", "Symbols And Pictographs Extended A", cast<uchar>(0x1FA70), cast<uchar>(0x1FAFF))); // 12.0
@@ -748,31 +680,6 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.vsSup, "VS Sup", "Variation Selectors Supplement", cast<uchar>(0xE0100u), cast<uchar>(0xE01EFu)));
             blocks.Add(new Block(BlockId.supPuaA, "Sup PUA A", "Supplementary Private Use Area-A", cast<uchar>(0xF0000u), cast<uchar>(0xFFFFFu)));
             blocks.Add(new Block(BlockId.supPuaB, "Sup PUA B", "Supplementary Private Use Area-B", cast<uchar>(0x100000u), cast<uchar>(0x10FFFFu)));
-        }
-        private BlockTable() : blocks(), blockIdMap(), shortNameMap(), longNameMap()
-        {
-            AddBlocks1();
-            AddBlocks2();
-            AddBlocks3();
-            AddBlocks4();
-            AddBlocks5();
-            AddBlocks6();
-            AddBlocks7();
-            AddBlocks8();
-            AddBlocks9();
-            AddBlocks10();
-            AddBlocks11();
-            AddBlocks12();
-            AddBlocks13();
-            AddBlocks14();
-            AddBlocks15();
-            AddBlocks16();
-            AddBlocks17();
-            AddBlocks18();
-            AddBlocks19();
-            AddBlocks20();
-            AddBlocks21();
-            AddBlocks22();
             for (Block* block : blocks)
             {
                 blockIdMap[cast<uint>(cast<ushort>(block->Id()))] = block;
@@ -889,7 +796,7 @@ namespace System.Unicode
             }
             return null;
         }
-        private void AddGenCat1()
+        private GeneralCategoryTable() : generalCategories(), generalCategoryIdMap(), shortNameMap(), longNameMap()
         {
             generalCategories.Add(new GeneralCategory(GeneralCategoryId.Lu, "Lu", "Uppercase Letter"));
             generalCategories.Add(new GeneralCategory(GeneralCategoryId.Lu, "Ll", "Lowercase Letter"));
@@ -904,9 +811,6 @@ namespace System.Unicode
             generalCategories.Add(new GeneralCategory(GeneralCategoryId.M, "M", "Mark"));
             generalCategories.Add(new GeneralCategory(GeneralCategoryId.Nd, "Nd", "Decimal Number"));
             generalCategories.Add(new GeneralCategory(GeneralCategoryId.Nl, "Nl", "Letter Number"));
-        }
-        private void AddGenCat2()
-        {
             generalCategories.Add(new GeneralCategory(GeneralCategoryId.No, "No", "Other Number"));
             generalCategories.Add(new GeneralCategory(GeneralCategoryId.N, "N", "Number"));
             generalCategories.Add(new GeneralCategory(GeneralCategoryId.Pc, "Pc", "Connector Punctuation"));
@@ -921,9 +825,6 @@ namespace System.Unicode
             generalCategories.Add(new GeneralCategory(GeneralCategoryId.Sc, "Sc", "Currency Symbol"));
             generalCategories.Add(new GeneralCategory(GeneralCategoryId.Sk, "Sk", "Modifier Symbol"));
             generalCategories.Add(new GeneralCategory(GeneralCategoryId.So, "So", "Other Symbol"));
-        }
-        private void AddGenCat3()
-        {
             generalCategories.Add(new GeneralCategory(GeneralCategoryId.S, "S", "Symbol"));
             generalCategories.Add(new GeneralCategory(GeneralCategoryId.Zs, "Zs", "Space Separator"));
             generalCategories.Add(new GeneralCategory(GeneralCategoryId.Zl, "Zl", "Line Separator"));
@@ -937,12 +838,6 @@ namespace System.Unicode
             generalCategories.Add(new GeneralCategory(GeneralCategoryId.C, "C", "Other"));
             generalCategories.Add(new GeneralCategory(GeneralCategoryId.G, "G", "Graphic"));
             generalCategories.Add(new GeneralCategory(GeneralCategoryId.B, "B", "Base"));
-        }
-        private GeneralCategoryTable() : generalCategories(), generalCategoryIdMap(), shortNameMap(), longNameMap()
-        {
-            AddGenCat1();
-            AddGenCat2();
-            AddGenCat3();
             for (GeneralCategory* generalCategory : generalCategories)
             {
                 generalCategoryIdMap[generalCategory->Id()] = generalCategory;
@@ -1040,7 +935,7 @@ namespace System.Unicode
             }
             return null;
         }
-        private void AddAge1()
+        private AgeTable() : ages(), ageIdMap(), versionMap()
         {
             ages.Add(new Age(AgeId.age_1_1, "1.1"));
             ages.Add(new Age(AgeId.age_2_0, "2.0"));
@@ -1054,9 +949,6 @@ namespace System.Unicode
             ages.Add(new Age(AgeId.age_5_1, "5.1"));
             ages.Add(new Age(AgeId.age_5_2, "5.2"));
             ages.Add(new Age(AgeId.age_6_0, "6.0"));
-        }
-        private void AddAge2()
-        {
             ages.Add(new Age(AgeId.age_6_1, "6.1"));
             ages.Add(new Age(AgeId.age_6_2, "6.2"));
             ages.Add(new Age(AgeId.age_6_3, "6.3"));
@@ -1067,11 +959,6 @@ namespace System.Unicode
             ages.Add(new Age(AgeId.age_11_0, "11.0"));
             ages.Add(new Age(AgeId.age_12_0, "12.0"));
             ages.Add(new Age(AgeId.age_12_1, "12.1"));
-        }
-        private AgeTable() : ages(), ageIdMap(), versionMap()
-        {
-            AddAge1();
-            AddAge2();
             for (Age* age : ages)
             {
                 ageIdMap[cast<uint>(cast<byte>(age->Id()))] = age;
@@ -1190,7 +1077,7 @@ namespace System.Unicode
             }
             return null;
         }
-        private void AddScript1()
+        private ScriptTable() : scripts(), scriptIdMap(), shortNameMap(), longNameMap()
         {
             scripts.Add(new Script(ScriptId.adlm, "Adlm", "Adlam"));
             scripts.Add(new Script(ScriptId.aghb, "Aghb", "Caucasian Albanian"));
@@ -1205,9 +1092,6 @@ namespace System.Unicode
             scripts.Add(new Script(ScriptId.batk, "Batk", "Batak")); 
             scripts.Add(new Script(ScriptId.beng, "Beng", "Bengali"));
             scripts.Add(new Script(ScriptId.bhks, "Bhks", "Bhaisuki"));
-        }
-        private void AddScript2()
-        {
             scripts.Add(new Script(ScriptId.bopo, "Bopo", "Bopomofo"));
             scripts.Add(new Script(ScriptId.brah, "Brah", "Brahmi"));
             scripts.Add(new Script(ScriptId.brai, "Brai", "Braille"));
@@ -1221,9 +1105,6 @@ namespace System.Unicode
             scripts.Add(new Script(ScriptId.copt, "Copt", "Coptic"));
             scripts.Add(new Script(ScriptId.cprt, "Cprt", "Cypriot"));
             scripts.Add(new Script(ScriptId.cyrl, "Cyrl", "Cyrillic"));
-        }
-        private void AddScript3()
-        {
             scripts.Add(new Script(ScriptId.deva, "Deva", "Devanagari"));
             scripts.Add(new Script(ScriptId.dogr, "Dogr", "Dogra"));
             scripts.Add(new Script(ScriptId.dsrt, "Dsrt", "Deseret"));
@@ -1238,9 +1119,6 @@ namespace System.Unicode
             scripts.Add(new Script(ScriptId.gonm, "Gonm", "Masaram Gondi"));
             scripts.Add(new Script(ScriptId.goth, "Goth", "Gothic"));
             scripts.Add(new Script(ScriptId.gran, "Gran", "Grantha"));
-        }
-        private void AddScript4()
-        {
             scripts.Add(new Script(ScriptId.grek, "Grek", "Greek"));
             scripts.Add(new Script(ScriptId.gujr, "Gujr", "Gujarati"));
             scripts.Add(new Script(ScriptId.guru, "Guru", "Gurmukhi"));
@@ -1255,9 +1133,6 @@ namespace System.Unicode
             scripts.Add(new Script(ScriptId.hmnp, "Hmnp", "Nyiakeng Puachue Hmong")); // 12.0
             scripts.Add(new Script(ScriptId.hrkt, "Hrkt", "Katakana Or Hiragana"));
             scripts.Add(new Script(ScriptId.hung, "Hung", "Old Hungarian"));
-        }
-        private void AddScript5()
-        {
             scripts.Add(new Script(ScriptId.ital, "Ital", "Old Italic"));
             scripts.Add(new Script(ScriptId.java, "Java", "Javanese"));
             scripts.Add(new Script(ScriptId.kali, "Kali", "Kayah Li"));
@@ -1271,9 +1146,6 @@ namespace System.Unicode
             scripts.Add(new Script(ScriptId.laoo, "Laoo", "Lao"));
             scripts.Add(new Script(ScriptId.latn, "Latn", "Latin"));
             scripts.Add(new Script(ScriptId.lepc, "Lepc", "Lepcha"));
-        }
-        private void AddScript6()
-        {
             scripts.Add(new Script(ScriptId.limb, "Limb", "Limbu"));
             scripts.Add(new Script(ScriptId.lina, "Lina", "Linear A"));
             scripts.Add(new Script(ScriptId.linb, "Linb", "Linear B"));
@@ -1288,9 +1160,6 @@ namespace System.Unicode
             scripts.Add(new Script(ScriptId.medf, "Medf", "Medefaidrin"));
             scripts.Add(new Script(ScriptId.mend, "Mend", "Mende Kikakui"));
             scripts.Add(new Script(ScriptId.merc, "Merc", "Meroitic Cursive"));
-        }
-        private void AddScript7()
-        {
             scripts.Add(new Script(ScriptId.mero, "Mero", "Meroitic Hieroglyphs"));
             scripts.Add(new Script(ScriptId.mlym, "Mlym", "Malayalam"));
             scripts.Add(new Script(ScriptId.modi, "Modi", "Modi"));
@@ -1305,9 +1174,6 @@ namespace System.Unicode
             scripts.Add(new Script(ScriptId.newa, "Newa", "Newa"));
             scripts.Add(new Script(ScriptId.nkoo, "Nkoo", "Nko"));
             scripts.Add(new Script(ScriptId.nshu, "Nshu", "Nushu"));
-        }
-        private void AddScript8()
-        {
             scripts.Add(new Script(ScriptId.ogam, "Ogam", "Ogham"));
             scripts.Add(new Script(ScriptId.olck, "Olck", "Ol Chiki"));
             scripts.Add(new Script(ScriptId.orkh, "Orkh", "Old Turkic"));
@@ -1323,9 +1189,6 @@ namespace System.Unicode
             scripts.Add(new Script(ScriptId.phnx, "Phnx", "Phoenician"));
             scripts.Add(new Script(ScriptId.plrd, "Plrd", "Miao"));
             scripts.Add(new Script(ScriptId.prti, "Prti", "Inscriptional Parthian"));
-        }
-        private void AddScript9()
-        {
             scripts.Add(new Script(ScriptId.rjng, "Rjng", "Rejang"));
             scripts.Add(new Script(ScriptId.rohg, "Rohg", "Hanifi Rohingya"));
             scripts.Add(new Script(ScriptId.runr, "Runr", "Runic"));
@@ -1340,9 +1203,6 @@ namespace System.Unicode
             scripts.Add(new Script(ScriptId.sinh, "Sinh", "Sinhala"));
             scripts.Add(new Script(ScriptId.sogd, "Sogd", "Sogdian"));
             scripts.Add(new Script(ScriptId.sogo, "Sogo", "Old Sogdian"));
-        }
-        private void AddScript10()
-        {
             scripts.Add(new Script(ScriptId.sora, "Sora", "Sora Sompeng"));
             scripts.Add(new Script(ScriptId.soyo, "Soyo", "Soyombo"));
             scripts.Add(new Script(ScriptId.sund, "Sund", "Sundanese"));
@@ -1356,9 +1216,6 @@ namespace System.Unicode
             scripts.Add(new Script(ScriptId.tang, "Tang", "Tangut"));
             scripts.Add(new Script(ScriptId.tavt, "Tavt", "Tai Viet"));
             scripts.Add(new Script(ScriptId.telu, "Telu", "Telugu"));
-        }
-        private void AddScript11()
-        {
             scripts.Add(new Script(ScriptId.tfng, "Tfng", "Tifinag"));
             scripts.Add(new Script(ScriptId.tglg, "Tglg", "Tagalog"));
             scripts.Add(new Script(ScriptId.thaa, "Thaa", "Thaana"));
@@ -1373,27 +1230,9 @@ namespace System.Unicode
             scripts.Add(new Script(ScriptId.xsux, "Xsux", "Cuneiform"));
             scripts.Add(new Script(ScriptId.yiii, "Yiii", "Yi"));
             scripts.Add(new Script(ScriptId.zanb, "Zanb", "Zanabazar Square"));
-        }
-        private void AddScript12()
-        {
             scripts.Add(new Script(ScriptId.zinh, "Zinh", "Inherited"));
             scripts.Add(new Script(ScriptId.zyyy, "Zyyy", "Common"));
             scripts.Add(new Script(ScriptId.zzzz, "Zzzz", "Unknown"));
-        }
-        private ScriptTable() : scripts(), scriptIdMap(), shortNameMap(), longNameMap()
-        {
-            AddScript1();
-            AddScript2();
-            AddScript3();
-            AddScript4();
-            AddScript5();
-            AddScript6();
-            AddScript7();
-            AddScript8();
-            AddScript9();
-            AddScript10();
-            AddScript11();
-            AddScript12();
             for (Script* script : scripts)
             {
                 scriptIdMap[cast<uint>(cast<byte>(script->Id()))] = script;
@@ -1675,7 +1514,7 @@ namespace System.Unicode
             }
             return null;
         }
-        private void AddBidi1()
+        private BidiClassTable() : bidiClasses(), bidiClassIdMap(), shortNameMap(), longNameMap()
         {
             bidiClasses.Add(new BidiClass(BidiClassId.al, "AL", "Arabic Letter"));
             bidiClasses.Add(new BidiClass(BidiClassId.an, "AN", "Arabic Number"));
@@ -1690,9 +1529,6 @@ namespace System.Unicode
             bidiClasses.Add(new BidiClass(BidiClassId.lre, "LRE", "Left To Right Embedding"));
             bidiClasses.Add(new BidiClass(BidiClassId.lri, "LRI", "Left To Right Isolate"));
             bidiClasses.Add(new BidiClass(BidiClassId.lro, "LRO", "Left To Right Override"));
-        }
-        private void AddBidi2()
-        {
             bidiClasses.Add(new BidiClass(BidiClassId.nsm, "NSM", "Nonspacing Mark"));
             bidiClasses.Add(new BidiClass(BidiClassId.on, "ON", "Other Neutral"));
             bidiClasses.Add(new BidiClass(BidiClassId.pdf, "PDF", "Pop Directional Format"));
@@ -1703,11 +1539,6 @@ namespace System.Unicode
             bidiClasses.Add(new BidiClass(BidiClassId.rlo, "RLO", "Right To Left Override"));
             bidiClasses.Add(new BidiClass(BidiClassId.s, "S", "Segment Separator"));
             bidiClasses.Add(new BidiClass(BidiClassId.ws, "WS", "White Space"));
-        }
-        private BidiClassTable() : bidiClasses(), bidiClassIdMap(), shortNameMap(), longNameMap()
-        {
-            AddBidi1();
-            AddBidi2();
             for (BidiClass* bidiClass : bidiClasses)
             {
                 bidiClassIdMap[cast<uint>(cast<byte>(bidiClass->Id()))] = bidiClass;
@@ -2163,7 +1994,8 @@ namespace System.Unicode
         {
             if (codePoint > cast<uchar>(0x10FFFF))
             {
-                throw UnicodeException("invalid Unicode code point " + ToHexString(cast<uint>(codePoint)));
+                //throw UnicodeException("invalid Unicode code point " + ToHexString(cast<uint>(codePoint)));
+				exit(250); // TODO
             }
             long pageIndex = cast<long>(codePoint) / numInfosInPage;
             if (pages.Count() <= pageIndex)
@@ -2176,21 +2008,25 @@ namespace System.Unicode
             CharacterInfoPage* page = pages[pageIndex].Get();
             if (page == null)
             {
-                string pathToUcdBinFile = PathToUcdBinFile();
-                if (!File.Exists(pathToUcdBinFile))
+                if (page == null)
                 {
-                    throw UnicodeException("Error: Cmajor Unicode database file '" + pathToUcdBinFile + "' does not exist.");
+                    string pathToUcdBinFile = PathToUcdBinFile();
+                    if (!File.Exists(pathToUcdBinFile))
+                    {
+                        // throw UnicodeException("Error: Cmajor Unicode database file '" + pathToUcdBinFile + "' does not exist.");
+						exit(250); // TODO
+                    }
+                    BinaryReader reader = File.OpenBinary(pathToUcdBinFile);
+                    if (!headerRead)
+                    {
+                        ReadHeader(reader);
+                    }
+                    uint pageStart = headerSize + characterInfoPageSize * cast<uint>(pageIndex);
+                    reader.Seek(cast<long>(pageStart), Origin.seekSet);
+                    page = new CharacterInfoPage();
+                    page->Read(reader);
+                    pages[pageIndex].Reset(page);
                 }
-                BinaryReader reader = File.OpenBinary(pathToUcdBinFile);
-                if (!headerRead)
-                {
-                    ReadHeader(reader);
-                }
-                uint pageStart = headerSize + characterInfoPageSize * cast<uint>(pageIndex);
-                reader.Seek(cast<long>(pageStart), Origin.seekSet);
-                page = new CharacterInfoPage();
-                page->Read(reader);
-                pages[pageIndex].Reset(page);
             }
             long infoIndex = cast<long>(codePoint) % numInfosInPage;
             return (*page)[infoIndex];
@@ -2199,7 +2035,8 @@ namespace System.Unicode
         {
             if (codePoint > cast<uchar>(0x10FFFF))
             {
-                throw UnicodeException("invalid Unicode code point " + ToHexString(cast<uint>(codePoint)));
+                // throw UnicodeException("invalid Unicode code point " + ToHexString(cast<uint>(codePoint)));
+				exit(250); // TODO
             }
             long pageIndex = cast<long>(codePoint) / numInfosInPage;
             if (extendedPages.Count() <= pageIndex)
@@ -2217,7 +2054,8 @@ namespace System.Unicode
                     string pathToUcdBinFile = PathToUcdBinFile();
                     if (!File.Exists(pathToUcdBinFile))
                     {
-                        throw UnicodeException("Error: Cmajor Unicode database file '" + pathToUcdBinFile + "' does not exist.");
+                        // throw UnicodeException("Error: Cmajor Unicode database file '" + pathToUcdBinFile + "' does not exist.");
+						exit(250); // TODO
                     }
                     BinaryReader reader = File.OpenBinary(pathToUcdBinFile);
                     if (!headerRead)
@@ -2238,7 +2076,7 @@ namespace System.Unicode
             long infoIndex = cast<long>(codePoint) % numInfosInPage;
             return (*extendedPage)[infoIndex];
         }
-        private CharacterTable() : headerRead(false), pages(), extendedHeaderStart(0u), extendedHeaderEnd(0u), extendedHeader(), extendedPages()
+        private CharacterTable() : headerRead(false), pages(), extendedHeaderStart(0u), extendedHeaderEnd(0u), extendedHeader(), extendedPages(), characterTableLock()
         {
             headerMagic.Resize(8);
             string hdrmgc = "CMAJUCD";
@@ -2267,14 +2105,18 @@ namespace System.Unicode
             {
                 if (magic[i] != cast<byte>(headerMagic[i]))
                 {
-                    throw UnicodeException("invalid cmajor_ucd.bin header magic: 'CMAJUCD' expected");
+                    // throw UnicodeException("invalid cmajor_ucd.bin header magic: 'CMAJUCD' expected");
+					exit(250); // TODO
                 }
             }
             if (magic[7] != headerMagic[7])
             {
+/*			
                 throw UnicodeException("invalid cmajor_ucd.bin version: version " + 
                     string(cast<char>(headerMagic[7]), 1) + " expected, version " + 
                     string(cast<char>(magic[7]), 1) + " read");
+*/
+				exit(250); // TODO
             }
             extendedHeaderStart = reader.ReadUInt();
             extendedHeaderEnd = reader.ReadUInt();
@@ -2296,6 +2138,7 @@ namespace System.Unicode
         private uint extendedHeaderEnd;
         private UniquePtr<ExtendedCharacterInfoHeader> extendedHeader;
         private List<UniquePtr<ExtendedCharacterInfoPage>> extendedPages;
+        private RecursiveMutex characterTableLock;
     }
 
     public const CharacterInfo& GetCharacterInfo(uchar codePoint)

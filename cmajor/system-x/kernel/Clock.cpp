@@ -55,6 +55,7 @@ void Clock::Tick()
     {
         Alarm alarm = alarms.front();
         alarms.erase(alarms.begin());
+        alarm.process->AddSleepTime();
         Scheduler::Instance().AddRunnableProcess(alarm.process);
     }
 }

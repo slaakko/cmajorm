@@ -7,8 +7,11 @@
 #include <system-x/intermediate/Context.hpp>
 #include <system-x/intermediate/Error.hpp>
 #include <system-x/intermediate/Visitor.hpp>
+#include <soulng/util/Util.hpp>
 
 namespace cmsx::intermediate {
+
+using namespace soulng::util;
 
 Type::Type(const SourcePos& sourcePos_, TypeKind kind_, int32_t id_) : sourcePos(sourcePos_), kind(kind_), id(id_)
 {
@@ -359,6 +362,11 @@ void ArrayType::Add(Types* types, Context* context)
 void ArrayType::Resolve(Types* types, Context* context)
 {
     types->ResolveType(elementTypeRef, context);
+}
+
+int64_t ArrayType::Size() const
+{ 
+    return Align(elementCount * ElementType()->Size(), 8); 
 }
 
 bool ArrayType::IsWeakType() const

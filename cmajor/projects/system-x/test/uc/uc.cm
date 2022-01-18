@@ -1,0 +1,242 @@
+using System;
+using System.Collections;
+
+public enum BinaryPropertyId : byte
+{
+	asciiHexDigit,
+	alphabetic,
+	bidiControl,
+	bidiMirrored,
+	cased,
+	compositionExclusion,
+	caseIgnorable,
+	fullCompositionExclusion,
+	changesWhenCasefolded,
+	changesWhenCaseMapped,
+	changesWhenNFKCCasefolded,
+	changesWhenLowercased,
+	changesWhenTitlecased,
+	changesWhenUppercased,
+	dash,
+	deprecated,
+	defaultIgnorableCodePoint,
+	diacritic,
+	extender,
+	graphemeBase,
+	graphemeExtend,
+	graphemeLink,
+	hexDigit,
+	hyphen,
+	idContinue,
+	ideographic,
+	idStart,
+	idsBinaryOperator,
+	idsTrinaryOperator,
+	joinControl,
+	logicalOrderException,
+	lowercase,
+	math,
+	noncharacterCodePoint,
+	otherAlphabetic,
+	otherDefaultIgnorableCodePoint,
+	otherGraphemeExtend,
+	otherIdContinue,
+	otherIdStart,
+	otherLowercase,
+	otherMath,
+	otherUppercase,
+	patternSyntax,
+	patternWhiteSpace,
+	prependedConcatenationMark,
+	quotationMark,
+	radical,
+	softDotted,
+	sentenceterminal,
+	terminalPunctuation,
+	unifiedIdeograph,
+	uppercase,
+	variationSelector,
+	whiteSpace,
+	xidContinue,
+	xidStart,
+	expandsOnNFC,
+	expandsOnNFD,
+	expandsOnNFKC,
+	expandsOnNFKD
+}
+
+public class BinaryProperty
+{
+	public nothrow BinaryProperty(BinaryPropertyId id_, const string& shortName_, const string& longName_) : id(id_), shortName(shortName_), longName(longName_)
+	{
+	}
+	public inline nothrow BinaryPropertyId Id()
+	{
+		return id;
+	}
+	public inline nothrow const string& ShortName()
+	{
+		return shortName;
+	}
+	public inline nothrow const string& LongName()
+	{
+		return longName;
+	}
+	private BinaryPropertyId id;
+	private string shortName;
+	private string longName;
+}
+
+public string MakeCanonicalPropertyName(const string& s)
+{
+	string result;
+	for (char c : s)
+	{
+		if (c != '_' && c != ' ' && c != '-')
+		{
+			result.Append(c);
+		}
+	}
+	//return ToLower(result); TODO
+	return result;
+}
+
+public class BinaryPropertyTable
+{
+	static BinaryPropertyTable() : instance(new BinaryPropertyTable())
+	{
+	}
+	public static nothrow BinaryPropertyTable& Instance()
+	{
+		return *instance;
+	}
+	public nothrow const BinaryProperty* GetBinaryProperty(BinaryPropertyId id) const
+	{
+		HashMap<uint, void*>.ConstIterator it = binaryPropertyIdMap.CFind(cast<uint>(cast<byte>(id)));
+		if (it != binaryPropertyIdMap.CEnd())
+		{
+			return cast<BinaryProperty*>(it->second);
+		}
+		return null;
+	}
+	public const BinaryProperty* GetBinaryPropertyByShortName(const string& shortName) const
+	{
+		HashMap<string, void*>.ConstIterator it = shortNameMap.CFind(MakeCanonicalPropertyName(shortName));
+		if (it != shortNameMap.CEnd())
+		{
+			return cast<BinaryProperty*>(it->second);
+		}
+		return null;
+	}
+	public const BinaryProperty* GetBinaryPropertyByLongName(const string& longName) const
+	{
+		HashMap<string, void*>.ConstIterator it = longNameMap.CFind(MakeCanonicalPropertyName(longName));
+		if (it != longNameMap.CEnd())
+		{
+			return cast<BinaryProperty*>(it->second);
+		}
+		return null;
+	}
+	private BinaryPropertyTable() : binaryProperties(), binaryPropertyIdMap(), shortNameMap(), longNameMap()
+	{
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.asciiHexDigit, "AHex", "Ascii Hex Digit"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.alphabetic, "Alpha", "Alphabetic"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.bidiControl, "Bidi C", "Bidi Control"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.bidiMirrored, "Bidi M", "Bidi Mirrored"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.cased, "Cased", "Cased"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.compositionExclusion, "CE", "Composition Exclusion"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.caseIgnorable, "CI", "Case Ignorable"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.fullCompositionExclusion, "Comp Ex", "Full Composition Exclusion"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.changesWhenCasefolded, "CWCF", "Changes When Casefolded"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.changesWhenCaseMapped, "CWCM", "Changes When Casemapped"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.changesWhenNFKCCasefolded, "CWKCF", "Changes When NFKC Casefolded"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.changesWhenLowercased, "CWL", "Changes When Lowercased"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.changesWhenTitlecased, "CWT", "Changes When Titlecased"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.changesWhenUppercased, "CWU", "Changes When Uppercased"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.dash, "Dash", "Dash"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.deprecated, "Dep", "Deprecated"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.defaultIgnorableCodePoint, "DI", "Default Ignorable Code Point"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.diacritic, "Dia", "Diacritic"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.extender, "Ext", "Extender"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.graphemeBase, "Gr Base", "Grapheme Base"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.graphemeExtend, "Gr Ext", "Grapheme Extend"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.graphemeLink, "Gr Link", "Grapheme Link"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.hexDigit, "Hex", "Hex Digit"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.hyphen, "Hyphen", "Hyphen"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.idContinue, "IDC", "ID Continue"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.ideographic, "Ideo", "Ideographic"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.idStart, "IDS", "ID Start"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.idsBinaryOperator, "IDSB", "IDS Binary Operator"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.idsTrinaryOperator, "IDST", "IDS Trinary Operator"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.joinControl, "Join C", "Join Control"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.logicalOrderException, "LOE", "Logical Order Exception"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.lowercase, "Lower", "Lowercase"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.math, "Math", "Math"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.noncharacterCodePoint, "NChar", "Noncharacter Code Point"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.otherAlphabetic, "OAlpha", "Other Alphabetic"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.otherDefaultIgnorableCodePoint, "ODI", "Other Default Ignorable Code Point"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.otherGraphemeExtend, "OGr Ext", "Other Grapheme Extend"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.otherIdContinue, "OIDC", "Other ID Continue"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.otherIdStart, "OIDS", "Other ID Start"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.otherLowercase, "OLower", "Other Lowercase"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.otherMath, "OMath", "Other Math"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.otherUppercase, "OUpper", "Other Uppercase"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.patternSyntax, "Pat Syn", "Pattern Syntax"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.patternWhiteSpace, "Pat WS", "Pattern White Space"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.prependedConcatenationMark, "PCM", "Prepended Concatenation Mark"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.quotationMark, "QMark", "Quotation Mark"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.radical, "Radical", "Radical"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.softDotted, "SD", "Soft Dotted"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.sentenceterminal, "STerm", "Sentence Terminal"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.terminalPunctuation, "Term", "Terminal Punctuation"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.unifiedIdeograph, "UIdeo", "Unified Ideograph"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.uppercase, "Upper", "Uppercase"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.variationSelector, "VS", "Variation Selector"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.whiteSpace, "WSpace", "White Space"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.xidContinue, "XIDC", "XID Continue"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.xidStart, "XIDS", "XID Start"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.expandsOnNFC, "XO NFC", "Expands On NFC"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.expandsOnNFD, "XO NFD", "Expands On NFD"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.expandsOnNFKC, "XO NFKC", "Expands On NFKC"));
+		binaryProperties.Add(new BinaryProperty(BinaryPropertyId.expandsOnNFKD, "XO NFKD", "Expands On NFKD"));
+		for (BinaryProperty* binaryProperty : binaryProperties)
+		{
+			binaryPropertyIdMap[cast<uint>(cast<byte>(binaryProperty->Id()))] = binaryProperty;
+			shortNameMap[MakeCanonicalPropertyName(binaryProperty->ShortName())] = binaryProperty;
+			longNameMap[MakeCanonicalPropertyName(binaryProperty->LongName())] = binaryProperty;
+		}
+	}
+	public ~BinaryPropertyTable()
+	{
+		for (BinaryProperty* binaryProperty : binaryProperties)
+		{
+			delete binaryProperty;
+		}
+	}
+	private List<BinaryProperty*> binaryProperties;
+	private HashMap<uint, void*> binaryPropertyIdMap;
+	private HashMap<string, void*> shortNameMap;
+	private HashMap<string, void*> longNameMap;
+	private static UniquePtr<BinaryPropertyTable> instance;
+}    
+
+public nothrow const BinaryProperty* GetBinaryProperty(BinaryPropertyId id)
+{
+	return BinaryPropertyTable.Instance().GetBinaryProperty(id);
+}
+
+public const BinaryProperty* GetBinaryPropertyByShortName(const string& shortName)
+{
+	return BinaryPropertyTable.Instance().GetBinaryPropertyByShortName(shortName);
+}
+
+public const BinaryProperty* GetBinaryPropertyByLongName(const string& longName)
+{
+	return BinaryPropertyTable.Instance().GetBinaryPropertyByLongName(longName);
+}
+
+void main()
+{
+	const BinaryProperty* p = GetBinaryProperty(BinaryPropertyId.lowercase);
+}
+

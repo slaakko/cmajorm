@@ -151,23 +151,35 @@ namespace System.Collections
         }
         public inline nothrow ReferenceType operator*()
         {
-            #assert(bucket != null);
+			if (bucket == null)
+			{
+				ThrowNullPointerException();
+			}
             return bucket->Value();
         }
         public inline nothrow PointerType operator->()
         {
-            #assert(bucket != null);
+			if (bucket == null)
+			{
+				ThrowNullPointerException();
+			}
             return &(bucket->Value());
         }
         public inline nothrow Self& operator++()
         {
-            #assert(bucket != null && table != null);
+			if (bucket == null || table == null)
+			{
+				ThrowNullPointerException();
+			}
             Bucket<ValueType>* old = bucket;
             bucket = bucket->Next();
             if (bucket == null)
             {
                 long index = table->GetBucketIndex(old->Value());
-                #assert(index != -1);
+				if (index == -1)
+				{
+					ThrowPreconditionViolationException();
+				}
                 ++index;
                 long n = table->GetBucketCount();
                 while (bucket == null && index < n)
@@ -294,7 +306,10 @@ namespace System.Collections
             }
             const KeyType& key = KeyOf(value);
             long index = Hash(key);
-            #assert(index != -1);
+			if (index == -1)
+			{
+				ThrowInvalidParameterException();
+			}
             Bucket<ValueType>* bucket = buckets[index];
             while (bucket != null)
             {
@@ -464,7 +479,10 @@ namespace System.Collections
                 {
                     const KeyType& key = KeyOf(bucket->Value());
                     long index = Hash(key);
-                    #assert(index != -1);
+					if (index == -1)
+					{
+						ThrowPreconditionViolationException();
+					}
                     Bucket<ValueType>* next = bucket->Next();
                     bucket->SetNext(buckets[index]);
                     buckets[index] = bucket;

@@ -339,6 +339,12 @@ cmsx::assembler::Node* MakeRegOperand(Value* value, const Register& r, CodeGener
                 inst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint64_t>(0)));
                 break;
             }
+            case ValueKind::symbolValue:
+            {
+                SymbolValue* v = static_cast<SymbolValue*>(value);
+                inst->AddOperand(cmsx::assembler::MakeGlobalSymbol(v->Symbol()));
+                break;
+            }
             default:
             {
                 codeGen.Error("error making reg operand: not implemented for value kind " + value->KindStr());
@@ -1075,12 +1081,19 @@ void EmitElemAddr(ElemAddrInstruction& inst, CodeGenerator& codeGen)
     ldaInst->AddOperand(MakeRegOperand(reg));
     if (elemAddrKind == ElemAddrKind::array)
     {
-        EmitPtrOperand(inst.Ptr(), ldaInst, codeGen);
+        cmsx::assembler::Instruction* primaryLdaInst = new cmsx::assembler::Instruction(cmsx::assembler::LDA);
+        primaryLdaInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
+        EmitPtrOperand(inst.Ptr(), primaryLdaInst, codeGen);
+        codeGen.Emit(primaryLdaInst);
+        ldaInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
     }
     else if (elemAddrKind == ElemAddrKind::structure)
     {
-        cmsx::assembler::Node* operand = MakeRegOperand(inst.Ptr(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen);
-        ldaInst->AddOperand(operand);
+        cmsx::assembler::Instruction* primaryLdaInst = new cmsx::assembler::Instruction(cmsx::assembler::LDA);
+        primaryLdaInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
+        EmitPtrOperand(inst.Ptr(), primaryLdaInst, codeGen);
+        codeGen.Emit(primaryLdaInst);
+        ldaInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
     }
     ldaInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regIX)));
     codeGen.Emit(ldaInst);

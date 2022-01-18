@@ -11,7 +11,7 @@
 
 namespace cmsx::kernel {
 
-CMSX_KERNEL_API void DumpHeap(cmsx::machine::Processor& processor, uint64_t freeAddr);
+CMSX_KERNEL_API void DumpHeap(cmsx::machine::Processor& processor, uint64_t freeAddr, int32_t tag, uint64_t ptr, uint64_t size);
 
 } // namespace cmsx::kernel
 

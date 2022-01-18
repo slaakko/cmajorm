@@ -151,7 +151,7 @@ namespace System
     
     public nothrow TimePoint Now()
     {
-        return TimePoint(get_current_time_point());
+        return TimePoint(current_time_point());
     }
     
     public nothrow void Sleep(const Duration& duration)
@@ -290,7 +290,7 @@ namespace System
         short y;
         sbyte m;
         sbyte d;
-        get_current_date(&y, &m, &d);
+        current_date(&y, &m, &d);
         return Date(y, cast<Month>(m), d);
     }
     
@@ -394,7 +394,7 @@ namespace System
         sbyte m;
         sbyte d;
         int secs;
-        get_current_date_time(&y, &m, &d, &secs);
+        current_date_time(&y, &m, &d, &secs);
         return DateTime(Date(y, cast<Month>(m), d), secs);
     }
     

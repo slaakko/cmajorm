@@ -148,11 +148,14 @@ int main(int argc, const char** argv)
             std::cout << "'" << args[0] << "' exited with code " << static_cast<int>(exitCode) << std::endl;
             std::cout << std::endl;
             std::chrono::steady_clock::duration userTime = process->UserTime();
+            std::chrono::steady_clock::duration sleepTime = process->SleepTime();
             std::chrono::steady_clock::duration systemTime = process->SystemTime();
-            std::chrono::steady_clock::duration totalTime = userTime + systemTime;
+            std::chrono::steady_clock::duration totalTime = userTime + sleepTime + systemTime;
             double userTimePercent = (100.0 * userTime) / totalTime;
+            double sleepTimePercent = (100.0 * sleepTime) / totalTime;
             double systemTimePercent = (100.0 * systemTime) / totalTime;
             std::cout << "user time:   " << DurationStr(userTime) << " (" << userTimePercent << "%)" << std::endl;
+            std::cout << "sleep time:  " << DurationStr(sleepTime) << " (" << sleepTimePercent << "%)" << std::endl;
             std::cout << "system time: " << DurationStr(systemTime) << " (" << systemTimePercent << "%)" << std::endl;
             std::cout << "total time:  " << DurationStr(totalTime) << std::endl;
         }

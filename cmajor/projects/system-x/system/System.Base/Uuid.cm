@@ -8,11 +8,11 @@ namespace System
     public class Uuid
     {
         public const long size = 16;
-        
+
         public typedef byte[size].Iterator Iterator;
         public typedef byte[size].ConstIterator ConstIterator;
-        
-        public nothrow inline Iterator Begin() 
+
+        public nothrow inline Iterator Begin()
         {
             return data.Begin();
         }
@@ -24,7 +24,7 @@ namespace System
         {
             return data.CBegin();
         }
-        public nothrow inline Iterator End() 
+        public nothrow inline Iterator End()
         {
             return data.End();
         }
@@ -36,7 +36,7 @@ namespace System
         {
             return data.CEnd();
         }
-        
+
         public nothrow Uuid() : data()
         {
         }
@@ -85,13 +85,13 @@ namespace System
             rightHalf = (rightHalf << 8u) | data[15];
             return rightHalf;
         }
-        public static nothrow Uuid Random() 
+        public static nothrow Uuid Random()
         {
             return Uuid(Random64(), Random64());
         }
         public byte[size] data;
     }
-    
+
     public nothrow inline bool operator==(const Uuid& left, const Uuid& right)
     {
         for (long i = 0; i < Uuid.size; ++i)
@@ -100,29 +100,43 @@ namespace System
         }
         return true;
     }
-    
+
     public nothrow string ToString(const Uuid& uuid)
     {
         string s;
+        int index = 0;
         for (byte x : uuid)
         {
-            s.Append(ToHexString(x));
+            //s.Append(ToLower(ToHexString(x))); TODO
+			s.Append(ToHexString(x));
+            if (index == 3 || index == 5 || index == 7 || index == 9)
+            {
+                s.Append('-');
+            }
+            ++index;
         }
         return s;
     }
-    
+
     public Uuid ParseUuid(const string& uuidHexString)
     {
-        if (uuidHexString.Length() != 2 * Uuid.size)
+        if (uuidHexString.Length() != 2 * Uuid.size + 4)
         {
-            ThrowConversionException("wrong number of hex bytes in uuid string '" + uuidHexString + "'." + ToString(Uuid.size) + " hex bytes expected.");
+            ThrowConversionException("wrong number of hex bytes in uuid string '" + uuidHexString + "'." + ToString(Uuid.size) + " hex bytes + 4 hyphens expected.");
         }
         Uuid uuid;
+        int index = 0;
         for (long i = 0; i < Uuid.size; ++i)
         {
-            string hexByteStr = uuidHexString.Substring(2 * i, 2);
+            string hexByteStr = uuidHexString.Substring(index, 2);
             byte hexByte = ParseHexByte(hexByteStr);
             uuid.data[i] = hexByte;
+            ++index;
+            ++index;
+            if (i == 3 || i == 5 || i == 7 || i == 9)
+            {
+                ++index;
+            }
         }
         return uuid;
     }

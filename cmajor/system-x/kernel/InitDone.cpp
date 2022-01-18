@@ -10,6 +10,7 @@
 #include <system-x/kernel/IOTraps.hpp>
 #include <system-x/kernel/TimeTraps.hpp>
 #include <system-x/kernel/MathTraps.hpp>
+#include <system-x/kernel/TrapRandom.hpp>
 #include <system-x/kernel/Kernel.hpp>
 #include <system-x/kernel/ProcessManager.hpp>
 #include <system-x/kernel/Scheduler.hpp>
@@ -26,6 +27,7 @@ void Init()
     InitIOTraps();
     InitTimeTraps();
     InitMathTraps();
+    InitTrapRandom();
     InitProcessManager();
     InitScheduler();
     InitEventManager();
@@ -40,6 +42,7 @@ void Done()
     DoneEventManager();
     DoneScheduler();
     DoneProcessManager();
+    DoneTrapRandom();
     DoneMathTraps();
     DoneTimeTraps();
     DoneIOTraps();

@@ -11,10 +11,10 @@ public const byte trap_allocate_memory_pages = 4u;
 public const byte trap_dump_heap = 5u;
 public const byte trap_random_seed = 6u;
 public const byte trap_write = 7u;
-public const byte trap_get_current_time_point = 8u;
+public const byte trap_current_time_point = 8u;
 public const byte trap_sleep = 9u;
-public const byte trap_get_current_date = 10u;
-public const byte trap_get_current_date_time = 11u;
+public const byte trap_current_date = 10u;
+public const byte trap_current_date_time = 11u;
 public const byte trap_pow = 12u;
 
 public cdecl nothrow void exit(byte exitCode)
@@ -43,9 +43,9 @@ public cdecl nothrow long allocate_memory_pages(int numPages)
 	return cast<long>(trap(0u, trap_allocate_memory_pages, 0u, numPages));
 }
 
-public cdecl nothrow void dump_heap(ulong free)
+public cdecl nothrow void dump_heap(ulong free, int tag, ulong ptr, ulong size)
 {
-	trap(0u, trap_dump_heap, 0u, free);
+	trap(0u, trap_dump_heap, 0u, free, tag, ptr, size);
 }
 
 public cdecl nothrow uint random_seed()
@@ -58,9 +58,9 @@ public cdecl nothrow long write(int fd, void* buffer, long count)
     return cast<long>(trap(0u, trap_write, 0u, fd, buffer, count));
 }
 
-public cdecl nothrow long get_current_time_point()
+public cdecl nothrow long current_time_point()
 {
-	return cast<long>(trap(0u, trap_get_current_time_point, 0u));
+	return cast<long>(trap(0u, trap_current_time_point, 0u));
 }
 
 public cdecl nothrow int sleep(long duration)
@@ -68,14 +68,14 @@ public cdecl nothrow int sleep(long duration)
 	return cast<int>(trap(0u, trap_sleep, 0u, duration));
 }
 
-public cdecl nothrow int get_current_date(short* y, sbyte* m, sbyte* d)
+public cdecl nothrow int current_date(short* y, sbyte* m, sbyte* d)
 {
-	return cast<int>(trap(0u, trap_get_current_date, 0u, y, m, d));
+	return cast<int>(trap(0u, trap_current_date, 0u, y, m, d));
 }
 
-public cdecl nothrow int get_current_date_time(short* y, sbyte* m, sbyte* d, int* secs)
+public cdecl nothrow int current_date_time(short* y, sbyte* m, sbyte* d, int* secs)
 {
-	return cast<int>(trap(0u, trap_get_current_date_time, 0u, y, m, d, secs));
+	return cast<int>(trap(0u, trap_current_date_time, 0u, y, m, d, secs));
 }
 
 public cdecl nothrow double pow(double x, double y)

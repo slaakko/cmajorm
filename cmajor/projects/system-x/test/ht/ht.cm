@@ -1,0 +1,49 @@
+using System;
+using System.Collections;
+
+void TestHashSet()
+{
+	HashSet<int> s;
+	for (int i = 0; i < 10; ++i)
+	{
+		int x = cast<int>(RandomNumber(100u));
+		s.Insert(x);
+	}
+	for (int x : s)
+	{
+		string s = ToString(x) + "\n";
+		write(1, s.Chars(), s.Length());
+	}
+}
+
+string MakeString()
+{
+	string s;
+	uint n = 16u * (RandomNumber(16u) + 1u);
+	for (uint i = 0u; i < n; ++i)
+	{
+		byte x = cast<byte>(i);
+		s.Append(ToHexString(x));
+	}
+	return s;
+}
+
+void TestHashMap()
+{
+	HashMap<int, string> m;
+	for (int i = 0; i < 10; ++i)
+	{
+		m[i] = MakeString();
+	}
+	for (const Pair<int, string>& p : m)
+	{
+		string s = ToString(p.first) + ": " + p.second + "\n";
+		write(1, s.Chars(), s.Length());
+	}
+}
+
+void main()
+{
+	TestHashSet();
+	TestHashMap();
+}

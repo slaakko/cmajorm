@@ -5,173 +5,109 @@
 
 namespace System
 {
+	// Adapted from K&R C general purpose storage allocator example.
+
 	private long pageSize = -1;
+	private Block empty;
+	private Block* free = null;
 	
-	internal nothrow long PageSize() 
+	public nothrow ulong FreeAddr() 
 	{
-		if (pageSize == -1)
+		return cast<ulong>(cast<void*>(free));
+	}
+	
+	internal class Block
+	{
+		public nothrow Block() : next(null), size(0) {}
+		public Block* next;
+		public long size;
+	}
+	
+	internal Block* MoreCore(long nb)
+	{
+		long bigBlock = Align(nb, pageSize);
+		int numPages = cast<int>(bigBlock / pageSize);
+		long addr = heap_start() + heap_length();
+		long sizeAllocated = allocate_memory_pages(numPages);
+		if (sizeAllocated == -1)
+		{
+			exit(254);
+		}
+		long allocatedUnits = sizeAllocated / sizeof(Block);
+		Block* a = cast<Block*>(cast<void*>(cast<ulong>(addr)));
+		a->size = allocatedUnits;
+		MemFree(a + 1);
+		return free;
+	}
+
+	public nothrow void* MemAlloc(long numBytes)
+	{
+		Block* prev = free;
+		if (free == null)
 		{
 			pageSize = memory_page_size();
+			empty.next = &empty;
+			prev = &empty;
+			free = prev;
 		}
-		return pageSize;
+		long nb = Align(numBytes, sizeof(Block)) + sizeof(Block);
+		long numUnits = nb / sizeof(Block);
+		Block* p = prev->next;
+		while (true)
+		{
+			if (p->size >= numUnits)
+			{
+				if (p->size == numUnits)
+				{
+					prev->next = p->next;
+				}
+				else
+				{
+					p->size = p->size - numUnits;
+					p = p + p->size;
+					p->size = numUnits;
+				}
+				free = prev;
+				return p + 1;
+			}
+			if (p == free)
+			{
+				p = MoreCore(nb);
+			}
+			prev = p;
+			p = p->next;
+		}
 	}
 	
-    internal class Block
-    {
-        public nothrow Block() : next(this), size(0)
-        {
-        }
-        public Block* next;
-        public long size;
-    }
-	
-    public nothrow void* malloc(long numBytes)
-    {
-		if (numBytes <= 0)
-		{
-			return null;
-		}
-        Block* block = Memory.AllocateBlock(numBytes);
-        if (block == null)
-        {
-            return null;
-        }
-        else
-        {
-            return block + 1;
-        }
-    }
-
-    public void* MemAlloc(long numBytes)
-    {
-        void* ptr = malloc(numBytes);
-        if (ptr == null)
-        {
-            exit(254);
-        }
-        else
-        {
-            return ptr;
-        }
-    }
-    
-    public nothrow void MemFree(void* ptr)
-    {
-        Block* block = cast<Block*>(ptr) - 1;
-        Memory.FreeBlock(block);
-    }
-
-	public nothrow void DumpHeap()
+	public nothrow void MemFree(void* ptr)
 	{
-		Memory.Dump();
-	}
-
-    internal static class Memory
-    {
-        static nothrow Memory() : baseBlock(), free(&baseBlock)
-        {
-        }
-        public nothrow static Block* AllocateBlock(long numBytes)
-        {
-            long numUnits = (numBytes + sizeof(Block) - 1) / sizeof(Block) + 1;
-            Block* prev = free;
-            Block* p = prev->next;
-            while (true)
-            {
-                if (p->size >= numUnits)
-                {
-                    if (p->size == numUnits)
-                    {
-                        prev->next = p->next;
-                    }
-                    else
-                    {
-                        p->size = p->size - numUnits;
-                        p = p + p->size;
-                        p->size = numUnits;
-                    }
-                    free = prev;
-                    return p;
-                }
-                if (p == free)
-                {
-                    p = AllocateMoreMemory(numUnits);
-                    if (p == null)
-                    {
-                        return null;
-                    }
-                }
-                prev = p; 
-                p = p->next;
-            }
-        }
-        public static nothrow void FreeBlock(Block* block)
-        {
-            Block* p = free;
-            for ( ; !(block > p && block < p->next); p = p->next)
-            {
-                if (p >= p->next && (block > p || block < p->next)) break;
-            }
-            if (block + block->size == p->next)
-            {
-                block->size = block->size + p->next->size;
-                block->next = p->next->next;
-            }
-            else
-            {
-                block->next = p->next;
-            }
-            if (p + p->size == block)
-            {
-                p->size = p->size + block->size;
-                p->next = block->next;
-            }
-            else
-            {
-                p->next = block;
-            }
-            free = p;
-        }
-		public static nothrow void Dump()
+		Block* bp = cast<Block*>(ptr) - 1;
+		Block* p;
+		for (p = free; !(bp > p && bp < p->next); p = p->next)
 		{
-			dump_heap(cast<ulong>(cast<void*>(free)));
+			if (p >= p->next && (bp > p || bp < p->next))
+			{
+				break;
+			}
 		}
-        private static nothrow Block* AllocateMoreMemory(long numUnits)
-        {
-            long numBytes = numUnits * sizeof(Block);
-			long pgsz = PageSize();
-			if (pgsz == -1)
-			{
-				return null;
-			}
-            if (numBytes < pgsz)
-            {
-                numBytes = pgsz;
-            }
-			int numPages = cast<int>((numBytes - 1) / pgsz + 1);
-			long start = heap_start();
-			if (start == -1)
-			{
-				return null;
-			}
-			long length = heap_length();
-			if (length == -1)
-			{
-				return null;
-			}
-			long p = start + length;
-			long amountAllocated = allocate_memory_pages(numPages);
-			if (amountAllocated == -1)
-			{
-				return null;
-			}
-            Block* u = cast<Block*>(cast<void*>(cast<ulong>(p)));
-            u->next = null;
-            u->size = amountAllocated;
-            FreeBlock(u);
-            return free;
-        }
-        private static Block baseBlock;
-        private static Block* free;
-    }
-}
+		if (bp + bp->size == p->next)
+		{
+			bp->size = bp->size + p->next->size;
+			bp->next = p->next->next;
+		}
+		else
+		{
+			bp->next = p->next;
+		}
+		if (p + p->size == bp)
+		{
+			p->size = p->size + bp->size;
+			p->next = bp->next;
+		}
+		else
+		{
+			p->next = bp;
+		}
+		free = p;
+	}
+}	

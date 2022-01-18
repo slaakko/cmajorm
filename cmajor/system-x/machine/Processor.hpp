@@ -46,11 +46,13 @@ public:
     virtual void SetState(ProcessState state) = 0;
     virtual void Exit(uint8_t exitCode) = 0;
     virtual void SetRunning(Processor* processor) = 0;
+    virtual Processor* GetProcessor() const = 0;
     virtual void ResetProcessor() = 0;
     virtual Debugger* GetDebugger() const = 0;
     virtual void SetDebugger(Debugger* debugger) = 0;
     virtual void SetObserver(ProcessObserver* observer) = 0;
     virtual void AddUserTime(std::chrono::steady_clock::duration duration) = 0;
+    virtual void AddSleepTime() = 0;
     virtual void AddSystemTime(std::chrono::steady_clock::duration duration) = 0;
     virtual int64_t HeapStartAddress() const = 0;
     virtual int64_t HeapLength() const = 0;
