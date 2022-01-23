@@ -24,6 +24,7 @@ void SimpleAssemblyCodeGenPass::Run(Context* context)
     SimpleAssemblyCodeGenerator codeGenerator(context, &assemblyFile);
     context->GetData().VisitGlobalVariables(codeGenerator);
     context->GetCode().VisitFunctions(codeGenerator);
+    codeGenerator.GenerateDebugInfo();
     codeGenerator.WriteOutputFile();
 }
 

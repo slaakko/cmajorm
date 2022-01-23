@@ -196,4 +196,21 @@ namespace System
             return 2 * Align(size, 4096);
         }
     }
+
+    public nothrow string GetStackTrace()
+    {
+        UniquePtr<byte> mem(cast<byte*>(MemAlloc(4096)));
+        if (stack_trace(mem.Get(), 4096) == 0)
+        {
+            string stackTrace;
+            byte* p = mem.Get();
+            while (*p != 0u)
+            {
+                stackTrace.Append(cast<char>(*p));
+                ++p;
+            }
+            return stackTrace;
+        }
+        return string();
+    }
 }

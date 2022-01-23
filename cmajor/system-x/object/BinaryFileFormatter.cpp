@@ -118,6 +118,11 @@ void BinaryFileFormatter::FormatSection(LinkSection* section)
 void BinaryFileFormatter::FormatSection(DebugSection* section)
 {
     currentSection = section;
+    for (const auto& debugRecord : section->DebugRecords())
+    {
+        FormatString(debugRecord->ToString());
+        FormatEol();
+    }
 }
 
 void BinaryFileFormatter::FormatSymbolTable(SymbolTable& symbolTable)

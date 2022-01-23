@@ -24,6 +24,11 @@ const uint8_t trap_sleep = 9;
 const uint8_t trap_current_date = 10;
 const uint8_t trap_current_date_time = 11;
 const uint8_t trap_pow = 12;
+const uint8_t trap_throw = 13;
+const uint8_t trap_catch = 14;
+const uint8_t trap_resume = 15;
+const uint8_t trap_stack_trace = 16;
+const uint8_t trap_get_system_error = 17;
 
 class CMSX_KERNEL_API TrapHandler
 {

@@ -1023,10 +1023,8 @@ void EmitBranch(BranchInstruction& inst, CodeGenerator& codeGen)
 
 void EmitNop(NoOperationInstruction& inst, CodeGenerator& codeGen)
 {
-    cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
-    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
-    setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
-    codeGen.Emit(setInst);
+    cmsx::assembler::Instruction* swymInst = new cmsx::assembler::Instruction(cmsx::machine::SWYM);
+    codeGen.Emit(swymInst);
 }
 
 void EmitElemAddr(ElemAddrInstruction& inst, CodeGenerator& codeGen)
@@ -1626,6 +1624,246 @@ void EmitString(StringValue& value, CodeGenerator& codeGen)
 void EmitClsId(const std::string& typeId, CodeGenerator& codeGen)
 {
     codeGen.EmitClsId(typeId);
+}
+
+void EmitSourceFileNameDebugInfo(const std::string& sourceFileName, int64_t id, CodeGenerator& codeGen)
+{
+    codeGen.EmitDebugInfoInst(new cmsx::assembler::Instruction(cmsx::assembler::BSPEC));
+    cmsx::assembler::Instruction* octaInst = new cmsx::assembler::Instruction(cmsx::assembler::OCTA);
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(cmsx::assembler::FILEINFO));
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(sourceFileName));
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(id));
+    codeGen.EmitDebugInfoInst(octaInst);
+    codeGen.EmitDebugInfoInst(new cmsx::assembler::Instruction(cmsx::assembler::ESPEC));
+}
+
+void EmitFunctionDebugInfo(Function* function, int64_t frameSize, CodeGenerator& codeGen)
+{
+    codeGen.EmitDebugInfoInst(new cmsx::assembler::Instruction(cmsx::assembler::BSPEC));
+    cmsx::assembler::Instruction* octaInst = new cmsx::assembler::Instruction(cmsx::assembler::OCTA);
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(cmsx::assembler::FUNCINFO));
+    octaInst->AddOperand(cmsx::assembler::MakeGlobalSymbol(function->Name()));
+    std::string functionFullName;
+    MetadataRef* metadataRef = function->GetMetadataRef();
+    if (metadataRef)
+    {
+        MetadataStruct* metadataStruct = metadataRef->GetMetadataStruct();
+        if (metadataStruct)
+        {
+            MetadataItem* fullNameItem = metadataStruct->GetItem("fullName");
+            if (fullNameItem && fullNameItem->Kind() == MetadataItemKind::metadataString)
+            {
+                MetadataString* fullNameStr = static_cast<MetadataString*>(fullNameItem);
+                functionFullName = fullNameStr->Value();
+            }
+        }
+    }
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(functionFullName));
+    if (metadataRef)
+    {
+        MetadataStruct* metadataStruct = metadataRef->GetMetadataStruct();
+        if (metadataStruct)
+        {
+            MetadataItem* sourceFileItem = metadataStruct->GetItem("sourceFile");
+            if (sourceFileItem && sourceFileItem->Kind() == MetadataItemKind::metadataRef)
+            {
+                MetadataRef* mdRef = static_cast<MetadataRef*>(sourceFileItem);
+                MetadataStruct* mdStruct = mdRef->GetMetadataStruct();
+                if (mdStruct)
+                {
+                    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(mdStruct->Id()));
+                }
+            }
+        }
+    }
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(frameSize));
+    codeGen.EmitDebugInfoInst(octaInst);
+    codeGen.EmitDebugInfoInst(new cmsx::assembler::Instruction(cmsx::assembler::ESPEC));
+}
+
+void EmitLineNumberInfo(uint32_t currentLineNumber, CodeGenerator& codeGen)
+{
+    codeGen.Emit(new cmsx::assembler::Instruction(cmsx::assembler::BSPEC));
+    cmsx::assembler::Instruction* octaInst = new cmsx::assembler::Instruction(cmsx::assembler::OCTA);
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(cmsx::assembler::LINEINFO));
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(currentLineNumber));
+    codeGen.Emit(octaInst);
+    codeGen.Emit(new cmsx::assembler::Instruction(cmsx::assembler::ESPEC));
+}
+
+void EmitBeginTry(uint32_t tryBlockId, uint32_t parentTryBlockId, CodeGenerator& codeGen)
+{
+    codeGen.Emit(new cmsx::assembler::Instruction(cmsx::assembler::BSPEC));
+    cmsx::assembler::Instruction* octaInst = new cmsx::assembler::Instruction(cmsx::assembler::OCTA);
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(cmsx::assembler::BEGINTRY));
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(tryBlockId));
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(parentTryBlockId));
+    codeGen.Emit(octaInst);
+    codeGen.Emit(new cmsx::assembler::Instruction(cmsx::assembler::ESPEC));
+}
+
+void EmitEndTry(uint32_t tryBlockId, CodeGenerator& codeGen)
+{
+    codeGen.Emit(new cmsx::assembler::Instruction(cmsx::assembler::BSPEC));
+    cmsx::assembler::Instruction* octaInst = new cmsx::assembler::Instruction(cmsx::assembler::OCTA);
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(cmsx::assembler::ENDTRY));
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(tryBlockId));
+    codeGen.Emit(octaInst);
+    codeGen.Emit(new cmsx::assembler::Instruction(cmsx::assembler::ESPEC));
+}
+
+void EmitCatch(uint32_t catchBlockId, uint32_t tryBlockId, uint64_t caughtTypeId1, uint64_t caughtTypeId2, CodeGenerator& codeGen)
+{
+    codeGen.Emit(new cmsx::assembler::Instruction(cmsx::assembler::BSPEC));
+    cmsx::assembler::Instruction* octaInst = new cmsx::assembler::Instruction(cmsx::assembler::OCTA);
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(cmsx::assembler::CATCH));
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(catchBlockId));
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(tryBlockId));
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(caughtTypeId1));
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(caughtTypeId2));
+    codeGen.Emit(octaInst);
+    codeGen.Emit(new cmsx::assembler::Instruction(cmsx::assembler::ESPEC));
+}
+
+void EmitBeginCleanup(uint32_t cleanupBlockId, uint32_t tryBlockId, CodeGenerator& codeGen)
+{
+    codeGen.Emit(new cmsx::assembler::Instruction(cmsx::assembler::BSPEC));
+    cmsx::assembler::Instruction* octaInst = new cmsx::assembler::Instruction(cmsx::assembler::OCTA);
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(cmsx::assembler::BEGINCLEANUP));
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(cleanupBlockId));
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(tryBlockId));
+    codeGen.Emit(octaInst);
+    codeGen.Emit(new cmsx::assembler::Instruction(cmsx::assembler::ESPEC));
+}
+
+void EmitEndCleanup(uint32_t cleanupBlockId, CodeGenerator& codeGen)
+{
+    codeGen.Emit(new cmsx::assembler::Instruction(cmsx::assembler::BSPEC));
+    cmsx::assembler::Instruction* octaInst = new cmsx::assembler::Instruction(cmsx::assembler::OCTA);
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(cmsx::assembler::ENDCLEANUP));
+    octaInst->AddOperand(cmsx::assembler::MakeConstantExpr(cleanupBlockId));
+    codeGen.Emit(octaInst);
+    codeGen.Emit(new cmsx::assembler::Instruction(cmsx::assembler::ESPEC));
+}
+
+void ProcessInstructionMetadata(Instruction* inst, CodeGenerator& codeGen)
+{
+    MetadataRef* mdRef = inst->GetMetadataRef();
+    if (mdRef)
+    {
+        MetadataStruct* mdStruct = mdRef->GetMetadataStruct();
+        if (mdStruct)
+        {
+            MetadataItem* mdItem = mdStruct->GetItem("nodeType");
+            if (mdItem->Kind() == MetadataItemKind::metadataLong)
+            {
+                MetadataLong* mdNodeTypeLong = static_cast<MetadataLong*>(mdItem);
+                int64_t nodeType = mdNodeTypeLong->Value();
+                switch (nodeType)
+                {
+                    case cmsx::assembler::LINEINFO:
+                    {
+                        MetadataItem* mdLineItem = mdStruct->GetItem("line");
+                        if (mdLineItem && mdLineItem->Kind() == MetadataItemKind::metadataLong)
+                        {
+                            MetadataLong* mdLineLong = static_cast<MetadataLong*>(mdLineItem);
+                            int64_t lineNumber = mdLineLong->Value();
+                            codeGen.SetCurrentLineNumber(static_cast<uint32_t>(lineNumber));
+                        }
+                        break;
+                    }
+                    case cmsx::assembler::BEGINTRY:
+                    {
+                        int64_t tryBlockId = -1;
+                        int64_t parentTryBlockId = -1;
+                        MetadataItem* tryBlockIdItem = mdStruct->GetItem("tryBlockId");
+                        if (tryBlockIdItem && tryBlockIdItem->Kind() == MetadataItemKind::metadataLong)
+                        {
+                            MetadataLong* mdTryBlockIdLong = static_cast<MetadataLong*>(tryBlockIdItem);
+                            tryBlockId = mdTryBlockIdLong->Value();
+                        }
+                        MetadataItem* parentTryBlockIdItem = mdStruct->GetItem("parentTryBlockId");
+                        if (parentTryBlockIdItem && parentTryBlockIdItem->Kind() == MetadataItemKind::metadataLong)
+                        {
+                            MetadataLong* mdParentTryBlockIdLong = static_cast<MetadataLong*>(parentTryBlockIdItem);
+                            parentTryBlockId = mdParentTryBlockIdLong->Value();
+                        }
+                        codeGen.BeginTry(static_cast<uint32_t>(tryBlockId), static_cast<uint32_t>(parentTryBlockId));
+                        break;
+                    }
+                    case cmsx::assembler::ENDTRY:
+                    {
+                        int64_t tryBlockId = -1;
+                        MetadataItem* tryBlockIdItem = mdStruct->GetItem("tryBlockId");
+                        if (tryBlockIdItem && tryBlockIdItem->Kind() == MetadataItemKind::metadataLong)
+                        {
+                            MetadataLong* mdTryBlockIdLong = static_cast<MetadataLong*>(tryBlockIdItem);
+                            tryBlockId = mdTryBlockIdLong->Value();
+                        }
+                        codeGen.EndTry(static_cast<uint32_t>(tryBlockId));
+                        break;
+                    }
+                    case cmsx::assembler::CATCH:
+                    {
+                        int64_t catchBlockId = -1;
+                        MetadataItem* catchBlockIdItem = mdStruct->GetItem("catchBlockId");
+                        if (catchBlockIdItem && catchBlockIdItem->Kind() == MetadataItemKind::metadataLong)
+                        {
+                            MetadataLong* mdCatchBlockIdLong = static_cast<MetadataLong*>(catchBlockIdItem);
+                            catchBlockId = mdCatchBlockIdLong->Value();
+                        }
+                        int64_t tryBlockId = -1;
+                        MetadataItem* tryBlockIdItem = mdStruct->GetItem("tryBlockId");
+                        if (tryBlockIdItem && tryBlockIdItem->Kind() == MetadataItemKind::metadataLong)
+                        {
+                            MetadataLong* mdTryBlockIdLong = static_cast<MetadataLong*>(tryBlockIdItem);
+                            tryBlockId = mdTryBlockIdLong->Value();
+                        }
+                        std::string caughtTypeIdStr;
+                        MetadataItem* caughtTypeIdItem = mdStruct->GetItem("caughtTypeId");
+                        if (caughtTypeIdItem && caughtTypeIdItem->Kind() == MetadataItemKind::metadataString)
+                        {
+                            MetadataString* mdCaughtTypeIdString = static_cast<MetadataString*>(caughtTypeIdItem);
+                            caughtTypeIdStr = mdCaughtTypeIdString->Value();
+                        }
+                        codeGen.Catch(static_cast<uint32_t>(catchBlockId), static_cast<uint32_t>(tryBlockId), caughtTypeIdStr);
+                        break;
+                    }
+                    case cmsx::assembler::BEGINCLEANUP:
+                    {
+                        int64_t cleanupBlockId = -1;
+                        int64_t tryBlockId = -1;
+                        MetadataItem* cleanupBlockIdItem = mdStruct->GetItem("cleanupBlockId");
+                        if (cleanupBlockIdItem && cleanupBlockIdItem->Kind() == MetadataItemKind::metadataLong)
+                        {
+                            MetadataLong* mdCleanupBlockIdLong = static_cast<MetadataLong*>(cleanupBlockIdItem);
+                            cleanupBlockId = mdCleanupBlockIdLong->Value();
+                        }
+                        MetadataItem* tryBlockIdItem = mdStruct->GetItem("tryBlockId");
+                        if (tryBlockIdItem && tryBlockIdItem->Kind() == MetadataItemKind::metadataLong)
+                        {
+                            MetadataLong* mdTryBlockIdLong = static_cast<MetadataLong*>(tryBlockIdItem);
+                            tryBlockId = mdTryBlockIdLong->Value();
+                        }
+                        codeGen.BeginCleanup(static_cast<uint32_t>(cleanupBlockId), static_cast<uint32_t>(tryBlockId));
+                        break;
+                    }
+                    case cmsx::assembler::ENDCLEANUP:
+                    {
+                        int64_t cleanupBlockId = -1;
+                        MetadataItem* cleanupBlockIdItem = mdStruct->GetItem("cleanupBlockId");
+                        if (cleanupBlockIdItem && cleanupBlockIdItem->Kind() == MetadataItemKind::metadataLong)
+                        {
+                            MetadataLong* mdCleanupBlockIdLong = static_cast<MetadataLong*>(cleanupBlockIdItem);
+                            cleanupBlockId = mdCleanupBlockIdLong->Value();
+                        }
+                        codeGen.EndCleanup(static_cast<uint32_t>(cleanupBlockId));
+                        break;
+                    }
+                }
+            }
+        }
+    }
 }
 
 } // cmsx::intermediate

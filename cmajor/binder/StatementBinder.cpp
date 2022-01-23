@@ -1838,9 +1838,9 @@ void StatementBinder::Visit(CatchNode& catchNode)
         moduleId = catchNode.ModuleId();
     }
     std::unique_ptr<BoundCatchStatement> boundCatchStatement(new BoundCatchStatement(span, moduleId));
-    TypeSymbol* catchedType = ResolveType(catchNode.TypeExpr(), boundCompileUnit, containerScope);
-    boundCatchStatement->SetCatchedType(catchedType);
-    boundCatchStatement->SetCatchedTypeUuidId(boundCompileUnit.Install(catchedType->BaseType()->TypeId()));
+    TypeSymbol* caughtType = ResolveType(catchNode.TypeExpr(), boundCompileUnit, containerScope);
+    boundCatchStatement->SetCaughtType(caughtType);
+    boundCatchStatement->SetCatchTypeUuidId(boundCompileUnit.Install(caughtType->BaseType()->TypeId()));
     LocalVariableSymbol* catchVar = nullptr;
     if (catchNode.Id())
     {
@@ -1868,14 +1868,14 @@ void StatementBinder::Visit(CatchNode& catchNode)
         getExceptionAddr->AddArgument(new InvokeNode(span, moduleId, new IdentifierNode(span, moduleId, U"do_catch")));
         handlerBlock.AddStatement(getExceptionAddr);
     }
-    PointerNode exceptionPtrTypeNode(span, moduleId, new IdentifierNode(span, moduleId, catchedType->BaseType()->FullName()));
+    PointerNode exceptionPtrTypeNode(span, moduleId, new IdentifierNode(span, moduleId, caughtType->BaseType()->FullName()));
     CloneContext cloneContext;
     ConstructionStatementNode* constructExceptionPtr = new ConstructionStatementNode(span, moduleId, exceptionPtrTypeNode.Clone(cloneContext), 
         new IdentifierNode(span, moduleId, U"@exceptionPtr"));
     constructExceptionPtr->AddArgument(new CastNode(span, moduleId, exceptionPtrTypeNode.Clone(cloneContext), new IdentifierNode(span, moduleId, U"@exceptionAddr")));
     handlerBlock.AddStatement(constructExceptionPtr);
     TemplateIdNode* uniquePtrNode = new TemplateIdNode(span, moduleId, new IdentifierNode(span, moduleId, U"UniquePtr"));
-    uniquePtrNode->AddTemplateArgument(new IdentifierNode(span, moduleId, catchedType->BaseType()->FullName()));
+    uniquePtrNode->AddTemplateArgument(new IdentifierNode(span, moduleId, caughtType->BaseType()->FullName()));
     ConstructionStatementNode* constructUniquePtrException = new ConstructionStatementNode(span, moduleId, uniquePtrNode, new IdentifierNode(span, moduleId, U"@exPtr"));
     constructUniquePtrException->AddArgument(new IdentifierNode(span, moduleId, U"@exceptionPtr"));
     handlerBlock.AddStatement(constructUniquePtrException);

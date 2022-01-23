@@ -9,11 +9,11 @@
 
 namespace cmsx::intermediate {
 
-MetadataRef::MetadataRef(const SourcePos& sourcePos_, int32_t nodeId_) : sourcePos(sourcePos_), nodeId(nodeId_), metadataStruct(nullptr)
+MetadataRef::MetadataRef(const SourcePos& sourcePos_, int32_t nodeId_) : MetadataItem(MetadataItemKind::metadataRef), sourcePos(sourcePos_), nodeId(nodeId_), metadataStruct(nullptr)
 {
 }
 
-MetadataItem::MetadataItem()
+MetadataItem::MetadataItem(MetadataItemKind kind_) : kind(kind_)
 {
 }
 
@@ -21,15 +21,15 @@ MetadataItem::~MetadataItem()
 {
 }
 
-MetadataBool::MetadataBool(bool value_) : value(value_)
+MetadataBool::MetadataBool(bool value_) : MetadataItem(MetadataItemKind::metadataBool), value(value_)
 {
 }
 
-MetadataLong::MetadataLong(int64_t value_) : value(value_)
+MetadataLong::MetadataLong(int64_t value_) : MetadataItem(MetadataItemKind::metadataLong), value(value_)
 {
 }
 
-MetadataString::MetadataString(const std::string& value_) : value(value_)
+MetadataString::MetadataString(const std::string& value_) : MetadataItem(MetadataItemKind::metadataString), value(value_)
 {
 }
 

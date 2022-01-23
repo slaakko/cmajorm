@@ -1,0 +1,52 @@
+using System;
+
+class Foo : Exception
+{
+	public Foo(int x) : base("Foo x=" + ToString(x))
+	{
+	}
+}
+
+void ex_throw()
+{
+	int x = 10;
+	throw Foo(x);
+}
+
+class Cleanup
+{
+	public ~Cleanup()
+	{
+		int c = 12345;
+		string s = "cleanup: c=" + ToString(c) + "\n";
+		write(1, s.Chars(), s.Length());
+	}
+}
+
+void ex_middle()
+{
+	Cleanup cleanup;
+	ex_throw();
+}
+
+void ex_catch()
+{
+	int y = 100;
+	try
+	{
+		y = 200;
+		ex_middle();
+		y = 300;
+	}
+	catch (const Exception& ex)
+	{
+		string s = ex.ToString();
+		s.Append("y = " + ToString(y) + "\n");
+		write(1, s.Chars(), s.Length());
+	}
+}
+
+void main()
+{
+	ex_catch();
+}

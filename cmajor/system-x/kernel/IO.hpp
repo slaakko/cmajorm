@@ -7,11 +7,16 @@
 #define CMSX_KERNEL_IO_INCLUDED
 #include <system-x/kernel/Api.hpp>
 #include <stdint.h>
+#include <string>
+#include <vector>
 
 namespace cmsx::kernel {
 
 class Process;
 
+CMSX_KERNEL_API std::vector<std::uint8_t> MakeStringBuffer(const std::string& str, int64_t maxLength);
+CMSX_KERNEL_API std::vector<uint8_t> ReadProcessMemory(Process* process, int64_t addr, int64_t count);
+CMSX_KERNEL_API void WriteProcessMemory(Process* process, int64_t addr, const std::vector<uint8_t>& buffer);
 CMSX_KERNEL_API int64_t Write(Process* process, int32_t fd, int64_t bufferAddr, int64_t count);
 CMSX_KERNEL_API int64_t Read(Process* process, int32_t fd, int64_t bufferAddr, int64_t count);
 

@@ -733,6 +733,43 @@ DebugSection::DebugSection(BinaryFile* file_) : Section(SectionKind::dbug, file_
 {
 }
 
+void DebugSection::AddDebugRecord(DebugRecord* debugRecord)
+{
+    debugRecords.push_back(std::unique_ptr<DebugRecord>(debugRecord));
+}
+
+void DebugSection::Finalize()
+{
+    if (Address() != 0)
+    {
+        throw std::runtime_error("error finalizing: pos == 0 in debug section of file '" + File()->FilePath() + " expected");
+    }
+    EmitDebugRecords();
+}
+
+void DebugSection::EmitDebugRecords()
+{
+    uint32_t count = debugRecords.size();
+    EmitTetra(count);
+    for (uint32_t i = 0; i < count; ++i)
+    {
+        DebugRecord* debugRecord = debugRecords[i].get();
+        debugRecord->Emit(this);
+    }
+}
+
+void DebugSection::Read(BinaryStreamReader& reader)
+{
+    Section::Read(reader);
+    SetPos(0);
+    uint32_t count = ReadTetra();
+    for (uint32_t i = 0; i < count; ++i)
+    {
+        DebugRecord* debugRecord = ReadDebugRecord(this);
+        AddDebugRecord(debugRecord);
+    }
+}
+
 BinaryFile::BinaryFile(const std::string& filePath_, BinaryFileKind kind_) : 
     filePath(filePath_), kind(kind_), 
     headerSection(nullptr),

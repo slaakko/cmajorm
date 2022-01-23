@@ -381,7 +381,7 @@ void BoundTryStatement::Accept(BoundNodeVisitor& visitor)
 }
 
 BoundCatchStatement::BoundCatchStatement(const Span& span_, const boost::uuids::uuid& moduleId_) :
-    BoundStatement(span_, moduleId_, BoundNodeType::boundCatchStatement), catchedType(nullptr), catchTypeUuidId(-1), catchVar(nullptr)
+    BoundStatement(span_, moduleId_, BoundNodeType::boundCatchStatement), caughtType(nullptr), catchTypeUuidId(-1), catchVar(nullptr)
 {
 }
 

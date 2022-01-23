@@ -118,6 +118,25 @@ void AssemblyLinkOnceObject::Write(CodeFormatter& formatter)
     formatter.DecIndent();
 }
 
+AssemblyDebugInfo::AssemblyDebugInfo() : AssemblyObject(AssemblyObjectKind::debugInfo)
+{
+}
+
+void AssemblyDebugInfo::AddInstruction(Instruction* inst)
+{
+    content.push_back(std::unique_ptr<Instruction>(inst));
+}
+
+void AssemblyDebugInfo::Write(CodeFormatter& formatter)
+{
+    formatter.IncIndent();
+    for (const auto& inst : content)
+    {
+        inst->Write(formatter);
+    }
+    formatter.DecIndent();
+}
+
 AssemblySection::AssemblySection(AssemblySectionKind kind_) : kind(kind_), externObject(nullptr), linkOnceObject(nullptr)
 {
 }
@@ -154,6 +173,13 @@ AssemblyStruct* AssemblySection::CreateStructure(const std::string& name)
     AssemblyStruct* structure = new AssemblyStruct(name);
     objects.push_back(std::unique_ptr<AssemblyObject>(structure));
     return structure;
+}
+
+AssemblyDebugInfo* AssemblySection::CreateDebugInfo()
+{
+    AssemblyDebugInfo* debugInfo = new AssemblyDebugInfo();
+    objects.push_back(std::unique_ptr<AssemblyObject>(debugInfo));
+    return debugInfo;
 }
 
 void AssemblySection::Write(CodeFormatter& formatter)

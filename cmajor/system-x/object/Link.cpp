@@ -6,6 +6,7 @@
 #include <system-x/object/Link.hpp>
 #include <system-x/object/LinkTable.hpp>
 #include <system-x/object/BinaryFile.hpp>
+#include <system-x/object/FunctionTable.hpp>
 #include <system-x/machine/Memory.hpp>
 #include <soulng/util/Log.hpp>
 #include <soulng/util/TextUtils.hpp>
@@ -879,6 +880,7 @@ void Link(int logStreamId, const std::string& executableFilePath, const std::vec
     LinkObjectFiles(linkTable, binaryFiles, executable.get());
     linkTable.CheckUnresolvedSymbols(logStreamId);
     CopyRanges(linkTable.CopyRanges());
+    MakeFunctionTable(binaryFiles, *executable, linkTable);
     executable->Finalize();
     executable->WriteFile();
     if (verbose)

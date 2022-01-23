@@ -282,7 +282,7 @@ void WindowsCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
         handleExceptionParamTypes.push_back(emitter->GetIrTypeForVoidPtrType());
         void* handleExceptionFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForBool(), handleExceptionParamTypes);
         std::vector<void*> handleExceptionArgs;
-        UuidValue uuidValue(boundCatchStatement->GetSpan(), boundCatchStatement->ModuleId(), boundCatchStatement->CatchedTypeUuidId());
+        UuidValue uuidValue(boundCatchStatement->GetSpan(), boundCatchStatement->ModuleId(), boundCatchStatement->CatchTypeUuidId());
         void* catchTypeIdValue = uuidValue.IrValue(*emitter);
         handleExceptionArgs.push_back(catchTypeIdValue);
         void* handleException = emitter->GetOrInsertFunction("RtHandleException", handleExceptionFunctionType, true);

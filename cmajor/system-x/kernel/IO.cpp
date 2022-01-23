@@ -10,6 +10,21 @@
 
 namespace cmsx::kernel {
 
+std::vector<std::uint8_t> MakeStringBuffer(const std::string& str, int64_t maxLength)
+{
+    std::vector<std::uint8_t> buffer;
+    for (char c : str)
+    {
+        if (buffer.size() >= maxLength - 1)
+        {
+            break;
+        }
+        buffer.push_back(static_cast<uint8_t>(c));
+    }
+    buffer.push_back(0);
+    return buffer;
+}
+
 std::vector<uint8_t> ReadProcessMemory(Process* process, int64_t addr, int64_t count)
 {
     std::vector<uint8_t> buffer;

@@ -16,7 +16,7 @@ using soulng::util::CodeFormatter;
 
 enum class AssemblyObjectKind : int
 {
-    function, structure, externObjects, linkOnceObjects
+    function, structure, externObjects, linkOnceObjects, debugInfo
 };
 
 enum class AssemblySectionKind : int
@@ -93,6 +93,18 @@ private:
     std::vector<std::unique_ptr<Instruction>> content;
 };
 
+class CMSX_ASSEMBLER_API AssemblyDebugInfo : public AssemblyObject
+{
+public:
+    AssemblyDebugInfo();
+    AssemblyDebugInfo(const AssemblyDebugInfo&) = delete;
+    AssemblyDebugInfo operator=(const AssemblyDebugInfo&) = delete;
+    void AddInstruction(Instruction* inst);
+    void Write(CodeFormatter& formatter) override;
+private:
+    std::vector<std::unique_ptr<Instruction>> content;
+};
+
 class CMSX_ASSEMBLER_API AssemblySection
 {
 public:
@@ -103,6 +115,7 @@ public:
     AssemblyLinkOnceObject* GetOrCreateLinkOnceObject();
     AssemblyFunction* CreateFunction(const std::string& name);
     AssemblyStruct* CreateStructure(const std::string& name);
+    AssemblyDebugInfo* CreateDebugInfo();
     void Write(CodeFormatter& formatter);
 private:
     AssemblySectionKind kind;

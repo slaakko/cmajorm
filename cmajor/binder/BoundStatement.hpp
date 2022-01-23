@@ -362,17 +362,17 @@ class BINDER_API BoundCatchStatement : public BoundStatement
 {
 public:
     BoundCatchStatement(const Span& span_, const boost::uuids::uuid& moduleId_);
-    void SetCatchedType(TypeSymbol* catchedType_) { catchedType = catchedType_; }
-    TypeSymbol* CatchedType() { return catchedType; }
+    void SetCaughtType(TypeSymbol* caughtType_) { caughtType = caughtType_; }
+    TypeSymbol* CaughtType() { return caughtType; }
     void SetCatchVar(LocalVariableSymbol* catchVar_) { catchVar = catchVar_; }
     LocalVariableSymbol* CatchVar() { return catchVar; }
     void SetCatchBlock(std::unique_ptr<BoundStatement>&& catchBlock_);
     BoundStatement* CatchBlock() { return catchBlock.get(); }
     void Accept(BoundNodeVisitor& visitor) override;
-    int CatchedTypeUuidId() const { return catchTypeUuidId; }
-    void SetCatchedTypeUuidId(int catchTypeUuidId_) { catchTypeUuidId = catchTypeUuidId_; }
+    int CatchTypeUuidId() const { return catchTypeUuidId; }
+    void SetCatchTypeUuidId(int catchTypeUuidId_) { catchTypeUuidId = catchTypeUuidId_; }
 private:
-    TypeSymbol* catchedType;
+    TypeSymbol* caughtType;
     LocalVariableSymbol* catchVar;
     std::unique_ptr<BoundStatement> catchBlock;
     int catchTypeUuidId;

@@ -24,6 +24,7 @@
 #include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Log.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 namespace cmajor { namespace codegensx {
 
@@ -1040,13 +1041,9 @@ void SystemXCodeGenerator::Visit(BoundCatchStatement& boundCatchStatement)
     emitter->AddMDItem(catch_, "nodeType", emitter->CreateMDLong(catchNodeType));
     emitter->AddMDItem(catch_, "tryBlockId", emitter->CreateMDLong(currentTryBlockId));
     emitter->AddMDItem(catch_, "catchBlockId", emitter->CreateMDBasicBlockRef(catchBlock));
-    const boost::uuids::uuid& uuid = compileUnit->GetUuid(boundCatchStatement.CatchedTypeUuidId());
-    std::string uuidStr;
-    for (const auto x : uuid)
-    {
-        uuidStr.append(soulng::util::ToHexString(x));
-    }
-    emitter->AddMDItem(catch_, "catchedTypeId", emitter->CreateMDString(uuidStr));
+    const boost::uuids::uuid& uuid = compileUnit->GetUuid(boundCatchStatement.CatchTypeUuidId());
+    std::string uuidStr = boost::uuids::to_string(uuid); 
+    emitter->AddMDItem(catch_, "caughtTypeId", emitter->CreateMDString(uuidStr));
     int catchId = emitter->GetMDStructId(catch_);
     void* catchMdRef = emitter->CreateMDStructRef(catchId);
     emitter->SetMetadataRef(nop1, catchMdRef);
@@ -1057,7 +1054,6 @@ void SystemXCodeGenerator::Visit(BoundCatchStatement& boundCatchStatement)
 
 void SystemXCodeGenerator::Visit(BoundRethrowStatement& boundRethrowStatement)
 {
-/*  TODO
     if (generateLineNumbers)
     {
         emitter->SetCurrentSourceSpan(boundRethrowStatement.GetSpan().line, 0, 0);
@@ -1067,10 +1063,20 @@ void SystemXCodeGenerator::Visit(BoundRethrowStatement& boundRethrowStatement)
     basicBlockOpen = false;
     SetTarget(&boundRethrowStatement);
     void* resumeFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), std::vector<void*>());
-    void* callee = emitter->GetOrInsertFunction("do_resume", resumeFunctionType, false);
+    void* callee = emitter->GetOrInsertFunction("resume", resumeFunctionType, false);
     emitter->CreateCall(callee, std::vector<void*>());
-    emitter->CreateRetVoid();
-*/
+    if (currentFunction->GetFunctionSymbol()->ReturnType() && currentFunction->GetFunctionSymbol()->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && 
+        !currentFunction->GetFunctionSymbol()->ReturnsClassInterfaceOrClassDelegateByValue())
+    {
+        void* defaultValue = currentFunction->GetFunctionSymbol()->ReturnType()->CreateDefaultIrValue(*emitter);
+        emitter->CreateRet(defaultValue);
+        lastInstructionWasRet = true;
+    }
+    else
+    {
+        emitter->CreateRetVoid();
+        lastInstructionWasRet = true;
+    }
 }
 
 void SystemXCodeGenerator::Visit(BoundParameter& boundParameter)
@@ -1289,7 +1295,12 @@ void SystemXCodeGenerator::ExitBlocks(BoundCompoundStatement* targetBlock)
     {
         currentBlockLastStatement = currentBlock->Statements().back().get();
     }
-    if (lastStatement && currentBlockLastStatement && lastStatement == currentBlockLastStatement && currentBlockLastStatement->GetBoundNodeType() == BoundNodeType::boundReturnStatement)
+    if (lastStatement && currentBlockLastStatement && lastStatement == currentBlockLastStatement && 
+        currentBlockLastStatement->GetBoundNodeType() == BoundNodeType::boundReturnStatement)
+    {
+        createBasicBlock = true;
+    }
+    if (currentBlockLastStatement && currentBlockLastStatement->GetBoundNodeType() == BoundNodeType::boundRethrowStatement)
     {
         createBasicBlock = true;
     }
@@ -1514,8 +1525,6 @@ void SystemXCodeGenerator::CreateCleanup()
 
 void SystemXCodeGenerator::GenerateCodeForCleanups()
 {
-//  TODO!!!!
-/*
     for (const std::unique_ptr<Cleanup>& cleanup : cleanups)
     {
         emitter->SetCurrentBasicBlock(cleanup->cleanupBlock);
@@ -1524,11 +1533,21 @@ void SystemXCodeGenerator::GenerateCodeForCleanups()
             destructorCall->Accept(*this);
         }
         void* resumeFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), std::vector<void*>());
-        void* callee = emitter->GetOrInsertFunction("do_resume", resumeFunctionType, false);
+        void* callee = emitter->GetOrInsertFunction("resume", resumeFunctionType, false);
         emitter->CreateCall(callee, std::vector<void*>());
-        emitter->CreateRetVoid();
+        if (currentFunction->GetFunctionSymbol()->ReturnType() && currentFunction->GetFunctionSymbol()->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol &&
+            !currentFunction->GetFunctionSymbol()->ReturnsClassInterfaceOrClassDelegateByValue())
+        {
+            void* defaultValue = currentFunction->GetFunctionSymbol()->ReturnType()->CreateDefaultIrValue(*emitter);
+            emitter->CreateRet(defaultValue);
+            lastInstructionWasRet = true;
+        }
+        else
+        {
+            emitter->CreateRetVoid();
+            lastInstructionWasRet = true;
+        }
     }
-*/
 }
 
 } } // namespace cmajor::codegensx

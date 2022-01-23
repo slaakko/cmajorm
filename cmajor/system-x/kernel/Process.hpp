@@ -10,6 +10,7 @@
 #include <system-x/kernel/File.hpp>
 #include <system-x/kernel/Region.hpp>
 #include <system-x/object/Symbol.hpp>
+#include <system-x/object/FunctionTable.hpp>
 #include <system-x/machine/Debugger.hpp>
 #include <system-x/machine/Processor.hpp>
 #include <soulng/util/IntrusiveList.hpp>
@@ -50,6 +51,7 @@ public:
     void SetHeapLength(int64_t heapLength_) override;
     cmsx::object::SymbolTable* GetSymbolTable() const { return symbolTable.get(); }
     void SetSymbolTable(cmsx::object::SymbolTable* symbolTable_);
+    cmsx::object::FunctionTable* GetFunctionTable();
     void RemoveFromParent();
     std::chrono::steady_clock::duration UserTime() const { return userTime; }
     std::chrono::steady_clock::duration SleepTime() const { return sleepTime; }
@@ -72,6 +74,12 @@ public:
     ProcessFileTable& GetFileTable() { return fileTable; }
     void SetError(const SystemError& error_);
     SystemError GetError() const { return error; }
+    uint64_t CurrentExceptionAddress() const { return currentExceptionAddress; }
+    void SetCurrentExceptionAddress(uint64_t exceptionAddress) { currentExceptionAddress = exceptionAddress; }
+    uint64_t CurrentExceptionClassId() const { return currentExceptionClassId; }
+    void SetCurrentExceptionClassId(uint64_t exceptionClassId) { currentExceptionClassId = exceptionClassId; }
+    cmsx::object::TryRecord* CurrentTryRecord() const { return currentTryRecord; }
+    void SetCurrentTryRecord(cmsx::object::TryRecord* tryRecord) { currentTryRecord = tryRecord; }
 private:
     int32_t id;
     uint64_t rv;
@@ -100,7 +108,11 @@ private:
     cmsx::machine::ProcessObserver* observer;
     RegionTable regionTable;
     ProcessFileTable fileTable;
+    std::unique_ptr<cmsx::object::FunctionTable> functionTable;
     SystemError error;
+    uint64_t currentExceptionAddress;
+    uint64_t currentExceptionClassId;
+    cmsx::object::TryRecord* currentTryRecord;
 };
 
 } // namespace cmsx::kernel

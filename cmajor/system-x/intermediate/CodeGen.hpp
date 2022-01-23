@@ -11,6 +11,7 @@
 namespace cmsx::intermediate {
 
 using soulng::lexer::SourcePos;
+class Function;
 class Value;
 class Type;
 class Context;
@@ -60,6 +61,7 @@ class DoubleValue;
 class AddressValue;
 class SymbolValue;
 class StringValue;
+class CompileUnit;
 
 class CMSX_INTERMEDIATE_API CodeGenerator
 {
@@ -76,7 +78,16 @@ public:
     virtual void EmitSymbol(const std::string& name) = 0;
     virtual int ExitLabelId() const = 0;
     virtual void EmitClsId(const std::string& typeId) = 0;
+    virtual void EmitDebugInfoInst(cmsx::assembler::Instruction* assemblyInstruction) = 0;
     virtual void Error(const std::string& message) = 0;
+    virtual void AddSourceFileInfo(CompileUnit& compileUnit) = 0;
+    virtual void GenerateDebugInfo() = 0;
+    virtual void SetCurrentLineNumber(uint32_t lineNumber) = 0;
+    virtual void BeginTry(uint32_t tryBlockId, uint32_t parentTryBlockId) = 0;
+    virtual void EndTry(uint32_t tryBlockId) = 0;
+    virtual void Catch(uint32_t catchBlockId, uint32_t tryBlockId, const std::string& caughtTypeIdStr) = 0;
+    virtual void BeginCleanup(uint32_t cleanupBlockId, uint32_t tryBlockId) = 0;
+    virtual void EndCleanup(uint32_t cleanupBlockId) = 0;
 };
 
 CMSX_INTERMEDIATE_API cmsx::assembler::Node* MakeRegOperand(const Register& reg);
@@ -139,6 +150,15 @@ CMSX_INTERMEDIATE_API void EmitAddress(AddressValue& value, CodeGenerator& codeG
 CMSX_INTERMEDIATE_API void EmitSymbol(SymbolValue& value, CodeGenerator& codeGen);
 CMSX_INTERMEDIATE_API void EmitString(StringValue& value, CodeGenerator& codeGen);
 CMSX_INTERMEDIATE_API void EmitClsId(const std::string& typeId, CodeGenerator& codeGen);
+CMSX_INTERMEDIATE_API void EmitSourceFileNameDebugInfo(const std::string& sourceFileName, int64_t id, CodeGenerator& codeGen);
+CMSX_INTERMEDIATE_API void EmitFunctionDebugInfo(Function* function, int64_t frameSize, CodeGenerator& codeGen);
+CMSX_INTERMEDIATE_API void EmitLineNumberInfo(uint32_t currentLineNumber, CodeGenerator& codeGen);
+CMSX_INTERMEDIATE_API void EmitBeginTry(uint32_t tryBlockId, uint32_t parentTryBlockId, CodeGenerator& codeGen);
+CMSX_INTERMEDIATE_API void EmitEndTry(uint32_t tryBlockId, CodeGenerator& codeGen);
+CMSX_INTERMEDIATE_API void EmitCatch(uint32_t catchBlockId, uint32_t tryBlockId, uint64_t caughtTypeId1, uint64_t caughtTypeId2, CodeGenerator& codeGen);
+CMSX_INTERMEDIATE_API void EmitBeginCleanup(uint32_t cleanupBlockId, uint32_t tryBlockId, CodeGenerator& codeGen);
+CMSX_INTERMEDIATE_API void EmitEndCleanup(uint32_t cleanupBlockId, CodeGenerator& codeGen);
+CMSX_INTERMEDIATE_API void ProcessInstructionMetadata(Instruction* inst, CodeGenerator& codeGen);
 
 } // cmsx::intermediate
 

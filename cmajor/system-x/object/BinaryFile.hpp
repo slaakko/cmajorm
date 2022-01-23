@@ -7,6 +7,7 @@
 #define CMSX_OBJECT_BINARY_FILE_INCLUDED
 #include <system-x/object/Symbol.hpp>
 #include <system-x/object/Link.hpp>
+#include <system-x/object/Debug.hpp>
 #include <soulng/util/BinaryStreamReader.hpp>
 #include <soulng/util/BinaryStreamWriter.hpp>
 #include <string>
@@ -85,8 +86,6 @@ public:
     void SetPos(int64_t pos_) { pos = pos_; }
     int64_t DataLength() const { return dataLength; }
     void SetDataLength(int64_t dataLength_) { dataLength = dataLength_; }
-    //int64_t CopyStartPos() const { return copyStartPos; }
-    //void SetCopyStartPos(int64_t copyStartPos_) { copyStartPos = copyStartPos_; }
     Section* CopyTargetSection() const { return copyTargetSection; }
     void SetCopyTargetSection(Section* copyTargetSection_) { copyTargetSection = copyTargetSection_; }
     int64_t RemoveOffset() const { return removeOffset; }
@@ -98,7 +97,6 @@ private:
     std::vector<uint8_t> data;
     int64_t pos;
     int64_t dataLength;
-    //int64_t copyStartPos;
     Section* copyTargetSection;
     int64_t removeOffset;
 };
@@ -163,6 +161,15 @@ class CMSX_OBJECT_API DebugSection : public Section
 {
 public:
     DebugSection(BinaryFile* file_);
+    DebugSection(const DebugSection&) = delete;
+    DebugSection operator=(const DebugSection&) = delete;
+    void AddDebugRecord(DebugRecord* debugRecord);
+    void Finalize() override;
+    void Read(BinaryStreamReader& reader) override;
+    const std::vector<std::unique_ptr<DebugRecord>>& DebugRecords() const { return debugRecords; };
+private:
+    void EmitDebugRecords();
+    std::vector<std::unique_ptr<DebugRecord>> debugRecords;
 };
 
 class CMSX_OBJECT_API BinaryFile

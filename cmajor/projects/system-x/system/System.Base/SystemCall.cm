@@ -16,6 +16,11 @@ public const byte trap_sleep = 9u;
 public const byte trap_current_date = 10u;
 public const byte trap_current_date_time = 11u;
 public const byte trap_pow = 12u;
+public const byte trap_throw = 13u;
+public const byte trap_catch = 14u;
+public const byte trap_resume = 15u;
+public const byte trap_stack_trace = 16u;
+public const byte trap_get_system_error = 17u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -84,4 +89,29 @@ public cdecl nothrow double pow(double x, double y)
 	long ly = *cast<long*>(cast<void*>(&y));
 	long result = trap(0u, trap_pow, 0u, lx, ly);
 	return *cast<double*>(cast<void*>(&result));
+}
+
+public cdecl nothrow int do_throw(void* exception, ulong exceptionClassId)
+{
+	return cast<int>(trap(0u, trap_throw, 0u, exception, exceptionClassId));
+}
+
+public cdecl nothrow void* do_catch()
+{
+	return cast<void*>(cast<ulong>(trap(0u, trap_catch, 0u)));
+}
+
+public cdecl nothrow int resume()
+{
+	return cast<int>(trap(0u, trap_resume, 0u));
+}
+
+public cdecl nothrow int stack_trace(void* buffer, long bufferSize)
+{
+	return cast<int>(trap(0u, trap_stack_trace, 0u, buffer, bufferSize));
+}
+
+public cdecl nothrow int get_system_error(int* errorCode, void* buffer, long bufferSize)
+{
+	return cast<int>(trap(0u, trap_get_system_error, 0u, buffer, bufferSize));
 }

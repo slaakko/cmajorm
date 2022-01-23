@@ -5,6 +5,7 @@
 
 #include <system-x/assembler/AssemblyInstruction.hpp>
 #include <system-x/assembler/Assembler.hpp>
+#include <system-x/object/Debug.hpp>
 #include <system-x/machine/OpCode.hpp>
 #include <system-x/machine/Registers.hpp>
 
@@ -81,6 +82,8 @@ void FuncInstruction::Assemble(Assembler& assembler)
     functionSymbol->SetAlignment(4);
     assembler.SetParentIndex(functionSymbol->Index());
     assembler.SetCurrentFunctionSymbol(functionSymbol);
+    cmsx::object::StartFuncRecord* startFuncRecord = new cmsx::object::StartFuncRecord(functionSymbol->Index());
+    assembler.GetObjectFile()->GetDebugSection()->AddDebugRecord(startFuncRecord);
 }
 
 class EndFuncInstruction : public AssemblyInstruction
@@ -95,6 +98,8 @@ void EndFuncInstruction::Assemble(Assembler& assembler)
     functionSymbol->SetLength(assembler.CurrentSection()->BaseAddress() + assembler.CurrentSection()->Address() - functionSymbol->Start());
     assembler.SetParentIndex(-1);
     assembler.SetCurrentFunctionSymbol(nullptr);
+    cmsx::object::EndFuncRecord* endFuncRecord = new cmsx::object::EndFuncRecord(functionSymbol->Index());
+    assembler.GetObjectFile()->GetDebugSection()->AddDebugRecord(endFuncRecord);
 }
 
 class StructureInstruction : public AssemblyInstruction
@@ -128,6 +133,28 @@ void EndStructureInstruction::Assemble(Assembler& assembler)
     structureSymbol->SetLength(assembler.CurrentSection()->BaseAddress() + assembler.CurrentSection()->Address() - structureSymbol->Start());
     assembler.SetParentIndex(-1);
     assembler.SetCurrentStructureSymbol(nullptr);
+}
+
+class BeginSpecInstruction : public AssemblyInstruction
+{
+public:
+    void Assemble(Assembler& assembler) override;
+};
+
+void BeginSpecInstruction::Assemble(Assembler& assembler)
+{
+    assembler.BeginSpec();
+}
+
+class EndSpecInstruction : public AssemblyInstruction
+{
+public:
+    void Assemble(Assembler& assembler) override;
+};
+
+void EndSpecInstruction::Assemble(Assembler& assembler)
+{
+    assembler.EndSpec();
 }
 
 class ByteInstruction : public AssemblyInstruction
@@ -229,29 +256,184 @@ public:
 void OctaInstruction::Assemble(Assembler& assembler)
 {
     Instruction* currentInst = assembler.CurrentInstruction();
-    if (assembler.CurrentSection()->IsDataSection())
+    if (assembler.InSpec())
     {
         int n = currentInst->Operands().size();
         if (n > 0)
         {
-            for (int i = 0; i < n; ++i)
+            cmsx::object::Value discriminator = currentInst->Operands()[0];
+            switch (discriminator.Val())
             {
-                cmsx::object::Value value = currentInst->Operands()[i];
-                if (value.IsSymbolValue())
+                case FILEINFO:
                 {
-                    assembler.EmitSymbolOcta(value);
+                    if (n == 3)
+                    {
+                        cmsx::object::Value sourceFileNameValue = currentInst->Operands()[1];
+                        const std::string& sourceFileName = assembler.GetString(sourceFileNameValue.Val(), currentInst->GetSourcePos());
+                        cmsx::object::Value sourceFileId = currentInst->Operands()[2];
+                        assembler.GetObjectFile()->GetDebugSection()->AddDebugRecord(new cmsx::object::FileInfoRecord(sourceFileName, sourceFileId.Val()));
+                    }
+                    else
+                    {
+                        assembler.Error(currentInst->GetOpCode()->Name() + ": OCTA FILEINFO requires three operands", currentInst->GetSourcePos());
+                    }
+                    break;
                 }
-                else if (value.IsPureValue())
+                case FUNCINFO:
                 {
-                    assembler.EmitPureOctaValue("octa", value);
+                    if (n == 5)
+                    {
+                        cmsx::object::Value functionValue = currentInst->Operands()[1];
+                        cmsx::object::Symbol* symbol = functionValue.GetSymbol();
+                        if (symbol)
+                        {
+                            if (symbol->Index() != -1)
+                            {
+                                uint32_t functionSymbolIndex = static_cast<uint32_t>(symbol->Index());
+                                cmsx::object::Value fullNameValue = currentInst->Operands()[2];
+                                const std::string& fullName = assembler.GetString(fullNameValue.Val(), currentInst->GetSourcePos());
+                                if (!fullName.empty())
+                                {
+                                    cmsx::object::Value sourceFileNameIdValue = currentInst->Operands()[3];
+                                    cmsx::object::Value frameSizeValue = currentInst->Operands()[4];
+                                    cmsx::object::FuncInfoRecord* funcInfoRecord = new cmsx::object::FuncInfoRecord(
+                                        functionSymbolIndex, fullName, sourceFileNameIdValue.Val(), frameSizeValue.Val());
+                                    assembler.GetObjectFile()->GetDebugSection()->AddDebugRecord(funcInfoRecord);
+                                }
+                                else
+                                {
+                                    assembler.Error(currentInst->GetOpCode()->Name() + ": OCTA FUNCINFO full function name not defined", currentInst->GetSourcePos());
+                                }
+                            }
+                            else
+                            {
+                                assembler.Error(currentInst->GetOpCode()->Name() + ": OCTA FUNCINFO symbol index not defined", currentInst->GetSourcePos());
+                            }
+                        }
+                        else
+                        {
+                            assembler.Error(currentInst->GetOpCode()->Name() + ": OCTA FUNCINFO operand 1 must be a symbol", currentInst->GetSourcePos());
+                        }
+                    }
+                    else
+                    {
+                        assembler.Error(currentInst->GetOpCode()->Name() + ": OCTA FUNCINFO requires five operands", currentInst->GetSourcePos());
+                    }
+                    break;
                 }
-                else if (value.IsTypeIdIndex())
+                case LINEINFO:
                 {
-                    assembler.EmitClsIdCommmand(value.Val(), currentInst->GetSourcePos());
+                    if (n == 2)
+                    {
+                        cmsx::object::Value lineValue = currentInst->Operands()[1];
+                        uint32_t offset = static_cast<uint32_t>(
+                            assembler.CurrentSection()->BaseAddress() + assembler.CurrentSection()->Address() - assembler.CurrentFunctionSymbol()->Start());
+                        cmsx::object::LineInfoRecord* lineInfoRecord = new cmsx::object::LineInfoRecord(offset, static_cast<uint32_t>(lineValue.Val()));
+                        assembler.GetObjectFile()->GetDebugSection()->AddDebugRecord(lineInfoRecord);
+                    }
+                    else
+                    {
+                        assembler.Error(currentInst->GetOpCode()->Name() + ": OCTA LINEINFO requires two operands", currentInst->GetSourcePos());
+                    }
+                    break;
                 }
-                else
+                case BEGINTRY:
                 {
-                    assembler.Error(currentInst->GetOpCode()->Name() + " operand must be a symbol, pure or type id index", currentInst->GetSourcePos());
+                    if (n == 3)
+                    {
+                        cmsx::object::Value tryBlockIdValue = currentInst->Operands()[1];
+                        uint32_t tryBlockId = static_cast<uint32_t>(tryBlockIdValue.Val());
+                        cmsx::object::Value parentTryBlockIdValue = currentInst->Operands()[2];
+                        uint32_t parentTryBlockId = static_cast<uint32_t>(parentTryBlockIdValue.Val());
+                        uint32_t offset = static_cast<uint32_t>(
+                            assembler.CurrentSection()->BaseAddress() + assembler.CurrentSection()->Address() - assembler.CurrentFunctionSymbol()->Start());
+                        cmsx::object::BeginTryRecord* beginTryRecord = new cmsx::object::BeginTryRecord(tryBlockId, parentTryBlockId, offset);
+                        assembler.GetObjectFile()->GetDebugSection()->AddDebugRecord(beginTryRecord);
+                    }
+                    else
+                    {
+                        assembler.Error(currentInst->GetOpCode()->Name() + ": OCTA BEGINTRY requires three operands", currentInst->GetSourcePos());
+                    }
+                    break;
+                }
+                case ENDTRY:
+                {
+                    if (n == 2)
+                    {
+                        cmsx::object::Value tryBlockIdValue = currentInst->Operands()[1];
+                        uint32_t tryBlockId = static_cast<uint32_t>(tryBlockIdValue.Val());
+                        uint32_t offset = static_cast<uint32_t>(
+                            assembler.CurrentSection()->BaseAddress() + assembler.CurrentSection()->Address() - assembler.CurrentFunctionSymbol()->Start());
+                        cmsx::object::EndTryRecord* endTryRecord = new cmsx::object::EndTryRecord(tryBlockId, offset);
+                        assembler.GetObjectFile()->GetDebugSection()->AddDebugRecord(endTryRecord);
+                    }
+                    else
+                    {
+                        assembler.Error(currentInst->GetOpCode()->Name() + ": OCTA ENDTRY requires two operands", currentInst->GetSourcePos());
+                    }
+                    break;
+                }
+                case CATCH:
+                {
+                    if (n == 5)
+                    {
+                        cmsx::object::Value catchBlockIdValue = currentInst->Operands()[1];
+                        uint32_t catchBlockId = static_cast<uint32_t>(catchBlockIdValue.Val());
+                        cmsx::object::Value tryBlockIdValue = currentInst->Operands()[2];
+                        uint32_t tryBlockId = static_cast<uint32_t>(tryBlockIdValue.Val());
+                        cmsx::object::Value caughtTypeId1Value = currentInst->Operands()[3];
+                        uint64_t caughtTypeId1 = caughtTypeId1Value.Val();
+                        cmsx::object::Value caughtTypeId2Value = currentInst->Operands()[4];
+                        uint64_t caughtTypeId2 = caughtTypeId2Value.Val();
+                        cmsx::object::CatchRecord* catchRecord = new cmsx::object::CatchRecord(catchBlockId, tryBlockId, caughtTypeId1, caughtTypeId2);
+                        assembler.GetObjectFile()->GetDebugSection()->AddDebugRecord(catchRecord);
+                    }
+                    else
+                    {
+                        assembler.Error(currentInst->GetOpCode()->Name() + ": OCTA CATCH requires five operands", currentInst->GetSourcePos());
+                    }
+                    break;
+                }
+                case BEGINCLEANUP:
+                {
+                    if (n == 3)
+                    {
+                        cmsx::object::Value cleanupBlockIdValue = currentInst->Operands()[1];
+                        uint32_t cleanupBlockId = static_cast<uint32_t>(cleanupBlockIdValue.Val());
+                        cmsx::object::Value tryBlockIdValue = currentInst->Operands()[2];
+                        uint32_t tryBlockId = static_cast<uint32_t>(tryBlockIdValue.Val());
+                        uint32_t offset = static_cast<uint32_t>(
+                            assembler.CurrentSection()->BaseAddress() + assembler.CurrentSection()->Address() - assembler.CurrentFunctionSymbol()->Start());
+                        cmsx::object::BeginCleanupRecord* beginCleanupRecord = new cmsx::object::BeginCleanupRecord(cleanupBlockId, tryBlockId, offset);
+                        assembler.GetObjectFile()->GetDebugSection()->AddDebugRecord(beginCleanupRecord);
+                    }
+                    else
+                    {
+                        assembler.Error(currentInst->GetOpCode()->Name() + ": OCTA BEGINCLEANUP requires three operands", currentInst->GetSourcePos());
+                    }
+                    break;
+                }
+                case ENDCLEANUP:
+                {
+                    if (n == 2)
+                    {
+                        cmsx::object::Value cleanupBlockIdValue = currentInst->Operands()[1];
+                        uint32_t cleanupBlockId = static_cast<uint32_t>(cleanupBlockIdValue.Val());
+                        uint32_t offset = static_cast<uint32_t>(
+                            assembler.CurrentSection()->BaseAddress() + assembler.CurrentSection()->Address() - assembler.CurrentFunctionSymbol()->Start());
+                        cmsx::object::EndCleanupRecord* endCleanupRecord = new cmsx::object::EndCleanupRecord(cleanupBlockId, offset);
+                        assembler.GetObjectFile()->GetDebugSection()->AddDebugRecord(endCleanupRecord);
+                    }
+                    else
+                    {
+                        assembler.Error(currentInst->GetOpCode()->Name() + ": OCTA ENDCLEANUP requires two operands", currentInst->GetSourcePos());
+                    }
+                    break;
+                }
+                default:
+                {
+                    assembler.Error(currentInst->GetOpCode()->Name() + ": unknown discriminator value", currentInst->GetSourcePos());
+                    break;
                 }
             }
         }
@@ -262,7 +444,41 @@ void OctaInstruction::Assemble(Assembler& assembler)
     }
     else
     {
-        assembler.Error(currentInst->GetOpCode()->Name() + " can appear only .DATA section", currentInst->GetSourcePos());
+        if (assembler.CurrentSection()->IsDataSection())
+        {
+            int n = currentInst->Operands().size();
+            if (n > 0)
+            {
+                for (int i = 0; i < n; ++i)
+                {
+                    cmsx::object::Value value = currentInst->Operands()[i];
+                    if (value.IsSymbolValue())
+                    {
+                        assembler.EmitSymbolOcta(value);
+                    }
+                    else if (value.IsPureValue())
+                    {
+                        assembler.EmitPureOctaValue("octa", value);
+                    }
+                    else if (value.IsTypeIdIndex())
+                    {
+                        assembler.EmitClsIdCommmand(value.Val(), currentInst->GetSourcePos());
+                    }
+                    else
+                    {
+                        assembler.Error(currentInst->GetOpCode()->Name() + " operand must be a symbol, pure or type id index", currentInst->GetSourcePos());
+                    }
+                }
+            }
+            else
+            {
+                assembler.Error(currentInst->GetOpCode()->Name() + " needs at least one operand", currentInst->GetSourcePos());
+            }
+        }
+        else
+        {
+            assembler.Error(currentInst->GetOpCode()->Name() + " can appear only .DATA section", currentInst->GetSourcePos());
+        }
     }
 }
 
@@ -1422,6 +1638,10 @@ AssemblyInstructionMap::AssemblyInstructionMap()
     MapInstruction(cmsx::machine::TRAP, trapInstruction);
     AssemblyInstruction* swymInstruction = AddInstruction(new SwymInstruction());
     MapInstruction(cmsx::machine::SWYM, swymInstruction);
+    AssemblyInstruction* beginSpecInstruction = AddInstruction(new BeginSpecInstruction());
+    MapInstruction(cmsx::assembler::BSPEC, beginSpecInstruction);
+    AssemblyInstruction* endSpecInstruction = AddInstruction(new EndSpecInstruction());
+    MapInstruction(cmsx::assembler::ESPEC, endSpecInstruction);
 }
 
 AssemblyInstruction* AssemblyInstructionMap::AddInstruction(AssemblyInstruction* instruction)

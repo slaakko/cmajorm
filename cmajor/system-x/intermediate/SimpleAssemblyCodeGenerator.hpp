@@ -17,6 +17,8 @@ class CMSX_INTERMEDIATE_API SimpleAssemblyCodeGenerator : public CodeGenerator, 
 {
 public:
     SimpleAssemblyCodeGenerator(Context* context_, cmsx::assembler::AssemblyFile* assemblyFile_);
+    void AddSourceFileInfo(CompileUnit& compileUnit) override;
+    void GenerateDebugInfo() override;
     void Error(const std::string& message) override;
     const SourcePos& GetSourcePos() const override;
     Context* Ctx() const override { return GetContext(); }
@@ -29,6 +31,13 @@ public:
     void EmitSymbol(const std::string& name) override;
     int ExitLabelId() const override;
     void EmitClsId(const std::string& typeId) override;
+    void EmitDebugInfoInst(cmsx::assembler::Instruction* assemblyInstruction) override;
+    void SetCurrentLineNumber(uint32_t lineNumber_) override;
+    void BeginTry(uint32_t tryBlockId, uint32_t parentTryBlockId) override;
+    void EndTry(uint32_t tryBlockId) override;
+    void Catch(uint32_t catchBlockId, uint32_t tryBlockId, const std::string& caughtTypeIdStr) override;
+    void BeginCleanup(uint32_t cleanupBlockId, uint32_t tryBlockId) override;
+    void EndCleanup(uint32_t cleanupBlockId) override;
     void WriteOutputFile();
     void Visit(GlobalVariable& globalVariable) override;
     void Visit(Function& function) override;
@@ -96,11 +105,16 @@ private:
     cmsx::assembler::AssemblyFile* assemblyFile;
     cmsx::assembler::AssemblyFunction* assemblyFunction;
     cmsx::assembler::AssemblyStruct* assemblyStructure;
+    cmsx::assembler::AssemblyDebugInfo* debugInfo;
     cmsx::assembler::Instruction* assemblyInst;
     RegisterAllocator* registerAllocator;
     Instruction* currentInst;
     bool leader;
     std::string symbolName;
+    std::vector<Function*> debugInfoFunctions;
+    std::map<std::string, int64_t > sourceFileNameMap;
+    std::map<Function*, int64_t> frameSizeMap;
+    int lineNumber;
 };
 
 } // cmsx::intermediate

@@ -8,13 +8,71 @@
 #include <system-x/intermediate/Context.hpp>
 #include <system-x/intermediate/Error.hpp>
 #include <system-x/assembler/Constant.hpp>
+#include <soulng/util/Uuid.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace cmsx::intermediate {
 
+using namespace soulng::util;
+
 SimpleAssemblyCodeGenerator::SimpleAssemblyCodeGenerator(Context* context_, cmsx::assembler::AssemblyFile* assemblyFile_) : 
     Visitor(context_), assemblyFile(assemblyFile_), emitSection(cmsx::assembler::AssemblySectionKind::code), 
-    assemblyFunction(nullptr), assemblyStructure(nullptr), assemblyInst(nullptr), currentInst(nullptr), registerAllocator(nullptr), leader(false)
+    assemblyFunction(nullptr), assemblyStructure(nullptr), assemblyInst(nullptr), currentInst(nullptr), registerAllocator(nullptr), leader(false), debugInfo(nullptr),
+    lineNumber(0)
 {
+}
+
+void SimpleAssemblyCodeGenerator::AddSourceFileInfo(CompileUnit& compileUnit)
+{
+    if (compileUnit.GetMetadataRef())
+    {
+        sourceFileNameMap[compileUnit.FilePath()] = compileUnit.GetMetadataRef()->NodeId();
+    }
+}
+
+void SimpleAssemblyCodeGenerator::GenerateDebugInfo()
+{
+    for (Function* debugInfoFunc : debugInfoFunctions)
+    {
+        MetadataRef* metadataRef = debugInfoFunc->GetMetadataRef();
+        if (metadataRef)
+        {
+            MetadataStruct* metadataStruct = metadataRef->GetMetadataStruct();
+            if (metadataStruct)
+            {
+                MetadataItem* sourceFileItem = metadataStruct->GetItem("sourceFile");
+                if (sourceFileItem && sourceFileItem->Kind() == MetadataItemKind::metadataRef)
+                {
+                    MetadataRef* mdRef = static_cast<MetadataRef*>(sourceFileItem);
+                    MetadataStruct* mdStruct = mdRef->GetMetadataStruct();
+                    if (mdStruct)
+                    {
+                        MetadataItem* sourceFileNameItem = mdStruct->GetItem("sourceFileName");
+                        if (sourceFileNameItem && sourceFileNameItem->Kind() == MetadataItemKind::metadataString)
+                        {
+                            MetadataString* mdString = static_cast<MetadataString*>(sourceFileNameItem);
+                            sourceFileNameMap[mdString->Value()] = mdStruct->Id();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    for (const std::pair<std::string, int64_t >& r : sourceFileNameMap)
+    {
+        EmitSourceFileNameDebugInfo(r.first, r.second, *this);
+    }
+    for (Function* debugInfoFunc : debugInfoFunctions)
+    {
+        int64_t frameSize = 0;
+        auto it = frameSizeMap.find(debugInfoFunc);
+        if (it != frameSizeMap.cend())
+        {
+            frameSize = it->second;
+        }
+        EmitFunctionDebugInfo(debugInfoFunc, frameSize, *this);
+    }
 }
 
 void SimpleAssemblyCodeGenerator::WriteOutputFile()
@@ -24,26 +82,26 @@ void SimpleAssemblyCodeGenerator::WriteOutputFile()
 
 void SimpleAssemblyCodeGenerator::Visit(GlobalVariable& globalVariable)
 {
-    if (globalVariable.Once())
-    {
-        assemblyFile->GetLinkSection()->GetOrCreateLinkOnceObject()->AddLinkOnceSymbol(cmsx::assembler::MakeGlobalSymbol(globalVariable.Name()));
-    }
-    else
-    {
-        assemblyFile->GetLinkSection()->GetOrCreateExternObject()->AddExternSymbol(cmsx::assembler::MakeGlobalSymbol(globalVariable.Name()));
-    }
-    emitSection = cmsx::assembler::AssemblySectionKind::data;
-    cmsx::assembler::AssemblySection* dataSection = assemblyFile->GetDataSection();
-    assemblyStructure = dataSection->CreateStructure(globalVariable.Name());
-    cmsx::assembler::Instruction* octaInst = new cmsx::assembler::Instruction(cmsx::assembler::OCTA);
-    symbolName = globalVariable.Name() + "_data";
-    octaInst->AddOperand(cmsx::assembler::MakeGlobalSymbol(symbolName));
-    leader = false;
-    Emit(octaInst);
-    leader = true;
-    assemblyInst = nullptr;
     if (globalVariable.Initializer())
     {
+        if (globalVariable.Once())
+        {
+            assemblyFile->GetLinkSection()->GetOrCreateLinkOnceObject()->AddLinkOnceSymbol(cmsx::assembler::MakeGlobalSymbol(globalVariable.Name()));
+        }
+        else
+        {
+            assemblyFile->GetLinkSection()->GetOrCreateExternObject()->AddExternSymbol(cmsx::assembler::MakeGlobalSymbol(globalVariable.Name()));
+        }
+        emitSection = cmsx::assembler::AssemblySectionKind::data;
+        cmsx::assembler::AssemblySection* dataSection = assemblyFile->GetDataSection();
+        assemblyStructure = dataSection->CreateStructure(globalVariable.Name());
+        cmsx::assembler::Instruction* octaInst = new cmsx::assembler::Instruction(cmsx::assembler::OCTA);
+        symbolName = globalVariable.Name() + "_data";
+        octaInst->AddOperand(cmsx::assembler::MakeGlobalSymbol(symbolName));
+        leader = false;
+        Emit(octaInst);
+        leader = true;
+        assemblyInst = nullptr;
         globalVariable.Initializer()->Accept(*this);
     }
 }
@@ -136,6 +194,57 @@ void SimpleAssemblyCodeGenerator::EmitClsId(const std::string& typeId)
     assemblyInst->AddOperand(new cmsx::assembler::ClsIdConstant(SourcePos(), typeId));
 }
 
+void SimpleAssemblyCodeGenerator::EmitDebugInfoInst(cmsx::assembler::Instruction* assemblyInstruction)
+{
+    if (!debugInfo)
+    {
+        debugInfo = assemblyFile->GetDebugSection()->CreateDebugInfo();
+    }
+    debugInfo->AddInstruction(assemblyInstruction);
+}
+
+void SimpleAssemblyCodeGenerator::SetCurrentLineNumber(uint32_t lineNumber_)
+{
+    if (lineNumber == 0)
+    {
+        lineNumber = lineNumber_;
+    }
+    else if (lineNumber != lineNumber_)
+    {
+        EmitLineNumberInfo(lineNumber, *this);
+        lineNumber = lineNumber_;
+    }
+}
+
+void SimpleAssemblyCodeGenerator::BeginTry(uint32_t tryBlockId, uint32_t parentTryBlockId)
+{
+    EmitBeginTry(tryBlockId, parentTryBlockId, *this);
+}
+
+void SimpleAssemblyCodeGenerator::EndTry(uint32_t tryBlockId)
+{
+    EmitEndTry(tryBlockId, *this);
+}
+
+void SimpleAssemblyCodeGenerator::Catch(uint32_t catchBlockId, uint32_t tryBlockId, const std::string& caughtTypeIdStr)
+{
+    boost::uuids::uuid caughtTypeId = boost::lexical_cast<boost::uuids::uuid>(caughtTypeIdStr);
+    uint64_t caughtTypeId1;
+    uint64_t caughtTypeId2;
+    UuidToInts(caughtTypeId, caughtTypeId1, caughtTypeId2);
+    EmitCatch(catchBlockId, tryBlockId, caughtTypeId1, caughtTypeId2, *this);
+}
+
+void SimpleAssemblyCodeGenerator::BeginCleanup(uint32_t cleanupBlockId, uint32_t tryBlockId)
+{
+    EmitBeginCleanup(cleanupBlockId, tryBlockId, *this);
+}
+
+void SimpleAssemblyCodeGenerator::EndCleanup(uint32_t cleanupBlockId)
+{
+    EmitEndCleanup(cleanupBlockId, *this);
+}
+
 void SimpleAssemblyCodeGenerator::Error(const std::string& message)
 {
     cmsx::intermediate::Error(message, currentInst->GetSourcePos(), GetContext());
@@ -148,11 +257,8 @@ const SourcePos& SimpleAssemblyCodeGenerator::GetSourcePos() const
 
 void SimpleAssemblyCodeGenerator::Visit(Function& function)
 {
-    if (function.Name() == "static_constructor_BinaryPropertyTable_D16E19032F35A54747EE26AEB0C5AC73FF4B29D8")
-    {
-        int x = 0;
-    }
     if (!function.IsDefined()) return;
+    lineNumber = 0;
     if (function.GetFlag(FunctionFlags::once))
     {
         assemblyFile->GetLinkSection()->GetOrCreateLinkOnceObject()->AddLinkOnceSymbol(cmsx::assembler::MakeGlobalSymbol(function.Name()));
@@ -167,10 +273,19 @@ void SimpleAssemblyCodeGenerator::Visit(Function& function)
     registerAllocator = linearScanRregisterAllocator.get();
     assemblyFunction = assemblyFile->CreateFunction(function.Name());
     function.VisitBasicBlocks(*this);
+    if (lineNumber != 0)
+    {
+        EmitLineNumberInfo(lineNumber, *this);
+    }
     assemblyFunction->SetActiveFunctionPart(cmsx::assembler::FunctionPart::prologue);
     EmitPrologue(*this);
     assemblyFunction->SetActiveFunctionPart(cmsx::assembler::FunctionPart::epilogue);
     EmitEpilogue(*this);
+    if (function.GetMetadataRef())
+    {
+        debugInfoFunctions.push_back(&function);
+        frameSizeMap[&function] = registerAllocator->GetFrame().Size();
+    }
 }
 
 void SimpleAssemblyCodeGenerator::Visit(BasicBlock& basicBlock)
@@ -180,6 +295,7 @@ void SimpleAssemblyCodeGenerator::Visit(BasicBlock& basicBlock)
     while (inst)
     {
         currentInst = inst;
+        ProcessInstructionMetadata(inst, *this);
         RegisterAllocationAction action = registerAllocator->Run(inst);
         if (action == RegisterAllocationAction::spill)
         {

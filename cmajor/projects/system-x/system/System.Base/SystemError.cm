@@ -23,26 +23,24 @@ namespace System
     
     public SystemError GetSystemError()
     {
-/*	
         int errorCode;
-        UniquePtr<byte> buffer(cast<byte*>(MemAlloc(1024)));
-        get_system_error(&errorCode, buffer.Get(), 1024);
-        string errorMessage;
-        byte* p = buffer.Get();
-        while (*p != 0u)
-        {
-            errorMessage.Append(cast<char>(*p));
-            ++p;
-        }
-*/		
-		int errorCode = EFAIL;
-		string errorMessage = "GetSystemError not implemented yet";
-        return SystemError(errorCode, errorMessage);
+        UniquePtr<byte> buffer(cast<byte*>(MemAlloc(4096)));
+        if (get_system_error(&errorCode, buffer.Get(), 4096) != -1)
+		{
+			string errorMessage;
+			byte* p = buffer.Get();
+			while (*p != 0u)
+			{
+				errorMessage.Append(cast<char>(*p));
+				++p;
+			}
+			return SystemError(errorCode, errorMessage);
+		}
+		return SystemError(EFAIL, "could not get system error");
     }
     
     public void ThrowSystemError()
     {
-        //throw GetSystemError(); TODO
-		exit(1u);
+        throw GetSystemError(); 
     }
 }

@@ -1300,6 +1300,12 @@ void InstructionFormatter::Format(Ori& inst, uint8_t x, uint8_t y, uint8_t z)
     FormatRegOperand(y);
     FormatComma();
     FormatByteOperand(z);
+    int64_t saddr = GetSetAddress(absoluteAddress - 4);
+    if (saddr >= textSegmentBaseAddress && saddr < dataSegmentBaseAddress)
+    {
+        FormatColon();
+        FormatSetAddress(saddr);
+    }
 }
 
 void InstructionFormatter::Format(Xor& inst, uint8_t x, uint8_t y, uint8_t z)

@@ -20,6 +20,7 @@ public:
     void SetFilePath(const std::string& filePath_);
     const std::string& Id() const { return id; }
     void SetInfo(const std::string& id_, MetadataRef* metadataRef_);
+    MetadataRef* GetMetadataRef() const { return metadataRef; }
 private:
     Context* context;
     std::string filePath;

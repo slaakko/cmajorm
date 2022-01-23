@@ -81,6 +81,10 @@ public:
     void EmitLongOffset(uint32_t offset);
     void EmitShortOffset(uint16_t offset);
     void EmitClsIdCommmand(uint64_t typeIdIndex, const SourcePos& sourcePos);
+    void BeginSpec();
+    void EndSpec();
+    bool InSpec() const { return inSpec; }
+    const std::string& GetString(uint64_t val, const SourcePos& sourcePos);
 private:
     void VisitInstructions();
     void Resolve();
@@ -101,10 +105,12 @@ private:
     cmsx::object::Symbol* currentStructureSymbol;
     std::vector<boost::uuids::uuid> typeIds;
     int64_t currentAlignment;
-    bool inSpec;
     int parentIndex;
     int line;
     bool prevWasEmptyLine;
+    std::stack<bool> specStack;
+    bool inSpec;
+    std::vector<std::string> strings;
 };
 
 } // namespace cmsx::assembler

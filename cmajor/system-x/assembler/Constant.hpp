@@ -110,6 +110,7 @@ CMSX_ASSEMBLER_API Node* MakeConstantExpr(uint64_t value);
 CMSX_ASSEMBLER_API Node* MakeConstantExpr(uint64_t value, bool hex);
 CMSX_ASSEMBLER_API Node* MakeConstantExpr(float value);
 CMSX_ASSEMBLER_API Node* MakeConstantExpr(double value);
+CMSX_ASSEMBLER_API Node* MakeConstantExpr(const std::string& str);
 
 } // namespace cmsx::assembler
 

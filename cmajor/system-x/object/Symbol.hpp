@@ -146,6 +146,7 @@ public:
     void SetLinkCommandIds(const std::vector<int32_t>& linkCommandIds_);
     Symbol* Clone() const;
     void Print(CodeFormatter& formatter);
+    bool IsRemoved() const { return linkage == Linkage::remove; }
 private:
     SymbolKind kind;
     int index;

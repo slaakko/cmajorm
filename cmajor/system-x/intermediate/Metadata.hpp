@@ -11,11 +11,19 @@ namespace cmsx::intermediate {
 
 class MetadataStruct;
 
+enum class MetadataItemKind
+{
+    metadataRef, metadataBool, metadataLong, metadataString
+};
+
 class CMSX_INTERMEDIATE_API MetadataItem
 {
 public:
-    MetadataItem();
+    MetadataItem(MetadataItemKind kind_);
     virtual ~MetadataItem();
+    MetadataItemKind Kind() const { return kind; }
+private:
+    MetadataItemKind kind;
 };
 
 class CMSX_INTERMEDIATE_API MetadataRef : public MetadataItem

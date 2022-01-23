@@ -135,9 +135,11 @@ void Assembler::Visit(StringConstant& node)
             currentSection->EmitByte(static_cast<uint8_t>(c));
         }
     }
-    else
+    else if (currentSection->IsDebugSection())
     {
-        // todo: debug section
+        std::string s = ToUtf8(node.Value());
+        value = cmsx::object::Value(static_cast<uint64_t>(strings.size()));
+        strings.push_back(s);
     }
 }
 
@@ -1271,6 +1273,32 @@ void Assembler::EmitClsIdCommmand(uint64_t typeIdIndex, const SourcePos& sourceP
     {
         Error("invalid type id index " + std::to_string(typeIdIndex), sourcePos);
     }
+}
+
+void Assembler::BeginSpec()
+{
+    specStack.push(inSpec);
+    inSpec = true;
+}
+
+void Assembler::EndSpec()
+{
+    inSpec = specStack.top();
+    specStack.pop();
+}
+
+const std::string& Assembler::GetString(uint64_t val, const SourcePos& sourcePos) 
+{
+    if (val >= 0 && val < strings.size())
+    {
+        return strings[val];
+    }
+    else
+    {
+        Error("invalid string index " + std::to_string(val), sourcePos);
+    }
+    static std::string empty;
+    return empty;
 }
 
 } // namespace cmsx::assembler

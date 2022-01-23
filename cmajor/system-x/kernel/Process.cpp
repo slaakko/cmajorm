@@ -14,7 +14,8 @@ namespace cmsx::kernel {
 Process::Process(int32_t id_) : 
     id(id_), rv(static_cast<uint64_t>(-1)), kernelSP(cmsx::machine::kernelBaseAddress), axAddress(0), bxAddress(0), cxAddress(0),
     state(cmsx::machine::ProcessState::created), entryPoint(-1), argumentsStartAddress(-1), argumentsLength(0), environmentStartAddress(-1), environmentLength(0), 
-    heapStartAddress(-1), heapLength(0), stackStartAddress(-1), userTime(0), systemTime(0), exitCode(0), debugger(nullptr), processor(nullptr), observer(nullptr)
+    heapStartAddress(-1), heapLength(0), stackStartAddress(-1), userTime(0), systemTime(0), exitCode(0), debugger(nullptr), processor(nullptr), observer(nullptr),
+    currentExceptionAddress(0), currentExceptionClassId(0), currentTryRecord(nullptr)
 {
 }
 
@@ -55,6 +56,15 @@ void Process::SetHeapLength(int64_t heapLength_)
 void Process::SetSymbolTable(cmsx::object::SymbolTable* symbolTable_)
 {
     symbolTable.reset(symbolTable_);
+}
+
+cmsx::object::FunctionTable* Process::GetFunctionTable()
+{
+    if (!functionTable)
+    {
+        functionTable.reset(new cmsx::object::FunctionTable());
+    }
+    return functionTable.get();
 }
 
 void Process::RemoveFromParent()

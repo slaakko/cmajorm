@@ -33,6 +33,16 @@ namespace System
         private string stackTrace;
     }
 
+    public void Throw(Exception* ex)
+    {
+        ex->SetStackTrace(GetStackTrace());
+        if (do_throw(ex, typeid(ex)) == -1)
+		{
+			SystemError systemError = GetSystemError();
+			// todo write system error to stderr
+		}
+    }
+
     public class NullPointerException : Exception
     {
         public nothrow NullPointerException() : base("null pointer exception")
@@ -63,25 +73,21 @@ namespace System
 
     public void ThrowNullPointerException()
     {
-        //throw NullPointerException();
-		exit(253);
+        throw NullPointerException();
     }
 
     public void ThrowIndexOutOfBoundsException()
     {
-        //throw IndexOutOfBoundsException();
-		exit(252);
+        throw IndexOutOfBoundsException();
     }
 
     public void ThrowInvalidParameterException()
     {
-        //throw InvalidParameterException();
-		exit(251);
-    }
+        throw InvalidParameterException();
+	}
 
     public void ThrowPreconditionViolationException()
     {
-        //throw PreconditionViolationException();
-		exit(250);
+        throw PreconditionViolationException();
     }
 }

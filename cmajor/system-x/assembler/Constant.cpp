@@ -226,4 +226,9 @@ Node* MakeConstantExpr(double value)
     return MakeConstantExpr(x, true);
 }
 
+Node* MakeConstantExpr(const std::string& str)
+{
+    return new StringConstant(SourcePos(), ToUtf32(str));
+}
+
 } // namespace cmsx::assembler
