@@ -35,37 +35,6 @@ void DoneApplication()
     soulng::util::Done();
 }
 
-class ProcessObserver : public cmsx::machine::ProcessObserver
-{
-public:
-    ProcessObserver();
-    void ProcessStateChanged(cmsx::machine::Process* process) override;
-    void WaitProcessExit();
-private:
-    std::mutex mtx;
-    std::condition_variable processExitEvent;
-    bool exit;
-};
-
-ProcessObserver::ProcessObserver() : exit(false)
-{
-}
-
-void ProcessObserver::ProcessStateChanged(cmsx::machine::Process* process)
-{
-    if (process->State() == cmsx::machine::ProcessState::zombie)
-    {
-        exit = true;
-        processExitEvent.notify_one();
-    }
-}
-
-void ProcessObserver::WaitProcessExit()
-{
-    std::unique_lock<std::mutex> lock(mtx);
-    processExitEvent.wait(lock, [this] { return exit; });
-}
-
 int main(int argc, const char** argv)
 {
     try
@@ -124,20 +93,18 @@ int main(int argc, const char** argv)
         {
             throw std::runtime_error("no program set");
         }
-        ProcessObserver observer;
         cmsx::machine::Machine machine;
         cmsx::kernel::Kernel::Instance().SetMachine(&machine);
         cmsx::kernel::Kernel::Instance().Start();
         cmsx::kernel::Process* process = cmsx::kernel::ProcessManager::Instance().CreateProcess();
         process->SetFilePath(args[0]);
-        process->SetObserver(&observer);
         cmsx::kernel::Load(process, args, env, machine);
         if (verbose)
         {
             std::cout << "running '" << args[0] << "'..." << std::endl;;
         }
         machine.Start();
-        observer.WaitProcessExit();
+        cmsx::kernel::ProcessManager::Instance().WaitForProcessesExit();
         if (verbose)
         {
             uint8_t exitCode = 255;

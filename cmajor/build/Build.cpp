@@ -1939,13 +1939,11 @@ void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& mo
     ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new IntNode(Span(), boost::uuids::nil_uuid()), 
         new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"));
     mainFunctionBody->AddStatement(constructExitCode);
-/*
     CompoundStatementNode* tryBlock = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
     InvokeNode* invokeSetupEnvironment = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"StartupSetupEnvironment"));
     invokeSetupEnvironment->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"envp"));
     StatementNode* callSetEnvironmentStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeSetupEnvironment);
     tryBlock->AddStatement(callSetEnvironmentStatement);
-*/
     FunctionSymbol* userMain = module.GetSymbolTable().MainFunctionSymbol();
     InvokeNode* invokeMain = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), userMain->GroupName()));
     if (!userMain->Parameters().empty())
@@ -1962,10 +1960,10 @@ void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& mo
     {
         callMainStatement = new AssignmentStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"), invokeMain);
     }
-/*
     tryBlock->AddStatement(callMainStatement);
     TryStatementNode* tryStatement = new TryStatementNode(Span(), boost::uuids::nil_uuid(), tryBlock);
     CompoundStatementNode* catchBlock = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
+/*
     InvokeNode* consoleError = new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"System.Console"), 
         new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Error")));
     DotNode* writeLine = new DotNode(Span(), boost::uuids::nil_uuid(), consoleError, new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"WriteLine"));
@@ -1975,6 +1973,28 @@ void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& mo
     printEx->AddArgument(exToString);
     ExpressionStatementNode* printExStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), printEx);
     catchBlock->AddStatement(printExStatement);
+*/
+    // temporary BEGIN
+    InvokeNode* printEx = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"write"));
+    InvokeNode* exToString = new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"ex"),
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"ToString")));
+    ConstructionStatementNode* constructStrStatement = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"string"),
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"str"));
+    constructStrStatement->AddArgument(exToString);
+    catchBlock->AddStatement(constructStrStatement);
+    InvokeNode* invokeStrChars = new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(),
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"str"),
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Chars")));
+    InvokeNode* invokeStrLength = new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(),
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"str"),
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Length")));
+    printEx->AddArgument(new IntLiteralNode(Span(), boost::uuids::nil_uuid(), 1));
+    printEx->AddArgument(invokeStrChars);
+    printEx->AddArgument(invokeStrLength);
+    ExpressionStatementNode* printExStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), printEx);
+    catchBlock->AddStatement(printExStatement);
+    // temporary END
+
     AssignmentStatementNode* assignExitCodeStatement = new AssignmentStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"), 
         new IntLiteralNode(Span(), boost::uuids::nil_uuid(), 1));
     catchBlock->AddStatement(assignExitCodeStatement);
@@ -1982,8 +2002,6 @@ void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& mo
         new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"System.Exception"))), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"ex"), catchBlock);
     tryStatement->AddCatch(catchAll);
     mainFunctionBody->AddStatement(tryStatement);
-*/
-    mainFunctionBody->AddStatement(callMainStatement);
     ReturnStatementNode* returnStatement = new ReturnStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"));
     mainFunctionBody->AddStatement(returnStatement);
     mainFunction->SetBody(mainFunctionBody);

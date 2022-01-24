@@ -38,6 +38,11 @@ ProcessFileTable::ProcessFileTable()
     files[2] = consoleOutputFile;
 }
 
+void ProcessFileTable::CopyFrom(const ProcessFileTable& that)
+{
+    files = that.files;
+}
+
 File* ProcessFileTable::GetFile(int32_t fd) const
 {
     if (fd < 0 || fd > files.size())

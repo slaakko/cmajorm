@@ -56,7 +56,7 @@ void EventManager::Wakeup(Event evnt)
     }
     for (auto& process : processes)
     {
-        Scheduler::Instance().AddRunnableProcess(process);
+        Scheduler::Instance().AddRunnableProcess(process, cmsx::machine::ProcessState::runnableInKernel);
     }
 }
 
@@ -64,6 +64,7 @@ void Sleep(Event evnt, cmsx::machine::Process* process)
 {
     process->GetProcessor()->ResetCurrentProcess();
     EventManager::Instance().SleepOn(evnt, process);
+    // TODO: switch to user fiber
 }
 
 void Wakeup(Event evnt)

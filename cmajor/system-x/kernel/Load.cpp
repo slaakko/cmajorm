@@ -5,6 +5,7 @@
 
 #include <system-x/kernel/Load.hpp>
 #include <system-x/kernel/Process.hpp>
+#include <system-x/kernel/ProcessManager.hpp>
 #include <system-x/kernel/Trap.hpp>
 #include <system-x/kernel/Scheduler.hpp>
 #include <system-x/object/BinaryFile.hpp>
@@ -155,11 +156,13 @@ void Load(Process* process, const std::vector<std::string>& args, const std::vec
             mainArgAddr = mainArgAddr + 8;
             machine.Mem().WriteOcta(rv, static_cast<uint64_t>(mainArgAddr), static_cast<uint64_t>(envAddress), cmsx::machine::Protection::write);
             mainArgAddr = mainArgAddr + 8;
-            process->SetSymbolTable(executable->ReleaseSymbolTable());
+            std::shared_ptr<cmsx::object::SymbolTable> symbolTable(executable->ReleaseSymbolTable());
+            process->SetSymbolTable(symbolTable);
             AddTrapsToSymbolTable(*process->GetSymbolTable());
             regs.Set(cmsx::machine::regSP, cmsx::machine::stackSegmentBaseAddress);
             process->SaveContext(machine, regs);
-            Scheduler::Instance().AddRunnableProcess(process);
+            ProcessManager::Instance().IncrementRunnableProcesses();
+            Scheduler::Instance().AddRunnableProcess(process, cmsx::machine::ProcessState::runnableInUser);
         }
         else
         {

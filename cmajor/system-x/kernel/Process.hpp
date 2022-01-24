@@ -49,8 +49,10 @@ public:
     void SetHeapStartAddress(int64_t heapStartAddress_) { heapStartAddress = heapStartAddress_; }
     int64_t HeapLength() const override { return heapLength; }
     void SetHeapLength(int64_t heapLength_) override;
+    void SetAddressesFrom(Process* parent);
     cmsx::object::SymbolTable* GetSymbolTable() const { return symbolTable.get(); }
-    void SetSymbolTable(cmsx::object::SymbolTable* symbolTable_);
+    const std::shared_ptr<cmsx::object::SymbolTable>& GetSymbolTablePtr() const { return symbolTable; }
+    void SetSymbolTable(const std::shared_ptr<cmsx::object::SymbolTable>& symbolTable_);
     cmsx::object::FunctionTable* GetFunctionTable();
     void RemoveFromParent();
     std::chrono::steady_clock::duration UserTime() const { return userTime; }
@@ -63,10 +65,10 @@ public:
     void RestoreContext(cmsx::machine::Machine& machine, cmsx::machine::Registers& regs) override;
     void SetRunning(cmsx::machine::Processor* processor_) override;
     void ResetProcessor() override;
-    void SetObserver(cmsx::machine::ProcessObserver* observer_) override;
     cmsx::machine::Debugger* GetDebugger() const override;
     void SetDebugger(cmsx::machine::Debugger* debugger_) override;
     cmsx::machine::Processor* GetProcessor() const override { return processor; }
+    void SetProcessor(cmsx::machine::Processor* processor_) { processor = processor_; }
     void AddUserTime(std::chrono::steady_clock::duration duration) override;
     void AddSleepTime() override;
     void AddSystemTime(std::chrono::steady_clock::duration duration) override;
@@ -102,10 +104,9 @@ private:
     std::chrono::steady_clock::duration userTime;
     std::chrono::steady_clock::duration sleepTime;
     std::chrono::steady_clock::duration systemTime;
-    std::unique_ptr<cmsx::object::SymbolTable> symbolTable;
+    std::shared_ptr<cmsx::object::SymbolTable> symbolTable;
     cmsx::machine::Debugger* debugger;
     cmsx::machine::Processor* processor;
-    cmsx::machine::ProcessObserver* observer;
     RegionTable regionTable;
     ProcessFileTable fileTable;
     std::unique_ptr<cmsx::object::FunctionTable> functionTable;
@@ -114,6 +115,9 @@ private:
     uint64_t currentExceptionClassId;
     cmsx::object::TryRecord* currentTryRecord;
 };
+
+CMSX_KERNEL_API int32_t Fork(Process* parent);
+CMSX_KERNEL_API int32_t Wait(Process* parent, int64_t childExitCodeAddress);
 
 } // namespace cmsx::kernel
 

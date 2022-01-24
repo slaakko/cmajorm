@@ -29,6 +29,9 @@ const uint8_t trap_catch = 14;
 const uint8_t trap_resume = 15;
 const uint8_t trap_stack_trace = 16;
 const uint8_t trap_get_system_error = 17;
+const uint8_t trap_fork = 18;
+const uint8_t trap_wait = 19;
+const uint8_t trap_getpid = 20;
 
 class CMSX_KERNEL_API TrapHandler
 {

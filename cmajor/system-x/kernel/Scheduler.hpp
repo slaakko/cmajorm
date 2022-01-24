@@ -18,7 +18,7 @@ public:
     static Scheduler& Instance() { return *instance; }
     void SetMachine(cmsx::machine::Machine* machine_) override;
     cmsx::machine::Process* GetRunnableProcess() override;
-    void AddRunnableProcess(cmsx::machine::Process* runnableProcess) override;
+    void AddRunnableProcess(cmsx::machine::Process* runnableProcess, cmsx::machine::ProcessState processState) override;
     void Start();
     void Stop() override;
 private:

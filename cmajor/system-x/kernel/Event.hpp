@@ -12,7 +12,7 @@ namespace cmsx::kernel {
 
 enum class EventKind
 {
-    processExitEvent
+    childExitEvent, alarmEvent
 };
 
 struct CMSX_KERNEL_API Event

@@ -17,6 +17,7 @@ CMSX_MACHINE_API int MaxProcs();
 CMSX_MACHINE_API int MaxOpenFiles();
 CMSX_MACHINE_API int MaxFiles();
 CMSX_MACHINE_API int MaxFilesystems();
+CMSX_MACHINE_API int MaxBlocks();
 CMSX_MACHINE_API std::string ConfigFilePath();
 CMSX_MACHINE_API void InitConfig();
 CMSX_MACHINE_API void DoneConfig();

@@ -26,6 +26,7 @@ public:
     RegionId Id() const { return id; }
     int64_t Start() const { return start; }
     int64_t Length() const { return length; }
+    void SetLength(int64_t length_) { length = length_; }
 private:
     RegionId id;
     int64_t start;

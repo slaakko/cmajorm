@@ -21,14 +21,14 @@ void ProcessManager::Done()
     instance.reset();
 }
 
-ProcessManager::ProcessManager() : machine(nullptr), maxProcs(cmsx::machine::MaxProcs()), nextProcessId(0)
+ProcessManager::ProcessManager() : machine(nullptr), maxProcs(cmsx::machine::MaxProcs()), numProcessTableSlots(maxProcs + 1), nextProcessId(1), numRunnableProcesses(0)
 {
     if (maxProcs <= 0 || maxProcs > 64 * 1024)
     {
         throw SystemError(EPARAM, "invalid 'maxProcs' (" + std::to_string(maxProcs) + ") in '" + cmsx::machine::ConfigFilePath() + 
             "': value should be in range 1..." + std::to_string(64 * 1024));
     }
-    processTable.resize(maxProcs);
+    processTable.resize(numProcessTableSlots);
 }
 
 ProcessManager::~ProcessManager()
@@ -37,7 +37,7 @@ ProcessManager::~ProcessManager()
 
 Process* ProcessManager::GetProcess(int32_t pid) const
 {
-    if (pid < 0 || pid > maxProcs)
+    if (pid < 1 || pid > maxProcs + 1)
     {
         throw SystemError(EPARAM, "invalid pid " + std::to_string(pid));
     }
@@ -47,8 +47,8 @@ Process* ProcessManager::GetProcess(int32_t pid) const
 void ProcessManager::Start()
 {
     processTable.clear();
-    processTable.resize(maxProcs);
-    nextProcessId = 0;
+    processTable.resize(numProcessTableSlots);
+    nextProcessId = 1;
 }
 
 void ProcessManager::Stop()
@@ -63,11 +63,11 @@ Process* ProcessManager::CreateProcess()
         throw SystemError(EFAIL, "machine not set in process manager");
     }
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
-    if (nextProcessId >= maxProcs)
+    if (nextProcessId > maxProcs)
     {
-        nextProcessId = 0;
+        nextProcessId = 1;
     }
-    while (nextProcessId < maxProcs && processTable[nextProcessId])
+    while (nextProcessId <= maxProcs && processTable[nextProcessId])
     {
         if (processTable[nextProcessId]->State() == cmsx::machine::ProcessState::zombie)
         {
@@ -76,7 +76,7 @@ Process* ProcessManager::CreateProcess()
         }
         ++nextProcessId;
     }
-    if (nextProcessId >= maxProcs)
+    if (nextProcessId > maxProcs)
     {
         throw SystemError(ELIMITEXCEEDED, "all process table entries in use");
     }
@@ -112,6 +112,26 @@ void ProcessManager::DeleteProcess(int32_t pid)
     {
         throw SystemError(ENOTFOUND, "process with id " + std::to_string(pid) + " not found");
     }
+}
+
+void ProcessManager::IncrementRunnableProcesses()
+{
+    ++numRunnableProcesses;
+}
+
+void ProcessManager::DecrementRunnableProcesses()
+{
+    --numRunnableProcesses;
+    if (numRunnableProcesses == 0)
+    {
+        processesExit.notify_all();
+    }
+}
+
+void ProcessManager::WaitForProcessesExit()
+{
+    std::unique_lock<std::recursive_mutex> lock(machine->Lock());
+    processesExit.wait(lock, [this]{ return numRunnableProcesses == 0 || machine->Exiting(); });
 }
 
 void InitProcessManager()

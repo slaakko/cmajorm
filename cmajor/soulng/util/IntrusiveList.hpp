@@ -14,7 +14,7 @@ class IntrusiveListNode
 {
 public:
     using NodePtr = IntrusiveListNode<T>*;
-    IntrusiveListNode() : parent(nullptr), nextSibling(nullptr), prevSibling(nullptr), firstChild(nullptr), lastChild(nullptr) {}
+    IntrusiveListNode(T* ptr_) : ptr(ptr_), parent(nullptr), nextSibling(nullptr), prevSibling(nullptr), firstChild(nullptr), lastChild(nullptr) {}
     NodePtr NextSibling() const { return nextSibling; }
     void SetNextSibling(NodePtr nextSibling_) { nextSibling = nextSibling_; }
     NodePtr PrevSibling() const { return prevSibling; }
@@ -114,7 +114,12 @@ public:
             }
         }
     }
+    T* Get() const
+    {
+        return ptr;
+    }
 private:
+    T* ptr;
     NodePtr parent;
     NodePtr nextSibling;
     NodePtr prevSibling;

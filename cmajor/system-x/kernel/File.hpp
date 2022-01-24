@@ -30,6 +30,7 @@ class CMSX_KERNEL_API ProcessFileTable
 public:
     ProcessFileTable();
     File* GetFile(int32_t fd) const;
+    void CopyFrom(const ProcessFileTable& that);
 private:
     std::vector<File*> files;
 };

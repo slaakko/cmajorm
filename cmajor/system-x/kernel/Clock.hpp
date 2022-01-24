@@ -15,7 +15,8 @@ class Process;
 
 struct CMSX_KERNEL_API Alarm
 {
-    Alarm(Process* process_, std::chrono::steady_clock::time_point dueTime_) : process(process_), dueTime(dueTime_) {}
+    Alarm(Process* process_, std::chrono::steady_clock::time_point dueTime_) : id(-1), process(process_), dueTime(dueTime_) {}
+    int id;
     Process* process;
     std::chrono::steady_clock::time_point dueTime;
 };
@@ -30,12 +31,13 @@ public:
     void Start();
     void Stop();
     void Tick() override;
-    void Schedule(const Alarm& alarm);
+    void Schedule(Alarm& alarm);
 private:
     Clock();
     static std::unique_ptr<Clock> instance;
     cmsx::machine::Machine* machine;
     std::vector<Alarm> alarms;
+    int nextAlarmId;
 };
 
 CMSX_KERNEL_API void InitClock();

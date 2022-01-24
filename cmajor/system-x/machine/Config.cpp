@@ -44,6 +44,7 @@ public:
     int MaxOpenFiles() const { return maxOpenFiles; }
     int MaxFiles() const { return maxFiles; }
     int MaxFilesystems() const { return maxFilesystems; }
+    int MaxBlocks() const { return maxBlocks; }
 private:
     Configuration();
     void Read();
@@ -56,6 +57,7 @@ private:
     int maxOpenFiles;
     int maxFiles;
     int maxFilesystems;
+    int maxBlocks;
     static std::unique_ptr<Configuration> instance;
 };
 
@@ -79,7 +81,8 @@ Configuration::Configuration() :
     maxProcs(1024), 
     maxOpenFiles(256),
     maxFiles(65536),
-    maxFilesystems(64)
+    maxFilesystems(64),
+    maxBlocks(256)
 {
     if (!boost::filesystem::exists(filePath))
     {
@@ -144,6 +147,12 @@ void Configuration::Read()
                     throw std::runtime_error("error reading configuration from '" + filePath + "': 'maxFilesystems' attribute not found");
                 }
                 maxFilesystems = boost::lexical_cast<int>(ToUtf8(maxFilesystemsAttribute));
+                std::u32string maxBlocksAttribute = configurationElement->GetAttribute(U"maxBlocks");
+                if (maxBlocksAttribute.empty())
+                {
+                    throw std::runtime_error("error reading configuration from '" + filePath + "': 'maxBlocks' attribute not found");
+                }
+                maxBlocks = boost::lexical_cast<int>(ToUtf8(maxBlocksAttribute));
             }
         }
         else 
@@ -165,6 +174,7 @@ void Configuration::Write()
     configurationElement->SetAttribute(U"maxOpenFiles", ToUtf32(std::to_string(maxOpenFiles)));
     configurationElement->SetAttribute(U"maxFiles", ToUtf32(std::to_string(maxFiles)));
     configurationElement->SetAttribute(U"maxFilesystems", ToUtf32(std::to_string(maxFilesystems)));
+    configurationElement->SetAttribute(U"maxBlocks", ToUtf32(std::to_string(maxBlocks)));
     configDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(configurationElement));
     CodeFormatter formatter(file);
     formatter.SetIndentSize(1);
@@ -204,6 +214,11 @@ int MaxFiles()
 int MaxFilesystems()
 {
     return Configuration::Instance().MaxFilesystems();
+}
+
+int MaxBlocks()
+{
+    return Configuration::Instance().MaxBlocks();
 }
 
 std::string ConfigFilePath()

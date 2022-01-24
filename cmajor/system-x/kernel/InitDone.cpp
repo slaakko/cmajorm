@@ -12,11 +12,13 @@
 #include <system-x/kernel/MathTraps.hpp>
 #include <system-x/kernel/TrapRandom.hpp>
 #include <system-x/kernel/ExceptionHandlingTraps.hpp>
+#include <system-x/kernel/ProcessManagementTraps.hpp>
 #include <system-x/kernel/Kernel.hpp>
 #include <system-x/kernel/ProcessManager.hpp>
 #include <system-x/kernel/Scheduler.hpp>
 #include <system-x/kernel/EventManager.hpp>
 #include <system-x/kernel/Clock.hpp>
+#include <system-x/kernel/BlockManager.hpp>
 
 namespace cmsx::kernel {
 
@@ -31,8 +33,10 @@ void Init()
     InitTrapRandom();
     InitExceptionHandlingTraps();
     InitProcessManager();
+    InitProcessManagementTraps();
     InitScheduler();
     InitEventManager();
+    InitBlockManager();
     InitClock();
     InitKernel();
 }
@@ -41,8 +45,10 @@ void Done()
 {
     DoneKernel();
     DoneClock();
+    DoneBlockManager();
     DoneEventManager();
     DoneScheduler();
+    DoneProcessManagementTraps();
     DoneProcessManager();
     DoneExceptionHandlingTraps();
     DoneTrapRandom();

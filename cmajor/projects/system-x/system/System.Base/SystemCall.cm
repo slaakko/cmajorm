@@ -21,6 +21,9 @@ public const byte trap_catch = 14u;
 public const byte trap_resume = 15u;
 public const byte trap_stack_trace = 16u;
 public const byte trap_get_system_error = 17u;
+public const byte trap_fork = 18u;
+public const byte trap_wait = 19u;
+public const byte trap_getpid = 20u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -114,4 +117,19 @@ public cdecl nothrow int stack_trace(void* buffer, long bufferSize)
 public cdecl nothrow int get_system_error(int* errorCode, void* buffer, long bufferSize)
 {
 	return cast<int>(trap(0u, trap_get_system_error, 0u, buffer, bufferSize));
+}
+
+public cdecl nothrow int fork()
+{
+	return cast<int>(trap(0u, trap_fork, 0u));
+}
+
+public cdecl nothrow int wait(byte* exitCode)
+{
+	return cast<int>(trap(0u, trap_wait, 0u, exitCode));
+}
+
+public cdecl nothrow int getpid()
+{
+	return cast<int>(trap(0u, trap_getpid, 0u));
 }

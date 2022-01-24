@@ -6,6 +6,7 @@
 #include <system-x/kernel/Clock.hpp>
 #include <system-x/kernel/Process.hpp>
 #include <system-x/kernel/Scheduler.hpp>
+#include <system-x/kernel/EventManager.hpp>
 #include <system-x/machine/Machine.hpp>
 #include <algorithm>
 
@@ -23,7 +24,7 @@ void Clock::Done()
     instance.reset();
 }
 
-Clock::Clock() : machine(nullptr)
+Clock::Clock() : machine(nullptr), nextAlarmId(0)
 {
 }
 
@@ -56,7 +57,7 @@ void Clock::Tick()
         Alarm alarm = alarms.front();
         alarms.erase(alarms.begin());
         alarm.process->AddSleepTime();
-        Scheduler::Instance().AddRunnableProcess(alarm.process);
+        Wakeup(Event(EventKind::alarmEvent, alarm.id));
     }
 }
 
@@ -70,12 +71,15 @@ struct AlarmEarlier
     }
 };
 
-void Clock::Schedule(const Alarm& alarm)
+void Clock::Schedule(Alarm& alarm)
 {
-    std::lock_guard<std::recursive_mutex> lock(machine->Lock());
-    alarm.process->SetState(cmsx::machine::ProcessState::asleep);
-    alarms.push_back(alarm);
-    std::sort(alarms.begin(), alarms.end(), AlarmEarlier());
+    {
+        std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+        alarm.id = nextAlarmId++;
+        alarms.push_back(alarm);
+        std::sort(alarms.begin(), alarms.end(), AlarmEarlier());
+    }
+    Sleep(Event(EventKind::alarmEvent, alarm.id), alarm.process);
 }
 
 void InitClock()

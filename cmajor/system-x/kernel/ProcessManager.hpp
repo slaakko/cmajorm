@@ -28,6 +28,9 @@ public:
     Process* CreateProcess();
     Process* GetProcess(int32_t pid) const;
     void DeleteProcess(int32_t pid);
+    void IncrementRunnableProcesses();
+    void DecrementRunnableProcesses();
+    void WaitForProcessesExit();
 private:
     ProcessManager();
     static std::unique_ptr<ProcessManager> instance;
@@ -35,6 +38,9 @@ private:
     int maxProcs;
     int32_t nextProcessId;
     std::vector<std::unique_ptr<Process>> processTable;
+    int32_t numProcessTableSlots;
+    int numRunnableProcesses;
+    std::condition_variable_any processesExit;
 };
 
 CMSX_KERNEL_API void InitProcessManager();

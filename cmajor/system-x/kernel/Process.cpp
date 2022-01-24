@@ -4,7 +4,9 @@
 // =================================
 
 #include <system-x/kernel/Process.hpp>
+#include <system-x/kernel/ProcessManager.hpp>
 #include <system-x/kernel/EventManager.hpp>
+#include <system-x/kernel/Scheduler.hpp>
 #include <system-x/machine/Config.hpp>
 #include <system-x/machine/Machine.hpp>
 #include <system-x/machine/Memory.hpp>
@@ -12,9 +14,9 @@
 namespace cmsx::kernel {
 
 Process::Process(int32_t id_) : 
-    id(id_), rv(static_cast<uint64_t>(-1)), kernelSP(cmsx::machine::kernelBaseAddress), axAddress(0), bxAddress(0), cxAddress(0),
+    soulng::util::IntrusiveListNode<Process>(this), id(id_), rv(static_cast<uint64_t>(-1)), kernelSP(cmsx::machine::kernelBaseAddress), axAddress(0), bxAddress(0), cxAddress(0),
     state(cmsx::machine::ProcessState::created), entryPoint(-1), argumentsStartAddress(-1), argumentsLength(0), environmentStartAddress(-1), environmentLength(0), 
-    heapStartAddress(-1), heapLength(0), stackStartAddress(-1), userTime(0), systemTime(0), exitCode(0), debugger(nullptr), processor(nullptr), observer(nullptr),
+    heapStartAddress(-1), heapLength(0), stackStartAddress(-1), userTime(0), systemTime(0), sleepTime(0), exitCode(0), debugger(nullptr), processor(nullptr),
     currentExceptionAddress(0), currentExceptionClassId(0), currentTryRecord(nullptr)
 {
 }
@@ -27,10 +29,6 @@ void Process::SetState(cmsx::machine::ProcessState state_)
         if (state == cmsx::machine::ProcessState::asleep)
         {
             sleepStartTime = std::chrono::steady_clock::now();
-        }
-        if (observer)
-        {
-            observer->ProcessStateChanged(this);
         }
     }
 }
@@ -53,9 +51,21 @@ void Process::SetHeapLength(int64_t heapLength_)
     }
 }
 
-void Process::SetSymbolTable(cmsx::object::SymbolTable* symbolTable_)
+void Process::SetAddressesFrom(Process* parent)
 {
-    symbolTable.reset(symbolTable_);
+    entryPoint = parent->entryPoint;
+    argumentsStartAddress = parent->argumentsStartAddress;
+    argumentsLength = parent->argumentsLength;
+    environmentStartAddress = parent->environmentStartAddress;
+    environmentLength = parent->environmentLength;
+    heapStartAddress = parent->heapStartAddress;
+    heapLength = parent->heapLength;
+    stackStartAddress = parent->stackStartAddress;
+}
+
+void Process::SetSymbolTable(const std::shared_ptr<cmsx::object::SymbolTable>& symbolTable_)
+{
+    symbolTable = symbolTable_;
 }
 
 cmsx::object::FunctionTable* Process::GetFunctionTable()
@@ -104,7 +114,20 @@ void Process::Exit(uint8_t exitCode_)
     {
         debugger->ProcessExit();
     }
-    Wakeup(Event(EventKind::processExitEvent, id));
+    else
+    {
+        if (rv != static_cast<uint64_t>(-1))
+        {
+            uint64_t rv_ = rv;
+            rv = static_cast<uint64_t>(-1);
+            cmsx::machine::Machine* machine = ProcessManager::Instance().GetMachine();
+            machine->Mem().FreeMemory(rv_);
+        }
+    }
+    symbolTable.reset();
+    functionTable.reset();
+    Wakeup(Event(EventKind::childExitEvent, Parent()->Get()->Id()));
+    ProcessManager::Instance().DecrementRunnableProcesses();
 }
 
 void Process::SaveContext(cmsx::machine::Machine& machine, cmsx::machine::Registers& regs)
@@ -221,6 +244,7 @@ void Process::RestoreContext(cmsx::machine::Machine& machine, cmsx::machine::Reg
     regs.Set(cmsx::machine::regFP, mem.ReadOcta(rv, kernelSP, cmsx::machine::Protection::read));
     kernelSP = kernelSP - 8;
     regs.Set(cmsx::machine::regSP, mem.ReadOcta(rv, kernelSP, cmsx::machine::Protection::read));
+    regs.SetSpecial(cmsx::machine::rV, rv);
 }
 
 void Process::SetRunning(cmsx::machine::Processor* processor_)
@@ -234,11 +258,6 @@ void Process::ResetProcessor()
     processor = nullptr;
 }
 
-void Process::SetObserver(cmsx::machine::ProcessObserver* observer_)
-{
-    observer = observer_;
-}
-
 cmsx::machine::Debugger* Process::GetDebugger() const
 {
     return debugger;
@@ -247,6 +266,77 @@ cmsx::machine::Debugger* Process::GetDebugger() const
 void Process::SetDebugger(cmsx::machine::Debugger* debugger_)
 {
     debugger = debugger_;
+}
+
+void SetupRegions(Process* parent, Process* child)
+{
+    Region textRegion = parent->GetRegionTable().GetRegion(RegionId::text);
+    ShareRegion(textRegion, parent, child);
+    Region dataRegion = parent->GetRegionTable().GetRegion(RegionId::data);
+    CopyRegion(dataRegion, parent, child);
+    Region stackRegion = parent->GetRegionTable().GetRegion(RegionId::stack);
+    uint64_t sp = parent->GetProcessor()->Regs().Get(cmsx::machine::regSP);
+    int64_t stackSize = sp - stackRegion.Start();
+    stackRegion.SetLength(stackSize);
+    CopyRegion(stackRegion, parent, child);
+    Region poolRegion = parent->GetRegionTable().GetRegion(RegionId::pool);
+    CopyRegion(poolRegion, parent, child);
+}
+
+int32_t Fork(Process* parent)
+{
+    cmsx::machine::Machine* machine = ProcessManager::Instance().GetMachine();
+    cmsx::machine::Processor* processor = parent->GetProcessor();
+    std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+    Process* child = ProcessManager::Instance().CreateProcess();
+    child->SetProcessor(processor);
+    uint64_t rv = machine->Mem().AllocateTranslationMap();
+    child->SetRV(rv);
+    SetupRegions(parent, child);
+    child->GetFileTable().CopyFrom(parent->GetFileTable());
+    child->SetAddressesFrom(parent);
+    child->SetSymbolTable(parent->GetSymbolTablePtr());
+    parent->AddChild(child);
+    uint64_t regAX = processor->Regs().Get(cmsx::machine::regAX);
+    processor->Regs().Set(cmsx::machine::regAX, 0);
+    uint64_t regRV = processor->Regs().GetSpecial(cmsx::machine::rV);
+    processor->Regs().SetSpecial(cmsx::machine::rV, rv);
+    child->SaveContext(*machine, processor->Regs());
+    processor->Regs().SetSpecial(cmsx::machine::rV, regRV);
+    processor->Regs().Set(cmsx::machine::regAX, regAX);
+    ProcessManager::Instance().IncrementRunnableProcesses();
+    Scheduler::Instance().AddRunnableProcess(child, cmsx::machine::ProcessState::runnableInUser);
+    return child->Id();
+}
+
+int32_t Wait(Process* parent, int64_t childExitCodeAddress)
+{
+    Process* child = parent->FirstChild()->Get();
+    while (child)
+    {
+        if (child->State() == cmsx::machine::ProcessState::zombie)
+        {
+            child->RemoveFromParent();
+            uint8_t exitCode = child->ExitCode();
+            parent->GetProcessor()->GetMachine()->Mem().WriteByte(parent->RV(), childExitCodeAddress, exitCode, cmsx::machine::Protection::write);
+            return child->Id();
+        }
+        child = child->NextSibling()->Get();
+    }
+    Sleep(Event(EventKind::childExitEvent, parent->Id()), parent);
+    child = parent->FirstChild()->Get();
+    while (child)
+    {
+        if (child->State() == cmsx::machine::ProcessState::zombie)
+        {
+            child->RemoveFromParent();
+            uint8_t exitCode = child->ExitCode();
+            parent->GetProcessor()->GetMachine()->Mem().WriteByte(parent->RV(), childExitCodeAddress, exitCode, cmsx::machine::Protection::write);
+            return child->Id();
+        }
+        child = child->NextSibling()->Get();
+    }
+    throw SystemError(ENOCHILD, "no child in zombie state");
 }
 
 } // namespace cmsx::kernel

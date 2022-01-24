@@ -70,14 +70,14 @@ void FreeRegion(Region& region, Process* fromProcess)
 
 void CopyRegion(const Region& region, Process* fromProcess, Process* toProcess)
 {
-    cmsx::machine::Memory& mem = toProcess->GetProcessor()->GetMachine()->Mem();
+    cmsx::machine::Memory& mem = fromProcess->GetProcessor()->GetMachine()->Mem();
     mem.CopyRange(fromProcess->RV(), toProcess->RV(), region.Start(), region.Length());
     toProcess->GetRegionTable().AddRegion(region);
 }
 
 void ShareRegion(const Region& region, Process* fromProcess, Process* toProcess)
 {
-    cmsx::machine::Memory& mem = toProcess->GetProcessor()->GetMachine()->Mem();
+    cmsx::machine::Memory& mem = fromProcess->GetProcessor()->GetMachine()->Mem();
     mem.ShareRange(fromProcess->RV(), toProcess->RV(), region.Start(), region.Length());
     toProcess->GetRegionTable().AddRegion(region);
 }

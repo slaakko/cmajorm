@@ -21,7 +21,7 @@ public:
     virtual ~Scheduler();
     virtual void SetMachine(Machine* machine_) = 0;
     virtual Process* GetRunnableProcess() = 0;
-    virtual void AddRunnableProcess(Process* process) = 0;
+    virtual void AddRunnableProcess(Process* process, ProcessState processState) = 0;
     virtual void Stop() = 0;
 };
 

@@ -11,10 +11,6 @@
 
 namespace cmsx::machine {
 
-ProcessObserver::~ProcessObserver()
-{
-}
-
 Process::~Process()
 {
 }
@@ -128,7 +124,12 @@ void Processor::CheckInterrupts()
                     {
                         currentProcess->AddUserTime(stop - start);
                     }
+                    if (currentProcess)
+                    {
+                        // TODO: switch to kernel fiber
+                    }
                     handler->HandleInterrupt(*this);
+                    // TODO: switched from kernel mode 
                     if (currentProcess)
                     {
                         start = std::chrono::steady_clock::now();

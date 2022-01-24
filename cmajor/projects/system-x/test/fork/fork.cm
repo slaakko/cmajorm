@@ -1,0 +1,27 @@
+using System;
+using System.Os;
+
+int main()
+{
+	try
+	{
+		int pid = Fork();
+		if (pid == 0)
+		{
+			string str = "in child! pid=" + ToString(GetPid()) + "\n";
+			write(1, str.Chars(), str.Length());
+		}
+		else
+		{
+			string str = "in parent! pid=" + ToString(GetPid()) + ", child pid=" + ToString(pid) + "\n";
+			write(1, str.Chars(), str.Length());
+		}
+	}
+	catch (const SystemError& systemError)
+	{
+		string str = systemError.ToString() + "\n";
+		write(1, str.Chars(), str.Length());
+		return 1;
+	}
+	return 0;
+}

@@ -25,14 +25,7 @@ using ProcessList = std::list<Process*, boost::fast_pool_allocator<Process*>>;
 
 enum class ProcessState
 {
-    created, asleep, runnable, running, zombie
-};
-
-class CMSX_MACHINE_API ProcessObserver
-{
-public:
-    virtual ~ProcessObserver();
-    virtual void ProcessStateChanged(Process* process) = 0;
+    created, asleep, runnableInUser, runnableInKernel, running, zombie
 };
 
 class CMSX_MACHINE_API Process
@@ -50,7 +43,6 @@ public:
     virtual void ResetProcessor() = 0;
     virtual Debugger* GetDebugger() const = 0;
     virtual void SetDebugger(Debugger* debugger) = 0;
-    virtual void SetObserver(ProcessObserver* observer) = 0;
     virtual void AddUserTime(std::chrono::steady_clock::duration duration) = 0;
     virtual void AddSleepTime() = 0;
     virtual void AddSystemTime(std::chrono::steady_clock::duration duration) = 0;

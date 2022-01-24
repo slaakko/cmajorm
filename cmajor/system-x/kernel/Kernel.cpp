@@ -8,6 +8,7 @@
 #include <system-x/kernel/EventManager.hpp>
 #include <system-x/kernel/ProcessManager.hpp>
 #include <system-x/kernel/Scheduler.hpp>
+#include <system-x/kernel/BlockManager.hpp>
 
 namespace cmsx::kernel {
 
@@ -38,10 +39,12 @@ void Kernel::Start()
     ProcessManager::Instance().Start();
     Scheduler::Instance().Start();
     Clock::Instance().Start();
+    StartBlockManager();
 }
 
 void Kernel::Stop()
 {
+    StopBlockManager();
     Clock::Instance().Stop();
     Scheduler::Instance().Stop();
     ProcessManager::Instance().Stop();
