@@ -12,7 +12,7 @@
 
 namespace cmsx::kernel {
 
-class CMSX_KERNEL_API ProcessManager
+class CMSX_KERNEL_API ProcessManager : public cmsx::machine::MachineObserver
 {
 public:
     static void Init();
@@ -31,6 +31,7 @@ public:
     void IncrementRunnableProcesses();
     void DecrementRunnableProcesses();
     void WaitForProcessesExit();
+    void MachineStateChanged() override;
 private:
     ProcessManager();
     static std::unique_ptr<ProcessManager> instance;
@@ -40,7 +41,7 @@ private:
     std::vector<std::unique_ptr<Process>> processTable;
     int32_t numProcessTableSlots;
     int numRunnableProcesses;
-    std::condition_variable_any processesExit;
+    std::condition_variable_any processesExitOrMachineStateChanged;
 };
 
 CMSX_KERNEL_API void InitProcessManager();

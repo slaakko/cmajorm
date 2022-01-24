@@ -45,6 +45,7 @@ public:
     int MaxFiles() const { return maxFiles; }
     int MaxFilesystems() const { return maxFilesystems; }
     int MaxBlocks() const { return maxBlocks; }
+    int KernelStackSize() const { return kernelStackSize; }
 private:
     Configuration();
     void Read();
@@ -58,6 +59,7 @@ private:
     int maxFiles;
     int maxFilesystems;
     int maxBlocks;
+    int kernelStackSize;
     static std::unique_ptr<Configuration> instance;
 };
 
@@ -82,7 +84,8 @@ Configuration::Configuration() :
     maxOpenFiles(256),
     maxFiles(65536),
     maxFilesystems(64),
-    maxBlocks(256)
+    maxBlocks(256),
+    kernelStackSize(16384)
 {
     if (!boost::filesystem::exists(filePath))
     {
@@ -153,6 +156,12 @@ void Configuration::Read()
                     throw std::runtime_error("error reading configuration from '" + filePath + "': 'maxBlocks' attribute not found");
                 }
                 maxBlocks = boost::lexical_cast<int>(ToUtf8(maxBlocksAttribute));
+                std::u32string kernelStackSizeAttribute = configurationElement->GetAttribute(U"kernelStackSize");
+                if (kernelStackSizeAttribute.empty())
+                {
+                    throw std::runtime_error("error reading configuration from '" + filePath + "': 'kernelStackSize' attribute not found");
+                }
+                kernelStackSize = boost::lexical_cast<int>(ToUtf8(kernelStackSizeAttribute));
             }
         }
         else 
@@ -219,6 +228,11 @@ int MaxFilesystems()
 int MaxBlocks()
 {
     return Configuration::Instance().MaxBlocks();
+}
+
+int KernelStackSize()
+{
+    return Configuration::Instance().KernelStackSize();
 }
 
 std::string ConfigFilePath()

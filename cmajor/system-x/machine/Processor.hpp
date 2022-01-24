@@ -18,6 +18,7 @@ class Instruction;
 class Processor;
 class Process;
 class Debugger;
+class InterruptHandler;
 
 class Process;
 
@@ -49,6 +50,8 @@ public:
     virtual int64_t HeapStartAddress() const = 0;
     virtual int64_t HeapLength() const = 0;
     virtual void SetHeapLength(int64_t heapLength) = 0;
+    virtual void* KernelFiber() const = 0;
+    virtual void SetKernelFiber(void* kernelFiber) = 0;
 };
 
 class CMSX_MACHINE_API Processor
@@ -66,18 +69,23 @@ public:
     Process* CurrentProcess() const { return currentProcess; }
     void ResetCurrentProcess();
     void CheckException();
+    void RunKernel();
+    void* MainFiber() const { return mainFiber; }
 private:
     Instruction* FetchInstruction(uint64_t& pc, uint8_t& x, uint8_t& y, uint8_t& z);
     void SetPC(Instruction* inst, uint64_t pc, uint64_t prevPC);
     void CheckInterrupts();
     int id;
+    void* mainFiber;
     Machine* machine;
     Registers registers;
     Process* currentProcess;
+    InterruptHandler* currentHandler;
     std::chrono::steady_clock::time_point start;
     std::chrono::steady_clock::time_point stop;
     std::thread thread;
     std::exception_ptr exception;
+    int kernelStackSize;
 };
 
 } // cmsx::machine

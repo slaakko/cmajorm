@@ -80,12 +80,14 @@ uint64_t TrapGetPidHandler::HandleTrap(cmsx::machine::Processor& processor)
 void InitProcessManagementTraps()
 {
     SetTrapHandler(trap_fork, new TrapForkHandler());
+    SetTrapHandler(trap_wait, new TrapWaitHandler());
     SetTrapHandler(trap_getpid, new TrapGetPidHandler());
 }
 
 void DoneProcessManagementTraps()
 {
     SetTrapHandler(trap_getpid, nullptr);
+    SetTrapHandler(trap_wait, nullptr);
     SetTrapHandler(trap_fork, nullptr);
 }
 

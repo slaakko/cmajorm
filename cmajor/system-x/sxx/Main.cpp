@@ -105,6 +105,17 @@ int main(int argc, const char** argv)
         }
         machine.Start();
         cmsx::kernel::ProcessManager::Instance().WaitForProcessesExit();
+        if (machine.HasException())
+        {
+            try
+            {
+                machine.CheckExceptions();
+            }
+            catch (const std::exception& ex)
+            {
+                std::cout << ex.what() << std::endl;
+            }
+        }
         if (verbose)
         {
             uint8_t exitCode = 255;

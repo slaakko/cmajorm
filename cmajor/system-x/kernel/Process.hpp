@@ -82,6 +82,9 @@ public:
     void SetCurrentExceptionClassId(uint64_t exceptionClassId) { currentExceptionClassId = exceptionClassId; }
     cmsx::object::TryRecord* CurrentTryRecord() const { return currentTryRecord; }
     void SetCurrentTryRecord(cmsx::object::TryRecord* tryRecord) { currentTryRecord = tryRecord; }
+    void SetKernelFiber(void* kernelFiber_) override { kernelFiber = kernelFiber_; }
+    void* KernelFiber() const override { return kernelFiber; }
+    void DeleteKernelFiber();
 private:
     int32_t id;
     uint64_t rv;
@@ -114,6 +117,8 @@ private:
     uint64_t currentExceptionAddress;
     uint64_t currentExceptionClassId;
     cmsx::object::TryRecord* currentTryRecord;
+    void* userFiber;
+    void* kernelFiber;
 };
 
 CMSX_KERNEL_API int32_t Fork(Process* parent);

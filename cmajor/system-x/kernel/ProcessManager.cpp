@@ -89,6 +89,7 @@ Process* ProcessManager::CreateProcess()
 void ProcessManager::SetMachine(cmsx::machine::Machine* machine_)
 {
     machine = machine_;
+    machine->AddObserver(this);
 }
 
 void ProcessManager::DeleteProcess(int32_t pid)
@@ -106,6 +107,7 @@ void ProcessManager::DeleteProcess(int32_t pid)
             machine->Mem().FreeMemory(process->RV());
         }
         process->RemoveFromParent();
+        process->DeleteKernelFiber();
         processTable[pid].reset();
     }
     else
@@ -124,14 +126,22 @@ void ProcessManager::DecrementRunnableProcesses()
     --numRunnableProcesses;
     if (numRunnableProcesses == 0)
     {
-        processesExit.notify_all();
+        processesExitOrMachineStateChanged.notify_all();
     }
 }
 
 void ProcessManager::WaitForProcessesExit()
 {
     std::unique_lock<std::recursive_mutex> lock(machine->Lock());
-    processesExit.wait(lock, [this]{ return numRunnableProcesses == 0 || machine->Exiting(); });
+    processesExitOrMachineStateChanged.wait(lock, [this]{ return numRunnableProcesses == 0 || machine->Exiting() || machine->HasException(); });
+}
+
+void ProcessManager::MachineStateChanged()
+{
+    if (machine->HasException() || machine->Exiting())
+    {
+        processesExitOrMachineStateChanged.notify_all();
+    }
 }
 
 void InitProcessManager()

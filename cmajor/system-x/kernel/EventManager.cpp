@@ -6,6 +6,7 @@
 #include <system-x/kernel/EventManager.hpp>
 #include <system-x/kernel/Scheduler.hpp>
 #include <system-x/machine/Machine.hpp>
+#include <soulng/util/Fiber.hpp>
 
 namespace cmsx::kernel {
 
@@ -62,9 +63,10 @@ void EventManager::Wakeup(Event evnt)
 
 void Sleep(Event evnt, cmsx::machine::Process* process)
 {
-    process->GetProcessor()->ResetCurrentProcess();
+    cmsx::machine::Processor* processor = process->GetProcessor();
+    processor->ResetCurrentProcess();
     EventManager::Instance().SleepOn(evnt, process);
-    // TODO: switch to user fiber
+    soulng::util::SwitchToFiber(processor->MainFiber());
 }
 
 void Wakeup(Event evnt)

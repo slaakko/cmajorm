@@ -10,6 +10,7 @@
 #include <system-x/machine/Config.hpp>
 #include <system-x/machine/Machine.hpp>
 #include <system-x/machine/Memory.hpp>
+#include <soulng/util/Fiber.hpp>
 
 namespace cmsx::kernel {
 
@@ -17,7 +18,7 @@ Process::Process(int32_t id_) :
     soulng::util::IntrusiveListNode<Process>(this), id(id_), rv(static_cast<uint64_t>(-1)), kernelSP(cmsx::machine::kernelBaseAddress), axAddress(0), bxAddress(0), cxAddress(0),
     state(cmsx::machine::ProcessState::created), entryPoint(-1), argumentsStartAddress(-1), argumentsLength(0), environmentStartAddress(-1), environmentLength(0), 
     heapStartAddress(-1), heapLength(0), stackStartAddress(-1), userTime(0), systemTime(0), sleepTime(0), exitCode(0), debugger(nullptr), processor(nullptr),
-    currentExceptionAddress(0), currentExceptionClassId(0), currentTryRecord(nullptr)
+    currentExceptionAddress(0), currentExceptionClassId(0), currentTryRecord(nullptr), userFiber(nullptr), kernelFiber(nullptr)
 {
 }
 
@@ -126,8 +127,21 @@ void Process::Exit(uint8_t exitCode_)
     }
     symbolTable.reset();
     functionTable.reset();
-    Wakeup(Event(EventKind::childExitEvent, Parent()->Get()->Id()));
+    Process* parent = Parent();
+    if (parent)
+    {
+        Wakeup(Event(EventKind::childExitEvent, parent->Id()));
+    }
     ProcessManager::Instance().DecrementRunnableProcesses();
+}
+
+void Process::DeleteKernelFiber()
+{
+    if (kernelFiber)
+    {
+        soulng::util::DeleteFiber(kernelFiber);
+        kernelFiber = nullptr;
+    }
 }
 
 void Process::SaveContext(cmsx::machine::Machine& machine, cmsx::machine::Registers& regs)
@@ -311,7 +325,7 @@ int32_t Fork(Process* parent)
 
 int32_t Wait(Process* parent, int64_t childExitCodeAddress)
 {
-    Process* child = parent->FirstChild()->Get();
+    Process* child = parent->FirstChild();
     while (child)
     {
         if (child->State() == cmsx::machine::ProcessState::zombie)
@@ -321,10 +335,14 @@ int32_t Wait(Process* parent, int64_t childExitCodeAddress)
             parent->GetProcessor()->GetMachine()->Mem().WriteByte(parent->RV(), childExitCodeAddress, exitCode, cmsx::machine::Protection::write);
             return child->Id();
         }
-        child = child->NextSibling()->Get();
+        child = child->NextSibling();
     }
-    Sleep(Event(EventKind::childExitEvent, parent->Id()), parent);
-    child = parent->FirstChild()->Get();
+    child = parent->FirstChild();
+    if (child)
+    {
+        Sleep(Event(EventKind::childExitEvent, parent->Id()), parent);
+    }
+    child = parent->FirstChild();
     while (child)
     {
         if (child->State() == cmsx::machine::ProcessState::zombie)
@@ -334,7 +352,7 @@ int32_t Wait(Process* parent, int64_t childExitCodeAddress)
             parent->GetProcessor()->GetMachine()->Mem().WriteByte(parent->RV(), childExitCodeAddress, exitCode, cmsx::machine::Protection::write);
             return child->Id();
         }
-        child = child->NextSibling()->Get();
+        child = child->NextSibling();
     }
     throw SystemError(ENOCHILD, "no child in zombie state");
 }

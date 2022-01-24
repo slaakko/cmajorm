@@ -25,6 +25,13 @@ public:
     virtual void Stop() = 0;
 };
 
+class CMSX_MACHINE_API MachineObserver
+{
+public:
+    virtual ~MachineObserver();
+    virtual void MachineStateChanged() = 0;
+};
+
 class CMSX_MACHINE_API Machine
 {
 public:
@@ -40,10 +47,14 @@ public:
     std::recursive_mutex& Lock() { return lock; }
     void Start();
     void Exit();
-    void SetExiting() { exiting = true; }
+    void SetExiting();
     bool Exiting() const { return exiting; }
+    bool HasException() const { return hasException; }
+    void SetHasException();
     std::vector<Processor>& Processors() { return processors; }
     void CheckExceptions();
+    void AddObserver(MachineObserver* observer);
+    void NotifyObservers();
 private:
     void SetInstruction(Instruction* inst);
     std::vector<Processor> processors;
@@ -54,6 +65,8 @@ private:
     std::vector<std::unique_ptr<Instruction>> instructions;
     Instruction* insts[256];
     std::recursive_mutex lock;
+    bool hasException;
+    std::vector<MachineObserver*> observers;
 };
 
 } // cmsx::machine

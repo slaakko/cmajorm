@@ -8,7 +8,7 @@
 
 namespace cmsx::machine {
 
-Machine::Machine() : clock(), scheduler(nullptr), processors(), memory(*this), insts(), exiting(false)
+Machine::Machine() : clock(), scheduler(nullptr), processors(), memory(*this), insts(), exiting(false), hasException(false)
 {
     clock.SetMachine(this);
     int numProcessors = NumProcessors();
@@ -277,6 +277,7 @@ void Machine::Start()
 void Machine::Exit()
 {
     exiting = true;
+    NotifyObservers();
     clock.Stop();
     scheduler->Stop();
     for (auto& processor : processors)
@@ -285,12 +286,41 @@ void Machine::Exit()
     }
 }
 
+void Machine::SetExiting()
+{
+    exiting = true;
+    NotifyObservers();
+}
+
+void Machine::SetHasException()
+{
+    hasException = true;
+    NotifyObservers();
+}
+
 void Machine::CheckExceptions()
 {
     for (auto& processor : processors)
     {
         processor.CheckException();
     }
+}
+
+void Machine::AddObserver(MachineObserver* observer)
+{
+    observers.push_back(observer);
+}
+
+void Machine::NotifyObservers()
+{
+    for (auto& observer : observers)
+    {
+        observer->MachineStateChanged();
+    }
+}
+
+MachineObserver::~MachineObserver()
+{
 }
 
 } // cmsx::machine

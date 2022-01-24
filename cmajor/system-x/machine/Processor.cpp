@@ -8,8 +8,12 @@
 #include <system-x/machine/Instruction.hpp>
 #include <system-x/machine/Interrupt.hpp>
 #include <system-x/machine/Debugger.hpp>
+#include <system-x/machine/Config.hpp>
+#include <soulng/util/Fiber.hpp>
 
 namespace cmsx::machine {
+
+void RunKernel();
 
 Process::~Process()
 {
@@ -19,7 +23,7 @@ Scheduler::~Scheduler()
 {
 }
 
-Processor::Processor() : id(0), machine(nullptr), currentProcess(nullptr)
+Processor::Processor() : mainFiber(nullptr), id(0), machine(nullptr), currentProcess(nullptr), currentHandler(nullptr), kernelStackSize(KernelStackSize())
 {
 }
 
@@ -42,6 +46,7 @@ void Processor::Run()
 {
     try
     {
+        mainFiber = soulng::util::ConvertThreadToFiber(this);
         while (!machine->Exiting())
         {
             Scheduler* scheduler = machine->GetScheduler();
@@ -50,10 +55,21 @@ void Processor::Run()
             {
                 break;
             }
+            if (!currentProcess->KernelFiber())
+            {
+                void* kernelFiber = soulng::util::CreateFiber(kernelStackSize, cmsx::machine::RunKernel, this);
+                currentProcess->SetKernelFiber(kernelFiber);
+            }
             start = std::chrono::steady_clock::now();
             currentProcess->RestoreContext(*machine, registers);
+            ProcessState processState = currentProcess->State();
             currentProcess->SetRunning(this);
             uint64_t pc = registers.GetPC();
+            if (processState == ProcessState::runnableInKernel)
+            {
+                soulng::util::SwitchToFiber(currentProcess->KernelFiber());
+                pc = registers.GetPC();
+            }
             while (currentProcess && currentProcess->State() == ProcessState::running)
             {
                 Debugger* debugger = currentProcess->GetDebugger();
@@ -74,9 +90,10 @@ void Processor::Run()
             }
         }
     }
-    catch (const std::exception&)
+    catch (...)
     {
         exception = std::current_exception();
+        machine->SetHasException();
     }
 }
 
@@ -126,10 +143,9 @@ void Processor::CheckInterrupts()
                     }
                     if (currentProcess)
                     {
-                        // TODO: switch to kernel fiber
+                        currentHandler = handler;
+                        soulng::util::SwitchToFiber(currentProcess->KernelFiber());
                     }
-                    handler->HandleInterrupt(*this);
-                    // TODO: switched from kernel mode 
                     if (currentProcess)
                     {
                         start = std::chrono::steady_clock::now();
@@ -165,6 +181,35 @@ void Processor::CheckException()
     {
         std::rethrow_exception(exception);
     }
+}
+
+void Processor::RunKernel()
+{
+    while (!machine->Exiting())
+    {
+        try
+        {
+            currentHandler->HandleInterrupt(*this);
+            if (currentProcess && currentProcess->State() != ProcessState::zombie)
+            {
+                machine->GetScheduler()->AddRunnableProcess(currentProcess, ProcessState::runnableInUser);
+                ResetCurrentProcess();
+            }
+        }
+        catch (...)
+        {
+            exception = std::current_exception();
+            machine->SetHasException();
+        }
+        soulng::util::SwitchToFiber(mainFiber);
+    }
+}
+
+void RunKernel()
+{
+    void* fiberData = soulng::util::GetFiberData();
+    Processor* processor = static_cast<Processor*>(fiberData);
+    processor->RunKernel();
 }
 
 } // cmsx::machine

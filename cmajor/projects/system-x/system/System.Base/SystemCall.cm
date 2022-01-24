@@ -116,7 +116,7 @@ public cdecl nothrow int stack_trace(void* buffer, long bufferSize)
 
 public cdecl nothrow int get_system_error(int* errorCode, void* buffer, long bufferSize)
 {
-	return cast<int>(trap(0u, trap_get_system_error, 0u, buffer, bufferSize));
+	return cast<int>(trap(0u, trap_get_system_error, 0u, errorCode, buffer, bufferSize));
 }
 
 public cdecl nothrow int fork()
