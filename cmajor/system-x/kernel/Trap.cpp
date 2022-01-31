@@ -8,6 +8,7 @@
 #include <system-x/machine/Interrupt.hpp>
 #include <system-x/machine/Machine.hpp>
 #include <system-x/machine/Registers.hpp>
+#include <system-x/machine/Processor.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <memory>
 #include <vector>

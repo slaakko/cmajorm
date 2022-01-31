@@ -1,0 +1,101 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.Collections;
+
+namespace System.Os
+{
+    public nothrow void Exit(byte exitCode)
+    {
+        exit(exitCode);
+    }
+    
+    public int Fork()
+    {
+        int result = fork();
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+	
+	public int Wait(byte* exitCode)
+	{
+		int result = wait(exitCode);
+		if (result == -1)
+		{
+			SystemError systemError = GetSystemError();
+			if (systemError.errorCode == ENOCHILD)
+			{
+				return -1;
+			}
+			else
+			{
+				throw systemError;
+			}
+		}
+		return result;
+	}
+	
+	public int GetPid()
+	{
+		int result = getpid();
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+	}
+
+	public int Create(const char* path, int mode)
+    {
+        int result = create(path, mode);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public int Open(const char* path, int flags, int mode)
+    {
+        int result = open(path, flags, mode);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public void Close(int fd)
+    {
+        int result = close(fd);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public long Read(int fd, void* buffer, long count)
+    {
+        long result = read(fd, buffer, count);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public long Write(int fd, void* buffer, long count)
+    {
+        long result = write(fd, buffer, count);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+}

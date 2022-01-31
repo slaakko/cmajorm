@@ -15,10 +15,6 @@ namespace cmsx::machine {
 
 void RunKernel();
 
-Process::~Process()
-{
-}
-
 Scheduler::~Scheduler()
 {
 }
@@ -60,7 +56,6 @@ void Processor::Run()
                 void* kernelFiber = soulng::util::CreateFiber(kernelStackSize, cmsx::machine::RunKernel, this);
                 currentProcess->SetKernelFiber(kernelFiber);
             }
-            start = std::chrono::steady_clock::now();
             currentProcess->RestoreContext(*machine, registers);
             ProcessState processState = currentProcess->State();
             currentProcess->SetRunning(this);
@@ -69,6 +64,10 @@ void Processor::Run()
             {
                 soulng::util::SwitchToFiber(currentProcess->KernelFiber());
                 pc = registers.GetPC();
+            }
+            if (currentProcess)
+            {
+                currentProcess->SetStartUserTime();
             }
             while (currentProcess && currentProcess->State() == ProcessState::running)
             {
@@ -136,20 +135,11 @@ void Processor::CheckInterrupts()
                 InterruptHandler* handler = GetInterruptHandler(irq);
                 if (handler)
                 {
-                    stop = std::chrono::steady_clock::now();
                     if (currentProcess)
                     {
-                        currentProcess->AddUserTime(stop - start);
-                    }
-                    if (currentProcess)
-                    {
+                        currentProcess->AddUserTime();
                         currentHandler = handler;
                         soulng::util::SwitchToFiber(currentProcess->KernelFiber());
-                    }
-                    if (currentProcess)
-                    {
-                        start = std::chrono::steady_clock::now();
-                        currentProcess->AddSystemTime(start - stop);
                     }
                 }
                 else
@@ -166,10 +156,12 @@ void Processor::EnableInterrupts()
     registers.SetSpecial(rK, ALL_INTERRUPT_BITS);
 }
 
-void Processor::ResetCurrentProcess()
+void Processor::ResetCurrentProcess(bool addSystemTime)
 {
-    start = std::chrono::steady_clock::now();
-    currentProcess->AddSystemTime(start - stop);
+    if (addSystemTime)
+    {
+        currentProcess->AddSystemTime();
+    }
     currentProcess->SaveContext(*machine, registers);
     currentProcess->ResetProcessor();
     currentProcess = nullptr;
@@ -189,12 +181,21 @@ void Processor::RunKernel()
     {
         try
         {
+            if (currentProcess)
+            {
+                currentProcess->SetStartSystemTime();
+            }
             currentHandler->HandleInterrupt(*this);
+            if (currentProcess)
+            {
+                currentProcess->AddSystemTime();
+            }
             if (currentProcess && currentProcess->State() != ProcessState::zombie)
             {
                 machine->GetScheduler()->AddRunnableProcess(currentProcess, ProcessState::runnableInUser);
-                ResetCurrentProcess();
+                ResetCurrentProcess(false);
             }
+            machine->GetScheduler()->CheckRunnable();
         }
         catch (...)
         {

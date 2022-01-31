@@ -4,6 +4,7 @@
 // =================================
 
 #include <system-x/machine/Machine.hpp>
+#include <system-x/machine/Processor.hpp>
 #include <system-x/machine/Config.hpp>
 
 namespace cmsx::machine {
@@ -298,8 +299,21 @@ void Machine::SetHasException()
     NotifyObservers();
 }
 
+void Machine::SetException(std::exception_ptr&& exception_)
+{
+    exception = exception_;
+    SetHasException();
+}
+
 void Machine::CheckExceptions()
 {
+    if (hasException)
+    {
+        if (exception)
+        {
+            std::rethrow_exception(exception);
+        }
+    }
     for (auto& processor : processors)
     {
         processor.CheckException();

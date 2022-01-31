@@ -1,0 +1,181 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+public const byte trap_exit = 0u;
+public const byte trap_memory_page_size = 1u;
+public const byte trap_heap_start = 2u;
+public const byte trap_heap_length = 3u;
+public const byte trap_allocate_memory_pages = 4u;
+public const byte trap_dump_heap = 5u;
+public const byte trap_random_seed = 6u;
+public const byte trap_current_time_point = 7u;
+public const byte trap_sleep = 8u;
+public const byte trap_current_date = 9u;
+public const byte trap_current_date_time = 10u;
+public const byte trap_times = 11u;
+public const byte trap_pow = 12u;
+public const byte trap_throw = 13u;
+public const byte trap_catch = 14u;
+public const byte trap_resume = 15u;
+public const byte trap_stack_trace = 16u;
+public const byte trap_get_system_error = 17u;
+public const byte trap_fork = 18u;
+public const byte trap_wait = 19u;
+public const byte trap_getpid = 20u;
+public const byte trap_create = 21u;
+public const byte trap_open = 22u;
+public const byte trap_close = 23u;
+public const byte trap_read = 24u;
+public const byte trap_write = 25u;
+public const byte trap_unlink = 26u;
+public const byte trap_seek = 27u;
+
+public cdecl nothrow void exit(byte exitCode)
+{
+	run_at_exits();
+    trap(0u, trap_exit, 0u, exitCode);
+}
+
+public cdecl nothrow long memory_page_size()
+{
+	return cast<long>(trap(0u, trap_memory_page_size, 0u));
+}
+
+public cdecl nothrow long heap_start()
+{
+	return cast<long>(trap(0u, trap_heap_start, 0u));
+}
+
+public cdecl nothrow long heap_length()
+{
+	return cast<long>(trap(0u, trap_heap_length, 0u));
+}
+
+public cdecl nothrow long allocate_memory_pages(int numPages)
+{
+	return cast<long>(trap(0u, trap_allocate_memory_pages, 0u, numPages));
+}
+
+public cdecl nothrow void dump_heap(ulong free, int tag, ulong ptr, ulong size)
+{
+	trap(0u, trap_dump_heap, 0u, free, tag, ptr, size);
+}
+
+public cdecl nothrow uint random_seed()
+{
+	return cast<uint>(trap(0u, trap_random_seed, 0u));
+}
+
+public cdecl nothrow long current_time_point()
+{
+	return cast<long>(trap(0u, trap_current_time_point, 0u));
+}
+
+public cdecl nothrow int sleep(long duration)
+{
+	return cast<int>(trap(0u, trap_sleep, 0u, duration));
+}
+
+public cdecl nothrow int current_date(short* y, sbyte* m, sbyte* d)
+{
+	return cast<int>(trap(0u, trap_current_date, 0u, y, m, d));
+}
+
+public cdecl nothrow int current_date_time(short* y, sbyte* m, sbyte* d, int* secs)
+{
+	return cast<int>(trap(0u, trap_current_date_time, 0u, y, m, d, secs));
+}
+
+public cdecl nothrow int times(long* userTime, long* sleepTime, long* systemTime)
+{
+	return cast<int>(trap(0u, trap_times, 0u, userTime, sleepTime, systemTime));
+}
+
+public cdecl nothrow double pow(double x, double y)
+{
+	long lx = *cast<long*>(cast<void*>(&x));
+	long ly = *cast<long*>(cast<void*>(&y));
+	long result = trap(0u, trap_pow, 0u, lx, ly);
+	return *cast<double*>(cast<void*>(&result));
+}
+
+public cdecl nothrow int do_throw(void* exception, ulong exceptionClassId)
+{
+	return cast<int>(trap(0u, trap_throw, 0u, exception, exceptionClassId));
+}
+
+public cdecl nothrow void* do_catch()
+{
+	return cast<void*>(cast<ulong>(trap(0u, trap_catch, 0u)));
+}
+
+public cdecl nothrow int resume()
+{
+	return cast<int>(trap(0u, trap_resume, 0u));
+}
+
+public cdecl nothrow int stack_trace(void* buffer, long bufferSize)
+{
+	return cast<int>(trap(0u, trap_stack_trace, 0u, buffer, bufferSize));
+}
+
+public cdecl nothrow int get_system_error(int* errorCode, void* buffer, long bufferSize)
+{
+	return cast<int>(trap(0u, trap_get_system_error, 0u, errorCode, buffer, bufferSize));
+}
+
+public cdecl nothrow int fork()
+{
+	return cast<int>(trap(0u, trap_fork, 0u));
+}
+
+public cdecl nothrow int wait(byte* exitCode)
+{
+	return cast<int>(trap(0u, trap_wait, 0u, exitCode));
+}
+
+public cdecl nothrow int getpid()
+{
+	return cast<int>(trap(0u, trap_getpid, 0u));
+}
+
+public cdecl nothrow int create(const char* path, int mode)
+{
+	return cast<int>(trap(0u, trap_create, 0u, path, mode));
+}
+
+public cdecl nothrow int open(const char* path, int flags, int mode)
+{
+	return cast<int>(trap(0u, trap_open, 0u, path, flags, mode));
+}
+
+public cdecl nothrow int close(int fd)
+{
+	return cast<int>(trap(0u, trap_close, 0u, fd));
+}
+
+public cdecl nothrow long read(int fd, void* buffer, long count)
+{
+    return cast<long>(trap(0u, trap_read, 0u, fd, buffer, count));
+}
+
+public cdecl nothrow long write(int fd, void* buffer, long count)
+{
+    return cast<long>(trap(0u, trap_write, 0u, fd, buffer, count));
+}
+
+public cdecl nothrow int unlink(const char* path)
+{
+	return cast<int>(trap(0u, trap_unlink, 0u, path));
+}
+
+const int seekSet = 0;
+const int seekCur = 1;
+const int seekEnd = 2;
+
+public cdecl nothrow int seek(int fd, long offset, int whence)
+{
+	return cast<int>(trap(0u, trap_seek, 0u, fd, offset, whence));
+}

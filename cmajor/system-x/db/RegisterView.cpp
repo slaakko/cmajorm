@@ -4,6 +4,7 @@
 // =================================
 
 #include <system-x/db/RegisterView.hpp>
+#include <system-x/machine/Processor.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Unicode.hpp>
 

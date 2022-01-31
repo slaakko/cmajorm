@@ -17,8 +17,11 @@ class CMSX_GUICON_API ConsoleFile : public cmsx::kernel::File
 public:
     ConsoleFile();
     void SetConsole(cmajor::wing::Console* console_) { console = console_; }
-    int64_t Write(const std::vector<uint8_t>& buffer) override;
-    std::vector<uint8_t> Read(int64_t count) override;
+    bool IsReadable() const override { return true; }
+    bool IsWritable() const override { return true; }
+    void Close(cmsx::machine::Process* process) override;
+    int64_t Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process) override;
+    std::vector<uint8_t> Read(int64_t count, cmsx::machine::Process* process) override;
 private:
     soulng::unicode::Utf8ToUtf32Engine utfEngine;
     cmajor::wing::Console* console;

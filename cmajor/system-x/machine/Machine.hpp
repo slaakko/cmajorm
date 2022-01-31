@@ -5,7 +5,7 @@
 
 #ifndef CMSX_MACHINE_MACHINE_INCLUDED
 #define CMSX_MACHINE_MACHINE_INCLUDED
-#include <system-x/machine/Processor.hpp>
+#include <system-x/machine/Process.hpp>
 #include <system-x/machine/Clock.hpp>
 #include <system-x/machine/Memory.hpp>
 #include <system-x/machine/Instruction.hpp>
@@ -20,8 +20,9 @@ class CMSX_MACHINE_API Scheduler
 public:
     virtual ~Scheduler();
     virtual void SetMachine(Machine* machine_) = 0;
-    virtual Process* GetRunnableProcess() = 0;
-    virtual void AddRunnableProcess(Process* process, ProcessState processState) = 0;
+    virtual UserProcess* GetRunnableProcess() = 0;
+    virtual void AddRunnableProcess(UserProcess* process, ProcessState processState) = 0;
+    virtual void CheckRunnable() = 0;
     virtual void Stop() = 0;
 };
 
@@ -51,6 +52,7 @@ public:
     bool Exiting() const { return exiting; }
     bool HasException() const { return hasException; }
     void SetHasException();
+    void SetException(std::exception_ptr&& exception_);
     std::vector<Processor>& Processors() { return processors; }
     void CheckExceptions();
     void AddObserver(MachineObserver* observer);
@@ -66,6 +68,7 @@ private:
     Instruction* insts[256];
     std::recursive_mutex lock;
     bool hasException;
+    std::exception_ptr exception;
     std::vector<MachineObserver*> observers;
 };
 

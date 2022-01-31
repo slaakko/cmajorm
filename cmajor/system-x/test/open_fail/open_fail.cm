@@ -1,0 +1,17 @@
+using System;
+using System.Os;
+
+int main()
+{
+	try
+	{
+		Open("abc", 0, 0);
+	}
+	catch (const Exception& ex)
+	{
+		string s = ex.ToString() + "\n";
+		write(1, s.Chars(), s.Length());
+		return 1;
+	}
+	return 0;
+}

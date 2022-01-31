@@ -4,7 +4,8 @@
 // =================================
 
 #include <system-x/kernel/Heap.hpp>
-#include <system-x/kernel/ProcessManager.hpp>
+#include <system-x/machine/Process.hpp>
+#include <system-x/machine/Machine.hpp>
 #include <soulng/util/CodeFormatter.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Path.hpp>
@@ -61,7 +62,7 @@ void DumpHeap(cmsx::machine::Processor& processor, uint64_t freeAddr, int32_t ta
     {
         formatter.WriteLine("after resize");
     }
-    cmsx::machine::Process* currentProcess = processor.CurrentProcess();
+    cmsx::machine::UserProcess* currentProcess = processor.CurrentProcess();
     if (currentProcess)
     {
         int64_t heapStart = currentProcess->HeapStartAddress();

@@ -15,7 +15,11 @@ ConsoleFile::ConsoleFile() :
 {
 }
 
-int64_t ConsoleFile::Write(const std::vector<uint8_t>& buffer)
+void ConsoleFile::Close(cmsx::machine::Process* process)
+{
+}
+
+int64_t ConsoleFile::Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process)
 {
     for (uint8_t x : buffer)
     {
@@ -51,8 +55,9 @@ int64_t ConsoleFile::Write(const std::vector<uint8_t>& buffer)
     return buffer.size();
 }
 
-std::vector<uint8_t> ConsoleFile::Read(int64_t count)
+std::vector<uint8_t> ConsoleFile::Read(int64_t count, cmsx::machine::Process* process)
 {
+    // todo
     return std::vector<uint8_t>();
 }
 

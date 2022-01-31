@@ -5,7 +5,7 @@
 
 #include <system-x/kernel/EventManager.hpp>
 #include <system-x/kernel/Scheduler.hpp>
-#include <system-x/machine/Machine.hpp>
+#include <system-x/machine/Processor.hpp>
 #include <soulng/util/Fiber.hpp>
 
 namespace cmsx::kernel {
@@ -41,35 +41,41 @@ void EventManager::Stop()
     sleepingProcesses.clear();
 }
 
-void EventManager::SleepOn(Event evnt, cmsx::machine::Process* process)
+void EventManager::SleepOn(const cmsx::machine::Event& evnt, cmsx::machine::Process* process, std::unique_lock<std::recursive_mutex>& lock)
+{
+    sleepingProcesses[evnt].push_back(process);
+    lock.unlock();
+    process->Sleep();
+}
+
+void EventManager::Wakeup(const cmsx::machine::Event& evnt)
 {
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
-    process->SetState(cmsx::machine::ProcessState::asleep);
-    sleepingProcesses[evnt].push_back(process);
-}
-
-void EventManager::Wakeup(Event evnt)
-{
     cmsx::machine::ProcessList processes;
-    {
-        std::lock_guard<std::recursive_mutex> lock(machine->Lock());
-        sleepingProcesses[evnt].swap(processes);
-    }
+    sleepingProcesses[evnt].swap(processes);
+    sleepingProcesses.erase(evnt);
     for (auto& process : processes)
     {
-        Scheduler::Instance().AddRunnableProcess(process, cmsx::machine::ProcessState::runnableInKernel);
+        process->Wakeup(machine->GetScheduler());
     }
 }
 
-void Sleep(Event evnt, cmsx::machine::Process* process)
+void Sleep(const cmsx::machine::Event& evnt, cmsx::machine::Process* process, std::unique_lock<std::recursive_mutex>& lock)
 {
     cmsx::machine::Processor* processor = process->GetProcessor();
-    processor->ResetCurrentProcess();
-    EventManager::Instance().SleepOn(evnt, process);
-    soulng::util::SwitchToFiber(processor->MainFiber());
+    if (processor)
+    {
+        processor->ResetCurrentProcess(true);
+    }
+    Scheduler::Instance().CheckRunnable();
+    EventManager::Instance().SleepOn(evnt, process, lock);
+    if (processor)
+    {
+        process->ReleaseProcessor(processor);
+    }
 }
 
-void Wakeup(Event evnt)
+void Wakeup(const cmsx::machine::Event& evnt)
 {
     EventManager::Instance().Wakeup(evnt);
 }

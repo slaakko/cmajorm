@@ -15,8 +15,11 @@ class Console : public cmsx::kernel::File
 {
 public:
     Console();
-    std::vector<uint8_t> Read(int64_t count) override;
-    int64_t Write(const std::vector<uint8_t>& buffer) override;
+    bool IsReadable() const override { return true; }
+    bool IsWritable() const override { return true; }
+    void Close(cmsx::machine::Process* process) override;
+    std::vector<uint8_t> Read(int64_t count, cmsx::machine::Process* process) override;
+    int64_t Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process) override;
 private:
     Utf8ToUtf32Engine utf8Engine;
 };

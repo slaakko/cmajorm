@@ -20,14 +20,27 @@ File::~File()
 {
 }
 
-std::vector<uint8_t> File::Read(int64_t count)
+std::vector<uint8_t> File::Read(int64_t count, cmsx::machine::Process* process)
 {
-    throw SystemError(EBADF, name + " not open for reading");
+    if (!IsReadable())
+    {
+        throw SystemError(EBADF, name + " not open for reading");
+    }
+    return std::vector<uint8_t>();
 }
 
-int64_t File::Write(const std::vector<uint8_t>& buffer)
+int64_t File::Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process)
 {
-    throw SystemError(EBADF, name + " not open for writing");
+    if (!IsWritable())
+    {
+        throw SystemError(EBADF, name + " not open for writing");
+    }
+    return 0;
+}
+
+void File::Seek(int64_t offset, Origin whence, cmsx::machine::Process* process)
+{
+    throw SystemError(EBADF, name + " not seekable");
 }
 
 ProcessFileTable::ProcessFileTable()
@@ -38,9 +51,35 @@ ProcessFileTable::ProcessFileTable()
     files[2] = consoleOutputFile;
 }
 
+void ProcessFileTable::CloseFiles(cmsx::machine::Process* process)
+{
+    for (File* file : files)
+    {
+        if (file)
+        {
+            file->Close(process);
+        }
+    }
+    files.clear();
+}
+
 void ProcessFileTable::CopyFrom(const ProcessFileTable& that)
 {
     files = that.files;
+}
+
+int32_t ProcessFileTable::AddFile(File* file)
+{
+    int32_t fd = files.size();
+    files.push_back(file);
+    return fd;
+}
+
+void ProcessFileTable::CloseFile(int32_t fd, cmsx::machine::Process* process)
+{
+    File* file = GetFile(fd);
+    file->Close(process);
+    files[fd] = nullptr;
 }
 
 File* ProcessFileTable::GetFile(int32_t fd) const

@@ -11,13 +11,17 @@ Console::Console() : cmsx::kernel::File("CONSOLE")
 {
 }
 
-std::vector<uint8_t> Console::Read(int64_t count)
+void Console::Close(cmsx::machine::Process* process)
+{
+}
+
+std::vector<uint8_t> Console::Read(int64_t count, cmsx::machine::Process* process)
 {
     // todo
     return std::vector<uint8_t>();
 }
 
-int64_t Console::Write(const std::vector<uint8_t>& buffer)
+int64_t Console::Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process)
 {
     for (uint8_t x : buffer)
     {

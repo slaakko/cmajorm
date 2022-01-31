@@ -6,6 +6,7 @@
 #include <system-x/machine/Instruction.hpp>
 #include <system-x/machine/Interrupt.hpp>
 #include <system-x/machine/Machine.hpp>
+#include <system-x/machine/Processor.hpp>
 #include <system-x/machine/OpCode.hpp>
 #include <system-x/machine/Formatter.hpp>
 #include <system-x/machine/Util.hpp>

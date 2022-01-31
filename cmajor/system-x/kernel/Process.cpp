@@ -7,9 +7,14 @@
 #include <system-x/kernel/ProcessManager.hpp>
 #include <system-x/kernel/EventManager.hpp>
 #include <system-x/kernel/Scheduler.hpp>
+#include <system-x/kernel/Kernel.hpp>
+#include <system-x/kernel/Mount.hpp>
+#include <system-x/kernel/Fs.hpp>
 #include <system-x/machine/Config.hpp>
 #include <system-x/machine/Machine.hpp>
 #include <system-x/machine/Memory.hpp>
+#include <system-x/machine/Registers.hpp>
+#include <system-x/machine/Processor.hpp>
 #include <soulng/util/Fiber.hpp>
 
 namespace cmsx::kernel {
@@ -17,21 +22,16 @@ namespace cmsx::kernel {
 Process::Process(int32_t id_) : 
     soulng::util::IntrusiveListNode<Process>(this), id(id_), rv(static_cast<uint64_t>(-1)), kernelSP(cmsx::machine::kernelBaseAddress), axAddress(0), bxAddress(0), cxAddress(0),
     state(cmsx::machine::ProcessState::created), entryPoint(-1), argumentsStartAddress(-1), argumentsLength(0), environmentStartAddress(-1), environmentLength(0), 
-    heapStartAddress(-1), heapLength(0), stackStartAddress(-1), userTime(0), systemTime(0), sleepTime(0), exitCode(0), debugger(nullptr), processor(nullptr),
-    currentExceptionAddress(0), currentExceptionClassId(0), currentTryRecord(nullptr), userFiber(nullptr), kernelFiber(nullptr)
+    heapStartAddress(-1), heapLength(0), stackStartAddress(-1), startUserTime(), startSleepTime(), startSystemTime(), userTime(0), sleepTime(0), systemTime(0),
+    exitCode(0), debugger(nullptr), processor(nullptr), currentExceptionAddress(0), currentExceptionClassId(0), currentTryRecord(nullptr), userFiber(nullptr), kernelFiber(nullptr),
+    inodeKeyOfWorkingDirAsULong(-1)
 {
+    SetINodeKeyOfWorkingDir(Kernel::Instance().GetINodeKeyOfRootDir());
 }
 
 void Process::SetState(cmsx::machine::ProcessState state_)
 {
-    if (state != state_)
-    {
-        state = state_;
-        if (state == cmsx::machine::ProcessState::asleep)
-        {
-            sleepStartTime = std::chrono::steady_clock::now();
-        }
-    }
+    state = state_;
 }
 
 void Process::SetFilePath(const std::string& filePath_)
@@ -86,20 +86,37 @@ void Process::RemoveFromParent()
     }
 }
 
-void Process::AddUserTime(std::chrono::steady_clock::duration duration)
+void Process::SetStartUserTime()
 {
-    userTime = userTime + duration;
+    startUserTime = std::chrono::steady_clock::now();
+}
+
+void Process::SetStartSleepTime()
+{
+    startSleepTime = std::chrono::steady_clock::now();
+}
+
+void Process::SetStartSystemTime()
+{
+    startSystemTime = std::chrono::steady_clock::now();
+}
+
+void Process::AddUserTime()
+{
+    std::chrono::steady_clock::time_point endUserTime = std::chrono::steady_clock::now();
+    userTime = userTime + (endUserTime - startUserTime);
 }
 
 void Process::AddSleepTime()
 {
-    std::chrono::steady_clock::time_point sleepEndTime = std::chrono::steady_clock::now();
-    sleepTime = sleepTime + (sleepEndTime - sleepStartTime);
+    std::chrono::steady_clock::time_point endSleepTime = std::chrono::steady_clock::now();
+    sleepTime = sleepTime + (endSleepTime - startSleepTime);
 }
 
-void Process::AddSystemTime(std::chrono::steady_clock::duration duration)
+void Process::AddSystemTime()
 {
-    systemTime = systemTime + duration;
+    std::chrono::steady_clock::time_point endSystemTime = std::chrono::steady_clock::now();
+    systemTime = systemTime + (endSystemTime - startSystemTime);
 }
 
 void Process::SetError(const SystemError& error_)
@@ -127,10 +144,11 @@ void Process::Exit(uint8_t exitCode_)
     }
     symbolTable.reset();
     functionTable.reset();
+    fileTable.CloseFiles(this);
     Process* parent = Parent();
     if (parent)
     {
-        Wakeup(Event(EventKind::childExitEvent, parent->Id()));
+        cmsx::kernel::Wakeup(cmsx::machine::Event(cmsx::machine::EventKind::childExitEvent, parent->Id()));
     }
     ProcessManager::Instance().DecrementRunnableProcesses();
 }
@@ -310,6 +328,7 @@ int32_t Fork(Process* parent)
     child->GetFileTable().CopyFrom(parent->GetFileTable());
     child->SetAddressesFrom(parent);
     child->SetSymbolTable(parent->GetSymbolTablePtr());
+    child->SetINodeKeyOfWorkingDir(parent->GetINodeKeyOfWorkingDir());
     parent->AddChild(child);
     uint64_t regAX = processor->Regs().Get(cmsx::machine::regAX);
     processor->Regs().Set(cmsx::machine::regAX, 0);
@@ -325,6 +344,8 @@ int32_t Fork(Process* parent)
 
 int32_t Wait(Process* parent, int64_t childExitCodeAddress)
 {
+    cmsx::machine::Machine* machine = ProcessManager::Instance().GetMachine();
+    std::unique_lock<std::recursive_mutex> lock(machine->Lock());
     Process* child = parent->FirstChild();
     while (child)
     {
@@ -340,7 +361,7 @@ int32_t Wait(Process* parent, int64_t childExitCodeAddress)
     child = parent->FirstChild();
     if (child)
     {
-        Sleep(Event(EventKind::childExitEvent, parent->Id()), parent);
+        Sleep(cmsx::machine::Event(cmsx::machine::EventKind::childExitEvent, parent->Id()), parent, lock);
     }
     child = parent->FirstChild();
     while (child)
@@ -349,7 +370,7 @@ int32_t Wait(Process* parent, int64_t childExitCodeAddress)
         {
             child->RemoveFromParent();
             uint8_t exitCode = child->ExitCode();
-            parent->GetProcessor()->GetMachine()->Mem().WriteByte(parent->RV(), childExitCodeAddress, exitCode, cmsx::machine::Protection::write);
+            machine->Mem().WriteByte(parent->RV(), childExitCodeAddress, exitCode, cmsx::machine::Protection::write);
             return child->Id();
         }
         child = child->NextSibling();

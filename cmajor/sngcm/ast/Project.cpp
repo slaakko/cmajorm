@@ -97,7 +97,6 @@ std::string CmajorSystemLibDir(const std::string& config, BackEnd backend, const
     else if (backend == BackEnd::cmsx)
     {
         boost::filesystem::path sld(CmajorRootDir());
-        sld /= "projects";
         sld /= "system-x";
         sld /= "system";
         sld /= "lib";

@@ -1346,7 +1346,7 @@ void LinkSystemX(const std::string& executableFilePath, const std::string& libra
     bdp.remove_filename();
     boost::filesystem::create_directories(bdp);
     std::vector<std::string> binaryFileNames;
-    std::string systemMainObjectFilePath = GetFullPath(Path::Combine(CmajorRootDir(), "projects/system-x/system/Main/Main.o"));
+    std::string systemMainObjectFilePath = GetFullPath(Path::Combine(CmajorRootDir(), "system-x/system/Main/Main.o"));
     binaryFileNames.push_back(systemMainObjectFilePath);
     binaryFileNames.push_back(mainObjectFilePath);
     int n = libraryFilePaths.size();

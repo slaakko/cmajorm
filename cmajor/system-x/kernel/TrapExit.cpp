@@ -5,7 +5,7 @@
 
 #include <system-x/kernel/TrapExit.hpp>
 #include <system-x/kernel/Trap.hpp>
-#include <system-x/kernel/ProcessManager.hpp>
+#include <system-x/machine/Processor.hpp>
 
 namespace cmsx::kernel {
 
@@ -19,7 +19,7 @@ public:
 uint64_t TrapExitHandler::HandleTrap(cmsx::machine::Processor& processor)
 {
     uint8_t exitCode = static_cast<uint8_t>(processor.Regs().Get(cmsx::machine::regAX));
-    cmsx::machine::Process* currentProcess = processor.CurrentProcess();
+    cmsx::machine::UserProcess* currentProcess = processor.CurrentProcess();
     currentProcess->Exit(exitCode);
     return 0;
 }

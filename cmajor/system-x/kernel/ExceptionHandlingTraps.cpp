@@ -8,6 +8,7 @@
 #include <system-x/kernel/ExceptionHandling.hpp>
 #include <system-x/kernel/IO.hpp>
 #include <system-x/kernel/Trap.hpp>
+#include <system-x/machine/Processor.hpp>
 
 namespace cmsx::kernel {
 

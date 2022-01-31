@@ -14,11 +14,16 @@
 #include <system-x/kernel/ExceptionHandlingTraps.hpp>
 #include <system-x/kernel/ProcessManagementTraps.hpp>
 #include <system-x/kernel/Kernel.hpp>
+#include <system-x/kernel/Mount.hpp>
+#include <system-x/kernel/Fs.hpp>
 #include <system-x/kernel/ProcessManager.hpp>
 #include <system-x/kernel/Scheduler.hpp>
 #include <system-x/kernel/EventManager.hpp>
 #include <system-x/kernel/Clock.hpp>
 #include <system-x/kernel/BlockManager.hpp>
+#include <system-x/kernel/HostFileManager.hpp>
+#include <system-x/kernel/IOManager.hpp>
+#include <system-x/kernel/INodeManager.hpp>
 
 namespace cmsx::kernel {
 
@@ -37,6 +42,9 @@ void Init()
     InitScheduler();
     InitEventManager();
     InitBlockManager();
+    InitINodeManager();
+    InitIOManager();
+    InitHostFileManager();
     InitClock();
     InitKernel();
 }
@@ -45,6 +53,9 @@ void Done()
 {
     DoneKernel();
     DoneClock();
+    DoneIOManager();
+    DoneHostFileManager();
+    DoneINodeManager();
     DoneBlockManager();
     DoneEventManager();
     DoneScheduler();

@@ -8,6 +8,7 @@
 #include <system-x/object/InstructionFormatter.hpp>
 #include <system-x/object/Symbol.hpp>
 #include <system-x/machine/OpCode.hpp>
+#include <system-x/machine/Processor.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Unicode.hpp>
 

@@ -6,6 +6,7 @@
 #include <system-x/kernel/Region.hpp>
 #include <system-x/kernel/Process.hpp>
 #include <system-x/machine/Machine.hpp>
+#include <system-x/machine/Processor.hpp>
 
 namespace cmsx::kernel {
 

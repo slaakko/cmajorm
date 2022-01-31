@@ -4,7 +4,10 @@
 // =================================
 
 #include <system-x/kernel/BlockManager.hpp>
+#include <system-x/kernel/EventManager.hpp>
+#include <system-x/kernel/Process.hpp>
 #include <system-x/machine/Config.hpp>
+#include <system-x/machine/Event.hpp>
 #include <condition_variable>
 #include <boost/pool/pool_alloc.hpp>
 #include <list>
@@ -12,7 +15,20 @@
 namespace cmsx::kernel {
 
 CMSX_KERNEL_API void PutBlock(Block* block);
-    
+
+Block::Block() : flags(BlockFlags::none), key(), data()
+{
+}
+
+Block::Block(BlockKey key_) : flags(BlockFlags::none), key(key_), data()
+{
+}
+
+void Block::Clear()
+{
+    std::memset(data, 0, Size());
+}
+
 BlockPtr::~BlockPtr()
 { 
     if (block)
@@ -21,6 +37,30 @@ BlockPtr::~BlockPtr()
     }
 }
 
+void BlockPtr::Release()
+{
+    if (block)
+    {
+        PutBlock(block);
+        block = nullptr;
+    }
+}
+
+uint64_t BlockKeyHash(BlockKey blockKey)
+{
+    return static_cast<uint64_t>(1099511628211) * blockKey.fsNumber + blockKey.blockNumber;
+}
+
+using BlockFreeList = std::list<Block*, boost::fast_pool_allocator<Block*>>;
+
+struct BlockHashQueueEntry
+{
+    BlockHashQueueEntry() : block(nullptr), it() {}
+    BlockHashQueueEntry(Block* block_, BlockFreeList::iterator it_) : block(block_), it(it_) {}
+    Block* block;
+    BlockFreeList::iterator it;
+};
+
 class BlockManager
 {
 public:
@@ -28,18 +68,34 @@ public:
     static void Done();
     static BlockManager& Instance() { return *instance; }
     ~BlockManager();
+    void SetMachine(cmsx::machine::Machine* machine_);
+    cmsx::machine::Machine* GetMachine() const { return machine; }
     void Start();
     void Stop();
-    BlockPtr GetBlock();
-    void PutBlock(Block* block);
+    int NumberOfHashQueues() const { return numberOfHashQueues; }
+    int GetHashQueueNumber(const BlockKey& key) const;
+    BlockHashQueueEntry* GetBlockFromHashQueue(const BlockKey& blockKey);
+    void RemoveFromHashQueue(Block* block);
+    void InsertIntoHashQueue(Block* block);
+    void RemoveFromFreeList(BlockHashQueueEntry* entry);
+    void PutBlockToFreeList(Block* block);
+    const cmsx::machine::Event* GetBlockKeyEvent(const BlockKey& blockKey) const;
+    cmsx::machine::Event MakeBlockKeyEvent(const BlockKey& blockKey);
+    void RemoveBlockKeyEvent(const BlockKey& blockKey);
+    cmsx::machine::Event GetAnyBlockBecomesFreeEvent() const { return anyBlockBecomesFreeEvent; }
+    bool IsFreeListEmpty() const { return freeList.empty(); }
+    Block* GetBlockFromFreeList();
 private:
     BlockManager();
     static std::unique_ptr<BlockManager> instance;
-    int maxBlocks;
-    bool exiting;
-    std::list<Block*, boost::fast_pool_allocator<Block*>> freeList;
-    std::mutex mtx;
-    std::condition_variable blockAvailableOrExitingVar;
+    cmsx::machine::Machine* machine;
+    int numCachedBlocks;
+    int numberOfHashQueues;
+    BlockFreeList freeList;
+    std::vector<std::list<BlockHashQueueEntry, boost::fast_pool_allocator<BlockHashQueueEntry>>> hashQueues;
+    std::map<BlockKey, cmsx::machine::Event> blockKeyMapEventMap;
+    cmsx::machine::Event anyBlockBecomesFreeEvent;
+    int nextBlockKeyEventId;
 };
 
 std::unique_ptr<BlockManager> BlockManager::instance;
@@ -54,8 +110,10 @@ void BlockManager::Done()
     instance.reset();
 }
 
-BlockManager::BlockManager() : exiting(false), maxBlocks(cmsx::machine::MaxBlocks())
+BlockManager::BlockManager() : machine(nullptr), numCachedBlocks(cmsx::machine::NumCachedBlocks()), numberOfHashQueues(cmsx::machine::NumBlockHashQueues()),
+    anyBlockBecomesFreeEvent(cmsx::machine::EventKind::blockFreeEvent, 0), nextBlockKeyEventId(1)
 {
+    hashQueues.resize(numberOfHashQueues);
 }
 
 BlockManager::~BlockManager()
@@ -68,7 +126,7 @@ BlockManager::~BlockManager()
 
 void BlockManager::Start()
 {
-    for (int i = 0; i < maxBlocks; ++i)
+    for (int i = 0; i < numCachedBlocks; ++i)
     {
         freeList.push_back(new Block());
     }
@@ -76,38 +134,168 @@ void BlockManager::Start()
 
 void BlockManager::Stop()
 {
-    exiting = true;
-    blockAvailableOrExitingVar.notify_all();
 }
 
-BlockPtr BlockManager::GetBlock()
+void BlockManager::SetMachine(cmsx::machine::Machine* machine_)
 {
-    std::unique_lock<std::mutex> lock(mtx);
-    blockAvailableOrExitingVar.wait(lock, [this] { return !freeList.empty() || exiting; });
-    if (exiting)
+    machine = machine_;
+}
+
+int BlockManager::GetHashQueueNumber(const BlockKey& key) const
+{
+    uint64_t blockKeyHash = BlockKeyHash(key);
+    uint64_t n = numberOfHashQueues;
+    return static_cast<int>(blockKeyHash % n);
+}
+
+BlockHashQueueEntry* BlockManager::GetBlockFromHashQueue(const BlockKey& blockKey) 
+{
+    int hashQueueIndex = GetHashQueueNumber(blockKey);
+    auto& hashQueue = hashQueues[hashQueueIndex];
+    for (auto it = hashQueue.begin(); it != hashQueue.end(); ++it)
     {
-        return BlockPtr(nullptr);
+        Block* block = it->block;
+        if (block->Key() == blockKey)
+        {
+            return &(*it);
+        }
     }
+    return nullptr;
+}
+
+void BlockManager::RemoveFromHashQueue(Block* block)
+{
+    if (block->Key() != BlockKey())
+    {
+        int hashQueueIndex = GetHashQueueNumber(block->Key());
+        auto& hashQueue = hashQueues[hashQueueIndex];
+        for (auto it = hashQueue.begin(); it != hashQueue.end(); ++it)
+        {
+            if (block == it->block)
+            {
+                hashQueue.erase(it);
+            }
+        }
+    }
+}
+
+void BlockManager::InsertIntoHashQueue(Block* block)
+{
+    int hashQueueIndex = GetHashQueueNumber(block->Key());
+    auto& hashQueue = hashQueues[hashQueueIndex];
+    hashQueue.push_back(BlockHashQueueEntry(block, BlockFreeList::iterator()));
+}
+
+void BlockManager::RemoveFromFreeList(BlockHashQueueEntry* entry)
+{
+    if (entry->it != freeList.end())
+    {
+        freeList.erase(entry->it);
+        entry->it = freeList.end();
+    }
+}
+
+void BlockManager::PutBlockToFreeList(Block* block)
+{
+    freeList.push_back(block);
+    BlockHashQueueEntry* entry = GetBlockFromHashQueue(block->Key());
+    if (entry)
+    {
+        BlockFreeList::iterator it = freeList.end();
+        --it;
+        entry->it = it;
+    }
+}
+
+const cmsx::machine::Event* BlockManager::GetBlockKeyEvent(const BlockKey& blockKey) const
+{
+    auto it = blockKeyMapEventMap.find(blockKey);
+    if (it != blockKeyMapEventMap.cend())
+    {
+        return &it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+cmsx::machine::Event BlockManager::MakeBlockKeyEvent(const BlockKey& blockKey)
+{
+    cmsx::machine::Event evnt = cmsx::machine::Event(cmsx::machine::EventKind::blockFreeEvent, nextBlockKeyEventId++);
+    blockKeyMapEventMap[blockKey] = evnt;
+    return evnt;
+}
+
+void BlockManager::RemoveBlockKeyEvent(const BlockKey& blockKey)
+{
+    blockKeyMapEventMap.erase(blockKey);
+}
+
+Block* BlockManager::GetBlockFromFreeList()
+{
     Block* block = freeList.front();
     freeList.pop_front();
-    return BlockPtr(block);
+    return block;
 }
 
-void BlockManager::PutBlock(Block* block)
+BlockPtr GetBlock(BlockKey blockKey, cmsx::machine::Process* process)
 {
-    std::unique_lock<std::mutex> lock(mtx);
-    freeList.push_back(block);
-    blockAvailableOrExitingVar.notify_one();
-}
-
-BlockPtr GetBlock()
-{
-    return BlockManager::Instance().GetBlock();
+    while (true)
+    {
+        BlockManager& blockManager = BlockManager::Instance();
+        std::unique_lock<std::recursive_mutex> lock(blockManager.GetMachine()->Lock());
+        BlockHashQueueEntry* entry = blockManager.GetBlockFromHashQueue(blockKey);
+        if (entry)
+        {
+            if (entry->block->IsLocked())
+            {
+                cmsx::machine::Event blockBecomesFreeEvent = blockManager.MakeBlockKeyEvent(blockKey);
+                Sleep(blockBecomesFreeEvent, process, lock);
+                continue;
+            }
+            else
+            {
+                entry->block->SetLocked();
+                blockManager.RemoveFromFreeList(entry);
+                return BlockPtr(entry->block);
+            }
+        }
+        else
+        {
+            if (blockManager.IsFreeListEmpty())
+            {
+                cmsx::machine::Event anyBlockBecomesFreeEvent = blockManager.GetAnyBlockBecomesFreeEvent();
+                Sleep(anyBlockBecomesFreeEvent, process, lock);
+                continue;
+            }
+            else
+            {
+                Block* block = blockManager.GetBlockFromFreeList();
+                blockManager.RemoveFromHashQueue(block);
+                block->SetKey(blockKey);
+                blockManager.InsertIntoHashQueue(block);
+                block->ResetValid();
+                block->SetLocked();
+                return BlockPtr(block);
+            }
+        }
+    }
 }
 
 void PutBlock(Block* block)
 {
-    BlockManager::Instance().PutBlock(block);
+    BlockManager& blockManager = BlockManager::Instance();
+    std::unique_lock<std::recursive_mutex> lock(blockManager.GetMachine()->Lock());
+    Wakeup(blockManager.GetAnyBlockBecomesFreeEvent());
+    const cmsx::machine::Event* blockFreeEvent = blockManager.GetBlockKeyEvent(block->Key());
+    if (blockFreeEvent)
+    {
+        Wakeup(*blockFreeEvent);
+    }
+    blockManager.RemoveBlockKeyEvent(block->Key());
+    blockManager.PutBlockToFreeList(block);
+    block->ResetLocked();
 }
 
 void InitBlockManager()
@@ -118,6 +306,11 @@ void InitBlockManager()
 void DoneBlockManager()
 {
     BlockManager::Done();
+}
+
+void SetBlockManagerMachine(cmsx::machine::Machine* machine)
+{
+    BlockManager::Instance().SetMachine(machine);
 }
 
 void StartBlockManager()

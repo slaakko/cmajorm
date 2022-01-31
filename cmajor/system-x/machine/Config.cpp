@@ -42,10 +42,14 @@ public:
     int ClockTickMilliseconds() const { return clockTickMilliseconds; }
     int MaxProcs() const { return maxProcs; }
     int MaxOpenFiles() const { return maxOpenFiles; }
-    int MaxFiles() const { return maxFiles; }
     int MaxFilesystems() const { return maxFilesystems; }
-    int MaxBlocks() const { return maxBlocks; }
+    int NumCachedBlocks() const { return numCachedBlocks; }
+    int NumBlockHashQueues() const { return numBlockHashQueues; }
+    int NumCachedINodes() const { return numCachedINodes; }
+    int NumINodeHashQueues() const { return numINodeHashQueues; }
     int KernelStackSize() const { return kernelStackSize; }
+    int RootFSNumBlocks() const { return rootFSNumBlocks; }
+    int RootFSMaxFiles() const { return rootFSMaxFiles; }
 private:
     Configuration();
     void Read();
@@ -56,10 +60,14 @@ private:
     int clockTickMilliseconds;
     int maxProcs;
     int maxOpenFiles;
-    int maxFiles;
     int maxFilesystems;
-    int maxBlocks;
+    int numCachedBlocks;
+    int numBlockHashQueues;
+    int numCachedINodes;
+    int numINodeHashQueues;
     int kernelStackSize;
+    int rootFSNumBlocks;
+    int rootFSMaxFiles;
     static std::unique_ptr<Configuration> instance;
 };
 
@@ -82,10 +90,14 @@ Configuration::Configuration() :
     clockTickMilliseconds(250),
     maxProcs(1024), 
     maxOpenFiles(256),
-    maxFiles(65536),
     maxFilesystems(64),
-    maxBlocks(256),
-    kernelStackSize(16384)
+    numCachedBlocks(256),
+    numBlockHashQueues(16),
+    numCachedINodes(256),
+    numINodeHashQueues(16),
+    kernelStackSize(16384),
+    rootFSNumBlocks(16384),
+    rootFSMaxFiles(1024)
 {
     if (!boost::filesystem::exists(filePath))
     {
@@ -138,30 +150,48 @@ void Configuration::Read()
                     throw std::runtime_error("error reading configuration from '" + filePath + "': 'maxOpenFiles' attribute not found");
                 }
                 maxOpenFiles = boost::lexical_cast<int>(ToUtf8(maxOpenFilesAttribute));
-                std::u32string maxFilesAttribute = configurationElement->GetAttribute(U"maxFiles");
-                if (maxFilesAttribute.empty())
-                {
-                    throw std::runtime_error("error reading configuration from '" + filePath + "': 'maxFiles' attribute not found");
-                }
-                maxFiles = boost::lexical_cast<int>(ToUtf8(maxFilesAttribute));
                 std::u32string maxFilesystemsAttribute = configurationElement->GetAttribute(U"maxFilesystems");
                 if (maxFilesystemsAttribute.empty())
                 {
                     throw std::runtime_error("error reading configuration from '" + filePath + "': 'maxFilesystems' attribute not found");
                 }
                 maxFilesystems = boost::lexical_cast<int>(ToUtf8(maxFilesystemsAttribute));
-                std::u32string maxBlocksAttribute = configurationElement->GetAttribute(U"maxBlocks");
-                if (maxBlocksAttribute.empty())
+                std::u32string numCachedBlocksAttribute = configurationElement->GetAttribute(U"numCachedBlocks");
+                if (numCachedBlocksAttribute.empty())
                 {
-                    throw std::runtime_error("error reading configuration from '" + filePath + "': 'maxBlocks' attribute not found");
+                    throw std::runtime_error("error reading configuration from '" + filePath + "': 'numCachedBlocks' attribute not found");
                 }
-                maxBlocks = boost::lexical_cast<int>(ToUtf8(maxBlocksAttribute));
+                numCachedBlocks = boost::lexical_cast<int>(ToUtf8(numCachedBlocksAttribute));
+                std::u32string numBlockHashQueuesAttribute = configurationElement->GetAttribute(U"numBlockHashQueues");
+                if (numBlockHashQueuesAttribute.empty())
+                {
+                    throw std::runtime_error("error reading configuration from '" + filePath + "': 'numBlockHashQueues' attribute not found");
+                }
+                numBlockHashQueues = boost::lexical_cast<int>(ToUtf8(numBlockHashQueuesAttribute));
+                std::u32string numCachedINodesAttribute = configurationElement->GetAttribute(U"numCachedINodes");
+                if (numCachedINodesAttribute.empty())
+                {
+                    throw std::runtime_error("error reading configuration from '" + filePath + "': 'numCachedINodes' attribute not found");
+                }
+                numCachedINodes = boost::lexical_cast<int>(ToUtf8(numCachedINodesAttribute));
                 std::u32string kernelStackSizeAttribute = configurationElement->GetAttribute(U"kernelStackSize");
                 if (kernelStackSizeAttribute.empty())
                 {
                     throw std::runtime_error("error reading configuration from '" + filePath + "': 'kernelStackSize' attribute not found");
                 }
                 kernelStackSize = boost::lexical_cast<int>(ToUtf8(kernelStackSizeAttribute));
+                std::u32string rootFSNumBlocksAttribute = configurationElement->GetAttribute(U"rootFSNumBlocks");
+                if (rootFSNumBlocksAttribute.empty())
+                {
+                    throw std::runtime_error("error reading configuration from '" + filePath + "': 'rootFSNumBlocks' attribute not found");
+                }
+                rootFSNumBlocks = boost::lexical_cast<int>(ToUtf8(rootFSNumBlocksAttribute));
+                std::u32string rootFSMaxFilesAttribute = configurationElement->GetAttribute(U"rootFSMaxFiles");
+                if (rootFSMaxFilesAttribute.empty())
+                {
+                    throw std::runtime_error("error reading configuration from '" + filePath + "': 'rootFSMaxFiles' attribute not found");
+                }
+                rootFSMaxFiles = boost::lexical_cast<int>(ToUtf8(rootFSMaxFilesAttribute));
             }
         }
         else 
@@ -181,9 +211,13 @@ void Configuration::Write()
     configurationElement->SetAttribute(U"clockTickMilliseconds", ToUtf32(std::to_string(clockTickMilliseconds)));
     configurationElement->SetAttribute(U"maxProcs", ToUtf32(std::to_string(maxProcs)));
     configurationElement->SetAttribute(U"maxOpenFiles", ToUtf32(std::to_string(maxOpenFiles)));
-    configurationElement->SetAttribute(U"maxFiles", ToUtf32(std::to_string(maxFiles)));
     configurationElement->SetAttribute(U"maxFilesystems", ToUtf32(std::to_string(maxFilesystems)));
-    configurationElement->SetAttribute(U"maxBlocks", ToUtf32(std::to_string(maxBlocks)));
+    configurationElement->SetAttribute(U"numCachedBlocks", ToUtf32(std::to_string(numCachedBlocks)));
+    configurationElement->SetAttribute(U"numBlockHashQueues", ToUtf32(std::to_string(numBlockHashQueues)));
+    configurationElement->SetAttribute(U"numCachedINodes", ToUtf32(std::to_string(numCachedINodes)));
+    configurationElement->SetAttribute(U"numINodeHashQueues", ToUtf32(std::to_string(numINodeHashQueues)));
+    configurationElement->SetAttribute(U"kernelStackSize", ToUtf32(std::to_string(kernelStackSize)));
+    configurationElement->SetAttribute(U"rootFSNumBlocks", ToUtf32(std::to_string(rootFSNumBlocks)));
     configDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(configurationElement));
     CodeFormatter formatter(file);
     formatter.SetIndentSize(1);
@@ -215,24 +249,44 @@ int MaxOpenFiles()
     return Configuration::Instance().MaxOpenFiles();
 }
 
-int MaxFiles()
-{
-    return Configuration::Instance().MaxFiles();
-}
-
 int MaxFilesystems()
 {
     return Configuration::Instance().MaxFilesystems();
 }
 
-int MaxBlocks()
+int NumCachedBlocks()
 {
-    return Configuration::Instance().MaxBlocks();
+    return Configuration::Instance().NumCachedBlocks();
+}
+
+int NumBlockHashQueues()
+{
+    return Configuration::Instance().NumBlockHashQueues();
+}
+
+int NumCachedINodes()
+{
+    return Configuration::Instance().NumCachedINodes();
+}
+
+int NumINodeHashQueues()
+{
+    return Configuration::Instance().NumINodeHashQueues();
 }
 
 int KernelStackSize()
 {
     return Configuration::Instance().KernelStackSize();
+}
+
+int RootFSNumBlocks()
+{
+    return Configuration::Instance().RootFSNumBlocks();
+}
+
+int RootFSMaxFiles()
+{
+    return Configuration::Instance().RootFSMaxFiles();
 }
 
 std::string ConfigFilePath()

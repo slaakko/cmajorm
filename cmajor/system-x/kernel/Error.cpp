@@ -4,8 +4,12 @@
 // =================================
 
 #include <system-x/kernel/Error.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <Windows.h>
 
 namespace cmsx::kernel {
+
+using namespace soulng::unicode;
 
 std::string ErrorCodeStr(int errorCode)
 {
@@ -37,13 +41,34 @@ std::string ErrorMsg(int errorCode)
     return std::string();
 }
 
-SystemError::SystemError() : std::runtime_error(""), errorCode(0), message()
+SystemError::SystemError() : std::runtime_error(""), errorCode(0), hostErrorCode(0), message()
 {
 }
 
 SystemError::SystemError(int errorCode_, const std::string& message_) : 
-    std::runtime_error(ErrorCodeStr(errorCode_) + "(" + std::to_string(errorCode_) + "): " + ErrorMsg(errorCode_) + ": " + message_), errorCode(errorCode_), message(message_)
+    std::runtime_error(ErrorCodeStr(errorCode_) + "(" + std::to_string(errorCode_) + "): " + ErrorMsg(errorCode_) + ": " + message_), 
+    errorCode(errorCode_), hostErrorCode(0), message(message_)
 {
+}
+
+std::string HostErrorMessage(uint64_t errorCode)
+{
+    char16_t buf[4096];
+    FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, errorCode, LANG_SYSTEM_DEFAULT, (LPWSTR)buf, 4096, nullptr);
+    return ToUtf8(buf);
+}
+
+int64_t GetLastHostErrorCode()
+{
+    return GetLastError();
+}
+
+void ThrowLastHostError()
+{
+    int64_t hostErrorCode = GetLastHostErrorCode();
+    SystemError systemError(EHOST, HostErrorMessage(hostErrorCode));
+    systemError.SetHostErrorCode(hostErrorCode);
+    throw systemError;
 }
 
 } // namespace cmsx::kernel

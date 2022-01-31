@@ -12,7 +12,7 @@
 #include <system-x/object/Symbol.hpp>
 #include <system-x/object/FunctionTable.hpp>
 #include <system-x/machine/Debugger.hpp>
-#include <system-x/machine/Processor.hpp>
+#include <system-x/machine/Process.hpp>
 #include <soulng/util/IntrusiveList.hpp>
 #include <chrono>
 #include <stdint.h>
@@ -21,7 +21,7 @@
 
 namespace cmsx::kernel {
 
-class CMSX_KERNEL_API Process : public soulng::util::IntrusiveListNode<Process>, public cmsx::machine::Process
+class CMSX_KERNEL_API Process : public soulng::util::IntrusiveListNode<Process>, public cmsx::machine::UserProcess
 {
 public:
     Process(int32_t id_);
@@ -55,9 +55,6 @@ public:
     void SetSymbolTable(const std::shared_ptr<cmsx::object::SymbolTable>& symbolTable_);
     cmsx::object::FunctionTable* GetFunctionTable();
     void RemoveFromParent();
-    std::chrono::steady_clock::duration UserTime() const { return userTime; }
-    std::chrono::steady_clock::duration SleepTime() const { return sleepTime; }
-    std::chrono::steady_clock::duration SystemTime() const { return systemTime; }
     uint8_t ExitCode() const { return exitCode; }
     void SetExitCode(uint8_t exitCode_) { exitCode = exitCode_; }
     void Exit(uint8_t exitCode_) override;
@@ -69,9 +66,15 @@ public:
     void SetDebugger(cmsx::machine::Debugger* debugger_) override;
     cmsx::machine::Processor* GetProcessor() const override { return processor; }
     void SetProcessor(cmsx::machine::Processor* processor_) { processor = processor_; }
-    void AddUserTime(std::chrono::steady_clock::duration duration) override;
+    void SetStartUserTime() override;
+    void SetStartSleepTime() override;
+    void SetStartSystemTime() override;
+    void AddUserTime() override;
     void AddSleepTime() override;
-    void AddSystemTime(std::chrono::steady_clock::duration duration) override;
+    void AddSystemTime() override;
+    const std::chrono::steady_clock::duration& UserTime() const { return userTime; }
+    const std::chrono::steady_clock::duration& SleepTime() const { return sleepTime; }
+    const std::chrono::steady_clock::duration& SystemTime() const { return systemTime; }
     RegionTable& GetRegionTable() { return regionTable; }
     ProcessFileTable& GetFileTable() { return fileTable; }
     void SetError(const SystemError& error_);
@@ -85,6 +88,8 @@ public:
     void SetKernelFiber(void* kernelFiber_) override { kernelFiber = kernelFiber_; }
     void* KernelFiber() const override { return kernelFiber; }
     void DeleteKernelFiber();
+    uint64_t GetINodeKeyOfWorkingDir() const override { return inodeKeyOfWorkingDirAsULong; }
+    void SetINodeKeyOfWorkingDir(uint64_t inodeKeyOfWorkingDirAsULong_) override { inodeKeyOfWorkingDirAsULong = inodeKeyOfWorkingDirAsULong_; }
 private:
     int32_t id;
     uint64_t rv;
@@ -103,7 +108,9 @@ private:
     int64_t heapLength;
     int64_t stackStartAddress;
     uint8_t exitCode;
-    std::chrono::steady_clock::time_point sleepStartTime;
+    std::chrono::steady_clock::time_point startUserTime;
+    std::chrono::steady_clock::time_point startSleepTime;
+    std::chrono::steady_clock::time_point startSystemTime;
     std::chrono::steady_clock::duration userTime;
     std::chrono::steady_clock::duration sleepTime;
     std::chrono::steady_clock::duration systemTime;
@@ -119,6 +126,7 @@ private:
     cmsx::object::TryRecord* currentTryRecord;
     void* userFiber;
     void* kernelFiber;
+    uint64_t inodeKeyOfWorkingDirAsULong;
 };
 
 CMSX_KERNEL_API int32_t Fork(Process* parent);

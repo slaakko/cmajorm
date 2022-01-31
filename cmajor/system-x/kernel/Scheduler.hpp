@@ -17,15 +17,16 @@ public:
     static void Done();
     static Scheduler& Instance() { return *instance; }
     void SetMachine(cmsx::machine::Machine* machine_) override;
-    cmsx::machine::Process* GetRunnableProcess() override;
-    void AddRunnableProcess(cmsx::machine::Process* runnableProcess, cmsx::machine::ProcessState processState) override;
+    cmsx::machine::UserProcess* GetRunnableProcess() override;
+    void AddRunnableProcess(cmsx::machine::UserProcess* runnableProcess, cmsx::machine::ProcessState processState) override;
+    void CheckRunnable() override;
     void Start();
     void Stop() override;
 private:
     Scheduler();
     static std::unique_ptr<Scheduler> instance;
     cmsx::machine::Machine* machine;
-    cmsx::machine::ProcessList runnableProcesses;
+    cmsx::machine::UserProcessList runnableProcesses;
     std::condition_variable_any queueNotEmptyOrExiting;
 };
 

@@ -20,9 +20,12 @@ const int ENOTFOUND = 5;
 const int EALREADYEXISTS = 6;
 const int ELIMITEXCEEDED = 7;
 const int ENOCHILD = 8;
+const int EHOST = 9;
 
 CMSX_KERNEL_API std::string ErrorCodeStr(int errorCode);
 CMSX_KERNEL_API std::string ErrorMsg(int errorCode);
+CMSX_KERNEL_API std::string HostErrorMessage(uint64_t errorCode);
+CMSX_KERNEL_API int64_t GetLastHostErrorCode();
 
 class CMSX_KERNEL_API SystemError : public std::runtime_error
 {
@@ -30,11 +33,16 @@ public:
     SystemError();
     SystemError(int errorCode_, const std::string& message_);
     int ErrorCode() const { return errorCode; }
+    int64_t HostErrorCode() const { return hostErrorCode; }
+    void SetHostErrorCode(int32_t hostErrorCode_) { hostErrorCode = hostErrorCode_; }
     const std::string& Message() const { return message; }
 private:
     int errorCode;
+    int64_t hostErrorCode;
     std::string message;
 };
+
+CMSX_KERNEL_API void ThrowLastHostError();
 
 } // namespace cmsx::kernel
 

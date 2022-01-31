@@ -6,6 +6,7 @@
 #include <system-x/kernel/ProcessManagementTraps.hpp>
 #include <system-x/kernel/Process.hpp>
 #include <system-x/kernel/Trap.hpp>
+#include <system-x/machine/Processor.hpp>
 
 namespace cmsx::kernel {
 

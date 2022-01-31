@@ -18,11 +18,11 @@ const uint8_t trap_heap_length = 3;
 const uint8_t trap_allocate_memory_pages = 4;
 const uint8_t trap_dump_heap = 5;
 const uint8_t trap_random_seed = 6;
-const uint8_t trap_write = 7;
-const uint8_t trap_current_time_point = 8;
-const uint8_t trap_sleep = 9;
-const uint8_t trap_current_date = 10;
-const uint8_t trap_current_date_time = 11;
+const uint8_t trap_current_time_point = 7;
+const uint8_t trap_sleep = 8;
+const uint8_t trap_current_date = 9;
+const uint8_t trap_current_date_time = 10;
+const uint8_t trap_times = 11;
 const uint8_t trap_pow = 12;
 const uint8_t trap_throw = 13;
 const uint8_t trap_catch = 14;
@@ -32,6 +32,12 @@ const uint8_t trap_get_system_error = 17;
 const uint8_t trap_fork = 18;
 const uint8_t trap_wait = 19;
 const uint8_t trap_getpid = 20;
+const uint8_t trap_create = 21;
+const uint8_t trap_open = 22;
+const uint8_t trap_read = 24;
+const uint8_t trap_write = 25;
+const uint8_t trap_unlink = 26;
+const uint8_t trap_seek = 27;
 
 class CMSX_KERNEL_API TrapHandler
 {

@@ -5,6 +5,7 @@
 
 #include <system-x/machine/Clock.hpp>
 #include <system-x/machine/Machine.hpp>
+#include <system-x/machine/Processor.hpp>
 #include <system-x/machine/Interrupt.hpp>
 #include <system-x/machine/Config.hpp>
 

@@ -5,8 +5,8 @@
 
 #include <system-x/kernel/MemoryTraps.hpp>
 #include <system-x/kernel/Trap.hpp>
-#include <system-x/kernel/ProcessManager.hpp>
 #include <system-x/kernel/Heap.hpp>
+#include <system-x/kernel/Process.hpp>
 
 namespace cmsx::kernel {
 
@@ -32,7 +32,7 @@ public:
 
 uint64_t TrapHeapStartHandler::HandleTrap(cmsx::machine::Processor& processor)
 {
-    cmsx::machine::Process* currentProcess = processor.CurrentProcess();
+    cmsx::machine::UserProcess* currentProcess = processor.CurrentProcess();
     return static_cast<uint64_t>(currentProcess->HeapStartAddress());
 }
 
@@ -45,7 +45,7 @@ public:
 
 uint64_t TrapHeapLengthHandler::HandleTrap(cmsx::machine::Processor& processor)
 {
-    cmsx::machine::Process* currentProcess = processor.CurrentProcess();
+    cmsx::machine::UserProcess* currentProcess = processor.CurrentProcess();
     return static_cast<uint64_t>(currentProcess->HeapLength());
 }
 

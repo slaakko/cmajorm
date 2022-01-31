@@ -4,6 +4,7 @@
 // =================================
 
 #include <system-x/object/InstructionFormatter.hpp>
+#include <system-x/machine/Registers.hpp>
 
 namespace cmsx::object {
 

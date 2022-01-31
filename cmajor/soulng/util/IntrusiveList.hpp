@@ -65,6 +65,7 @@ public:
             firstChild = child;
         }
         child->SetParent(this);
+        lastChild = child;
     }
     NodePtr RemoveChild(NodePtr child)
     {

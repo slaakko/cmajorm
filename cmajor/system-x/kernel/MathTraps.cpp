@@ -5,6 +5,7 @@
 
 #include <system-x/kernel/MathTraps.hpp>
 #include <system-x/kernel/Trap.hpp>
+#include <system-x/machine/Processor.hpp>
 #include <cmath>
 
 namespace cmsx::kernel {

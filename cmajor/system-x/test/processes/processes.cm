@@ -1,0 +1,62 @@
+using System;
+using System.Os;
+
+void RunChild()
+{
+	int pid = GetPid();
+	string start = ToString(pid) + " starting...\n";
+	write(1, start.Chars(), start.Length());
+	int n = 10;
+	for (int i = 0; i < n; ++i)
+	{
+		int secs = 1 + cast<int>(RandomNumber(5u));
+		string s = ToString(pid) + ": round " + ToString(i) + " sleeping for " + ToString(secs) + " seconds...\n";
+		write(1, s.Chars(), s.Length());
+		Sleep(Duration.FromSeconds(secs));
+		string w = ToString(pid) + ": round " + ToString(i) + " wake up\n";
+		write(1, w.Chars(), w.Length());
+	}
+	string stop = ToString(pid) + " stopping.\n";
+	write(1, stop.Chars(), stop.Length());
+	Duration userTime;
+	Duration sleepTime;
+	Duration systemTime;
+	Times(userTime, sleepTime, systemTime);
+	string tms = "Process " + ToString(pid) + ":\nuser time:   " + DurationStr(userTime) + "\nsleep time:  " + DurationStr(sleepTime) + "\nsystem time: " + DurationStr(systemTime) + "\n";
+	write(1, tms.Chars(), tms.Length());
+}
+
+void Run()
+{
+	int n = 10;
+	for (int i = 0; i < n; ++i)
+	{
+		int pid = Fork();
+		if (pid == 0)
+		{
+			RunChild();
+			return;
+		}
+	}
+	byte exitCode = 0u;
+	int pid = Wait(&exitCode);
+	while (pid != -1)
+	{
+		pid = Wait(&exitCode);
+	}
+}
+
+int main()
+{
+	try
+	{
+		Run();
+	}
+	catch (const Exception& ex)
+	{
+		string s = ex.ToString() + "\n";
+		write(1, s.Chars(), s.Length());
+		return 1;
+	}
+	return 0;
+}

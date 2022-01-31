@@ -1,0 +1,31 @@
+parent: 1
+sleep: childExit event pid=1
+
+sleepingProcesses: parent 1
+
+child 3: sleeping for 1 second
+
+clock:
+alarm 1 child 2 
+
+child 3:
+sleep: alarmEvent 0
+
+wake up alarm 0 child 3
+
+runnable processes:
+child 2 in user
+child 3 in user
+child 4 in user
+
+child 2: sleeping for 4 seconds
+
+wake up alarm 1 child 2
+
+child 4: sleeping for 1 second
+
+child 2: 
+
+wake up child 2
+
+wake up child 4

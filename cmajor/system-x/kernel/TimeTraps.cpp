@@ -8,6 +8,7 @@
 #include <system-x/kernel/Process.hpp>
 #include <system-x/kernel/Clock.hpp>
 #include <system-x/kernel/Time.hpp>
+#include <system-x/machine/Processor.hpp>
 #include <ctime>
 
 namespace cmsx::kernel {
@@ -49,7 +50,6 @@ uint64_t TrapSleepHandler::HandleTrap(cmsx::machine::Processor& processor)
         std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
         std::chrono::steady_clock::duration duration(static_cast<int64_t>(processor.Regs().Get(cmsx::machine::regAX)));
         std::chrono::steady_clock::time_point dueTime = now + duration;
-        processor.ResetCurrentProcess();
         Alarm alarm(process, dueTime);
         Clock::Instance().Schedule(alarm);
         return 0;
@@ -144,16 +144,58 @@ uint64_t TrapCurrentDateTimeHandler::HandleTrap(cmsx::machine::Processor& proces
     }
 }
 
+class TrapTimesHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_times"; }
+};
+
+uint64_t TrapTimesHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        uint64_t ax = processor.Regs().Get(cmsx::machine::regAX);
+        uint64_t bx = processor.Regs().Get(cmsx::machine::regBX);
+        uint64_t cx = processor.Regs().Get(cmsx::machine::regCX);
+        if (ax == 0)
+        {
+            throw SystemError(EPARAM, "user time pointer is null");
+        }
+        if (bx == 0)
+        {
+            throw SystemError(EPARAM, "sleep time pointer is null");
+        }
+        if (cx == 0)
+        {
+            throw SystemError(EPARAM, "system time pointer is null");
+        }
+        cmsx::machine::Memory& mem = processor.GetMachine()->Mem();
+        mem.WriteOcta(process->RV(), ax, process->UserTime().count(), cmsx::machine::Protection::write);
+        mem.WriteOcta(process->RV(), bx, process->SleepTime().count(), cmsx::machine::Protection::write);
+        mem.WriteOcta(process->RV(), cx, process->SystemTime().count(), cmsx::machine::Protection::write);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
 void InitTimeTraps()
 {
     SetTrapHandler(trap_current_time_point, new TrapCurrentTimePointHandler());
     SetTrapHandler(trap_sleep, new TrapSleepHandler());
     SetTrapHandler(trap_current_date, new TrapCurrentDateHandler());
     SetTrapHandler(trap_current_date_time, new TrapCurrentDateTimeHandler());
+    SetTrapHandler(trap_times, new TrapTimesHandler());
 }
 
 void DoneTimeTraps()
 {
+    SetTrapHandler(trap_times, nullptr);
     SetTrapHandler(trap_current_date_time, nullptr);
     SetTrapHandler(trap_current_date, nullptr);
     SetTrapHandler(trap_sleep, nullptr);

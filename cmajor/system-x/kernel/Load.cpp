@@ -6,8 +6,10 @@
 #include <system-x/kernel/Load.hpp>
 #include <system-x/kernel/Process.hpp>
 #include <system-x/kernel/ProcessManager.hpp>
+#include <system-x/kernel/IO.hpp>
 #include <system-x/kernel/Trap.hpp>
 #include <system-x/kernel/Scheduler.hpp>
+#include <system-x/machine/Registers.hpp>
 #include <system-x/object/BinaryFile.hpp>
 #include <soulng/util/Util.hpp>
 
@@ -41,20 +43,9 @@ void SetupStack(cmsx::machine::Memory& memory, uint64_t rv)
     memory.WriteOcta(rv, static_cast<uint64_t>(stackStart), 0, cmsx::machine::Protection::write);
 }
 
-int64_t WriteString(const std::string& s, int64_t address, cmsx::machine::Memory& memory, uint64_t rv)
+int64_t SetupArgs(Process* process, int64_t address, const std::vector<std::string>& args, cmsx::machine::Memory& memory)
 {
-    for (char c : s)
-    {
-        memory.WriteByte(rv, static_cast<uint64_t>(address), static_cast<uint8_t>(c), cmsx::machine::Protection::write);
-        ++address;
-    }
-    memory.WriteByte(rv, static_cast<uint64_t>(address), static_cast<uint8_t>(0), cmsx::machine::Protection::write);
-    ++address;
-    return address;
-}
-
-int64_t SetupArgs(int64_t address, const std::vector<std::string>& args, cmsx::machine::Memory& memory, uint64_t rv)
-{
+    uint64_t rv = process->RV();
     int64_t start = address;
     for (int32_t i = 0; i < args.size(); ++i)
     {
@@ -68,7 +59,7 @@ int64_t SetupArgs(int64_t address, const std::vector<std::string>& args, cmsx::m
     {
         argAddresses.push_back(static_cast<uint64_t>(address));
         const std::string& arg = args[i];
-        address = WriteString(arg, address, memory, rv);
+        address = WriteString(process, arg, address, memory);
     }
     int64_t end = address;
     address = start;
@@ -80,8 +71,9 @@ int64_t SetupArgs(int64_t address, const std::vector<std::string>& args, cmsx::m
     return end;
 }
 
-int64_t SetupEnv(int64_t address, const std::vector<std::string>& env, cmsx::machine::Memory& memory, uint64_t rv)
+int64_t SetupEnv(Process* process, int64_t address, const std::vector<std::string>& env, cmsx::machine::Memory& memory)
 {
+    uint64_t rv = process->RV();
     int64_t start = address;
     for (int i = 0; i < env.size(); ++i)
     {
@@ -95,7 +87,7 @@ int64_t SetupEnv(int64_t address, const std::vector<std::string>& env, cmsx::mac
     {
         envAddresses.push_back(static_cast<uint64_t>(address));
         const std::string& e = env[i];
-        address = WriteString(e, address, memory, rv);
+        address = WriteString(process, e, address, memory);
     }
     int64_t end = address;
     address = start;
@@ -131,11 +123,11 @@ void Load(Process* process, const std::vector<std::string>& args, const std::vec
         int64_t address = poolSegmentBaseAddress;
         int64_t argsAddress = soulng::util::Align(address, 8);
         process->SetArgumentsStartAddress(argsAddress);
-        address = SetupArgs(argsAddress, args, machine.Mem(), rv);
+        address = SetupArgs(process, argsAddress, args, machine.Mem());
         process->SetArgumentsLength(address - argsAddress);
         int64_t envAddress = soulng::util::Align(address, 8);
         process->SetEnvironmentStartAddress(envAddress);
-        address = SetupEnv(envAddress, env, machine.Mem(), rv);
+        address = SetupEnv(process, envAddress, env, machine.Mem());
         process->SetEnvironmentLength(address - envAddress);
         address = soulng::util::Align(address, 4096);
         Region poolRegion(RegionId::pool, poolSegmentBaseAddress, address - poolSegmentBaseAddress);

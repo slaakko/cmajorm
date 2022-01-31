@@ -51,13 +51,13 @@ void Clock::Stop()
 void Clock::Tick()
 {
     if (alarms.empty()) return;
+    std::lock_guard<std::recursive_mutex> lock(machine->Lock());
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     while (!alarms.empty() && now >= alarms.front().dueTime)
     {
         Alarm alarm = alarms.front();
         alarms.erase(alarms.begin());
-        alarm.process->AddSleepTime();
-        Wakeup(Event(EventKind::alarmEvent, alarm.id));
+        Wakeup(cmsx::machine::Event(cmsx::machine::EventKind::alarmEvent, alarm.id));
     }
 }
 
@@ -73,13 +73,11 @@ struct AlarmEarlier
 
 void Clock::Schedule(Alarm& alarm)
 {
-    {
-        std::lock_guard<std::recursive_mutex> lock(machine->Lock());
-        alarm.id = nextAlarmId++;
-        alarms.push_back(alarm);
-        std::sort(alarms.begin(), alarms.end(), AlarmEarlier());
-    }
-    Sleep(Event(EventKind::alarmEvent, alarm.id), alarm.process);
+    std::unique_lock<std::recursive_mutex> lock(machine->Lock());
+    alarm.id = nextAlarmId++;
+    alarms.push_back(alarm);
+    std::sort(alarms.begin(), alarms.end(), AlarmEarlier());
+    Sleep(cmsx::machine::Event(cmsx::machine::EventKind::alarmEvent, alarm.id), alarm.process, lock);
 }
 
 void InitClock()
