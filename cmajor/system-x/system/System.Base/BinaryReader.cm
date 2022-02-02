@@ -107,27 +107,6 @@ namespace System.IO
             void* u = &x;
             return *cast<double*>(u);
         }
-        public string ReadString()
-        {
-            string s;
-            char c = ReadChar();
-            while (c != '\0')
-            {
-                s.Append(c);
-                c = ReadChar();
-            }
-            return s;
-        }
-        public wstring ReadWString()
-        {
-            string s = ReadString();
-            return ToUtf16(s);
-        }
-        public ustring ReadUString()
-        {
-            string s = ReadString();
-            return ToUtf32(s);
-        }
         public uint ReadULEB128UInt()
         {
             uint result = 0u;
@@ -189,6 +168,27 @@ namespace System.IO
                 result = result | ~cast<long>(0) << shift;
             }
             return result;
+        }
+        public string ReadString()
+        {
+            string s;
+            char c = ReadChar();
+            while (c != '\0')
+            {
+                s.Append(c);
+                c = ReadChar();
+            }
+            return s;
+        }
+        public wstring ReadWString()
+        {
+            string s = ReadString();
+            return ToUtf16(s);
+        }
+        public ustring ReadUString()
+        {
+            string s = ReadString();
+            return ToUtf32(s);
         }
         public Uuid ReadUuid()
         {

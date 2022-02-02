@@ -5,7 +5,7 @@
 
 using System;
 using System.Collections;
-// using System.IO;
+using System.IO;
 
 namespace System.Unicode
 {
@@ -18,28 +18,17 @@ namespace System.Unicode
     
     public void ThrowUnicodeException(const string& message)
     {
-        //throw UnicodeException(message);
-		exit(250);
+        throw UnicodeException(message);
     }
     
     public string PathToUnicodeDirectory()
     {
-/*		TODO
-        string cmajorRoot = RtGetEnvironmentVariable("CMAJOR_ROOT");
-        if (cmajorRoot.IsEmpty())
-        {
-            ThrowUnicodeException("CMAJOR_ROOT environment variable not set (set it to /path/to/cmajor directory)");
-            return string();
-        }
-        return Path.Combine(cmajorRoot, "unicode");
-*/
-		return string();
+		return "/mnt/cmajor/unicode";
     }
     
     public string PathToUcdBinFile()
     {        
-        // return Path.Combine(PathToUnicodeDirectory(), "cmajor_ucd.bin"); TODO
-		return string();
+        return Path.Combine(PathToUnicodeDirectory(), "cmajor_ucd.bin");
     }
     
     public string MakeCanonicalPropertyName(const string& s)
@@ -1994,8 +1983,7 @@ namespace System.Unicode
         {
             if (codePoint > cast<uchar>(0x10FFFF))
             {
-                //throw UnicodeException("invalid Unicode code point " + ToHexString(cast<uint>(codePoint)));
-				exit(250); // TODO
+                throw UnicodeException("invalid Unicode code point " + ToHexString(cast<uint>(codePoint)));
             }
             long pageIndex = cast<long>(codePoint) / numInfosInPage;
             if (pages.Count() <= pageIndex)
@@ -2013,8 +2001,7 @@ namespace System.Unicode
                     string pathToUcdBinFile = PathToUcdBinFile();
                     if (!File.Exists(pathToUcdBinFile))
                     {
-                        // throw UnicodeException("Error: Cmajor Unicode database file '" + pathToUcdBinFile + "' does not exist.");
-						exit(250); // TODO
+                        throw UnicodeException("Error: Cmajor Unicode database file '" + pathToUcdBinFile + "' does not exist.");
                     }
                     BinaryReader reader = File.OpenBinary(pathToUcdBinFile);
                     if (!headerRead)
@@ -2035,8 +2022,7 @@ namespace System.Unicode
         {
             if (codePoint > cast<uchar>(0x10FFFF))
             {
-                // throw UnicodeException("invalid Unicode code point " + ToHexString(cast<uint>(codePoint)));
-				exit(250); // TODO
+                throw UnicodeException("invalid Unicode code point " + ToHexString(cast<uint>(codePoint)));
             }
             long pageIndex = cast<long>(codePoint) / numInfosInPage;
             if (extendedPages.Count() <= pageIndex)
@@ -2054,8 +2040,7 @@ namespace System.Unicode
                     string pathToUcdBinFile = PathToUcdBinFile();
                     if (!File.Exists(pathToUcdBinFile))
                     {
-                        // throw UnicodeException("Error: Cmajor Unicode database file '" + pathToUcdBinFile + "' does not exist.");
-						exit(250); // TODO
+                        throw UnicodeException("Error: Cmajor Unicode database file '" + pathToUcdBinFile + "' does not exist.");
                     }
                     BinaryReader reader = File.OpenBinary(pathToUcdBinFile);
                     if (!headerRead)
@@ -2076,7 +2061,7 @@ namespace System.Unicode
             long infoIndex = cast<long>(codePoint) % numInfosInPage;
             return (*extendedPage)[infoIndex];
         }
-        private CharacterTable() : headerRead(false), pages(), extendedHeaderStart(0u), extendedHeaderEnd(0u), extendedHeader(), extendedPages(), characterTableLock()
+        private CharacterTable() : headerRead(false), pages(), extendedHeaderStart(0u), extendedHeaderEnd(0u), extendedHeader(), extendedPages()
         {
             headerMagic.Resize(8);
             string hdrmgc = "CMAJUCD";
@@ -2105,18 +2090,14 @@ namespace System.Unicode
             {
                 if (magic[i] != cast<byte>(headerMagic[i]))
                 {
-                    // throw UnicodeException("invalid cmajor_ucd.bin header magic: 'CMAJUCD' expected");
-					exit(250); // TODO
+                    throw UnicodeException("invalid cmajor_ucd.bin header magic: 'CMAJUCD' expected");
                 }
             }
             if (magic[7] != headerMagic[7])
             {
-/*			
                 throw UnicodeException("invalid cmajor_ucd.bin version: version " + 
                     string(cast<char>(headerMagic[7]), 1) + " expected, version " + 
                     string(cast<char>(magic[7]), 1) + " read");
-*/
-				exit(250); // TODO
             }
             extendedHeaderStart = reader.ReadUInt();
             extendedHeaderEnd = reader.ReadUInt();
@@ -2138,7 +2119,6 @@ namespace System.Unicode
         private uint extendedHeaderEnd;
         private UniquePtr<ExtendedCharacterInfoHeader> extendedHeader;
         private List<UniquePtr<ExtendedCharacterInfoPage>> extendedPages;
-        private RecursiveMutex characterTableLock;
     }
 
     public const CharacterInfo& GetCharacterInfo(uchar codePoint)

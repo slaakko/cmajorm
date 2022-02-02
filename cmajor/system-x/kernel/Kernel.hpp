@@ -16,6 +16,7 @@ class MountTable;
 class KernelProcess : public cmsx::machine::Process
 {
 public:
+    int32_t Id() const { return 0; }
     void Sleep() override;
     void Wakeup(cmsx::machine::Scheduler* scheduler) override;
     cmsx::machine::Processor* GetProcessor() const override;

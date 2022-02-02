@@ -79,8 +79,8 @@ namespace System.IO
     {
         public static bool Exists(const string& path)
         {
-            byte[System.Os.statBufSize] statBuf;
-            int result = stat(path.Chars(), &statBuf[0]);
+            byte[statBufSize] statBuf;
+            int result = stat(path.Chars(), &statBuf[0], statBufSize);
             return result != -1;
         }
         public static nothrow string MakeCanonical(const string& path)

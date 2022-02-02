@@ -53,17 +53,26 @@ namespace System.Collections
         }
         public inline nothrow ReferenceType operator*()
         {
-            #assert(node != null);
+			if (node == null)
+			{
+				ThrowNullPointerException();
+			}
             return node->Value();
         }
         public inline nothrow PointerType operator->()
         {
-            #assert(node != null);
+			if (node == null)
+			{
+				ThrowNullPointerException();
+			}
             return &(node->Value());
         }
         public inline nothrow Self& operator++()
         {
-            #assert(node != null);
+			if (node == null)
+			{
+				ThrowNullPointerException();
+			}
             node = node->Next();
             return *this;
         }
@@ -163,7 +172,10 @@ namespace System.Collections
         }
         public inline nothrow const ValueType& Front() const
         {
-            #assert(head != null);
+			if (head == null)
+			{
+				ThrowInvalidParameterException();
+			}
             return head->Value();
         }
         public inline Iterator InsertFront(const ValueType& value)
@@ -183,7 +195,10 @@ namespace System.Collections
         }
         public nothrow void RemoveFront()
         {
-            #assert(head != null);
+			if (head == null)
+			{
+				ThrowPreconditionViolationException();
+			}
             NodePtr node = head;
             head = head->Next();
             delete node;
@@ -191,9 +206,15 @@ namespace System.Collections
         public nothrow void RemoveAfter(Iterator pos)
         {
             NodePtr node = pos.Node();
-            #assert(node != null);
+			if (node == null)
+			{
+				ThrowInvalidParameterException();
+			}
             NodePtr toRemove = node->Next();
-            #assert(toRemove != null);
+            if (toRemove == null)
+			{
+				ThrowInvalidParameterException();
+			}
             node->SetNext(toRemove->Next());
             delete toRemove;
         }
@@ -213,7 +234,6 @@ namespace System.Collections
                     }                    
                     else
                     {
-                        #assert(prev != null);
                         prev->SetNext(node->Next());
                         delete node;
                         node = prev->Next();

@@ -535,6 +535,12 @@ std::string TimeToString(std::time_t time)
     return buffer;
 }
 
+DateTime ToDateTime(time_t time)
+{
+    struct tm* localTime = std::localtime(&time);
+    return DateTime(Date(1900 + localTime->tm_year, static_cast<Month>(1 + localTime->tm_mon), static_cast<int8_t>(localTime->tm_mday)), localTime->tm_hour * 3600 + localTime->tm_min * 60 + localTime->tm_sec);
+}
+
 void TimeInit()
 {
     TimestampProvider::Init();

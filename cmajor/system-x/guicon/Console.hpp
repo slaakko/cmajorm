@@ -19,6 +19,9 @@ public:
     void SetConsole(cmajor::wing::Console* console_) { console = console_; }
     bool IsReadable() const override { return true; }
     bool IsWritable() const override { return true; }
+    bool IsConsole() const override { return true; }
+    bool IsHostTextFile() const override { return false; }
+    bool HasColors() const override { return true; }
     void Close(cmsx::machine::Process* process) override;
     int64_t Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process) override;
     std::vector<uint8_t> Read(int64_t count, cmsx::machine::Process* process) override;

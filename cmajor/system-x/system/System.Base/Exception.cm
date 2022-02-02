@@ -39,7 +39,7 @@ namespace System
         if (do_throw(ex, typeid(ex)) == -1)
 		{
 			SystemError systemError = GetSystemError();
-			// todo write system error to stderr
+			Console.Error() << systemError.ToString() << endl();
 		}
     }
 

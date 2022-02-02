@@ -218,6 +218,14 @@ cmsx::assembler::Node* MakeRegOperand(Value* value, const Register& r, CodeGener
         Instruction* inst = regValue->Inst();
         if (inst)
         {
+            if (inst->IsLocalInstruction())
+            {
+                cmsx::assembler::Instruction* ldaInst = new cmsx::assembler::Instruction(cmsx::assembler::LDA);
+                ldaInst->AddOperand(MakeRegOperand(r));
+                EmitPtrOperand(value, ldaInst, codeGen);
+                codeGen.Emit(ldaInst);
+                return MakeRegOperand(r);
+            }
             Locations locs = codeGen.RegAllocator()->GetLocations(inst);
             if ((locs & Locations::reg) != Locations::none)
             {
@@ -635,12 +643,52 @@ void EmitNot(NotInstruction& inst, CodeGenerator& codeGen)
     {
         codeGen.Error("error emitting not: reg not valid");
     }
-    cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen);
-    cmsx::assembler::Instruction* zszInst = new cmsx::assembler::Instruction(cmsx::machine::ZSZ);
-    zszInst->AddOperand(MakeRegOperand(reg));
-    zszInst->AddOperand(operandReg);
-    zszInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint8_t>(1)));
-    codeGen.Emit(zszInst);
+    if (inst.Operand()->GetType()->IsBooleanType())
+    {
+        cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen);
+        cmsx::assembler::Instruction* zszInst = new cmsx::assembler::Instruction(cmsx::machine::ZSZ);
+        zszInst->AddOperand(MakeRegOperand(reg));
+        zszInst->AddOperand(operandReg);
+        zszInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint8_t>(1)));
+        codeGen.Emit(zszInst);
+    }
+    else if (inst.Operand()->GetType()->IsIntegerType())
+    {
+        if (inst.Operand()->GetType()->Size() == 1)
+        {
+            cmsx::assembler::Instruction* xorInst = new cmsx::assembler::Instruction(cmsx::machine::XOR);
+            xorInst->AddOperand(MakeRegOperand(reg));
+            cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen);
+            xorInst->AddOperand(operandReg);
+            xorInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint8_t>(0xFF)));
+            codeGen.Emit(xorInst);
+        }
+        else
+        {
+            cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET); 
+            setInst->AddOperand(cmsx::assembler::MakeGlobalRegOperand(cmsx::machine::regIX));
+            int64_t operandSize = inst.Operand()->GetType()->Size();
+            if (operandSize <= 2)
+            {
+                setInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint16_t>(0xFFFF)));
+            }
+            else if (operandSize <= 4)
+            {
+                setInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint32_t>(0xFFFFFFFF)));
+            }
+            else
+            {
+                setInst->AddOperand(cmsx::assembler::MakeConstantExpr(static_cast<uint32_t>(0xFFFFFFFFFFFFFFFF)));
+            }
+            codeGen.Emit(setInst);
+            cmsx::assembler::Instruction* xorInst = new cmsx::assembler::Instruction(cmsx::machine::XOR);
+            xorInst->AddOperand(MakeRegOperand(reg));
+            cmsx::assembler::Node* operandReg = MakeRegOperand(inst.Operand(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX), codeGen);
+            xorInst->AddOperand(operandReg);
+            xorInst->AddOperand(cmsx::assembler::MakeGlobalRegOperand(cmsx::machine::regIX));
+            codeGen.Emit(xorInst);
+        }
+    }
 }
 
 void EmitNeg(NegInstruction& inst, CodeGenerator& codeGen)
@@ -899,6 +947,7 @@ void EmitEqual(EqualInstruction& inst, CodeGenerator& codeGen)
                 machineInst = cmsx::machine::CMP;
                 break;
             }
+            case boolTypeId:
             case byteTypeId:
             case ushortTypeId:
             case uintTypeId:

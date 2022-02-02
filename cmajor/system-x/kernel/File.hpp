@@ -17,7 +17,7 @@ class Process;
 
 enum class OpenFlags : int32_t
 {
-    none = 0, read = 1 << 0, write = 1 << 1, create = 1 << 2, truncate = 1 << 3, random_access = 1 << 4, opened = 1 << 5
+    none = 0, read = 1 << 0, write = 1 << 1, create = 1 << 2, append = 1 << 3, truncate = 1 << 4, text = 1 << 5, random_access = 1 << 6, opened = 1 << 7
 };
 
 CMSX_KERNEL_API inline OpenFlags operator|(OpenFlags left, OpenFlags right)
@@ -49,9 +49,13 @@ public:
     virtual void Close(cmsx::machine::Process* process) = 0;
     virtual bool IsReadable() const = 0;
     virtual bool IsWritable() const = 0;
+    virtual bool IsConsole() const = 0;
+    virtual bool IsHostTextFile() const = 0;
+    virtual bool HasColors() const = 0;
     virtual std::vector<uint8_t> Read(int64_t count, cmsx::machine::Process* process);
     virtual int64_t Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process);
-    virtual void Seek(int64_t offset, Origin whence, cmsx::machine::Process* process);
+    virtual int64_t Seek(int64_t offset, Origin whence, cmsx::machine::Process* process);
+    virtual int64_t Tell(cmsx::machine::Process* process);
 private:
     std::string name;
 };

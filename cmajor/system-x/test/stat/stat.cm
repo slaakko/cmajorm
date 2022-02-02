@@ -1,0 +1,24 @@
+using System;
+using System.IO;
+using System.Os;
+
+int main()
+{
+	try
+	{
+		FileStatus status;
+		Stat("/mnt/cmajor/unicode/cmajor_ucd.bin", status);
+		if (status.fileType == FileType.regular)
+		{
+			string s = "file found!\n";
+			write(1, s.Chars(), s.Length());
+		}
+	}
+	catch (const Exception& ex)
+	{
+		string s = ex.ToString() + "\n";
+		write(1, s.Chars(), s.Length());
+		return 1;
+	}
+	return 0;
+}

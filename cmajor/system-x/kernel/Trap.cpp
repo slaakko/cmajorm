@@ -85,7 +85,7 @@ void AddTrapsToSymbolTable(cmsx::object::SymbolTable& symbolTable)
     SoftwareInterruptHandler* softwareInterruptHandler = static_cast<SoftwareInterruptHandler*>(cmsx::machine::GetInterruptHandler(cmsx::machine::irq_software));
     if (softwareInterruptHandler)
     {
-        for (int i = 0; i< 256; ++i)
+        for (int i = 0; i < 256; ++i)
         {
             uint8_t trap = static_cast<uint8_t>(i);
             TrapHandler* trapHandler = softwareInterruptHandler->GetTrapHandler(trap);

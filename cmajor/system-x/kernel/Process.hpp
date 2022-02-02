@@ -25,7 +25,7 @@ class CMSX_KERNEL_API Process : public soulng::util::IntrusiveListNode<Process>,
 {
 public:
     Process(int32_t id_);
-    int32_t Id() const { return id; }
+    int32_t Id() const override { return id; }
     uint64_t RV() const override { return rv; }
     void SetRV(uint64_t rv_) { rv = rv_; }
     uint64_t AXAddress() const { return axAddress; }

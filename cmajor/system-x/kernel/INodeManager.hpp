@@ -7,6 +7,7 @@
 #define CMSX_KERNEL_INODE_MANAGER_INCLUDED
 #include <system-x/kernel/Api.hpp>
 #include <system-x/machine/Machine.hpp>
+#include <soulng/util/MemoryWriter.hpp>
 #include <soulng/util/Time.hpp>
 #include <stdint.h>
 #include <algorithm>
@@ -75,6 +76,7 @@ struct CMSX_KERNEL_API INodeKey
 {
     INodeKey() : fsNumber(-1), inodeNumber(-1) {}
     INodeKey(int32_t fsNumber_, int32_t inodeNumber_) : fsNumber(fsNumber_), inodeNumber(inodeNumber_) {}
+    bool IsDefault() const { return fsNumber == -1 && inodeNumber == -1; }
     int32_t fsNumber;
     int32_t inodeNumber;
 };
@@ -119,11 +121,14 @@ public:
     void Read(Block* block, int index);
     void Write(Block* block, int index);
     bool IsLocked() const { return GetFlag(flags, INodeFlags::locked); }
-    void SetLocked() { SetFlag(flags, INodeFlags::locked); }
-    void ResetLocked() { ResetFlag(flags, INodeFlags::locked); }
+    void Lock(int32_t processId) { SetFlag(flags, INodeFlags::locked); lockerProcessId = processId; ++lockCount; }
+    void Unlock() { --lockCount; if (lockCount == 0) { ResetFlag(flags, INodeFlags::locked); lockerProcessId = -1; } }
     bool IsValid() const { return GetFlag(flags, INodeFlags::valid); }
     void SetValid() { SetFlag(flags, INodeFlags::valid); }
     void ResetValid() { ResetFlag(flags, INodeFlags::valid); }
+    bool IsMountPoint() const { return GetFlag(flags, INodeFlags::mountPoint); }
+    void SetMountPoint() { SetFlag(flags, INodeFlags::mountPoint); }
+    void ResetMountPoint() { ResetFlag(flags, INodeFlags::mountPoint); }
     bool IsFree() const { return fileType == FileType::free; }
     void SetFree() { fileType = FileType::free; }
     FileType GetFileType() const { return fileType; }
@@ -156,9 +161,15 @@ public:
     int32_t DoubleIndirectBlockNumber() const { return doubleIndirectBlockNumber; }
     void SetDoubleIndirectBlockNumber(int32_t doubleIndirectBlockNumber_) { doubleIndirectBlockNumber = doubleIndirectBlockNumber_; }
     int32_t NumberOfBlocks() const;
+    int32_t LockCount() const { return lockCount; }
+    void SetLockCount(int32_t lockCount_) { lockCount = lockCount_; }
+    int32_t LockerProcessId() const { return lockerProcessId; }
+    void SetLockerProcessId(int32_t lockerProcessId_) { lockerProcessId = lockerProcessId_; }
     int32_t ReferenceCount() const { return referenceCount; }
     void IncrementReferenceCount() { ++referenceCount; }
     void DecrementReferenceCount() { --referenceCount; }
+    static constexpr int32_t StatBufSize() { return 68; }
+    void WriteStat(MemoryWriter& writer);
 private:
     INodeKey key;
     FileType fileType;
@@ -177,6 +188,8 @@ private:
     int32_t singleIndirectBlockNumber;
     int32_t doubleIndirectBlockNumber;
     int32_t referenceCount;
+    int32_t lockCount;
+    int32_t lockerProcessId;
 };
 
 class CMSX_KERNEL_API INodePtr

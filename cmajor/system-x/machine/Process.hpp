@@ -26,6 +26,7 @@ class CMSX_MACHINE_API Process
 {
 public:
     virtual ~Process();
+    virtual int32_t Id() const = 0;
     virtual void Sleep() = 0;
     virtual void Wakeup(Scheduler* scheduler) = 0;
     virtual Processor* GetProcessor() const = 0;

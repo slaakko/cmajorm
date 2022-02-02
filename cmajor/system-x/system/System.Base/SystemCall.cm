@@ -29,8 +29,14 @@ public const byte trap_open = 22u;
 public const byte trap_close = 23u;
 public const byte trap_read = 24u;
 public const byte trap_write = 25u;
-public const byte trap_unlink = 26u;
-public const byte trap_seek = 27u;
+public const byte trap_ioctl = 26u;
+public const byte trap_unlink = 27u;
+public const byte trap_seek = 28u;
+public const byte trap_tell = 29u;
+public const byte trap_stat = 30u;
+public const byte trap_dir_stat = 31u;
+public const byte trap_getcwd = 32u;
+public const byte trap_chdir = 33u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -146,9 +152,21 @@ public cdecl nothrow int create(const char* path, int mode)
 	return cast<int>(trap(0u, trap_create, 0u, path, mode));
 }
 
-public cdecl nothrow int open(const char* path, int flags, int mode)
+public enum OpenFlags : int
 {
-	return cast<int>(trap(0u, trap_open, 0u, path, flags, mode));
+	none = 0,
+	read = 1 << 0,
+	write = 1 << 1,
+	create = 1 << 2,
+	append = 1 << 3,
+	truncate = 1 << 4,
+	text = 1 << 5,
+	random_access = 1 << 6
+}
+
+public cdecl nothrow int open(const char* path, OpenFlags flags, int mode)
+{
+	return cast<int>(trap(0u, trap_open, 0u, path, cast<int>(flags), mode));
 }
 
 public cdecl nothrow int close(int fd)
@@ -166,16 +184,54 @@ public cdecl nothrow long write(int fd, void* buffer, long count)
     return cast<long>(trap(0u, trap_write, 0u, fd, buffer, count));
 }
 
+public enum IOControlItem : int
+{
+	isConsole = 0,
+	isHostTextFile = 1,
+	hasColors = 2
+}
+
+public cdecl nothrow int ioctl(int fd, IOControlItem item)
+{
+	return cast<int>(trap(0u, trap_ioctl, 0u, fd, item));
+}
+
 public cdecl nothrow int unlink(const char* path)
 {
 	return cast<int>(trap(0u, trap_unlink, 0u, path));
 }
 
-const int seekSet = 0;
-const int seekCur = 1;
-const int seekEnd = 2;
-
-public cdecl nothrow int seek(int fd, long offset, int whence)
+public enum Origin : int
 {
-	return cast<int>(trap(0u, trap_seek, 0u, fd, offset, whence));
+	seekSet = 0, seekCur = 1, seekEnd = 2
+}
+    
+public cdecl nothrow long seek(int fd, long offset, Origin whence)
+{
+	return cast<long>(trap(0u, trap_seek, 0u, fd, offset, cast<int>(whence)));
+}
+
+public cdecl nothrow long tell(int fd)
+{
+	return cast<long>(trap(0u, trap_tell, 0u, fd));
+}
+
+public cdecl nothrow int stat(const char* path, byte* statBuf, int statBufSize)
+{
+	return cast<int>(trap(0u, trap_stat, 0u, path, statBuf, statBufSize));
+}
+
+public cdecl nothrow int dir_stat(const char* path)
+{
+	return cast<int>(trap(0u, trap_dir_stat, 0u, path));
+}
+
+public cdecl nothrow int getcwd(char* pathBuf, long bufSize)
+{
+	return cast<int>(trap(0u, trap_getcwd, 0u, pathBuf, bufSize));
+}
+
+public cdecl nothrow int chdir(const char* path)
+{
+	return cast<int>(trap(0u, trap_chdir, 0u, path));
 }

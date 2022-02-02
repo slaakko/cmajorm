@@ -106,9 +106,13 @@ int32_t Create(Process* process, int64_t pathAddr, int32_t mode)
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::string path = ReadString(process, pathAddr, mem);
     Filesystem* fs = GetFs(rootFSNumber);
-    BlockFile* file = fs->Create(path, mode, process);
+    BlockFile* file = fs->Create(path, nullptr, mode, process);
     ProcessFileTable& fileTable = process->GetFileTable();
     int32_t fd = fileTable.AddFile(file);
+    if (fd == -1)
+    {
+        throw SystemError(ELIMITEXCEEDED, "maximum number of open files exceeded");
+    }
     return fd;
 }
 
@@ -121,9 +125,13 @@ int32_t Open(Process* process, int64_t pathAddr, int32_t flags, int32_t mode)
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::string path = ReadString(process, pathAddr, mem);
     Filesystem* fs = GetFs(rootFSNumber);
-    File* file = fs->Open(path, flags, mode, process);
+    File* file = fs->Open(path, nullptr, flags, mode, process);
     ProcessFileTable& fileTable = process->GetFileTable();
     int32_t fd = fileTable.AddFile(file);
+    if (fd == -1)
+    {
+        throw SystemError(ELIMITEXCEEDED, "maximum number of open files exceeded");
+    }
     return fd;
 }
 
@@ -166,6 +174,31 @@ int64_t Read(Process* process, int32_t fd, int64_t bufferAddr, int64_t count)
     return buffer.size();
 }
 
+int32_t IOCtl(Process* process, int32_t fd, int32_t item)
+{
+    ProcessFileTable& fileTable = process->GetFileTable();
+    File* file = fileTable.GetFile(fd);
+    switch (static_cast<IOControlItem>(item))
+    {
+        case IOControlItem::isConsole:
+        {
+            return static_cast<int32_t>(file->IsConsole());
+        }
+        case IOControlItem::isHostTextFile:
+        {
+            return static_cast<int32_t>(file->IsHostTextFile());
+        }
+        case IOControlItem::hasColors:
+        {
+            return static_cast<int32_t>(file->HasColors());
+        }
+        default:
+        {
+            throw SystemError(EPARAM, "unknown ioctl item");
+        }
+    }
+}
+
 void Unlink(Process* process, int64_t pathAddr)
 {
     if (pathAddr == 0)
@@ -184,11 +217,159 @@ void Unlink(Process* process, int64_t pathAddr)
     RemoveDirectoryEntry(fileName, dirINode.Get(), GetFs(rootFSNumber), process);
 }
 
-void Seek(Process* process, int32_t fd, int64_t offset, int32_t whence)
+int64_t Seek(Process* process, int32_t fd, int64_t offset, int32_t whence)
 {
     ProcessFileTable& fileTable = process->GetFileTable();
     File* file = fileTable.GetFile(fd);
-    file->Seek(offset, static_cast<Origin>(whence), process);
+    return file->Seek(offset, static_cast<Origin>(whence), process);
+}
+
+int64_t Tell(Process* process, int32_t fd)
+{
+    ProcessFileTable& fileTable = process->GetFileTable();
+    File* file = fileTable.GetFile(fd);
+    return file->Tell(process);
+}
+
+void Stat(Process* process, int64_t pathAddr, int64_t statBufAddr, int32_t statBufSize)
+{
+    if (pathAddr == 0)
+    {
+        throw SystemError(EPARAM, "path is null");
+    }
+    if (statBufAddr == 0)
+    {
+        throw SystemError(EPARAM, "stat buffer is null");
+    }
+    if (statBufSize < INode::StatBufSize())
+    {
+        throw SystemError(EPARAM, "stat buffer too small");
+    }
+    cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
+    std::string path = ReadString(process, pathAddr, mem);
+    Filesystem* fs = GetFs(rootFSNumber);
+    INodePtr inode = PathToINode(path, GetFs(rootFSNumber), process, PathToINodeFlags::stat);
+    if (!inode.Get())
+    {
+        throw SystemError(ENOTFOUND, "path '" + path + "' not found");
+    }
+    std::vector<uint8_t> statBuffer(statBufSize, 0);
+    MemoryWriter writer(statBuffer.data(), statBufSize);
+    try
+    {
+        inode.Get()->WriteStat(writer);
+    }
+    catch (const std::exception& ex)
+    {
+        throw SystemError(EPARAM, "memory writer exception: " + std::string(ex.what()));
+    }
+    WriteProcessMemory(process, statBufAddr, statBuffer);
+}
+
+int32_t DirStat(Process* process, int64_t pathAddr)
+{
+    if (pathAddr == 0)
+    {
+        throw SystemError(EPARAM, "path is null");
+    }
+    cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
+    std::string path = ReadString(process, pathAddr, mem);
+    bool directoryExists = DirectoryExists(path, GetFs(rootFSNumber), process);
+    if (directoryExists)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+void GetCWD(Process* process, int64_t bufAddr, int64_t bufSize)
+{
+    if (bufAddr == 0)
+    {
+        throw SystemError(EPARAM, "path buffer is null");
+    }
+    if (bufSize <= 1)
+    {
+        throw SystemError(EPARAM, "invalid buffer size");
+    }
+    INodeKey cwdINodeKey = ToINodeKey(process->GetINodeKeyOfWorkingDir());
+    Filesystem* fs = GetFs(cwdINodeKey.fsNumber);
+    if (fs->Id() != rootFSNumber)
+    {
+        throw SystemError(EFAIL, "process cwd not in root filesystem");
+    }
+    INodePtr dirINodePtr = ReadINode(cwdINodeKey, process);
+    if (dirINodePtr.Get())
+    {
+        INodePtr parentDirINodePtr = SearchDirectory("..", dirINodePtr.Get(), fs, process);
+        if (parentDirINodePtr.Get())
+        {
+            std::string cwd;
+            while (dirINodePtr.Get()->Key() != parentDirINodePtr.Get()->Key())
+            {
+                DirectoryEntry entry = GetDirectoryEntry(parentDirINodePtr.Get(), dirINodePtr.Get()->Key().inodeNumber, fs, process);
+                if (!entry.IsFree())
+                {
+                    cwd = Path::Combine(entry.Name(), cwd);
+                }
+                else
+                {
+                    throw SystemError(EFAIL, "parent directory entry not found");
+                }
+                INodePtr grandParentDirINodePtr = SearchDirectory("..", parentDirINodePtr.Get(), fs, process);
+                if (!grandParentDirINodePtr.Get())
+                {
+                    throw SystemError(EFAIL, "grand parent directory not found");
+                }
+                dirINodePtr = std::move(parentDirINodePtr);
+                parentDirINodePtr = std::move(grandParentDirINodePtr);
+            }
+            cwd = Path::Combine("/", cwd);
+            std::vector<uint8_t> buffer;
+            for (int64_t i = 0; i < bufSize - 1; ++i)
+            {
+                if (i >= cwd.length())
+                {
+                    break;
+                }
+                buffer.push_back(static_cast<uint8_t>(cwd[i]));
+            }
+            buffer.push_back(0);
+            WriteProcessMemory(process, bufAddr, buffer);
+        }
+        else
+        {
+            throw SystemError(EFAIL, "parent directory not found from current directory");
+        }
+    }
+    else
+    {
+        throw SystemError(EFAIL, "current directory not found from process");
+    }
+}
+
+void ChDir(Process* process, int64_t pathAddr)
+{
+    if (pathAddr == 0)
+    {
+        throw SystemError(EPARAM, "path is null");
+    }
+    Filesystem* fs = GetFs(rootFSNumber);
+    cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
+    std::string path = ReadString(process, pathAddr, mem);
+    INodePtr inodePtr = PathToINode(path, fs, process);
+    if (inodePtr.Get())
+    {
+        INodeKey inodeKey = inodePtr.Get()->Key();
+        process->SetINodeKeyOfWorkingDir(ToULong(inodeKey));
+    }
+    else
+    {
+        throw SystemError(ENOTFOUND, "path '" + path + "' not found");
+    }
 }
 
 } // namespace cmsx::kernel

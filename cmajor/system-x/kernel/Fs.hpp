@@ -20,9 +20,12 @@ public:
     int32_t Id() const { return id; }
     virtual void SetMachine(cmsx::machine::Machine* machine) = 0;
     virtual void Initialize() = 0;
-    virtual BlockFile* Create(const std::string& path, int32_t mode, cmsx::machine::Process* process) = 0;
-    virtual BlockFile* Open(const std::string& path, int32_t flags, int32_t mode, cmsx::machine::Process* process) = 0;
+    virtual BlockFile* Create(const std::string& path, INode* dirINode, int32_t mode, cmsx::machine::Process* process) = 0;
+    virtual BlockFile* Open(const std::string& path, INode* dirINode, int32_t flags, int32_t mode, cmsx::machine::Process* process) = 0;
     virtual BlockFile* HostFile() const = 0;
+    virtual INodeKey MountPoint() const { return INodeKey(); }
+    virtual INodePtr SearchDirectory(const std::string& name, INode* dirINode, cmsx::machine::Process* process) = 0;
+    virtual void Stat(INode* inode) = 0;
 private:
     int32_t id;
 };
@@ -162,9 +165,34 @@ CMSX_KERNEL_API void FreeBlocks(INode* inode, Filesystem* fs, cmsx::machine::Pro
 CMSX_KERNEL_API int32_t MapBlockNumber(int32_t logicalBlockNumber, INode* inode, Filesystem* fs, cmsx::machine::Process* process);
 CMSX_KERNEL_API void SetBlockNumber(int32_t logicalBlockNumber, int32_t blockNumber, INode* inode, Filesystem* fs, cmsx::machine::Process* process);
 CMSX_KERNEL_API INodePtr SearchDirectory(const std::string& name, INode* dirINode, Filesystem* fs, cmsx::machine::Process* process);
+CMSX_KERNEL_API DirectoryEntry GetDirectoryEntry(INode* dirINode, int32_t inodeNumber, Filesystem* fs, cmsx::machine::Process* process);
 CMSX_KERNEL_API void AddDirectoryEntry(const DirectoryEntry& entry, INode* dirINode, Filesystem* fs, cmsx::machine::Process* process);
 CMSX_KERNEL_API void RemoveDirectoryEntry(const std::string& name, INode* dirINode, Filesystem* fs, cmsx::machine::Process* process);
+CMSX_KERNEL_API INodePtr MakeDirectory(const std::string& path, Filesystem* fs, cmsx::machine::Process* process);
+CMSX_KERNEL_API bool DirectoryExists(const std::string& path, Filesystem* fs, cmsx::machine::Process* process);
+
+enum class PathToINodeFlags : int32_t
+{
+    none = 0, ignoreMountPoint = 1 << 0, stat = 1 << 1
+};
+
+CMSX_KERNEL_API inline PathToINodeFlags operator|(PathToINodeFlags left, PathToINodeFlags right)
+{
+    return PathToINodeFlags(int32_t(left) | int32_t(right));
+}
+
+CMSX_KERNEL_API inline PathToINodeFlags operator&(PathToINodeFlags left, PathToINodeFlags right)
+{
+    return PathToINodeFlags(int32_t(left) & int32_t(right));
+}
+
+CMSX_KERNEL_API inline PathToINodeFlags operator~(PathToINodeFlags flags)
+{
+    return PathToINodeFlags(~int32_t(flags));
+}
+
 CMSX_KERNEL_API INodePtr PathToINode(const std::string& path, Filesystem* fs, cmsx::machine::Process* process);
+CMSX_KERNEL_API INodePtr PathToINode(const std::string& path, Filesystem* fs, cmsx::machine::Process* process, PathToINodeFlags flags);
 
 } // namespace cmsx::kernel
 

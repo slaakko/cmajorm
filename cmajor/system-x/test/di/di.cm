@@ -18,8 +18,7 @@ class Cleanup
 	public ~Cleanup()
 	{
 		int c = 12345;
-		string s = "cleanup: c=" + ToString(c) + "\n";
-		write(1, s.Chars(), s.Length());
+		Console.Out() << "cleanup: c=" << c << endl();
 	}
 }
 
@@ -40,9 +39,7 @@ void ex_catch()
 	}
 	catch (const Exception& ex)
 	{
-		string s = ex.ToString();
-		s.Append("y = " + ToString(y) + "\n");
-		write(1, s.Chars(), s.Length());
+		Console.Error() << ex.ToString() << ", y=" << y << endl();
 	}
 }
 

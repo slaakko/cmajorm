@@ -11,9 +11,13 @@
 #include <system-x/kernel/Mount.hpp>
 #include <system-x/kernel/BlockFile.hpp>
 #include <system-x/kernel/Kernel.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <boost/filesystem.hpp>
 
 namespace cmsx::kernel {
+
+using namespace soulng::util;
 
 class HostFilesystemFile : public BlockFile
 {
@@ -22,6 +26,9 @@ public:
     void Close(cmsx::machine::Process* process) override;
     bool IsReadable() const override { return (flags & OpenFlags::read) != OpenFlags::none; }
     bool IsWritable() const override { return (flags & OpenFlags::write) != OpenFlags::none; }
+    bool IsConsole() const override { return false; }
+    bool IsHostTextFile() const override { return (flags & OpenFlags::text) != OpenFlags::none; }
+    bool HasColors() const override { return false; }
     int32_t GetBlockNumber(INode* inode, cmsx::machine::Process* process, bool allocate) const override;
     INodePtr GetINode(cmsx::machine::Process* process) override;
     int64_t Read(Block* block, cmsx::machine::Process* process) override;
@@ -54,9 +61,13 @@ int32_t HostFilesystemFile::GetBlockNumber(INode* inode, cmsx::machine::Process*
 INodePtr HostFilesystemFile::GetINode(cmsx::machine::Process* process)
 {
     INodePtr inode = cmsx::kernel::GetINode(GetINodeKey(), process);
-    if (IsReadable() && boost::filesystem::exists(Name()))
+    if (boost::filesystem::exists(Name()))
     {
         inode.Get()->SetFileSize(boost::filesystem::file_size(Name()));
+    }
+    if ((flags & OpenFlags::append) != OpenFlags::none)
+    {
+        SetFilePos(inode.Get()->FileSize());
     }
     return inode;
 }
@@ -105,7 +116,7 @@ int64_t HostFilesystemFile::Write(Block* block, cmsx::machine::Process* process)
     }
 }
 
-HostFilesystem::HostFilesystem() : Filesystem(hostFSNumber), nextFileId(0), machine(nullptr)
+HostFilesystem::HostFilesystem(int32_t id_, const std::string& prefix_) : Filesystem(id_), nextINodeId(0), machine(nullptr), prefix(prefix_)
 {
 }
 
@@ -113,25 +124,103 @@ void HostFilesystem::Initialize()
 {
 }
 
-BlockFile* HostFilesystem::Create(const std::string& path, int32_t mode, cmsx::machine::Process* process)
+BlockFile* HostFilesystem::Create(const std::string& path, INode* dirINode, int32_t mode, cmsx::machine::Process* process)
 {
     OpenFlags openFlags = OpenFlags::create | OpenFlags::truncate | OpenFlags::write | OpenFlags::random_access;
-    return Open(path, static_cast<int32_t>(openFlags), mode, process);
+    return Open(path, dirINode, static_cast<int32_t>(openFlags), mode, process);
 }
 
-BlockFile* HostFilesystem::Open(const std::string& path, int32_t flags, int32_t mode, cmsx::machine::Process* process)
+BlockFile* HostFilesystem::Open(const std::string& path, INode* dirINode, int32_t flags, int32_t mode, cmsx::machine::Process* process)
 {
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
-    int32_t fileId = nextFileId++;
-    OpenFlags openFlags = static_cast<OpenFlags>(flags);
-    INodeKey inodeKey(hostFSNumber, fileId);
+    std::string fullPath;
+    if (dirINode)
+    {
+        auto it = inodePathMap.find(dirINode->Key().inodeNumber);
+        if (it != inodePathMap.cend())
+        {
+            fullPath = Path::Combine(it->second, path);
+        }
+        else
+        {
+            throw SystemError(ENOTFOUND, "path '" + path + "' not found from host file system '" + prefix + "'");
+        }
+    }
+    else
+    {
+        fullPath = Path::Combine(prefix, path);
+    }
+    int32_t fileId = nextINodeId++;
+    INodeKey inodeKey(Id(), fileId);
     INodePtr inodePtr = GetINode(inodeKey, process);
     INode* inode = inodePtr.Get();
     inode->IncrementReferenceCount();
     inode->SetValid();
-    HostFilesystemFile* file = new HostFilesystemFile(this, fileId, path, openFlags, inodeKey);
+    OpenFlags openFlags = static_cast<OpenFlags>(flags);
+    inodePathMap[inode->Key().inodeNumber] = fullPath;
+    HostFilesystemFile* file = new HostFilesystemFile(this, fileId, fullPath, openFlags, inodeKey);
     fileMap[fileId] = file;
     return file;
+}
+
+INodePtr HostFilesystem::SearchDirectory(const std::string& name, INode* dirINode, cmsx::machine::Process* process)
+{
+    std::string fullPath;
+    if (dirINode->Key() == mountPoint)
+    {
+        fullPath = GetFullPath(Path::Combine(prefix, name));
+    }
+    else if (dirINode->Key().fsNumber == Id())
+    {
+        auto it = inodePathMap.find(dirINode->Key().inodeNumber);
+        if (it != inodePathMap.cend())
+        {
+            fullPath = Path::Combine(it->second, name);
+        }
+    }
+    if (boost::filesystem::exists(fullPath))
+    {
+        INodeKey inodeKey(Id(), nextINodeId++);
+        inodePathMap[inodeKey.inodeNumber] = fullPath;
+        INodePtr inode = GetINode(inodeKey, process);
+        Stat(inode.Get());
+        return inode;
+    }
+    else
+    {
+        return INodePtr(nullptr);
+    }
+}
+
+void HostFilesystem::Stat(INode* inode)
+{
+    auto it = inodePathMap.find(inode->Key().inodeNumber);
+    if (it != inodePathMap.cend())
+    {
+        std::string fullPath = it->second;
+        boost::filesystem::file_status status = boost::filesystem::status(fullPath);
+        if (status.type() == boost::filesystem::file_type::regular_file)
+        {
+            inode->SetFileType(FileType::regular);
+            inode->SetFileSize(boost::filesystem::file_size(fullPath));
+        }
+        else if (status.type() == boost::filesystem::file_type::directory_file)
+        {
+            inode->SetFileType(FileType::directory);
+        }
+        else
+        {
+            throw SystemError(EFAIL, "path '" + fullPath + "' has unknown file type");
+        }
+        inode->SetNLinks(1);
+        std::time_t lastWriteTime = boost::filesystem::last_write_time(fullPath);
+        DateTime mtime = ToDateTime(lastWriteTime);
+        inode->SetMTime(mtime);
+    }
+    else
+    {
+        throw SystemError(ENOTFOUND, "path not found");
+    }
 }
 
 void HostFilesystem::Close(int32_t fileId, INode* inode)

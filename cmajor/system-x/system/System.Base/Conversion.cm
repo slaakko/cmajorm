@@ -17,8 +17,7 @@ namespace System
 
     public void ThrowConversionException(const string& message)
     {
-        //throw ConversionException(message); // todo
-		exit(1u);
+        throw ConversionException(message);
     }
 
     public nothrow string ToString<I, U>(I x) where I is SignedInteger and U is UnsignedInteger and ExplicitlyConvertible<I, U> and ExplicitlyConvertible<U, byte>
@@ -144,8 +143,7 @@ namespace System
     {
         return string(c);
     }
-
-/*	TODO
+	
     public string ToString(wchar c)
     {
         wstring s(c);
@@ -157,7 +155,6 @@ namespace System
         ustring s(c);
         return ToUtf8(s);
     }
-*/
 
     public nothrow string ToString(bool b)
     {

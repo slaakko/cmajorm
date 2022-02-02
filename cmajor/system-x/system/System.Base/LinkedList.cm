@@ -59,17 +59,26 @@ namespace System.Collections
         }
         public inline nothrow ReferenceType operator*()
         {
-            #assert(node != null);
+			if (node == null)
+			{
+				ThrowNullPointerException();
+			}
             return node->Value();
         }
         public inline nothrow PointerType operator->()
         {
-            #assert(node != null);
+			if (node == null)
+			{
+				ThrowNullPointerException();
+			}
             return &(node->Value());
         }
         public inline nothrow Self& operator++()
         {
-            #assert(node != null);
+			if (node == null)
+			{
+				ThrowNullPointerException();
+			}
             node = node->Next();
             return *this;
         }
@@ -77,7 +86,10 @@ namespace System.Collections
         {
             if (node == null)
             {
-                #assert(list != null);
+                if (list == null)
+				{
+					ThrowPreconditionViolationException();
+				}
                 node = list->Tail();
             }
             else
@@ -234,7 +246,10 @@ namespace System.Collections
         }
         public nothrow void RemoveFirst()
         {
-            #assert(head != null);
+			if (head == null)
+			{
+				ThrowPreconditionViolationException();
+			}
             LinkedListNode<ValueType>* n = head;
             head = head->Next();
             if (head != null)
@@ -250,7 +265,10 @@ namespace System.Collections
         }
         public nothrow void RemoveLast()
         {
-            #assert(tail != null);
+			if (tail == null)
+			{
+				ThrowPreconditionViolationException();
+			}
             LinkedListNode<ValueType>* n = tail;
             tail = tail->Prev();
             if (tail != null)
@@ -267,7 +285,10 @@ namespace System.Collections
         public nothrow void Remove(Iterator pos)
         {
             LinkedListNode<ValueType>* n = pos.Node();
-            #assert(n != null);
+			if (n == null)
+			{
+				ThrowInvalidParameterException();
+			}
             LinkedListNode<ValueType>* prev = n->Prev();
             LinkedListNode<ValueType>* next = n->Next();
             if (prev != null)
@@ -309,12 +330,18 @@ namespace System.Collections
         }
         public inline nothrow const ValueType& Front() const
         {
-            #assert(head != null);
+			if (head == null)
+			{
+				ThrowPreconditionViolationException();
+			}
             return head->Value();
         }
         public inline nothrow const ValueType& Back() const
         {
-            #assert(tail != null);
+			if (tail == null)
+			{
+				ThrowPreconditionViolationException();
+			}
             return tail->Value();
         }
         public inline nothrow LinkedListNode<ValueType>* Tail()

@@ -4,6 +4,7 @@
 // =================================
 
 using System.Collections;
+using System.IO;
 
 namespace System.Os
 {
@@ -60,7 +61,7 @@ namespace System.Os
         return result;
     }
     
-    public int Open(const char* path, int flags, int mode)
+    public int Open(const char* path, OpenFlags flags, int mode)
     {
         int result = open(path, flags, mode);
         if (result == -1)
@@ -98,4 +99,52 @@ namespace System.Os
         }
         return result;
     }
+	
+	public int IOCtl(int fd, IOControlItem item)
+	{
+		int result = ioctl(fd, item);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+		return result;
+	}
+	
+    public long Seek(int fd, long pos, Origin origin)
+    {
+        long result = seek(fd, pos, origin);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+	
+	public long Tell(int fd)
+	{
+        long result = tell(fd);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+	}
+	
+    public void GetCWD(char* pathBuf, long bufSize)
+    {
+        int result = getcwd(pathBuf, bufSize);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+	
+	public void ChDir(const char* path)
+	{
+		int result = chdir(path);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+	}
 }

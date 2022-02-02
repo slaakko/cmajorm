@@ -16,8 +16,10 @@ public:
     RootFilesystem();
     void SetMachine(cmsx::machine::Machine* machine_) override { machine = machine_; }
     void Initialize() override;
-    BlockFile* Create(const std::string& path, int32_t mode, cmsx::machine::Process* process) override;
-    BlockFile* Open(const std::string& path, int32_t flags, int32_t mode, cmsx::machine::Process* process) override;
+    BlockFile* Create(const std::string& path, INode* dirINode, int32_t mode, cmsx::machine::Process* process) override;
+    BlockFile* Open(const std::string& path, INode* dirINode, int32_t flags, int32_t mode, cmsx::machine::Process* process) override;
+    INodePtr SearchDirectory(const std::string& name, INode* dirINode, cmsx::machine::Process* process) override;
+    void Stat(INode* inode) override;
     BlockFile* HostFile() const override { return hostFile; }
     void CloseFile(int32_t id);
 private:

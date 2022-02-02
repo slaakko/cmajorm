@@ -10,6 +10,8 @@
 
 namespace cmsx::kernel {
 
+const uint32_t fixedDriveType = DRIVE_FIXED;
+
 void* OsCreateHostFile(const char* filePath, bool randomAccess)
 {
     DWORD accessFlag = FILE_FLAG_SEQUENTIAL_SCAN;
@@ -159,6 +161,42 @@ bool OsWriteFile(void* fileHandle, void* buffer, uint32_t numberOfBytesToWrite, 
         }
     }
     return retval;
+}
+
+std::string OsGetLogicalDrives()
+{
+    char d[4096];
+    int retval = GetLogicalDriveStringsA(4096, &d[0]);
+    if (retval == 0)
+    {
+        return std::string();
+    }
+    else
+    {
+        std::string s;
+        for (int i = 0; i < retval; ++i)
+        {
+            char c = d[i];
+            if (c == '\0')
+            {
+                s.append(1, ';');
+            }
+            else
+            {
+                s.append(1, c);
+            }
+        }
+        if (!s.empty() && s.back() == ';')
+        {
+            s.erase(s.end() - 1);
+        }
+        return s;
+    }
+}
+
+uint32_t OsGetDriveType(const char* rootPathName)
+{
+    return GetDriveTypeA(rootPathName);
 }
 
 } // namespace cmsx::kernel

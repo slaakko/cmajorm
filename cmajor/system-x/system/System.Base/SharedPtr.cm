@@ -22,7 +22,6 @@ namespace System
         }
         public inline nothrow void AddReference()
         {
-            #assert(!(useCount == 0 && weakCount != 0));
             ++useCount;
             ++weakCount;
         }
@@ -107,7 +106,6 @@ namespace System
         }
         public nothrow SharedCount(const WeakCount<T>& that) : counter(that.GetCounter())
         {
-            #assert(counter != null);
             counter->AddReference();
         }
         public nothrow void operator=(const Self& that)
@@ -314,17 +312,19 @@ namespace System
         }
         public nothrow inline T* operator->() const
         {
-            #assert(ptr != null);
+			if (ptr == null)
+			{
+				ThrowNullPointerException();
+			}
             return ptr;
         }
         public nothrow inline T& operator*() const
         {
-            #assert(ptr != null);
+			if (ptr == null)
+			{
+				ThrowNullPointerException();
+			}
             return *ptr;
-        }
-        public nothrow inline T* GetPtr() const
-        {
-            return ptr;
         }
         public nothrow inline T* Get() const
         {
@@ -362,7 +362,6 @@ namespace System
 
     public nothrow bool operator<<T>(const SharedPtr<T>& left, const SharedPtr<T>& right)
     {
-        #assert(left.Get() != null && right.Get() != null || left.Get() == null && right.Get() == null);
         return left.Get() < right.Get();
     }
 
@@ -448,7 +447,6 @@ namespace System
         public nothrow SharedPtr<T> GetSharedFromThis() const
         {
             SharedPtr<T> p(weakThis);
-            #assert(p.Get() == this);
             return p;
         }
         public nothrow WeakPtr<T>& GetWeakThis() 

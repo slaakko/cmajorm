@@ -37,10 +37,10 @@ void DoneApplication()
 
 int main(int argc, const char** argv)
 {
+    sxx::Console console;
     try
     {
         InitApplication();
-        sxx::Console console;
         cmsx::kernel::SetConsoleFiles(&console, &console);
         std::vector<std::string> args;
         std::vector<std::string> env;
@@ -103,6 +103,7 @@ int main(int argc, const char** argv)
         {
             std::cout << "running '" << args[0] << "'..." << std::endl;;
         }
+        console.SetToUtf16Mode();
         machine.Start();
         cmsx::kernel::ProcessManager::Instance().WaitForProcessesExit();
         if (machine.HasException())
@@ -123,6 +124,7 @@ int main(int argc, const char** argv)
             {
                 exitCode = process->ExitCode();
             }
+            console.SetToTextMode();
             std::cout << "'" << args[0] << "' exited with code " << static_cast<int>(exitCode) << std::endl;
             std::cout << std::endl;
             std::chrono::steady_clock::duration userTime = process->UserTime();
@@ -143,6 +145,7 @@ int main(int argc, const char** argv)
     }
     catch (const std::exception& ex)
     {
+        console.SetToTextMode();
         std::cerr << ex.what() << std::endl;
         return 1;
     }

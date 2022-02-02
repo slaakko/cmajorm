@@ -138,7 +138,10 @@ namespace System
 
     public constexpr nothrow I Next<I>(I i, long n) where I is ForwardIterator
     {
-        #assert(n >= 0);
+		if (n < 0)
+		{
+			ThrowPreconditionViolationException();
+		}
         while (n > 0)
         {
             ++i;

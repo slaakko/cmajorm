@@ -38,7 +38,12 @@ int64_t File::Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* 
     return 0;
 }
 
-void File::Seek(int64_t offset, Origin whence, cmsx::machine::Process* process)
+int64_t File::Seek(int64_t offset, Origin whence, cmsx::machine::Process* process)
+{
+    throw SystemError(EBADF, name + " not seekable");
+}
+
+int64_t File::Tell(cmsx::machine::Process* process)
 {
     throw SystemError(EBADF, name + " not seekable");
 }
@@ -70,9 +75,15 @@ void ProcessFileTable::CopyFrom(const ProcessFileTable& that)
 
 int32_t ProcessFileTable::AddFile(File* file)
 {
-    int32_t fd = files.size();
-    files.push_back(file);
-    return fd;
+    for (int32_t fd = 0; fd < files.size(); ++fd)
+    {
+        if (!files[fd])
+        {
+            files[fd] = file;
+            return fd;
+        }
+    }
+    return -1;
 }
 
 void ProcessFileTable::CloseFile(int32_t fd, cmsx::machine::Process* process)

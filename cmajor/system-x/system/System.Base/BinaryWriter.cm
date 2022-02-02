@@ -97,22 +97,6 @@ namespace System.IO
             ulong* u = cast<ulong*>(v);
             Write(*u);
         }
-        public void Write(const string& x)
-        {
-            for (char c : x)
-            {
-                Write(c);
-            }
-            Write('\0');
-        }
-        public void Write(const wstring& x)
-        {
-            Write(ToUtf8(x));
-        }
-        public void Write(const ustring& x)
-        {
-            Write(ToUtf8(x));
-        }
         public void WriteULEB128UInt(uint x)
         {
             do
@@ -186,6 +170,22 @@ namespace System.IO
                 }
                 Write(b);
             }
+        }
+        public void Write(const string& x)
+        {
+            for (char c : x)
+            {
+                Write(c);
+            }
+            Write('\0');
+        }
+        public void Write(const wstring& x)
+        {
+            Write(ToUtf8(x));
+        }
+        public void Write(const ustring& x)
+        {
+            Write(ToUtf8(x));
         }
         public void Write(const Uuid& uuid)
         {

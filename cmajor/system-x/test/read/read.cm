@@ -1,0 +1,31 @@
+using System;
+using System.Os;
+
+int main()
+{
+	try
+	{
+		int fd = Open("foo", OpenFlags.read, 0);
+		string s = "    ";
+		long bytesRead = Read(fd, s.Chars(), s.Length());
+		if (bytesRead > 0)
+		{
+			write(1, s.Chars(), bytesRead);
+		}
+		string t = ToString(bytesRead) + "\n";
+		write(1, t.Chars(), t.Length());
+		Seek(fd, 4096, Origin.seekSet);
+		char x;
+		bytesRead =	Read(fd, &x, 1);
+		string u(x);
+		write(1, u.Chars(), u.Length());
+		Close(fd);
+	}
+	catch (const Exception& ex)
+	{
+		string s = ex.ToString() + "\n";
+		write(1, s.Chars(), s.Length());
+		return 1;
+	}
+	return 0;
+}

@@ -15,8 +15,7 @@ class Cleanup
 	}
 	public ~Cleanup()
 	{
-		string s = "cleanup: y=" + ToString(y) + "\n";
-		write(1, s.Chars(), s.Length());
+		Console.Out() << "cleanup: y=" << y << endl();
 	}
 	private int y;
 }
@@ -39,14 +38,12 @@ void ex()
 		}
 		catch (const Bar& bar)
 		{
-			string s = "wrong handler!\n";
-			write(1, s.Chars(), s.Length());
+			Console.Out() << "wrong handler!" << endl();
 		}
 	}
 	catch (const Foo& foo)
 	{
-		string s = foo.ToString() + "(x=" + ToString(x) + ")\n";
-		write(1, s.Chars(), s.Length());
+		Console.Out() << foo.ToString() << "\n:(x=" << x << ")" << endl();
 		throw;
 	}
 }
@@ -59,8 +56,7 @@ int main()
 	}
 	catch (const Foo& foo)
 	{
-		string s = foo.ToString() + "\n";
-		write(1, s.Chars(), s.Length());
+		Console.Error() << foo.ToString() << endl();
 		return 1;
 	}
 	return 0;

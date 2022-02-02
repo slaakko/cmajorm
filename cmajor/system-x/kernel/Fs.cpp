@@ -10,6 +10,7 @@
 #include <system-x/kernel/BlockFile.hpp>
 #include <soulng/util/MemoryReader.hpp>
 #include <soulng/util/MemoryWriter.hpp>
+#include <soulng/util/Path.hpp>
 #include <soulng/util/Util.hpp>
 
 namespace cmsx::kernel {
@@ -535,6 +536,7 @@ INodePtr ReadINode(const INodeKey& inodeKey, cmsx::machine::Process* process)
 void WriteINode(INode* inode, cmsx::machine::Process* process)
 {
     Filesystem* fs = GetFs(inode->Key().fsNumber);
+    if (fs->Id() != rootFSNumber) return;
     SuperBlock superBlock;
     ReadSuperBlock(superBlock, fs, process);
     int32_t inodeBlockNumber = superBlock.GetINodeBlockNumber(inode->Key().inodeNumber);
@@ -753,6 +755,34 @@ INodePtr SearchDirectory(const std::string& name, INode* dirINode, Filesystem* f
     return INodePtr(nullptr);
 }
 
+DirectoryEntry GetDirectoryEntry(INode* dirINode, int32_t inodeNumber, Filesystem* fs, cmsx::machine::Process* process)
+{
+    if (dirINode->GetFileType() != FileType::directory)
+    {
+        throw SystemError(EFAIL, "not a directory inode");
+    }
+    int32_t logicalBlockNumber = 0;
+    int32_t blockNumber = MapBlockNumber(logicalBlockNumber, dirINode, fs, process);
+    while (blockNumber != -1)
+    {
+        DirectoryBlock directoryBlock;
+        BlockPtr blockPtr = ReadDirectoryBlock(directoryBlock, blockNumber, fs, process);
+        int32_t n = directoryBlock.Entries().size();
+        for (int32_t i = 0; i < n; ++i)
+        {
+            DirectoryEntry directoryEntry;
+            directoryEntry.Read(blockPtr.Get(), i);
+            if (inodeNumber == directoryEntry.INodeNumber())
+            {
+                return directoryEntry;
+            }
+        }
+        ++logicalBlockNumber;
+        blockNumber = MapBlockNumber(logicalBlockNumber, dirINode, fs, process);
+    }
+    return DirectoryEntry();
+}
+
 void AddDirectoryEntry(const DirectoryEntry& entry, INode* dirINode, Filesystem* fs, cmsx::machine::Process* process)
 {
     if (dirINode->GetFileType() != FileType::directory)
@@ -829,7 +859,58 @@ void RemoveDirectoryEntry(const std::string& name, INode* dirINode, Filesystem* 
     throw SystemError(EFAIL, "could not remove: name '" + name + "' not found");
 }
 
+INodePtr MakeDirectory(const std::string& path, Filesystem* fs, cmsx::machine::Process* process)
+{
+    std::string parentDirectoryPath = Path::GetDirectoryName(path);
+    INodePtr parentDirINode = PathToINode(parentDirectoryPath, fs, process);
+    if (!parentDirINode.Get())
+    {
+        throw SystemError(ENOTFOUND, "could not create directory: parent directory '" + parentDirectoryPath + "' does not exist");
+    }
+    INodePtr dirINodePtr = AllocateINode(fs->Id(), process);
+    INode* dirINode = dirINodePtr.Get();
+    dirINode->SetFileType(FileType::directory);
+    BlockPtr dirBlockPtr = AllocateBlock(fs->Id(), process);
+    dirINode->SetDirectBlockNumber(dirBlockPtr.Get()->Key().blockNumber, 0);
+    DirectoryBlock dirBlock; 
+    DirectoryEntry thisEntry;
+    thisEntry.SetINodeNumber(dirINode->Key().inodeNumber);
+    thisEntry.SetName(".");
+    dirBlock.AddEntry(thisEntry);
+    DirectoryEntry parentEntry;
+    parentEntry.SetINodeNumber(parentDirINode.Get()->Key().inodeNumber);
+    parentEntry.SetName("..");
+    dirBlock.AddEntry(parentEntry);
+    dirINode->SetFileSize(2 * DirectoryEntry::Size());
+    WriteDirectoryBlock(dirBlock, dirBlockPtr, fs, process);
+    WriteINode(dirINode, process);
+    DirectoryEntry entry;
+    entry.SetName(Path::GetFileName(path));
+    entry.SetINodeNumber(dirINode->Key().inodeNumber);
+    AddDirectoryEntry(entry, parentDirINode.Get(), fs, process);
+    return dirINodePtr;
+}
+
+bool DirectoryExists(const std::string& path, Filesystem* fs, cmsx::machine::Process* process)
+{
+    INodePtr inode = PathToINode(path, fs, process);
+    if (!inode.Get())
+    {
+        return false;
+    }
+    if (inode.Get()->GetFileType() == FileType::directory)
+    {
+        return true;
+    }
+    return false;
+}
+
 INodePtr PathToINode(const std::string& path, Filesystem* fs, cmsx::machine::Process* process)
+{
+    return PathToINode(path, fs, process, PathToINodeFlags::none);
+}
+
+INodePtr PathToINode(const std::string& path, Filesystem* fs, cmsx::machine::Process* process, PathToINodeFlags flags)
 {
     Filesystem* rootFs = GetFs(rootFSNumber);
     SuperBlock superBlock;
@@ -840,39 +921,51 @@ INodePtr PathToINode(const std::string& path, Filesystem* fs, cmsx::machine::Pro
         INodePtr inode = ReadINode(rootDirINodeKey, process);
         return inode;
     }
+    INodeKey inodeKey;
+    int start = 0;
     if (path.starts_with('/'))
     {
-        INodeKey rootDirINodeKey = MakeINodeKey(rootFSNumber, superBlock.INodeNumberOfRootDirectory());
-        INodePtr inode = ReadINode(rootDirINodeKey, process);
-        std::vector<std::string> components = Split(path, '/');
-        for (int i = 1; i < components.size(); ++i)
-        {
-            const std::string& name = components[i];
-            inode = SearchDirectory(name, inode.Get(), fs, process);
-            if (!inode.Get())
-            {
-                return INodePtr(nullptr);
-            }
-        }
-        return inode;
+        inodeKey = MakeINodeKey(rootFSNumber, superBlock.INodeNumberOfRootDirectory());
+        start = 1;
     }
     else
     {
-        INodeKey currentDirINodeKey = ToINodeKey(process->GetINodeKeyOfWorkingDir());
-        INodePtr inode = ReadINode(currentDirINodeKey, process);
-        std::vector<std::string> components = Split(path, '/');
-        for (int i = 0; i < components.size(); ++i)
+        inodeKey = ToINodeKey(process->GetINodeKeyOfWorkingDir());
+    }
+    INodePtr inode = ReadINode(inodeKey, process);
+    std::vector<std::string> components = Split(path, '/');
+    for (int i = start; i < components.size(); ++i)
+    {
+        const std::string& name = components[i];
+        inode = fs->SearchDirectory(name, inode.Get(), process);
+        if (!inode.Get())
         {
-            const std::string& name = components[i];
-            inode = SearchDirectory(name, inode.Get(), fs, process);
-            if (!inode.Get())
+            return INodePtr(nullptr);
+        }
+        if (inode.Get()->IsMountPoint() && ((flags & PathToINodeFlags::ignoreMountPoint) == PathToINodeFlags::none))
+        {
+            MountTable& mountTable = Kernel::Instance().GetMountTable();
+            fs = mountTable.GetMountedFilesystem(inode.Get()->Key());
+            if (fs)
+            {
+                inode = fs->SearchDirectory(".", inode.Get(), process);
+                if (!inode.Get())
+                {
+                    return INodePtr(nullptr);
+                }
+            }
+            else
             {
                 return INodePtr(nullptr);
             }
         }
-        return inode;
     }
-    return INodePtr(nullptr);
+    if (inode.Get() && (flags & PathToINodeFlags::stat) != PathToINodeFlags::none)
+    {
+        Filesystem* fs = GetFs(inode.Get()->Key().fsNumber);
+        fs->Stat(inode.Get());
+    }
+    return inode;
 }
 
 } // namespace cmsx::kernel

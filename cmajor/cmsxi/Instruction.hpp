@@ -375,15 +375,6 @@ public:
     bool IsNoOperation() const override { return true; }
 };
 
-/*
-class CMSXI_API SaveInstruction : public Instruction
-{
-public:
-    SaveInstruction();
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
-};
-*/
-
 } // namespace cmsxi
 
 #endif // CMAJOR_CMSXI_INSTRUCTION_INCLUDED

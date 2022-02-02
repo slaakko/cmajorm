@@ -1,0 +1,21 @@
+using System;
+using System.IO;
+using System.Os;
+
+int main()
+{
+	try
+	{
+		Console.WriteLine(GetCurrentWorkingDirectory());
+		ChDir("/mnt");
+		Console.WriteLine(GetCurrentWorkingDirectory());
+		ChDir("..");
+		Console.WriteLine(GetCurrentWorkingDirectory());
+	}
+	catch (const Exception& ex)
+	{
+		Console.Error() << ex.ToString() << endl();
+		return 1;
+	}	
+	return 0;
+}

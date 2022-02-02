@@ -441,8 +441,8 @@ void VerifierVisitor::Visit(SwitchInstruction& inst)
 
 void VerifierVisitor::Visit(NotInstruction& inst)
 {
-    CheckSameType("result type", inst.Result()->GetType(), "Boolean type", GetContext()->GetTypes().GetBoolType(), inst.GetSourcePos());
-    CheckSameType("operand type", inst.Operand()->GetType(), "Boolean type", GetContext()->GetTypes().GetBoolType(), inst.GetSourcePos());
+    CheckIntegerOrBooleanType(inst.Result()->GetType(), "result type", inst.GetSourcePos());
+    CheckIntegerOrBooleanType(inst.Operand()->GetType(), "operand type", inst.GetSourcePos());
     CheckUnaryInstuction(&inst);
     inst.AddUse();
     inst.SetIndex(index++);
@@ -472,9 +472,9 @@ void VerifierVisitor::Visit(SignExtendInstruction& inst)
 
 void VerifierVisitor::Visit(ZeroExtendInstruction& inst)
 {
-    CheckArithmeticType(inst.Operand()->GetType(), "operand type", inst.GetSourcePos());
+    CheckArithmeticOrBooleanType(inst.Operand()->GetType(), "operand type", inst.GetSourcePos());
     CheckArithmeticType(inst.Result()->GetType(), "result type", inst.GetSourcePos());
-    if (inst.Result()->GetType()->Size() <= inst.Operand()->GetType()->Size())
+    if (!inst.Operand()->GetType()->IsBooleanType() && inst.Result()->GetType()->Size() <= inst.Operand()->GetType()->Size())
     {
         Error("code verification error: result type width expected to be greater than operand type width", inst.GetSourcePos(), GetContext());
     }

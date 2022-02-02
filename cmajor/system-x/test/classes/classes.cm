@@ -4,8 +4,7 @@ public class Empty
 {
 	public void Write()
 	{
-		string s = "empty\n";
-		write(1, s.Chars(), s.Length());
+		Console.WriteLine("empty");
 	}
 }
 
@@ -13,12 +12,9 @@ public class Data
 {
 	public void Write()
 	{
-		string s = "data\n";
-		write(1, s.Chars(), s.Length());
-		s = ToString(x) + "\n";
-		write(1, s.Chars(), s.Length());
-		s = ToString(y) + "\n";
-		write(1, s.Chars(), s.Length());
+		Console.WriteLine("data");
+		Console.WriteLine(x);
+		Console.WriteLine(y);
 	}
 	public int x;
 	public int y;
@@ -29,12 +25,9 @@ public class Base
 	public default virtual ~Base();
 	public virtual void Write()
 	{
-		string s = "base\n";
-		write(1, s.Chars(), s.Length());
-		s = ToString(x) + "\n";
-		write(1, s.Chars(), s.Length());
-		s = ToString(y) + "\n";
-		write(1, s.Chars(), s.Length());
+		Console.WriteLine("base");
+		Console.WriteLine(x);
+		Console.WriteLine(y);
 	}
 	public int x;
 	public int y;
@@ -44,14 +37,9 @@ public class DerivedClass : Base
 {
 	public override void Write()
 	{
-		string s = "derived\n";
-		write(1, s.Chars(), s.Length());
-		s = ToString(x) + "\n";
-		write(1, s.Chars(), s.Length());
-		s = ToString(y) + "\n";
-		write(1, s.Chars(), s.Length());
-		s = ToString(z) + "\n";
-		write(1, s.Chars(), s.Length());
+		Console.WriteLine("derived");
+		Console.WriteLine(x);
+		Console.WriteLine(y);
 	}
 	public int z;
 }
@@ -59,24 +47,20 @@ public class DerivedClass : Base
 void main()
 {
 	Empty* empty = new Empty();
-	string emptySize = "empty size: " + ToString(sizeof(Empty)) + "\n";
-	write(1, emptySize.Chars(), emptySize.Length());
+	Console.Out() << "sizeof empty is " << sizeof(Empty) << endl();
 	empty->Write();
 	Data* data = new Data();
-	string dataSize = "data size: " + ToString(sizeof(Data)) + "\n";
-	write(1, dataSize.Chars(), dataSize.Length());
+	Console.Out() << "sizeof data is " << sizeof(Data) << endl();
 	data->x = 1;
 	data->y = 2;
 	data->Write();
 	Base* bse = new Base();
-	string baseSize = "base size: " + ToString(sizeof(Base)) + "\n";
-	write(1, baseSize.Chars(), baseSize.Length());
+	Console.Out() << "sizeof base is " << sizeof(Base) << endl();
 	bse->x = 10;
 	bse->y = 20;
 	bse->Write();
 	DerivedClass* derived = new DerivedClass();
-	string derivedSize = "derived size: " + ToString(sizeof(DerivedClass)) + "\n";
-	write(1, derivedSize.Chars(), derivedSize.Length());
+	Console.Out() << "sizeof derived is " << sizeof(DerivedClass) << endl();
 	derived->x = 100;
 	derived->y = 200;
 	derived->z = 300;

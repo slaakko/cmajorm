@@ -5,6 +5,7 @@
 
 #include <system-x/kernel/HostFileManager.hpp>
 #include <system-x/kernel/IoManager.hpp>
+#include <system-x/kernel/OsFileApi.hpp>
 #include <map>
 #include <set>
 #include <memory>
@@ -105,6 +106,10 @@ void HostFileManager::CloseHostFile(int32_t hostFileId)
         hostFile->DecrementReferenceCount();
         if (hostFile->ReferenceCount() == 0)
         {
+            if (hostFile->FileHandle())
+            {
+                OsCloseHostFile(hostFile->FileHandle());
+            }
             hostFileMap.erase(hostFile->Id());
             delete hostFile;
         }

@@ -58,7 +58,9 @@ INode::INode() :
     directBlockNumbers(NumDirectBlockNumbers(), -1),
     singleIndirectBlockNumber(-1),
     doubleIndirectBlockNumber(-1),
-    referenceCount(0)
+    referenceCount(0),
+    lockCount(0),
+    lockerProcessId(-1)
 {
 }
 
@@ -79,7 +81,9 @@ INode::INode(INodeKey key_) :
     directBlockNumbers(NumDirectBlockNumbers(), -1),
     singleIndirectBlockNumber(-1),
     doubleIndirectBlockNumber(-1),
-    referenceCount(0)
+    referenceCount(0),
+    lockCount(0),
+    lockerProcessId(-1)
 {
 }
 
@@ -167,6 +171,23 @@ int32_t INode::NumberOfBlocks() const
     return static_cast<int32_t>((fileSize - 1) / Block::Size() + 1);
 }
 
+void INode::WriteStat(MemoryWriter& writer)
+{
+    writer.Write(key.fsNumber);
+    writer.Write(key.inodeNumber);
+    writer.Write(static_cast<int32_t>(fileType));
+    writer.Write(static_cast<int32_t>(ownerAccess));
+    writer.Write(static_cast<int32_t>(groupAccess));
+    writer.Write(static_cast<int32_t>(otherAccess));
+    writer.Write(nlinks);
+    writer.Write(uid);
+    writer.Write(gid);
+    writer.Write(fileSize);
+    writer.Write(ctime);
+    writer.Write(mtime);
+    writer.Write(atime);
+}
+
 INodePtr::~INodePtr()
 {
     if (inode)
@@ -186,7 +207,11 @@ void INodePtr::Release()
 
 void INodePtr::SetINode(const INode& inode_)
 {
+    int32_t lockCount = inode->LockCount();
+    int32_t lockerProcessId = inode->LockerProcessId();
     *inode = inode_;
+    inode->SetLockCount(lockCount);
+    inode->SetLockerProcessId(lockerProcessId);
 }
 
 uint64_t INodeKeyHash(INodeKey inodeKey)
@@ -381,13 +406,18 @@ INodePtr GetINode(INodeKey inodeKey, cmsx::machine::Process* process)
         {
             if (entry->inode->IsLocked())
             {
+                if (entry->inode->LockerProcessId() == process->Id())
+                {
+                    entry->inode->Lock(process->Id());
+                    return INodePtr(entry->inode);
+                }
                 cmsx::machine::Event inodeBecomesFreeEvent = inodeManager.GetINodeKeyEvent(inodeKey);
                 Sleep(inodeBecomesFreeEvent, process, lock);
                 continue;
             }
             else
             {
-                entry->inode->SetLocked();
+                entry->inode->Lock(process->Id());
                 inodeManager.RemoveFromFreeList(entry);
                 return INodePtr(entry->inode);
             }
@@ -405,7 +435,7 @@ INodePtr GetINode(INodeKey inodeKey, cmsx::machine::Process* process)
                 inode->SetKey(inodeKey);
                 inodeManager.InsertIntoHashQueue(inode);
                 inode->ResetValid();
-                inode->SetLocked();
+                inode->Lock(process->Id());
                 return INodePtr(inode);
             }
         }
@@ -416,11 +446,14 @@ void PutINode(INode* inode)
 {
     INodeManager& inodeManager = INodeManager::Instance();
     std::unique_lock<std::recursive_mutex> lock(inodeManager.GetMachine()->Lock());
-    cmsx::machine::Event inodeFreeEvent = inodeManager.GetINodeKeyEvent(inode->Key());
-    Wakeup(inodeFreeEvent);
-    inodeManager.RemoveINodeKeyEvent(inode->Key());
-    inodeManager.PutINodeToFreeList(inode);
-    inode->ResetLocked();
+    inode->Unlock();
+    if (inode->LockCount() == 0)
+    {
+        cmsx::machine::Event inodeFreeEvent = inodeManager.GetINodeKeyEvent(inode->Key());
+        Wakeup(inodeFreeEvent);
+        inodeManager.RemoveINodeKeyEvent(inode->Key());
+        inodeManager.PutINodeToFreeList(inode);
+    }
 }
 
 void InitINodeManager()

@@ -9,6 +9,7 @@
 #include <system-x/kernel/Mount.hpp>
 #include <system-x/kernel/Error.hpp>
 #include <system-x/kernel/BlockFile.hpp>
+#include <system-x/kernel/OsFileApi.hpp>
 #include <system-x/machine/Config.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/TextUtils.hpp>
@@ -26,6 +27,9 @@ public:
     void Close(cmsx::machine::Process* process) override;
     bool IsReadable() const override { return (flags & OpenFlags::read) != OpenFlags::none; }
     bool IsWritable() const override { return (flags & OpenFlags::write) != OpenFlags::none; }
+    bool IsConsole() const override { return false; }
+    bool IsHostTextFile() const override { return false; }
+    bool HasColors() const override { return false; }
     int32_t GetBlockNumber(INode* inode, cmsx::machine::Process* process, bool allocate) const override;
     INodePtr GetINode(cmsx::machine::Process* process) override;
     int64_t Read(Block* block, cmsx::machine::Process* process) override;
@@ -88,6 +92,8 @@ int64_t RootFilesystemFile::Write(Block* block, cmsx::machine::Process* process)
     return fs->HostFile()->Write(block, process);
 }
 
+void MountHostDirectories(Filesystem* fs, cmsx::machine::Process* kernelProcess);
+
 RootFilesystem::RootFilesystem() : Filesystem(rootFSNumber), machine(nullptr), hostFs(nullptr), hostFile(nullptr), nextFileId(0)
 {
 }
@@ -98,24 +104,25 @@ void RootFilesystem::Initialize()
     if (!RootFsExists())
     {
         int32_t mode = 0;
-        hostFile = hostFs->Create(RootFsHostFilePath(), mode, Kernel::Instance().GetKernelProcess());
+        hostFile = hostFs->Create(RootFsHostFilePath(), nullptr, mode, Kernel::Instance().GetKernelProcess());
         MakeRootFs(*this);
     }
     else
     {
         OpenFlags flags = OpenFlags::read | OpenFlags::write | OpenFlags::random_access;
         int32_t mode = 0;
-        hostFile = hostFs->Open(RootFsHostFilePath(), static_cast<int32_t>(flags), mode, Kernel::Instance().GetKernelProcess());
+        hostFile = hostFs->Open(RootFsHostFilePath(), nullptr, static_cast<int32_t>(flags), mode, Kernel::Instance().GetKernelProcess());
+        MountHostDirectories(this, Kernel::Instance().GetKernelProcess());
     }
 }
 
-BlockFile* RootFilesystem::Create(const std::string& path, int32_t mode, cmsx::machine::Process* process)
+BlockFile* RootFilesystem::Create(const std::string& path, INode* dirINode, int32_t mode, cmsx::machine::Process* process)
 {
     OpenFlags flags = OpenFlags::create | OpenFlags::truncate | OpenFlags::write;
-    return Open(path, static_cast<int32_t>(flags), mode, process);
+    return Open(path, dirINode, static_cast<int32_t>(flags), mode, process);
 }
 
-BlockFile* RootFilesystem::Open(const std::string& path, int32_t flags, int32_t mode, cmsx::machine::Process* process)
+BlockFile* RootFilesystem::Open(const std::string& path, INode* dirINode, int32_t flags, int32_t mode, cmsx::machine::Process* process)
 {
     if (path.empty() || path == "/")
     {
@@ -123,12 +130,17 @@ BlockFile* RootFilesystem::Open(const std::string& path, int32_t flags, int32_t 
     }
     std::string dirPath = Path::GetDirectoryName(path);
     std::string fileName = Path::GetFileName(path);
-    INodePtr dirINode = PathToINode(dirPath, this, process);
-    if (!dirINode.Get())
+    INodePtr dirINodePtr = PathToINode(dirPath, this, process);
+    if (!dirINodePtr.Get())
     {
         throw SystemError(EFAIL, "could not open: directory '" + dirPath + "' not found");
     }
-    INodePtr fileINode = SearchDirectory(fileName, dirINode.Get(), this, process);
+    Filesystem* fs = GetFs(dirINodePtr.Get()->Key().fsNumber);
+    if (fs != this)
+    {
+        return fs->Open(fileName, dirINodePtr.Get(), flags, mode, process);
+    }
+    INodePtr fileINode = cmsx::kernel::SearchDirectory(fileName, dirINodePtr.Get(), this, process);
     OpenFlags openFlags = static_cast<OpenFlags>(flags);
     bool truncated = false;
     if ((openFlags & OpenFlags::truncate) != OpenFlags::none)
@@ -153,15 +165,30 @@ BlockFile* RootFilesystem::Open(const std::string& path, int32_t flags, int32_t 
             fileINode = AllocateINode(Id(), process);
             fileINode.Get()->SetFileType(FileType::regular);
             WriteINode(fileINode.Get(), process);
+            DirectoryEntry entry;
+            entry.SetName(fileName);
+            entry.SetINodeNumber(fileINode.Get()->Key().inodeNumber);
+            AddDirectoryEntry(entry, dirINodePtr.Get(), this, process);
         }
     }
     if (!fileINode.Get())
     {
         throw SystemError(ENOTFOUND, "could not open: path '" + path + "' not found");
     }
+    fileINode.Get()->IncrementReferenceCount();
     RootFilesystemFile* file = new RootFilesystemFile(this, path, openFlags, fileINode.Get()->Key(), nextFileId++);
     fileMap[file->Id()] = file;
     return file;
+}
+
+INodePtr RootFilesystem::SearchDirectory(const std::string& name, INode* dirINode, cmsx::machine::Process* process)
+{
+    return cmsx::kernel::SearchDirectory(name, dirINode, this, process);
+}
+
+void RootFilesystem::Stat(INode* inode)
+{
+    // status already obtained
 }
 
 void RootFilesystem::CloseFile(int32_t id)
@@ -284,6 +311,33 @@ void MakeRootDirectory(cmsx::machine::Process* process)
     WriteINode(rootDirINode, process);
 }
 
+void MountHostDirectories(Filesystem* fs, cmsx::machine::Process* kernelProcess)
+{
+    std::string mountDirPath = "/mnt";
+    if (!DirectoryExists(mountDirPath, fs, kernelProcess))
+    {
+        MakeDirectory(mountDirPath, fs, kernelProcess);
+    }
+    std::string driveStr = OsGetLogicalDrives();
+    std::vector<std::string> drives = Split(driveStr, ';');
+    for (const std::string& drive : drives)
+    {
+        uint32_t driveType = OsGetDriveType(drive.c_str());
+        if (driveType == fixedDriveType)
+        {
+            std::string hostPath = GetFullPath(drive);
+            std::string driveMountDirPath = "/mnt/" + std::string(1, std::tolower(hostPath[0]));
+            cmsx::kernel::Mount(hostPath, driveMountDirPath, kernelProcess);
+        }
+    }
+    std::string cmajorRootPath = GetFullPath(CmajorRoot());
+    std::string cmajorMountDirPath = "/mnt/cmajor";
+    cmsx::kernel::Mount(cmajorRootPath, cmajorMountDirPath, kernelProcess);
+    std::string sxRootPath = GetFullPath(Path::Combine(CmajorRoot(), "system-x"));
+    std::string sxMountDirPath = "/mnt/sx";
+    cmsx::kernel::Mount(sxRootPath, sxMountDirPath, kernelProcess);
+}
+
 void MakeRootFs(RootFilesystem& rootFs)
 {
     BlockFile* rootHostFile = rootFs.HostFile();
@@ -301,6 +355,7 @@ void MakeRootFs(RootFilesystem& rootFs)
     MakeBlockNumberBlocks(superBlock, rootHostFile, kernelProcess);
     MakeINodeBlocks(superBlock, rootHostFile, kernelProcess);
     MakeRootDirectory(kernelProcess);
+    MountHostDirectories(&rootFs, kernelProcess);
 }
 
 } // namespace cmsx::kernel

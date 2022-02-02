@@ -18,7 +18,8 @@ public:
     BlockFile(const std::string& name_, INodeKey inodeKey_);
     std::vector<uint8_t> Read(int64_t count, cmsx::machine::Process* process) override;
     int64_t Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process) override;
-    void Seek(int64_t offset, Origin whence, cmsx::machine::Process* process) override;
+    int64_t Seek(int64_t offset, Origin whence, cmsx::machine::Process* process) override;
+    int64_t Tell(cmsx::machine::Process* process) override;
     virtual INodePtr GetINode(cmsx::machine::Process* process) = 0;
     virtual int32_t GetBlockNumber(INode* inode, cmsx::machine::Process* process, bool allocate) const = 0;
     virtual int64_t Read(Block* block, cmsx::machine::Process* process) = 0;

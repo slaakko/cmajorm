@@ -6,6 +6,7 @@
 #ifndef CMSX_KERNEL_OS_FILE_API_INCLUDED
 #define CMSX_KERNEL_OS_FILE_API_INCLUDED
 #include <system-x/kernel/Api.hpp>
+#include <string>
 #include <stdint.h>
 
 namespace cmsx::kernel {
@@ -22,6 +23,9 @@ CMSX_KERNEL_API void* OsCreateOverlapped(uint64_t offset);
 CMSX_KERNEL_API void OsDestroyOverlapped(void* overlapped);
 CMSX_KERNEL_API bool OsReadFile(void* fileHandle, void* buffer, uint32_t numberOfBytesToRead, void* overlapped);
 CMSX_KERNEL_API bool OsWriteFile(void* fileHandle, void* buffer, uint32_t numberOfBytesToWrite, void* overlapped);
+CMSX_KERNEL_API std::string OsGetLogicalDrives();
+CMSX_KERNEL_API uint32_t OsGetDriveType(const char* rootPathName);
+extern const uint32_t fixedDriveType;
 
 } // namespace cmsx::kernel
 

@@ -91,7 +91,7 @@ void Kernel::Start()
     mountTable.reset(new MountTable(machine));
     RootFilesystem* rootFs = new RootFilesystem();
     mountTable->AddFilesystem(rootFs);
-    HostFilesystem* hostFs = new HostFilesystem();
+    HostFilesystem* hostFs = new HostFilesystem(hostFSNumber, std::string());
     mountTable->AddFilesystem(hostFs);
     StartBlockManager();
     StartINodeManager();

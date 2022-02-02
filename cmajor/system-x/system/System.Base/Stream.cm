@@ -24,12 +24,12 @@ namespace System.IO
         public virtual long Seek(long pos, Origin origin)
         {
             string streamClassName = typename(*this);
-            throw SystemError(ENOTSUPPORTED, streamClassName + " stream does not support seek");
+            throw SystemError(EBADF, streamClassName + " stream does not support seek");
         }
         public virtual long Tell()
         {
             string streamClassName = typename(*this);
-            throw SystemError(ENOTSUPPORTED, streamClassName + " stream does not support tell");
+            throw SystemError(EBADF, streamClassName + " stream does not support tell");
         }
         public virtual bool IsHostTextFile() const
         {
@@ -45,7 +45,10 @@ namespace System.IO
         }
         public void CopyTo(Stream& destination, long bufferSize)
         {
-            #assert(bufferSize > 0);
+			if (bufferSize <= 0)
+			{
+				ThrowInvalidParameterException();
+			}
             Buffer buffer(bufferSize);
             long bytesRead = 0;
             do
@@ -60,7 +63,7 @@ namespace System.IO
                         long bytesWritten = destination.Write(buffer.Mem() + offset, count);
                         if (bytesWritten <= 0)
                         {   
-                            throw SystemError(EIO, "stream write failed");
+                            throw SystemError(EFAIL, "stream write failed");
                         }
                         count = count - bytesWritten;
                         offset = offset + bytesWritten;

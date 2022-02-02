@@ -5,7 +5,7 @@
 
 #ifndef CMSX_KERNEL_MOUNT_INCLUDED
 #define CMSX_KERNEL_MOUNT_INCLUDED
-#include <system-x/kernel/Api.hpp>
+#include <system-x/kernel/INodeManager.hpp>
 #include <system-x/machine/Machine.hpp>
 #include <string>
 #include <map>
@@ -27,11 +27,16 @@ public:
     MountTable& operator=(const MountTable&) = delete;
     void AddFilesystem(Filesystem* filesystem);
     Filesystem* GetFilesystem(int32_t fsNumber) const;
+    Filesystem* GetMountedFilesystem(INodeKey mountPoint) const;
+    int32_t NextFileSystemId() { return nextFileSystemId++; }
 private:
+    int32_t nextFileSystemId;
     cmsx::machine::Machine* machine;
     std::vector<std::unique_ptr<Filesystem>> filesystems;
     std::map<int32_t, Filesystem*> filesystemMap;
 };
+
+void Mount(const std::string& hostPath, const std::string& dirPath, cmsx::machine::Process* process);
 
 } // namespace cmsx::kernel
 

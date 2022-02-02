@@ -11,17 +11,6 @@ namespace System.IO
     public const int stdout = 1;
     public const int stderr = 2;
 
-    public enum OpenFlags : int
-    {
-        none = 0u,
-        read = 1u << 0u,
-        write = 1u << 1u,
-        create = 1 << 2u,
-        append = 1u << 3u,
-        truncate = 1u << 4u,
-        text = 1u << 5u
-    }
-    
     public nothrow string OpenFlagStr(OpenFlags flags)
     {
         string s;
@@ -49,12 +38,11 @@ namespace System.IO
         {
             s.Append('t');
         }
+		if ((flags & OpenFlags.random_access) != OpenFlags.none)
+		{
+			s.Append('n');
+		}
         return s;
-    }
-    
-    public enum Origin : byte
-    {
-        seekSet, seekCur, seekEnd
     }
     
     public class FileSystemException : Exception
@@ -111,7 +99,7 @@ namespace System.IO
             }
             catch (const Exception& ex)
             {
-                throw FileSystemException("error opening file '" + filePath + "' with flags '" + OpenFlagStr(flags) + "' and mode " + AccessModeStr(mode) + ": " + ex.Message());
+				throw FileSystemException("error opening file '" + filePath + "' with flags '" + OpenFlagStr(flags) + ": " + ex.Message());
             }
         }
         public void Close()
@@ -159,11 +147,13 @@ namespace System.IO
         }
         public override bool IsHostTextFile() const
         {
-            return System.Os.IsHostTextFile(fd);
+            int result = System.Os.IOCtl(fd, IOControlItem.isHostTextFile);
+			return result == 1;
         }
         public override bool IsConsole() const
         {
-            return System.Os.IsConsole(fd);
+			int result = System.Os.IOCtl(fd, IOControlItem.isConsole);
+			return result == 1;
         }
         private int fd;
         private bool closeOnExit;

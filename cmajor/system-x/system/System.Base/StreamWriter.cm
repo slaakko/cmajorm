@@ -7,7 +7,7 @@ using System;
 
 namespace System.IO
 {
-    public class StreamWriter
+    public class StreamWriter : TextWriter
     {
         public nothrow StreamWriter(const SharedPtr<Stream>& stream_) : this(stream_, stream_->IsHostTextFile())
         {
@@ -43,162 +43,177 @@ namespace System.IO
                 stream->Write(cast<byte*>(cast<void*>(x)), length);
             }
         }
-        public void Write(const string& x)
+        public override void Write(const string& x)
         {
             Write(x.Chars(), x.Length());
         }
-        public void Write(const wstring& x)
+        public override void Write(const wstring& x)
         {
             Write(ToUtf8(x));
         }
-        public void Write(const ustring& x)
+        public override void Write(const ustring& x)
         {
             Write(ToUtf8(x));
         }
-        public void Write(bool x)
+        public override void Write(bool x)
         {
             Write(ToString(x));
         }
-        public void Write(char x)
+        public override void Write(char x)
         {
             Write(ToString(x));
         }
-        public void Write(wchar x)
+        public override void Write(wchar x)
         {
             Write(ToString(x));
         }
-        public void Write(uchar x)
+        public override void Write(uchar x)
         {
             Write(ToString(x));
         }
-        public void Write(sbyte x)
+        public override void Write(sbyte x)
         {
             Write(ToString(x));
         }
-        public void Write(byte x)
+        public override void Write(byte x)
         {
             Write(ToString(x));
         }
-        public void Write(short x)
+        public override void Write(short x)
         {
             Write(ToString(x));
         }
-        public void Write(ushort x)
+        public override void Write(ushort x)
         {
             Write(ToString(x));
         }
-        public void Write(int x)
+        public override void Write(int x)
         {
             Write(ToString(x));
         }
-        public void Write(uint x)
+        public override void Write(uint x)
         {
             Write(ToString(x));
         }
-        public void Write(long x)
+        public override void Write(long x)
         {
             Write(ToString(x));
         }
-        public void Write(ulong x)
+        public override void Write(ulong x)
         {
             Write(ToString(x));
         }
-        public void Write(float x)
+        public override void Write(float x)
         {
             Write(ToString(x));
         }
-        public void Write(double x)
+        public override void Write(double x)
         {
             Write(ToString(x));
         }
-        public void Write(const Date& date)
+        public override void Write(const Date& date)
         {
             Write(date.ToString());
         }
-        public void Write(const DateTime& dateTime)
+        public override void Write(const DateTime& dateTime)
         {            
             Write(dateTime.ToString());
         }
-        public void WriteLine()
+        public override void WriteLine()
         {
             Write("\n", 1);
         }
-        public void WriteLine(const string& x)
+        public override void WriteLine(const string& x)
         {
             Write(x);
             WriteLine();
         }
-        public void WriteLine(const wstring& x)
+        public override void WriteLine(const wstring& x)
         {
             Write(x);
             WriteLine();
         }
-        public void WriteLine(const ustring& x)
+        public override void WriteLine(const ustring& x)
         {
             Write(x);
             WriteLine();
         }
-        public void WriteLine(bool x)
+        public override void WriteLine(bool x)
         {
             Write(x);
             WriteLine();
         }
-        public void WriteLine(sbyte x)
+        public override void WriteLine(char x)
+        {
+            Write(x);
+			WriteLine();
+        }
+        public override void WriteLine(wchar x)
+        {
+            Write(x);
+			WriteLine();
+        }
+        public override void WriteLine(uchar x)
+        {
+            Write(x);
+			WriteLine();
+        }
+        public override void WriteLine(sbyte x)
         {
             Write(x);
             WriteLine();
         }
-        public void WriteLine(byte x)
+        public override void WriteLine(byte x)
         {
             Write(x);
             WriteLine();
         }
-        public void WriteLine(short x)
+        public override void WriteLine(short x)
         {
             Write(x);
             WriteLine();
         }
-        public void WriteLine(ushort x)
+        public override void WriteLine(ushort x)
         {
             Write(x);
             WriteLine();
         }
-        public void WriteLine(int x)
+        public override void WriteLine(int x)
         {
             Write(x);
             WriteLine();
         }
-        public void WriteLine(uint x)
+        public override void WriteLine(uint x)
         {
             Write(x);
             WriteLine();
         }
-        public void WriteLine(long x)
+        public override void WriteLine(long x)
         {
             Write(x);
             WriteLine();
         }
-        public void WriteLine(ulong x)
+        public override void WriteLine(ulong x)
         {
             Write(x);
             WriteLine();
         }
-        public void WriteLine(float x)
+        public override void WriteLine(float x)
         {
             Write(x);
             WriteLine();
         }
-        public void WriteLine(double x)
+        public override void WriteLine(double x)
         {
             Write(x);
             WriteLine();
         }
-        public void WriteLine(const Date& date)
+        public override void WriteLine(const Date& date)
         {
             Write(date);
             WriteLine();
         }
-        public void WriteLine(const DateTime& dateTime)
+        public override void WriteLine(const DateTime& dateTime)
         {            
             Write(dateTime);
             WriteLine();
@@ -217,143 +232,5 @@ namespace System.IO
         }
         private SharedPtr<Stream> stream;
         private bool expandLineEndings;
-    }
-
-    public StreamWriter& operator<<(StreamWriter& writer, const char* x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-
-    public StreamWriter& operator<<(StreamWriter& writer, const wchar* x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-
-    public StreamWriter& operator<<(StreamWriter& writer, const uchar* x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-
-    public StreamWriter& operator<<(StreamWriter& writer, const string& x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-
-    public StreamWriter& operator<<(StreamWriter& writer, const wstring& x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-
-    public StreamWriter& operator<<(StreamWriter& writer, const ustring& x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-
-    public StreamWriter& operator<<(StreamWriter& writer, bool x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-
-    public StreamWriter& operator<<(StreamWriter& writer, sbyte x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-
-    public StreamWriter& operator<<(StreamWriter& writer, byte x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-
-    public StreamWriter& operator<<(StreamWriter& writer, short x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-
-    public StreamWriter& operator<<(StreamWriter& writer, ushort x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-
-    public StreamWriter& operator<<(StreamWriter& writer, int x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-
-    public StreamWriter& operator<<(StreamWriter& writer, uint x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-
-    public StreamWriter& operator<<(StreamWriter& writer, long x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-
-    public StreamWriter& operator<<(StreamWriter& writer, ulong x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-
-    public StreamWriter& operator<<(StreamWriter& writer, float x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-
-    public StreamWriter& operator<<(StreamWriter& writer, double x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-    
-    public StreamWriter& operator<<(StreamWriter& writer, const Date& date)
-    {
-        writer.Write(date);
-        return writer;
-    }
-    
-    public StreamWriter& operator<<(StreamWriter& writer, const DateTime& dateTime)
-    {
-        writer.Write(dateTime);
-        return writer;
-    }
-
-    public StreamWriter& operator<<(StreamWriter& writer, char x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-    
-    public StreamWriter& operator<<(StreamWriter& writer, wchar x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-    
-    public StreamWriter& operator<<(StreamWriter& writer, uchar x)
-    {
-        writer.Write(x);
-        return writer;
-    }
-
-    public StreamWriter& operator<<(StreamWriter& writer, const Endl&)
-    {
-        writer.WriteLine();
-        return writer;
     }
 }
