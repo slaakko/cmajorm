@@ -125,15 +125,15 @@ namespace System.IO
         }
         public static BinaryWriter CreateBinary(const string& filePath)
         {
-			return CreateBinary(filePath, false);
+            return CreateBinary(filePath, false);
         }
         public static BinaryWriter CreateBinary(const string& filePath, bool randomAccess)
         {
-			OpenFlags flags = cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate);
-			if (randomAccess)
-			{
-				flags = cast<OpenFlags>(flags | OpenFlags.random_access);
-			}
+            OpenFlags flags = cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate);
+            if (randomAccess)
+            {
+                flags = cast<OpenFlags>(flags | OpenFlags.random_access);
+            }
             return BinaryWriter(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(new FileStream(filePath, flags)))));
         }
         public static StreamWriter AppendText(const string& filePath)
@@ -284,29 +284,29 @@ namespace System.IO
                 throw SystemError(EPARAM, "cannot have both 'FileCopyOptions.addCrs' and 'FileCopyOptions.removeCrs' option");
             }
             long size = File.Size(sourceFilePath); 
-			bool bufferedCopy = (options & FileCopyOptions.noBufferedCopy) == FileCopyOptions.none && !addCrs && !removeCrs;
-			if (bufferedCopy)
-			{
-				BufferedCopy(sourceFilePath, destFilePath, size);
-			}
-			else
-			{
-				BinaryReader reader = File.OpenBinary(sourceFilePath);
-				BinaryWriter writer = File.CreateBinary(destFilePath);
-				for (long i = 0; i < size; ++i)
-				{
-					byte x = reader.ReadByte();
-					if (removeCrs && x == cast<byte>('\r'))
-					{
-						continue;
-					}
-					if (addCrs && x == cast<byte>('\n'))
-					{
-						writer.Write(cast<byte>('\r'));
-					}
-					writer.Write(x);
-				}
-			}
+            bool bufferedCopy = (options & FileCopyOptions.noBufferedCopy) == FileCopyOptions.none && !addCrs && !removeCrs;
+            if (bufferedCopy)
+            {
+                BufferedCopy(sourceFilePath, destFilePath, size);
+            }
+            else
+            {
+                BinaryReader reader = File.OpenBinary(sourceFilePath);
+                BinaryWriter writer = File.CreateBinary(destFilePath);
+                for (long i = 0; i < size; ++i)
+                {
+                    byte x = reader.ReadByte();
+                    if (removeCrs && x == cast<byte>('\r'))
+                    {
+                        continue;
+                    }
+                    if (addCrs && x == cast<byte>('\n'))
+                    {
+                        writer.Write(cast<byte>('\r'));
+                    }
+                    writer.Write(x);
+                }
+            }
         }
         if (copy)
         {
@@ -320,19 +320,19 @@ namespace System.IO
             }
         }
     }
-	
-	public void BufferedCopy(const string& sourceFilePath, const string& destFilePath, long size)
-	{
-		FileStream sourceFileStream(sourceFilePath, OpenFlags.read);
-		FileStream destFileStream(destFilePath, cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate));
-		byte[4096] buffer;
-		while (size > 0)
-		{
-			long bytesRead = sourceFileStream.Read(&buffer[0], 4096);
-			destFileStream.Write(&buffer[0], bytesRead);
-			size = size - bytesRead;
-		}
-	}
+    
+    public void BufferedCopy(const string& sourceFilePath, const string& destFilePath, long size)
+    {
+        FileStream sourceFileStream(sourceFilePath, OpenFlags.read);
+        FileStream destFileStream(destFilePath, cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate));
+        byte[4096] buffer;
+        while (size > 0)
+        {
+            long bytesRead = sourceFileStream.Read(&buffer[0], 4096);
+            destFileStream.Write(&buffer[0], bytesRead);
+            size = size - bytesRead;
+        }
+    }
     
     public void RemoveFile(const string& filePath)
     {

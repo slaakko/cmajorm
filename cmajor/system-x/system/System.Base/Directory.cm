@@ -25,27 +25,27 @@ namespace System.IO
     {
         public static bool Exists(const string& directoryPath)
         {
-			return DirectoryExists(directoryPath);
+            return DirectoryExists(directoryPath);
         }
         public static DateTime AccessTime(const string& directoryPath)
         {
-			return GetDirectoryAccessTime(directoryPath);
+            return GetDirectoryAccessTime(directoryPath);
         }
         public static DateTime ModificationTime(const string& directoryPath)
         {
-			return GetDirectoryModificationTime(directoryPath);
+            return GetDirectoryModificationTime(directoryPath);
         }
         public static void GetTimes(const string& directoryPath, DateTime& accessTime, DateTime& modificationTime)
         {
-			GetDirectoryTimes(directoryPath, accessTime, modificationTime);
+            GetDirectoryTimes(directoryPath, accessTime, modificationTime);
         }
         public static void SetTimes(const string& directoryPath, const DateTime& accessTime, const DateTime& modificationTime)
         {
-			SetDirectoryTimes(directoryPath, accessTime, modificationTime);
+            SetDirectoryTimes(directoryPath, accessTime, modificationTime);
         }
         public static void Remove(const string& directoryPath)
         {
-			RemoveDirectory(directoryPath);
+            RemoveDirectory(directoryPath);
         }
     }
   
@@ -87,96 +87,96 @@ namespace System.IO
             }
         }
     }
-	
-	public bool DirectoryExists(const string& dirPath)
-	{
-		byte[statBufSize] statBuf;
-		int result = stat(dirPath.Chars(), &statBuf[0], statBufSize);
-		if (result == -1) 
-		{
-			SystemError systemError = GetSystemError();
-			if (systemError.errorCode == ENOTFOUND)
-			{
-				return false;
-			}
-			else
-			{
-				ThrowSystemError();
-			}
-		}
-		else
-		{
-			FileStatus status;
-			GetFileStatus(&statBuf[0], status);
-			if (status.fileType == FileType.directory)
-			{
-				return true;
-			}
-			else
-			{
-				throw FileSystemException("path '" + dirPath + "' is not a directory path");
-			}
-		}
-	}
-	
-	public DateTime GetDirectoryAccessTime(const string& dirPath)
-	{
-		FileStatus status;
-		Stat(dirPath.Chars(), status);
-		if (status.fileType != FileType.directory)
-		{
-			throw FileSystemException("path '" + dirPath + "' is not a directory path");
-		}
-		return status.atime;
-	}
     
-	public DateTime GetDirectoryModificationTime(const string& dirPath)
-	{
-		FileStatus status;
-		Stat(dirPath.Chars(), status);
-		if (status.fileType != FileType.directory)
-		{
-			throw FileSystemException("path '" + dirPath + "' is not a directory path");
-		}
-		return status.mtime;
-	}
-	
-	public void GetDirectoryTimes(const string& dirPath, DateTime& accessTime, DateTime& modificationTime)
-	{
-		FileStatus status;
-		Stat(dirPath.Chars(), status);
-		if (status.fileType != FileType.directory)
-		{
-			throw FileSystemException("path '" + dirPath + "' is not a directory path");
-		}
-		accessTime = status.atime;
-		modificationTime = status.mtime;
-	}
-	
-	public void SetDirectoryTimes(const string& dirPath, const DateTime& accessTime, const DateTime& modificationTime)
-	{
-		UTime(dirPath.Chars(), accessTime, modificationTime); 
-	}
-	
+    public bool DirectoryExists(const string& dirPath)
+    {
+        byte[statBufSize] statBuf;
+        int result = stat(dirPath.Chars(), &statBuf[0], statBufSize);
+        if (result == -1) 
+        {
+            SystemError systemError = GetSystemError();
+            if (systemError.errorCode == ENOTFOUND)
+            {
+                return false;
+            }
+            else
+            {
+                ThrowSystemError();
+            }
+        }
+        else
+        {
+            FileStatus status;
+            GetFileStatus(&statBuf[0], status);
+            if (status.fileType == FileType.directory)
+            {
+                return true;
+            }
+            else
+            {
+                throw FileSystemException("path '" + dirPath + "' is not a directory path");
+            }
+        }
+    }
+    
+    public DateTime GetDirectoryAccessTime(const string& dirPath)
+    {
+        FileStatus status;
+        Stat(dirPath.Chars(), status);
+        if (status.fileType != FileType.directory)
+        {
+            throw FileSystemException("path '" + dirPath + "' is not a directory path");
+        }
+        return status.atime;
+    }
+    
+    public DateTime GetDirectoryModificationTime(const string& dirPath)
+    {
+        FileStatus status;
+        Stat(dirPath.Chars(), status);
+        if (status.fileType != FileType.directory)
+        {
+            throw FileSystemException("path '" + dirPath + "' is not a directory path");
+        }
+        return status.mtime;
+    }
+    
+    public void GetDirectoryTimes(const string& dirPath, DateTime& accessTime, DateTime& modificationTime)
+    {
+        FileStatus status;
+        Stat(dirPath.Chars(), status);
+        if (status.fileType != FileType.directory)
+        {
+            throw FileSystemException("path '" + dirPath + "' is not a directory path");
+        }
+        accessTime = status.atime;
+        modificationTime = status.mtime;
+    }
+    
+    public void SetDirectoryTimes(const string& dirPath, const DateTime& accessTime, const DateTime& modificationTime)
+    {
+        UTime(dirPath.Chars(), accessTime, modificationTime); 
+    }
+    
     public class DirectoryEntry
     {
-		public nothrow DirectoryEntry() : inodeNumber(-1), name()
-		{
-		}
-		public nothrow bool IsDot() const
-		{
-			return name == ".";
-		}
-		public nothrow bool IsDotDot() const
-		{
-			return name == "..";
-		}
+        public nothrow DirectoryEntry() : inodeNumber(-1), name()
+        {
+        }
+        public nothrow bool IsDot() const
+        {
+            return name == ".";
+        }
+        public nothrow bool IsDotDot() const
+        {
+            return name == "..";
+        }
         public int inodeNumber;
         public string name;
     }
     
-	public const int directoryEntrySize = 256;
-	
+    public const int directoryEntrySize = 256;
+    
     public class DirectoryReader
     {
         public nothrow DirectoryReader(const string& dirPath) : dfd(OpenDir(dirPath.Chars()))
@@ -184,16 +184,16 @@ namespace System.IO
         }
         public bool Read(DirectoryEntry& dirEntry)
         {
-			byte[directoryEntrySize] dirEntryBuf;
+            byte[directoryEntrySize] dirEntryBuf;
             int result = ReadDir(dfd, &dirEntryBuf[0], directoryEntrySize);
             if (result == 1)
-			{
-				MemoryReader reader(&dirEntryBuf[0], directoryEntrySize);
-				dirEntry.inodeNumber = reader.ReadInt();
-				dirEntry.name = reader.ReadString();
-				return true;
-			}
-			return false;
+            {
+                MemoryReader reader(&dirEntryBuf[0], directoryEntrySize);
+                dirEntry.inodeNumber = reader.ReadInt();
+                dirEntry.name = reader.ReadString();
+                return true;
+            }
+            return false;
         }
         public ~DirectoryReader()
         {

@@ -156,15 +156,15 @@ namespace System.Os
             ThrowSystemError();
         }
     }
-	
-	public void MkDir(const char* path, int mode)
-	{
-		int result = mkdir(path, mode);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-	}
+    
+    public void MkDir(const char* path, int mode)
+    {
+        int result = mkdir(path, mode);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
     
     public void UTime(const char* path, byte* timeBuf, long timeBufSize)
     {
@@ -184,7 +184,7 @@ namespace System.Os
         }
         return result;
     }
-	
+    
     public void CloseDir(int dfd)
     {
         int result = closedir(dfd);
@@ -193,8 +193,8 @@ namespace System.Os
             ThrowSystemError();
         }
     }
-	
-	public int ReadDir(int dfd, byte* dirEntryBuf, long dirEntryBufSize)
+    
+    public int ReadDir(int dfd, byte* dirEntryBuf, long dirEntryBufSize)
     {
         int result = readdir(dfd, dirEntryBuf, dirEntryBufSize);
         if (result == -1)

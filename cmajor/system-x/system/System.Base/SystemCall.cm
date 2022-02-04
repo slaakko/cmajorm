@@ -238,7 +238,7 @@ public cdecl nothrow int chdir(const char* path)
 
 public cdecl nothrow int mkdir(const char* path, int mode)
 {
-	return cast<int>(trap(0u, trap_mkdir, 0u, path, mode));
+    return cast<int>(trap(0u, trap_mkdir, 0u, path, mode));
 }
 
 public cdecl nothrow int utime(const char* path, byte* timeBuf, long timeBufSize)
@@ -248,20 +248,20 @@ public cdecl nothrow int utime(const char* path, byte* timeBuf, long timeBufSize
 
 public cdecl nothrow int mcpy(byte* sourceBuffer, byte* destBuffer, long count)
 {
-	return cast<int>(trap(0u, trap_mcpy, 0u, sourceBuffer, destBuffer, count));
+    return cast<int>(trap(0u, trap_mcpy, 0u, sourceBuffer, destBuffer, count));
 }
 
 public cdecl nothrow int opendir(const char* path)
 {
-	return cast<int>(trap(0u, trap_opendir, 0u, path));
+    return cast<int>(trap(0u, trap_opendir, 0u, path));
 }
 
 public cdecl nothrow int closedir(int dd)
 {
-	return cast<int>(trap(0u, trap_closedir, 0u, dd));
+    return cast<int>(trap(0u, trap_closedir, 0u, dd));
 }
 
 public cdecl nothrow int readdir(int dd, byte* dirEntryBuf, long dirEntryBufSize)
 {
-	return cast<int>(trap(0u, trap_readdir, 0u, dd, dirEntryBuf, dirEntryBufSize));
+    return cast<int>(trap(0u, trap_readdir, 0u, dd, dirEntryBuf, dirEntryBufSize));
 }
