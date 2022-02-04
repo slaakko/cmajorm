@@ -10,7 +10,9 @@
 #include <system-x/kernel/EventManager.hpp>
 #include <system-x/kernel/Mount.hpp>
 #include <system-x/kernel/BlockFile.hpp>
+#include <system-x/kernel/DirFile.hpp>
 #include <system-x/kernel/Kernel.hpp>
+#include <system-x/kernel/OsFileApi.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <boost/filesystem.hpp>
@@ -116,7 +118,61 @@ int64_t HostFilesystemFile::Write(Block* block, cmsx::machine::Process* process)
     }
 }
 
-HostFilesystem::HostFilesystem(int32_t id_, const std::string& prefix_) : Filesystem(id_), nextINodeId(0), machine(nullptr), prefix(prefix_)
+class HostFilesystemDirFile : public DirFile 
+{
+public:
+    HostFilesystemDirFile(HostFilesystem* fs_, const std::string& name_, int32_t id_);
+    void Close(cmsx::machine::Process* process) override;
+    int32_t Read(DirectoryEntry& dirEntry, cmsx::machine::Process* process) override;
+    int32_t Id() const { return id; }
+private:
+    HostFilesystem* fs;
+    int32_t id;
+    int32_t dirEntryIndex;
+    void* searchHandle;
+};
+
+HostFilesystemDirFile::HostFilesystemDirFile(HostFilesystem* fs_, const std::string& name_, int32_t id_) : DirFile(name_), fs(fs_), id(id_), dirEntryIndex(0), searchHandle(nullptr)
+{
+}
+
+void HostFilesystemDirFile::Close(cmsx::machine::Process* process)
+{
+    fs->CloseDir(id);
+}
+
+int32_t HostFilesystemDirFile::Read(DirectoryEntry& dirEntry, cmsx::machine::Process* process)
+{
+    std::string entryStr;
+    if (searchHandle == nullptr)
+    {
+        if (OsFindFirstFile(Name(), entryStr, searchHandle))
+        {
+            dirEntry.SetINodeNumber(-1);
+            dirEntry.SetNameTruncate(entryStr);
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        if (OsFindNextFile(searchHandle, entryStr))
+        {
+            dirEntry.SetINodeNumber(-1);
+            dirEntry.SetNameTruncate(entryStr);
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+}
+
+HostFilesystem::HostFilesystem(int32_t id_, const std::string& prefix_) : Filesystem(id_), nextINodeId(0), nextDirId(0), machine(nullptr), prefix(prefix_)
 {
 }
 
@@ -165,6 +221,7 @@ BlockFile* HostFilesystem::Open(const std::string& path, INode* dirINode, int32_
 
 INodePtr HostFilesystem::SearchDirectory(const std::string& name, INode* dirINode, cmsx::machine::Process* process)
 {
+    std::lock_guard<std::recursive_mutex> lock(machine->Lock());
     std::string fullPath;
     if (dirINode->Key() == mountPoint)
     {
@@ -242,6 +299,40 @@ void HostFilesystem::Close(int32_t fileId, INode* inode)
 BlockFile* HostFilesystem::HostFile() const
 {
     throw SystemError(EFAIL, "host filesystem does not provide a host file");
+}
+
+DirFile* HostFilesystem::OpenDir(const std::string& path, INode* dirINode)
+{
+    std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+    auto it = inodePathMap.find(dirINode->Key().inodeNumber);
+    if (it != inodePathMap.cend())
+    {
+        std::string fullPath = it->second;
+        HostFilesystemDirFile* dirFile = new HostFilesystemDirFile(this, fullPath, nextDirId++);
+        dirFileMap[dirFile->Id()] = dirFile;
+        return dirFile;
+    }
+    else
+    {
+        throw SystemError(ENOTFOUND, "path not found from inode path map with inode number " + std::to_string(dirINode->Key().inodeNumber));
+    }
+}
+
+void HostFilesystem::MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process)
+{
+    // todo
+}
+
+void HostFilesystem::CloseDir(int32_t dirId)
+{
+    std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+    auto it = dirFileMap.find(dirId);
+    if (it != dirFileMap.cend())
+    {
+        DirFile* dir = it->second;
+        dirFileMap.erase(dirId);
+        delete dir;
+    }
 }
 
 } // namespace cmsx::kernel

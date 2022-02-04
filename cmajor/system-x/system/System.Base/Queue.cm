@@ -30,7 +30,9 @@ namespace System.Collections
         }
         public inline ValueType Get()
         {
-            return items.RemoveFirst();
+            ValueType first = Front();
+            items.RemoveFirst();
+            return first;
         }
         public inline nothrow const ValueType& Front() const 
         {
@@ -40,10 +42,10 @@ namespace System.Collections
         {
             items.Clear();
         }
-        public inline nothrow List<ValueType>& Rep()
+        public inline nothrow LinkedList<ValueType>& Rep()
         {
             return items;
         }
-        private List<ValueType> items;
+        private LinkedList<ValueType> items;
     }
 }

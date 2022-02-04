@@ -247,28 +247,6 @@ uint64_t TrapStatHandler::HandleTrap(cmsx::machine::Processor& processor)
     }
 }
 
-class TrapDirStatHandler : public TrapHandler
-{
-public:
-    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
-    std::string TrapName() const { return "trap_dir_stat"; }
-};
-
-uint64_t TrapDirStatHandler::HandleTrap(cmsx::machine::Processor& processor)
-{
-    Process* process = static_cast<Process*>(processor.CurrentProcess());
-    try
-    {
-        int64_t pathAddr = static_cast<int64_t>(processor.Regs().Get(cmsx::machine::regAX));
-        return DirStat(process, pathAddr);
-    }
-    catch (const SystemError& error)
-    {
-        process->SetError(error);
-        return static_cast<uint64_t>(-1);
-    }
-}
-
 class TrapGetCWDHandler : public TrapHandler
 {
 public:
@@ -316,6 +294,124 @@ uint64_t TrapChDirHandler::HandleTrap(cmsx::machine::Processor& processor)
     }
 }
 
+class TrapMkDirHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_mkdir"; }
+};
+
+uint64_t TrapMkDirHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int64_t pathAddr = static_cast<int64_t>(processor.Regs().Get(cmsx::machine::regAX));
+        int32_t mode = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regBX));
+        MkDir(process, pathAddr, mode);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapOpenDirHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_opendir"; }
+};
+
+uint64_t TrapOpenDirHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int64_t pathAddr = static_cast<int64_t>(processor.Regs().Get(cmsx::machine::regAX));
+        return OpenDir(process, pathAddr);
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapCloseDirHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_closedir"; }
+};
+
+uint64_t TrapCloseDirHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t dd = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
+        CloseDir(process, dd);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapReadDirHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_readdir"; }
+};
+
+uint64_t TrapReadDirHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t dd = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
+        int64_t dirEntryBufAddr = static_cast<int64_t>(processor.Regs().Get(cmsx::machine::regBX));
+        int64_t dirEntryBufSize = static_cast<int64_t>(processor.Regs().Get(cmsx::machine::regCX));
+        return ReadDir(process, dd, dirEntryBufAddr, dirEntryBufSize);
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapUTimeHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_utime"; }
+};
+
+uint64_t TrapUTimeHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int64_t pathAddr = static_cast<int64_t>(processor.Regs().Get(cmsx::machine::regAX));
+        int64_t timeBufAddr = static_cast<int64_t>(processor.Regs().Get(cmsx::machine::regBX));
+        int64_t timeBufSize = static_cast<int64_t>(processor.Regs().Get(cmsx::machine::regCX));
+        UTime(process, pathAddr, timeBufAddr, timeBufSize);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
 void InitIOTraps()
 {
     SetTrapHandler(trap_create, new TrapCreateHandler());
@@ -328,16 +424,24 @@ void InitIOTraps()
     SetTrapHandler(trap_seek, new TrapSeekHandler());
     SetTrapHandler(trap_tell, new TrapTellHandler());
     SetTrapHandler(trap_stat, new TrapStatHandler());
-    SetTrapHandler(trap_dir_stat, new TrapDirStatHandler());
     SetTrapHandler(trap_getcwd, new TrapGetCWDHandler());
     SetTrapHandler(trap_chdir, new TrapChDirHandler());
+    SetTrapHandler(trap_mkdir, new TrapMkDirHandler());
+    SetTrapHandler(trap_opendir, new TrapOpenDirHandler());
+    SetTrapHandler(trap_closedir, new TrapCloseDirHandler());
+    SetTrapHandler(trap_readdir, new TrapReadDirHandler());
+    SetTrapHandler(trap_utime, new TrapUTimeHandler());
 }
 
 void DoneIOTraps()
 {
+    SetTrapHandler(trap_utime, nullptr);
+    SetTrapHandler(trap_readdir, nullptr);
+    SetTrapHandler(trap_closedir, nullptr);
+    SetTrapHandler(trap_opendir, nullptr);
+    SetTrapHandler(trap_mkdir, nullptr);
     SetTrapHandler(trap_chdir, nullptr);
     SetTrapHandler(trap_getcwd, nullptr);
-    SetTrapHandler(trap_dir_stat, nullptr);
     SetTrapHandler(trap_stat, nullptr);
     SetTrapHandler(trap_tell, nullptr);
     SetTrapHandler(trap_seek, nullptr);

@@ -151,35 +151,35 @@ namespace System.Collections
         }
         public inline nothrow ReferenceType operator*()
         {
-			if (bucket == null)
-			{
-				ThrowNullPointerException();
-			}
+            if (bucket == null)
+            {
+                ThrowNullPointerException();
+            }
             return bucket->Value();
         }
         public inline nothrow PointerType operator->()
         {
-			if (bucket == null)
-			{
-				ThrowNullPointerException();
-			}
+            if (bucket == null)
+            {
+                ThrowNullPointerException();
+            }
             return &(bucket->Value());
         }
         public inline nothrow Self& operator++()
         {
-			if (bucket == null || table == null)
-			{
-				ThrowNullPointerException();
-			}
+            if (bucket == null || table == null)
+            {
+                ThrowNullPointerException();
+            }
             Bucket<ValueType>* old = bucket;
             bucket = bucket->Next();
             if (bucket == null)
             {
                 long index = table->GetBucketIndex(old->Value());
-				if (index == -1)
-				{
-					ThrowPreconditionViolationException();
-				}
+                if (index == -1)
+                {
+                    ThrowPreconditionViolationException();
+                }
                 ++index;
                 long n = table->GetBucketCount();
                 while (bucket == null && index < n)
@@ -306,10 +306,10 @@ namespace System.Collections
             }
             const KeyType& key = KeyOf(value);
             long index = Hash(key);
-			if (index == -1)
-			{
-				ThrowInvalidParameterException();
-			}
+            if (index == -1)
+            {
+                ThrowInvalidParameterException();
+            }
             Bucket<ValueType>* bucket = buckets[index];
             while (bucket != null)
             {
@@ -479,10 +479,10 @@ namespace System.Collections
                 {
                     const KeyType& key = KeyOf(bucket->Value());
                     long index = Hash(key);
-					if (index == -1)
-					{
-						ThrowPreconditionViolationException();
-					}
+                    if (index == -1)
+                    {
+                        ThrowPreconditionViolationException();
+                    }
                     Bucket<ValueType>* next = bucket->Next();
                     bucket->SetNext(buckets[index]);
                     buckets[index] = bucket;

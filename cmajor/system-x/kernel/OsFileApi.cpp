@@ -5,10 +5,15 @@
 
 #include <system-x/kernel/OsFileApi.hpp>
 #include <system-x/kernel/Error.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Path.hpp>
 #include <Windows.h>
 #include <cstring>
 
 namespace cmsx::kernel {
+
+using namespace soulng::unicode;
+using namespace soulng::util;
 
 const uint32_t fixedDriveType = DRIVE_FIXED;
 
@@ -197,6 +202,41 @@ std::string OsGetLogicalDrives()
 uint32_t OsGetDriveType(const char* rootPathName)
 {
     return GetDriveTypeA(rootPathName);
+}
+
+bool OsFindFirstFile(const std::string& directoryName, std::string& entry, void*& searchHandle)
+{
+    std::u16string s = ToUtf16(MakeNativePath(directoryName) + "\\*.*");
+    WIN32_FIND_DATAW findData;
+    HANDLE handle = FindFirstFile((LPCWSTR)s.c_str(), &findData);
+    if (handle == INVALID_HANDLE_VALUE)
+    {
+        searchHandle = nullptr;
+        return false;
+    }
+    else
+    {
+        searchHandle = handle;
+        std::u16string entryStr((char16_t*)&findData.cFileName[0]);
+        entry = ToUtf8(entryStr);
+        return true;
+    }
+}
+
+bool OsFindNextFile(void* searchHandle, std::string& entry)
+{
+    WIN32_FIND_DATAW findData;
+    if (FindNextFile(searchHandle, &findData))
+    {
+        std::u16string entryStr((char16_t*)&findData.cFileName[0]);
+        entry = ToUtf8(entryStr);
+        return true;
+    }
+    else
+    {
+        FindClose(searchHandle);
+        return false;
+    }
 }
 
 } // namespace cmsx::kernel

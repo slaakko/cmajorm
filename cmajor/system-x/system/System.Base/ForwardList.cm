@@ -53,26 +53,26 @@ namespace System.Collections
         }
         public inline nothrow ReferenceType operator*()
         {
-			if (node == null)
-			{
-				ThrowNullPointerException();
-			}
+            if (node == null)
+            {
+                ThrowNullPointerException();
+            }
             return node->Value();
         }
         public inline nothrow PointerType operator->()
         {
-			if (node == null)
-			{
-				ThrowNullPointerException();
-			}
+            if (node == null)
+            {
+                ThrowNullPointerException();
+            }
             return &(node->Value());
         }
         public inline nothrow Self& operator++()
         {
-			if (node == null)
-			{
-				ThrowNullPointerException();
-			}
+            if (node == null)
+            {
+                ThrowNullPointerException();
+            }
             node = node->Next();
             return *this;
         }
@@ -172,10 +172,10 @@ namespace System.Collections
         }
         public inline nothrow const ValueType& Front() const
         {
-			if (head == null)
-			{
-				ThrowInvalidParameterException();
-			}
+            if (head == null)
+            {
+                ThrowInvalidParameterException();
+            }
             return head->Value();
         }
         public inline Iterator InsertFront(const ValueType& value)
@@ -195,10 +195,10 @@ namespace System.Collections
         }
         public nothrow void RemoveFront()
         {
-			if (head == null)
-			{
-				ThrowPreconditionViolationException();
-			}
+            if (head == null)
+            {
+                ThrowPreconditionViolationException();
+            }
             NodePtr node = head;
             head = head->Next();
             delete node;
@@ -206,15 +206,15 @@ namespace System.Collections
         public nothrow void RemoveAfter(Iterator pos)
         {
             NodePtr node = pos.Node();
-			if (node == null)
-			{
-				ThrowInvalidParameterException();
-			}
+            if (node == null)
+            {
+                ThrowInvalidParameterException();
+            }
             NodePtr toRemove = node->Next();
             if (toRemove == null)
-			{
-				ThrowInvalidParameterException();
-			}
+            {
+                ThrowInvalidParameterException();
+            }
             node->SetNext(toRemove->Next());
             delete toRemove;
         }

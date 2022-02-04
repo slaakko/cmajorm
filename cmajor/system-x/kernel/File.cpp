@@ -113,4 +113,18 @@ void SetConsoleFiles(File* consoleOutputFile, File* consoleInputFile)
     cmsx::kernel::consoleInputFile = consoleInputFile;
 }
 
+void WriteToConsole(const std::string& text, cmsx::machine::Process* process)
+{
+    if (cmsx::kernel::consoleOutputFile)
+    {
+        std::vector<std::uint8_t> buffer;
+        for (char c : text)
+        {
+            buffer.push_back(static_cast<uint8_t>(c));
+        }
+        cmsx::kernel::consoleOutputFile->Write(buffer, process);
+    }
+}
+
+
 } // namespace cmsx::kernel

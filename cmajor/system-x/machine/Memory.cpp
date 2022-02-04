@@ -128,7 +128,7 @@ void Memory::FreePage(MemoryPage* page)
 MemoryPage* Memory::CopyPage(MemoryPage* from)
 {
     MemoryPage* copy = AllocatePage();
-    memcpy(reinterpret_cast<void*>(copy->Address()), reinterpret_cast<void*>(from->Address()), static_cast<size_t>(pageSize));
+    std::memcpy(reinterpret_cast<void*>(copy->Address()), reinterpret_cast<void*>(from->Address()), static_cast<size_t>(pageSize));
     return copy;
 }
 
@@ -398,6 +398,13 @@ void Memory::ShareRange(uint64_t fromRV, uint64_t toRV, uint64_t start, uint64_t
             throw std::runtime_error("page #" + ToHexString(static_cast<uint64_t>(i)) + " not found from memory translation map #" + ToHexString(fromRV));
         }
     }
+}
+
+void Memory::Copy(uint64_t rv, uint64_t sourceVirtualAddress, uint64_t targetVirtualAddress, uint64_t count)
+{
+    uint64_t from = TranslateAddress(rv, sourceVirtualAddress, cmsx::machine::Protection::read);
+    uint64_t to = TranslateAddress(rv, targetVirtualAddress, cmsx::machine::Protection::write);
+    std::memcpy(reinterpret_cast<void*>(to), reinterpret_cast<void*>(from), count);
 }
 
 uint64_t Memory::TranslateAddress(uint64_t rv, uint64_t virtualAddress, Protection access)

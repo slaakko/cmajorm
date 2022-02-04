@@ -4,7 +4,7 @@
 // =================================
 
 #include <system-x/kernel/Heap.hpp>
-#include <system-x/machine/Process.hpp>
+#include <system-x/kernel/Process.hpp>
 #include <system-x/machine/Machine.hpp>
 #include <soulng/util/CodeFormatter.hpp>
 #include <soulng/util/Unicode.hpp>
@@ -86,6 +86,11 @@ void DumpHeap(cmsx::machine::Processor& processor, uint64_t freeAddr, int32_t ta
             next = n;
         }
     }
+}
+
+void MCpy(cmsx::kernel::Process* process, uint64_t sourceBufferAddr, uint64_t targetBufferAddr, uint64_t count)
+{
+    process->GetProcessor()->GetMachine()->Mem().Copy(process->RV(), sourceBufferAddr, targetBufferAddr, count);
 }
 
 } // namespace cmsx::kernel

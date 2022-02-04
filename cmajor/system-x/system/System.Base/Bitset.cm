@@ -53,10 +53,10 @@ namespace System.Collections
         public void Resize(long numBits_)
         {
             numBits = numBits_;
-			if (numBits < 0)
-			{
-				ThrowInvalidParameterException();
-			}
+            if (numBits < 0)
+            {
+                ThrowInvalidParameterException();
+            }
             if (numBits > 0)
             {
                 bits.Resize(1 + NumFullBlocks());
@@ -84,19 +84,19 @@ namespace System.Collections
         }       
         public inline nothrow void Set(long pos)
         {
-			if (pos < 0 || pos >= numBits)
-			{
-				ThrowInvalidParameterException();
-			}
+            if (pos < 0 || pos >= numBits)
+            {
+                ThrowInvalidParameterException();
+            }
             ulong& b = bits[pos / blockSize];
             b = b | (1u << (cast<ulong>(pos) & blockMask));
         }
         public inline nothrow void Reset(long pos)
         {
-			if (pos < 0 || pos >= numBits)
-			{
-				ThrowInvalidParameterException();
-			}
+            if (pos < 0 || pos >= numBits)
+            {
+                ThrowInvalidParameterException();
+            }
             ulong& b = bits[pos / blockSize];
             b = b & ~(1u << (cast<ulong>(pos) & blockMask));
         }
@@ -121,10 +121,10 @@ namespace System.Collections
         }
         public inline nothrow void Flip(long pos)
         {
-			if (pos < 0 || pos >= numBits)
-			{
-				ThrowInvalidParameterException();
-			}
+            if (pos < 0 || pos >= numBits)
+            {
+                ThrowInvalidParameterException();
+            }
             ulong& b = bits[pos / blockSize];
             b = b ^ (1u << (cast<ulong>(pos) & blockMask));
         }
@@ -134,10 +134,10 @@ namespace System.Collections
         }
         public inline nothrow bool Test(long pos) const
         {
-			if (pos < 0 || pos >= numBits)
-			{
-				ThrowInvalidParameterException();
-			}
+            if (pos < 0 || pos >= numBits)
+            {
+                ThrowInvalidParameterException();
+            }
             ulong b = bits[pos / blockSize];
             return (b & (1u << (cast<ulong>(pos) & blockMask))) != 0u;
         }

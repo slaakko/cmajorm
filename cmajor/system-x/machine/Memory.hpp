@@ -86,6 +86,7 @@ public:
     void FreeRange(uint64_t rv, uint64_t start, uint64_t length);
     void CopyRange(uint64_t fromRV, uint64_t toRV, uint64_t start, uint64_t length);
     void ShareRange(uint64_t fromRV, uint64_t toRV, uint64_t start, uint64_t length);
+    void Copy(uint64_t rv, uint64_t sourceVirtualAddress, uint64_t targetVirtualAddress, uint64_t count);
 private:
     MemoryPage* AllocatePage();
     void FreePage(MemoryPage* page);

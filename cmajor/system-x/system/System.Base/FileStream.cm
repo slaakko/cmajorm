@@ -38,10 +38,10 @@ namespace System.IO
         {
             s.Append('t');
         }
-		if ((flags & OpenFlags.random_access) != OpenFlags.none)
-		{
-			s.Append('n');
-		}
+        if ((flags & OpenFlags.random_access) != OpenFlags.none)
+        {
+            s.Append('n');
+        }
         return s;
     }
     
@@ -99,7 +99,7 @@ namespace System.IO
             }
             catch (const Exception& ex)
             {
-				throw FileSystemException("error opening file '" + filePath + "' with flags '" + OpenFlagStr(flags) + ": " + ex.Message());
+                throw FileSystemException("error opening file '" + filePath + "' with flags '" + OpenFlagStr(flags) + ": " + ex.Message());
             }
         }
         public void Close()
@@ -148,12 +148,12 @@ namespace System.IO
         public override bool IsHostTextFile() const
         {
             int result = System.Os.IOCtl(fd, IOControlItem.isHostTextFile);
-			return result == 1;
+            return result == 1;
         }
         public override bool IsConsole() const
         {
-			int result = System.Os.IOCtl(fd, IOControlItem.isConsole);
-			return result == 1;
+            int result = System.Os.IOCtl(fd, IOControlItem.isConsole);
+            return result == 1;
         }
         private int fd;
         private bool closeOnExit;

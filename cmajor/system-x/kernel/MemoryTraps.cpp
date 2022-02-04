@@ -109,6 +109,30 @@ uint64_t TrapDumpHeapHandler::HandleTrap(cmsx::machine::Processor& processor)
     return 0;
 }
 
+class TrapMCpyHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_mcpy"; }
+};
+
+uint64_t TrapMCpyHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* currentProcess = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        uint64_t sourceBufferAddr = processor.Regs().Get(cmsx::machine::regAX);
+        uint64_t targetBufferAddr = processor.Regs().Get(cmsx::machine::regBX);
+        uint64_t count = processor.Regs().Get(cmsx::machine::regCX);
+        MCpy(currentProcess, sourceBufferAddr, targetBufferAddr, count);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        currentProcess->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
 
 void InitMemoryTraps()
 {
@@ -117,10 +141,12 @@ void InitMemoryTraps()
     SetTrapHandler(trap_heap_length, new TrapHeapLengthHandler());
     SetTrapHandler(trap_allocate_memory_pages, new TrapAllocateMemoryPagesHandler());
     SetTrapHandler(trap_dump_heap, new TrapDumpHeapHandler());
+    SetTrapHandler(trap_mcpy, new TrapMCpyHandler());
 }
 
 void DoneMemoryTraps()
 {
+    SetTrapHandler(trap_mcpy, nullptr);
     SetTrapHandler(trap_dump_heap, nullptr);
     SetTrapHandler(trap_allocate_memory_pages, nullptr);
     SetTrapHandler(trap_heap_length, nullptr);

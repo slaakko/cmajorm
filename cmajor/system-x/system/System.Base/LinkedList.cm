@@ -59,26 +59,26 @@ namespace System.Collections
         }
         public inline nothrow ReferenceType operator*()
         {
-			if (node == null)
-			{
-				ThrowNullPointerException();
-			}
+            if (node == null)
+            {
+                ThrowNullPointerException();
+            }
             return node->Value();
         }
         public inline nothrow PointerType operator->()
         {
-			if (node == null)
-			{
-				ThrowNullPointerException();
-			}
+            if (node == null)
+            {
+                ThrowNullPointerException();
+            }
             return &(node->Value());
         }
         public inline nothrow Self& operator++()
         {
-			if (node == null)
-			{
-				ThrowNullPointerException();
-			}
+            if (node == null)
+            {
+                ThrowNullPointerException();
+            }
             node = node->Next();
             return *this;
         }
@@ -87,9 +87,9 @@ namespace System.Collections
             if (node == null)
             {
                 if (list == null)
-				{
-					ThrowPreconditionViolationException();
-				}
+                {
+                    ThrowPreconditionViolationException();
+                }
                 node = list->Tail();
             }
             else
@@ -246,10 +246,10 @@ namespace System.Collections
         }
         public nothrow void RemoveFirst()
         {
-			if (head == null)
-			{
-				ThrowPreconditionViolationException();
-			}
+            if (head == null)
+            {
+                ThrowPreconditionViolationException();
+            }
             LinkedListNode<ValueType>* n = head;
             head = head->Next();
             if (head != null)
@@ -265,10 +265,10 @@ namespace System.Collections
         }
         public nothrow void RemoveLast()
         {
-			if (tail == null)
-			{
-				ThrowPreconditionViolationException();
-			}
+            if (tail == null)
+            {
+                ThrowPreconditionViolationException();
+            }
             LinkedListNode<ValueType>* n = tail;
             tail = tail->Prev();
             if (tail != null)
@@ -285,10 +285,10 @@ namespace System.Collections
         public nothrow void Remove(Iterator pos)
         {
             LinkedListNode<ValueType>* n = pos.Node();
-			if (n == null)
-			{
-				ThrowInvalidParameterException();
-			}
+            if (n == null)
+            {
+                ThrowInvalidParameterException();
+            }
             LinkedListNode<ValueType>* prev = n->Prev();
             LinkedListNode<ValueType>* next = n->Next();
             if (prev != null)
@@ -330,18 +330,18 @@ namespace System.Collections
         }
         public inline nothrow const ValueType& Front() const
         {
-			if (head == null)
-			{
-				ThrowPreconditionViolationException();
-			}
+            if (head == null)
+            {
+                ThrowPreconditionViolationException();
+            }
             return head->Value();
         }
         public inline nothrow const ValueType& Back() const
         {
-			if (tail == null)
-			{
-				ThrowPreconditionViolationException();
-			}
+            if (tail == null)
+            {
+                ThrowPreconditionViolationException();
+            }
             return tail->Value();
         }
         public inline nothrow LinkedListNode<ValueType>* Tail()

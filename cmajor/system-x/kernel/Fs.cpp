@@ -800,6 +800,8 @@ void AddDirectoryEntry(const DirectoryEntry& entry, INode* dirINode, Filesystem*
             directoryBlock.AddEntry(entry);
             WriteDirectoryBlock(directoryBlock, blockPtr, fs, process);
             dirINode->SetFileSize(dirINode->FileSize() + DirectoryEntry::Size());
+            dirINode->SetMTime(GetCurrentDateTime());
+            dirINode->SetCTime(GetCurrentDateTime());
             WriteINode(dirINode, process);
             return;
         }
@@ -812,6 +814,8 @@ void AddDirectoryEntry(const DirectoryEntry& entry, INode* dirINode, Filesystem*
     directoryBlock.AddEntry(entry);
     WriteDirectoryBlock(directoryBlock, blockPtr, fs, process);
     dirINode->SetFileSize(dirINode->FileSize() + DirectoryEntry::Size());
+    dirINode->SetMTime(GetCurrentDateTime());
+    dirINode->SetCTime(GetCurrentDateTime());
     WriteINode(dirINode, process);
 }
 
@@ -840,8 +844,11 @@ void RemoveDirectoryEntry(const std::string& name, INode* dirINode, Filesystem* 
                     INodePtr inodePtr = ReadINode(MakeINodeKey(fs->Id(), inodeNumber), process);
                     INode* inode = inodePtr.Get();
                     int32_t nlinks = inode->NLinks();
-                    inode->SetNLinks(nlinks - 1);
+                    --nlinks;
+                    inode->SetNLinks(nlinks);
                     dirINode->SetFileSize(dirINode->FileSize() - DirectoryEntry::Size());
+                    dirINode->SetCTime(GetCurrentDateTime());
+                    dirINode->SetMTime(GetCurrentDateTime());
                     if (nlinks == 0 && inode->ReferenceCount() == 0)
                     {
                         FreeBlocks(inode, fs, process);
@@ -882,6 +889,8 @@ INodePtr MakeDirectory(const std::string& path, Filesystem* fs, cmsx::machine::P
     parentEntry.SetName("..");
     dirBlock.AddEntry(parentEntry);
     dirINode->SetFileSize(2 * DirectoryEntry::Size());
+    dirINode->SetCTime(GetCurrentDateTime());
+    dirINode->SetMTime(GetCurrentDateTime());
     WriteDirectoryBlock(dirBlock, dirBlockPtr, fs, process);
     WriteINode(dirINode, process);
     DirectoryEntry entry;

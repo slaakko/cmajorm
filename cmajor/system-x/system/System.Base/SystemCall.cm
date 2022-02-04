@@ -34,144 +34,149 @@ public const byte trap_unlink = 27u;
 public const byte trap_seek = 28u;
 public const byte trap_tell = 29u;
 public const byte trap_stat = 30u;
-public const byte trap_dir_stat = 31u;
-public const byte trap_getcwd = 32u;
-public const byte trap_chdir = 33u;
+public const byte trap_getcwd = 31u;
+public const byte trap_chdir = 32u;
+public const byte trap_mkdir = 33u;
+public const byte trap_opendir = 34u;
+public const byte trap_closedir = 35u;
+public const byte trap_readdir = 36u;
+public const byte trap_utime = 37u;
+public const byte trap_mcpy = 38u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
-	run_at_exits();
+    run_at_exits();
     trap(0u, trap_exit, 0u, exitCode);
 }
 
 public cdecl nothrow long memory_page_size()
 {
-	return cast<long>(trap(0u, trap_memory_page_size, 0u));
+    return cast<long>(trap(0u, trap_memory_page_size, 0u));
 }
 
 public cdecl nothrow long heap_start()
 {
-	return cast<long>(trap(0u, trap_heap_start, 0u));
+    return cast<long>(trap(0u, trap_heap_start, 0u));
 }
 
 public cdecl nothrow long heap_length()
 {
-	return cast<long>(trap(0u, trap_heap_length, 0u));
+    return cast<long>(trap(0u, trap_heap_length, 0u));
 }
 
 public cdecl nothrow long allocate_memory_pages(int numPages)
 {
-	return cast<long>(trap(0u, trap_allocate_memory_pages, 0u, numPages));
+    return cast<long>(trap(0u, trap_allocate_memory_pages, 0u, numPages));
 }
 
 public cdecl nothrow void dump_heap(ulong free, int tag, ulong ptr, ulong size)
 {
-	trap(0u, trap_dump_heap, 0u, free, tag, ptr, size);
+    trap(0u, trap_dump_heap, 0u, free, tag, ptr, size);
 }
 
 public cdecl nothrow uint random_seed()
 {
-	return cast<uint>(trap(0u, trap_random_seed, 0u));
+    return cast<uint>(trap(0u, trap_random_seed, 0u));
 }
 
 public cdecl nothrow long current_time_point()
 {
-	return cast<long>(trap(0u, trap_current_time_point, 0u));
+    return cast<long>(trap(0u, trap_current_time_point, 0u));
 }
 
 public cdecl nothrow int sleep(long duration)
 {
-	return cast<int>(trap(0u, trap_sleep, 0u, duration));
+    return cast<int>(trap(0u, trap_sleep, 0u, duration));
 }
 
 public cdecl nothrow int current_date(short* y, sbyte* m, sbyte* d)
 {
-	return cast<int>(trap(0u, trap_current_date, 0u, y, m, d));
+    return cast<int>(trap(0u, trap_current_date, 0u, y, m, d));
 }
 
 public cdecl nothrow int current_date_time(short* y, sbyte* m, sbyte* d, int* secs)
 {
-	return cast<int>(trap(0u, trap_current_date_time, 0u, y, m, d, secs));
+    return cast<int>(trap(0u, trap_current_date_time, 0u, y, m, d, secs));
 }
 
 public cdecl nothrow int times(long* userTime, long* sleepTime, long* systemTime)
 {
-	return cast<int>(trap(0u, trap_times, 0u, userTime, sleepTime, systemTime));
+    return cast<int>(trap(0u, trap_times, 0u, userTime, sleepTime, systemTime));
 }
 
 public cdecl nothrow double pow(double x, double y)
 {
-	long lx = *cast<long*>(cast<void*>(&x));
-	long ly = *cast<long*>(cast<void*>(&y));
-	long result = trap(0u, trap_pow, 0u, lx, ly);
-	return *cast<double*>(cast<void*>(&result));
+    long lx = *cast<long*>(cast<void*>(&x));
+    long ly = *cast<long*>(cast<void*>(&y));
+    long result = trap(0u, trap_pow, 0u, lx, ly);
+    return *cast<double*>(cast<void*>(&result));
 }
 
 public cdecl nothrow int do_throw(void* exception, ulong exceptionClassId)
 {
-	return cast<int>(trap(0u, trap_throw, 0u, exception, exceptionClassId));
+    return cast<int>(trap(0u, trap_throw, 0u, exception, exceptionClassId));
 }
 
 public cdecl nothrow void* do_catch()
 {
-	return cast<void*>(cast<ulong>(trap(0u, trap_catch, 0u)));
+    return cast<void*>(cast<ulong>(trap(0u, trap_catch, 0u)));
 }
 
 public cdecl nothrow int resume()
 {
-	return cast<int>(trap(0u, trap_resume, 0u));
+    return cast<int>(trap(0u, trap_resume, 0u));
 }
 
 public cdecl nothrow int stack_trace(void* buffer, long bufferSize)
 {
-	return cast<int>(trap(0u, trap_stack_trace, 0u, buffer, bufferSize));
+    return cast<int>(trap(0u, trap_stack_trace, 0u, buffer, bufferSize));
 }
 
 public cdecl nothrow int get_system_error(int* errorCode, void* buffer, long bufferSize)
 {
-	return cast<int>(trap(0u, trap_get_system_error, 0u, errorCode, buffer, bufferSize));
+    return cast<int>(trap(0u, trap_get_system_error, 0u, errorCode, buffer, bufferSize));
 }
 
 public cdecl nothrow int fork()
 {
-	return cast<int>(trap(0u, trap_fork, 0u));
+    return cast<int>(trap(0u, trap_fork, 0u));
 }
 
 public cdecl nothrow int wait(byte* exitCode)
 {
-	return cast<int>(trap(0u, trap_wait, 0u, exitCode));
+    return cast<int>(trap(0u, trap_wait, 0u, exitCode));
 }
 
 public cdecl nothrow int getpid()
 {
-	return cast<int>(trap(0u, trap_getpid, 0u));
+    return cast<int>(trap(0u, trap_getpid, 0u));
 }
 
 public cdecl nothrow int create(const char* path, int mode)
 {
-	return cast<int>(trap(0u, trap_create, 0u, path, mode));
+    return cast<int>(trap(0u, trap_create, 0u, path, mode));
 }
 
 public enum OpenFlags : int
 {
-	none = 0,
-	read = 1 << 0,
-	write = 1 << 1,
-	create = 1 << 2,
-	append = 1 << 3,
-	truncate = 1 << 4,
-	text = 1 << 5,
-	random_access = 1 << 6
+    none = 0,
+    read = 1 << 0,
+    write = 1 << 1,
+    create = 1 << 2,
+    append = 1 << 3,
+    truncate = 1 << 4,
+    text = 1 << 5,
+    random_access = 1 << 6
 }
 
 public cdecl nothrow int open(const char* path, OpenFlags flags, int mode)
 {
-	return cast<int>(trap(0u, trap_open, 0u, path, cast<int>(flags), mode));
+    return cast<int>(trap(0u, trap_open, 0u, path, cast<int>(flags), mode));
 }
 
 public cdecl nothrow int close(int fd)
 {
-	return cast<int>(trap(0u, trap_close, 0u, fd));
+    return cast<int>(trap(0u, trap_close, 0u, fd));
 }
 
 public cdecl nothrow long read(int fd, void* buffer, long count)
@@ -186,52 +191,77 @@ public cdecl nothrow long write(int fd, void* buffer, long count)
 
 public enum IOControlItem : int
 {
-	isConsole = 0,
-	isHostTextFile = 1,
-	hasColors = 2
+    isConsole = 0,
+    isHostTextFile = 1,
+    hasColors = 2
 }
 
 public cdecl nothrow int ioctl(int fd, IOControlItem item)
 {
-	return cast<int>(trap(0u, trap_ioctl, 0u, fd, item));
+    return cast<int>(trap(0u, trap_ioctl, 0u, fd, item));
 }
 
 public cdecl nothrow int unlink(const char* path)
 {
-	return cast<int>(trap(0u, trap_unlink, 0u, path));
+    return cast<int>(trap(0u, trap_unlink, 0u, path));
 }
 
 public enum Origin : int
 {
-	seekSet = 0, seekCur = 1, seekEnd = 2
+    seekSet = 0, seekCur = 1, seekEnd = 2
 }
     
 public cdecl nothrow long seek(int fd, long offset, Origin whence)
 {
-	return cast<long>(trap(0u, trap_seek, 0u, fd, offset, cast<int>(whence)));
+    return cast<long>(trap(0u, trap_seek, 0u, fd, offset, cast<int>(whence)));
 }
 
 public cdecl nothrow long tell(int fd)
 {
-	return cast<long>(trap(0u, trap_tell, 0u, fd));
+    return cast<long>(trap(0u, trap_tell, 0u, fd));
 }
 
 public cdecl nothrow int stat(const char* path, byte* statBuf, int statBufSize)
 {
-	return cast<int>(trap(0u, trap_stat, 0u, path, statBuf, statBufSize));
-}
-
-public cdecl nothrow int dir_stat(const char* path)
-{
-	return cast<int>(trap(0u, trap_dir_stat, 0u, path));
+    return cast<int>(trap(0u, trap_stat, 0u, path, statBuf, statBufSize));
 }
 
 public cdecl nothrow int getcwd(char* pathBuf, long bufSize)
 {
-	return cast<int>(trap(0u, trap_getcwd, 0u, pathBuf, bufSize));
+    return cast<int>(trap(0u, trap_getcwd, 0u, pathBuf, bufSize));
 }
 
 public cdecl nothrow int chdir(const char* path)
 {
-	return cast<int>(trap(0u, trap_chdir, 0u, path));
+    return cast<int>(trap(0u, trap_chdir, 0u, path));
+}
+
+public cdecl nothrow int mkdir(const char* path, int mode)
+{
+	return cast<int>(trap(0u, trap_mkdir, 0u, path, mode));
+}
+
+public cdecl nothrow int utime(const char* path, byte* timeBuf, long timeBufSize)
+{
+    return cast<int>(trap(0u, trap_utime, 0u, path, timeBuf, timeBufSize));
+}
+
+public cdecl nothrow int mcpy(byte* sourceBuffer, byte* destBuffer, long count)
+{
+	return cast<int>(trap(0u, trap_mcpy, 0u, sourceBuffer, destBuffer, count));
+}
+
+public cdecl nothrow int opendir(const char* path)
+{
+	return cast<int>(trap(0u, trap_opendir, 0u, path));
+}
+
+public cdecl nothrow int closedir(int dd)
+{
+	return cast<int>(trap(0u, trap_closedir, 0u, dd));
+}
+
+public cdecl nothrow int readdir(int dd, byte* dirEntryBuf, long dirEntryBufSize)
+{
+	return cast<int>(trap(0u, trap_readdir, 0u, dd, dirEntryBuf, dirEntryBufSize));
 }

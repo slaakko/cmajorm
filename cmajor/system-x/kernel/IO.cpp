@@ -10,8 +10,10 @@
 #include <system-x/kernel/Kernel.hpp>
 #include <system-x/kernel/Fs.hpp>
 #include <system-x/kernel/BlockFile.hpp>
+#include <system-x/kernel/DirFile.hpp>
 #include <system-x/machine/Machine.hpp>
 #include <system-x/machine/Processor.hpp>
+#include <soulng/util/MemoryReader.hpp>
 #include <soulng/util/Path.hpp>
 
 namespace cmsx::kernel {
@@ -266,25 +268,6 @@ void Stat(Process* process, int64_t pathAddr, int64_t statBufAddr, int32_t statB
     WriteProcessMemory(process, statBufAddr, statBuffer);
 }
 
-int32_t DirStat(Process* process, int64_t pathAddr)
-{
-    if (pathAddr == 0)
-    {
-        throw SystemError(EPARAM, "path is null");
-    }
-    cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
-    std::string path = ReadString(process, pathAddr, mem);
-    bool directoryExists = DirectoryExists(path, GetFs(rootFSNumber), process);
-    if (directoryExists)
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
 void GetCWD(Process* process, int64_t bufAddr, int64_t bufSize)
 {
     if (bufAddr == 0)
@@ -365,6 +348,140 @@ void ChDir(Process* process, int64_t pathAddr)
     {
         INodeKey inodeKey = inodePtr.Get()->Key();
         process->SetINodeKeyOfWorkingDir(ToULong(inodeKey));
+    }
+    else
+    {
+        throw SystemError(ENOTFOUND, "path '" + path + "' not found");
+    }
+}
+
+void MkDir(Process* process, int64_t pathAddr, int32_t mode)
+{
+    if (pathAddr == 0)
+    {
+        throw SystemError(EPARAM, "path is null");
+    }
+    Filesystem* fs = GetFs(rootFSNumber);
+    cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
+    std::string path = ReadString(process, pathAddr, mem);
+    std::string parentPath = Path::GetDirectoryName(path);
+    std::string dirName = Path::GetFileName(path);
+    INodePtr inodePtr = PathToINode(parentPath, fs, process);
+    if (inodePtr.Get())
+    {
+        Filesystem* ds = GetFs(inodePtr.Get()->Key().fsNumber);
+        ds->MkDir(inodePtr.Get(), dirName, process);
+    }
+    else
+    {
+        throw SystemError(ENOTFOUND, "directory path '" + parentPath + "' not found");
+    }
+}
+
+int32_t OpenDir(Process* process, int64_t pathAddr)
+{
+    if (pathAddr == 0)
+    {
+        throw SystemError(EPARAM, "path is null");
+    }
+    cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
+    std::string path = ReadString(process, pathAddr, mem);
+    Filesystem* fs = GetFs(rootFSNumber);
+    INodePtr inodePtr = PathToINode(path, fs, process);
+    if (inodePtr.Get())
+    {
+        Filesystem* ds = GetFs(inodePtr.Get()->Key().fsNumber);
+        DirFile* dirFile = ds->OpenDir(path, inodePtr.Get());
+        ProcessFileTable& fileTable = process->GetFileTable();
+        int32_t dd = fileTable.AddFile(dirFile);
+        if (dd == -1)
+        {
+            throw SystemError(ELIMITEXCEEDED, "maximum number of open files exceeded");
+        }
+        return dd;
+    }
+    else
+    {
+        throw SystemError(ENOTFOUND, "path '" + path + "' not found");
+    }
+    return 0;
+}
+
+void CloseDir(Process* process, int32_t dfd)
+{
+    ProcessFileTable& fileTable = process->GetFileTable();
+    fileTable.CloseFile(dfd, process);
+}
+
+int32_t ReadDir(Process* process, int32_t dfd, int64_t dirEntryBufAddr, int64_t dirEntryBufSize)
+{
+    if (dirEntryBufAddr == 0)
+    {
+        throw SystemError(EPARAM, "directory entry buffer is null");
+    }
+    if (dirEntryBufSize < DirectoryEntry::Size())
+    {
+        throw SystemError(EPARAM, "invalid directory entry buffer size");
+    }
+    ProcessFileTable& fileTable = process->GetFileTable();
+    File* file = fileTable.GetFile(dfd);
+    if (file->IsDirFile())
+    {
+        DirFile* dirFile = static_cast<DirFile*>(file);
+        DirectoryEntry dirEntry;
+        int32_t result = dirFile->Read(dirEntry, process);
+        if (result == 0)
+        {
+            return result;
+        }
+        std::vector<uint8_t> buffer(DirectoryEntry::Size(), static_cast<uint8_t>(0));
+        MemoryWriter writer(buffer.data(), DirectoryEntry::Size());
+        writer.Write(dirEntry.INodeNumber());
+        std::string name = dirEntry.Name();
+        for (char c : name)
+        {
+            uint8_t b = static_cast<uint8_t>(c);
+            writer.Write(b);
+        }
+        writer.Write(static_cast<uint8_t>(0));
+        WriteProcessMemory(process, dirEntryBufAddr, buffer);
+        return 1;
+    }
+    else
+    {
+        throw SystemError(EBADF, "invalid directory file descriptor");
+    }
+}
+
+void UTime(Process* process, int64_t pathAddr, int64_t timeBufAddr, int64_t timeBufSize)
+{
+    if (pathAddr == 0)
+    {
+        throw SystemError(EPARAM, "path is null");
+    }
+    if (timeBufAddr == 0)
+    {
+        throw SystemError(EPARAM, "time buffer is null");
+    }
+    if (timeBufSize < 16)
+    {
+        throw SystemError(EPARAM, "invalid time buffer size");
+    }
+    std::vector<uint8_t> times = ReadProcessMemory(process, timeBufAddr, std::min(static_cast<int64_t>(16), timeBufSize));
+    Filesystem* fs = GetFs(rootFSNumber);
+    cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
+    std::string path = ReadString(process, pathAddr, mem);
+    INodePtr inodePtr = PathToINode(path, fs, process);
+    INode* inode = inodePtr.Get();
+    if (inode)
+    {
+        MemoryReader reader(times.data(), times.size());
+        DateTime aTime = reader.ReadDateTime();
+        DateTime mTime = reader.ReadDateTime();
+        inode->SetATime(aTime);
+        inode->SetMTime(mTime);
+        inode->SetCTime(GetCurrentDateTime());
+        WriteINode(inode, process);
     }
     else
     {

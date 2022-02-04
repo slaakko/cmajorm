@@ -45,10 +45,10 @@ namespace System.IO
         }
         public void CopyTo(Stream& destination, long bufferSize)
         {
-			if (bufferSize <= 0)
-			{
-				ThrowInvalidParameterException();
-			}
+            if (bufferSize <= 0)
+            {
+                ThrowInvalidParameterException();
+            }
             Buffer buffer(bufferSize);
             long bytesRead = 0;
             do

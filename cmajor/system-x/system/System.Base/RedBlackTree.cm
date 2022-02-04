@@ -668,18 +668,18 @@ namespace System.Collections
         }
         public inline nothrow long Count() const
         {
-			if (count < 0)
-			{
-				ThrowPreconditionViolationException();
-			}
+            if (count < 0)
+            {
+                ThrowPreconditionViolationException();
+            }
             return count;
         }
         public inline nothrow bool IsEmpty() const
         {
-			if (count < 0)
-			{
-				ThrowPreconditionViolationException();
-			}
+            if (count < 0)
+            {
+                ThrowPreconditionViolationException();
+            }
             return count == 0;
         }
         public nothrow void Clear()
@@ -908,14 +908,14 @@ namespace System.Collections
         }
         private RedBlackTreeNode<ValueType>* Copy(RedBlackTreeNode<ValueType>* x, RedBlackTreeNode<ValueType>* p)
         {
-			if (x == null)
-			{
-				ThrowInvalidParameterException();
-			}
-			if (p == null)
-			{
-				ThrowInvalidParameterException();
-			}
+            if (x == null)
+            {
+                ThrowInvalidParameterException();
+            }
+            if (p == null)
+            {
+                ThrowInvalidParameterException();
+            }
             RedBlackTreeNode<ValueType>* top = CloneNode(x, p);
             if (x->Right() != null)
             {
@@ -938,14 +938,14 @@ namespace System.Collections
         }
         private RedBlackTreeNode<ValueType>* CloneNode(RedBlackTreeNode<ValueType>* x, RedBlackTreeNode<ValueType>* p) const
         {
-			if (x == null)
-			{
-				ThrowInvalidParameterException();
-			}
-			if (p == null)
-			{
-				ThrowInvalidParameterException();
-			}
+            if (x == null)
+            {
+                ThrowInvalidParameterException();
+            }
+            if (p == null)
+            {
+                ThrowInvalidParameterException();
+            }
             RedBlackTreeNode<ValueType>* clone = new RedBlackTreeNode<ValueType>(x->Value(), p);
             clone->SetColor(x->GetColor());
             return clone;

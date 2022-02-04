@@ -9,11 +9,10 @@ using System.Os;
 
 namespace System.IO
 {
-    public const int nameMax = 252;
     public const int pathMax = 4096;
-	public const int statBufSize = 68;
+    public const int statBufSize = 68;
 
-	public string GetCurrentWorkingDirectory()
+    public string GetCurrentWorkingDirectory()
     {
         Buffer buffer(pathMax);
         char* buf = cast<char*>(cast<void*>(buffer.Mem()));
@@ -26,96 +25,36 @@ namespace System.IO
     {
         public static bool Exists(const string& directoryPath)
         {
-            byte[statBufSize] statBuf;
-            int result = stat(directoryPath.Chars(), &statBuf[0], statBufSize);
-            if (result == -1) 
-            {
-                SystemError systemError = GetSystemError();
-                if (systemError.errorCode == ENOTFOUND)
-                {
-                    return false;
-                }
-                else
-                {
-                    ThrowSystemError();
-                }
-            }
-            else
-            {
-                FileStatus status;
-                GetFileStatus(&statBuf[0], status);
-                if (status.fileType == FileType.directory)
-                {
-                    return true;
-                }
-                else
-                {
-                    throw FileSystemException("path '" + directoryPath + "' is not a directory path");
-                }
-            }
+			return DirectoryExists(directoryPath);
         }
-/*		
         public static DateTime AccessTime(const string& directoryPath)
         {
-            StatInfo statInfo;
-            Stat(directoryPath.Chars(), statInfo);
-            if (statInfo.Type() != FileType.directory)
-            {
-                throw FileSystemException("path '" + directoryPath + "' is not a directory path");
-            }
-            return statInfo.ATime();
+			return GetDirectoryAccessTime(directoryPath);
         }
         public static DateTime ModificationTime(const string& directoryPath)
         {
-            StatInfo statInfo;
-            Stat(directoryPath.Chars(), statInfo);
-            if (statInfo.Type() != FileType.directory)
-            {
-                throw FileSystemException("path '" + directoryPath + "' is not a directory path");
-            }
-            return statInfo.MTime();
+			return GetDirectoryModificationTime(directoryPath);
         }
         public static void GetTimes(const string& directoryPath, DateTime& accessTime, DateTime& modificationTime)
         {
-            StatInfo statInfo;
-            Stat(directoryPath.Chars(), statInfo);
-            if (statInfo.Type() != FileType.directory)
-            {
-                throw FileSystemException("path '" + directoryPath + "' is not a directory path");
-            }
-            accessTime = statInfo.ATime();
-            modificationTime = statInfo.MTime();
+			GetDirectoryTimes(directoryPath, accessTime, modificationTime);
         }
         public static void SetTimes(const string& directoryPath, const DateTime& accessTime, const DateTime& modificationTime)
         {
-            UTime(directoryPath.Chars(), accessTime, modificationTime); 
+			SetDirectoryTimes(directoryPath, accessTime, modificationTime);
         }
         public static void Remove(const string& directoryPath)
         {
-            if (Exists(directoryPath))
-            {
-                Unlink(directoryPath.Chars());
-            }
-            else
-            {
-                throw SystemError(ENOTFOUND, "could not remove directory: directory '" + directoryPath + "' does not exist");
-            }
+			RemoveDirectory(directoryPath);
         }
-*/		
     }
   
-/*  
     public void CreateDirectories(const string& directoryPath)
     {
         CreateDirectories(directoryPath, 0);
     }
     
     public void CreateDirectories(const string& directoryPath, int mode)
-    {
-        CreateDirectories(directoryPath, 0, false);
-    }
-    
-    public void CreateDirectories(const string& directoryPath, int mode, bool verbose)
     {
         if (directoryPath.IsEmpty())
         {
@@ -137,50 +76,140 @@ namespace System.IO
         }
         if (!Directory.Exists(dir))
         {
-            Mkdir(dir.Chars(), mode);
-            if (verbose)
-            {
-                Console.Out() << "created directory '" + dir + "'" << endl();
-            }
+            MkDir(dir.Chars(), mode);
         }
         for (int i = next; i < n; ++i)
         {
             dir = Path.Combine(dir, components[i]);
             if (!Directory.Exists(dir))
             {
-                Mkdir(dir.Chars(), mode);
-                Console.Out() << "created directory '" + dir + "'" << endl();
+                MkDir(dir.Chars(), mode);
             }
         }
     }
+	
+	public bool DirectoryExists(const string& dirPath)
+	{
+		byte[statBufSize] statBuf;
+		int result = stat(dirPath.Chars(), &statBuf[0], statBufSize);
+		if (result == -1) 
+		{
+			SystemError systemError = GetSystemError();
+			if (systemError.errorCode == ENOTFOUND)
+			{
+				return false;
+			}
+			else
+			{
+				ThrowSystemError();
+			}
+		}
+		else
+		{
+			FileStatus status;
+			GetFileStatus(&statBuf[0], status);
+			if (status.fileType == FileType.directory)
+			{
+				return true;
+			}
+			else
+			{
+				throw FileSystemException("path '" + dirPath + "' is not a directory path");
+			}
+		}
+	}
+	
+	public DateTime GetDirectoryAccessTime(const string& dirPath)
+	{
+		FileStatus status;
+		Stat(dirPath.Chars(), status);
+		if (status.fileType != FileType.directory)
+		{
+			throw FileSystemException("path '" + dirPath + "' is not a directory path");
+		}
+		return status.atime;
+	}
     
+	public DateTime GetDirectoryModificationTime(const string& dirPath)
+	{
+		FileStatus status;
+		Stat(dirPath.Chars(), status);
+		if (status.fileType != FileType.directory)
+		{
+			throw FileSystemException("path '" + dirPath + "' is not a directory path");
+		}
+		return status.mtime;
+	}
+	
+	public void GetDirectoryTimes(const string& dirPath, DateTime& accessTime, DateTime& modificationTime)
+	{
+		FileStatus status;
+		Stat(dirPath.Chars(), status);
+		if (status.fileType != FileType.directory)
+		{
+			throw FileSystemException("path '" + dirPath + "' is not a directory path");
+		}
+		accessTime = status.atime;
+		modificationTime = status.mtime;
+	}
+	
+	public void SetDirectoryTimes(const string& dirPath, const DateTime& accessTime, const DateTime& modificationTime)
+	{
+		UTime(dirPath.Chars(), accessTime, modificationTime); 
+	}
+	
     public class DirectoryEntry
     {
+		public nothrow DirectoryEntry() : inodeNumber(-1), name()
+		{
+		}
+		public nothrow bool IsDot() const
+		{
+			return name == ".";
+		}
+		public nothrow bool IsDotDot() const
+		{
+			return name == "..";
+		}
         public int inodeNumber;
-        public char[nameMax] name;
+        public string name;
     }
     
+	public const int directoryEntrySize = 256;
+	
     public class DirectoryReader
     {
-        public nothrow DirectoryReader(const string& dirPath) : dd(OpenDir(dirPath.Chars()))
+        public nothrow DirectoryReader(const string& dirPath) : dfd(OpenDir(dirPath.Chars()))
         {
         }
         public bool Read(DirectoryEntry& dirEntry)
         {
-            int result = ReadDir(dd, &dirEntry.inodeNumber, &dirEntry.name[0]);
-            return result == 1;
+			byte[directoryEntrySize] dirEntryBuf;
+            int result = ReadDir(dfd, &dirEntryBuf[0], directoryEntrySize);
+            if (result == 1)
+			{
+				MemoryReader reader(&dirEntryBuf[0], directoryEntrySize);
+				dirEntry.inodeNumber = reader.ReadInt();
+				dirEntry.name = reader.ReadString();
+				return true;
+			}
+			return false;
         }
         public ~DirectoryReader()
         {
             try
             {
-                CloseDir(dd);
+                CloseDir(dfd);
             }
             catch (const Exception&)
             {
             }
         }
-        private int dd;
+        private int dfd;
     }
-*/	
+
+    public void RemoveDirectory(const string& dirPath)
+    {
+        Unlink(dirPath.Chars());
+    }
 }

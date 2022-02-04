@@ -6,6 +6,7 @@
 #include <system-x/kernel/BlockManager.hpp>
 #include <system-x/kernel/EventManager.hpp>
 #include <system-x/kernel/Process.hpp>
+#include <system-x/kernel/File.hpp>
 #include <system-x/machine/Config.hpp>
 #include <system-x/machine/Event.hpp>
 #include <condition_variable>
@@ -84,6 +85,7 @@ public:
     void RemoveBlockKeyEvent(const BlockKey& blockKey);
     cmsx::machine::Event GetAnyBlockBecomesFreeEvent() const { return anyBlockBecomesFreeEvent; }
     bool IsFreeListEmpty() const { return freeList.empty(); }
+    int32_t FreeListSize() const { return freeList.size(); }
     Block* GetBlockFromFreeList();
 private:
     BlockManager();
@@ -169,11 +171,19 @@ void BlockManager::RemoveFromHashQueue(Block* block)
     {
         int hashQueueIndex = GetHashQueueNumber(block->Key());
         auto& hashQueue = hashQueues[hashQueueIndex];
-        for (auto it = hashQueue.begin(); it != hashQueue.end(); ++it)
+        auto it = hashQueue.begin();
+        while (it != hashQueue.end())
         {
             if (block == it->block)
             {
+                auto next = it;
+                ++next;
                 hashQueue.erase(it);
+                it = next;
+            }
+            else
+            {
+                ++it;
             }
         }
     }

@@ -24,11 +24,16 @@ public:
     BlockFile* HostFile() const override;
     INodeKey MountPoint() const override { return mountPoint; }
     void SetMountPoint(INodeKey mountPoint_) { mountPoint = mountPoint_; }
+    DirFile* OpenDir(const std::string& path, INode* dirINode) override;
+    void MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process) override;
+    void CloseDir(int32_t dirId);
 private:
     cmsx::machine::Machine* machine;
     int32_t nextINodeId;
+    int32_t nextDirId;
     std::map<int32_t, BlockFile*> fileMap;
     std::map<int32_t, std::string> inodePathMap;
+    std::map<int32_t, DirFile*> dirFileMap;
     std::string prefix;
     INodeKey mountPoint;
 };

@@ -4,115 +4,119 @@
 // =================================
 
 using System;
-using System.Collections;
 using System.Os;
 
 namespace System.IO
 {
-	public enum FileType : int
-	{
-		regular = 1, directory = 2, fifo = 3
-	}
+    public enum FileType : int
+    {
+        regular = 1, directory = 2, fifo = 3
+    }
 
-	public enum Access : int
-	{
-		none = 0, read = 1 << 0, write = 1 << 1, execute = 1 << 2
-	}
+    public enum Access : int
+    {
+        none = 0, read = 1 << 0, write = 1 << 1, execute = 1 << 2
+    }
 
-	public class FileStatus
-	{
-		public int fileSystemNumber;
-		public int inodeNumber;
-		public FileType fileType;
-		public Access ownerAccess;
-		public Access groupAccess;
-		public Access otherAccess;
-		public int nlinks;
-		public int uid;
-		public int gid;
-		public long fileSize;
-		public DateTime ctime;
-		public DateTime mtime;
-		public DateTime atime;
-	}
-	
-	public void Stat(const char* path, FileStatus& status)
-	{
-		byte[statBufSize] statBuf;
-		int result = stat(path, &statBuf[0], statBufSize);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-		GetFileStatus(&statBuf[0], status);
-	}
-	
-	public void GetFileStatus(byte* statBuf, FileStatus& status)
-	{
-		MemoryReader reader(statBuf, statBufSize);
-		status.fileSystemNumber = reader.ReadInt();
-		status.inodeNumber = reader.ReadInt();
-		status.fileType = cast<FileType>(reader.ReadInt());
-		status.ownerAccess = cast<Access>(reader.ReadInt());
-		status.groupAccess = cast<Access>(reader.ReadInt());
-		status.otherAccess = cast<Access>(reader.ReadInt());
-		status.nlinks = reader.ReadInt();
-		status.uid = reader.ReadInt();
-		status.gid = reader.ReadInt();
-		status.fileSize = reader.ReadLong();
-		status.ctime = reader.ReadDateTime();
-		status.mtime = reader.ReadDateTime();
-		status.atime = reader.ReadDateTime();
-	}
+    public const int rootFileSystemNumber = 0;
+
+    public class FileStatus
+    {
+        public int fileSystemNumber;
+        public int inodeNumber;
+        public FileType fileType;
+        public Access ownerAccess;
+        public Access groupAccess;
+        public Access otherAccess;
+        public int nlinks;
+        public int uid;
+        public int gid;
+        public long fileSize;
+        public DateTime ctime;
+        public DateTime mtime;
+        public DateTime atime;
+    }
+    
+    public void Stat(const char* path, FileStatus& status)
+    {
+        byte[statBufSize] statBuf;
+        int result = stat(path, &statBuf[0], statBufSize);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        GetFileStatus(&statBuf[0], status);
+    }
+    
+    public void GetFileStatus(byte* statBuf, FileStatus& status)
+    {
+        MemoryReader reader(statBuf, statBufSize);
+        status.fileSystemNumber = reader.ReadInt();
+        status.inodeNumber = reader.ReadInt();
+        status.fileType = cast<FileType>(reader.ReadInt());
+        status.ownerAccess = cast<Access>(reader.ReadInt());
+        status.groupAccess = cast<Access>(reader.ReadInt());
+        status.otherAccess = cast<Access>(reader.ReadInt());
+        status.nlinks = reader.ReadInt();
+        status.uid = reader.ReadInt();
+        status.gid = reader.ReadInt();
+        status.fileSize = reader.ReadLong();
+        status.ctime = reader.ReadDateTime();
+        status.mtime = reader.ReadDateTime();
+        status.atime = reader.ReadDateTime();
+    }
+    
+    public void UTime(const char* path, const DateTime& atime, const DateTime& mtime)
+    {
+        byte[16] timeBuf;
+        MemoryWriter writer(&timeBuf[0], 16);
+        writer.Write(atime);
+        writer.Write(mtime);
+        UTime(path, &timeBuf[0], 16);
+    }
+    
+    public enum FileCopyOptions : int
+    {
+        none = 0, update = 1 << 0, verbose = 1 << 1, dontPreserveTimestamps = 1 << 2, removeCrs = 1 << 3, addCrs = 1 << 4, noBufferedCopy = 1 << 5
+    }
 
     public static class File
     {
         public static bool Exists(const string& filePath)
         {
-            byte[statBufSize] statBuf;
-            int result = stat(filePath.Chars(), &statBuf[0], statBufSize);
-            if (result == -1) 
-            {
-                SystemError systemError = GetSystemError();
-                if (systemError.errorCode == ENOTFOUND)
-                {
-                    return false;
-                }
-                else
-                {
-                    ThrowSystemError();
-                }
-            }
-            else
-            {
-                FileStatus status;
-                GetFileStatus(&statBuf[0], status);
-                if (status.fileType == FileType.regular)
-                {
-                    return true;
-                }
-                else
-                {
-                    throw FileSystemException("path '" + filePath + "' is not a regular file path");
-                }
-            }
+            return FileExists(filePath);
         }
         public static long Size(const string& filePath)
         {
-            if (filePath.IsEmpty())
-            {
-                throw InvalidPathException("file path is empty");
-            }
-            FileStatus status;
-            Stat(filePath.Chars(), status);
-            if (status.fileType == FileType.regular)
-            {
-                return status.fileSize;
-            }
-            else
-            {
-                throw InvalidPathException("path '" + filePath + "' is not a file path");
-            }
+            return GetFileSize(filePath);
+        }
+        public static DateTime AccessTime(const string& filePath)
+        {
+            return GetFileAccessTime(filePath);
+        }
+        public static DateTime ModificationTime(const string& filePath)
+        {
+            return GetFileModificationTime(filePath);
+        }
+        public static void GetTimes(const string& path, DateTime& accessTime, DateTime& modificationTime)
+        {
+            GetFileTimes(path, accessTime, modificationTime);
+        }
+        public static void SetTimes(const string& path, const DateTime& accessTime, const DateTime& modificationTime)
+        {
+            SetFileTimes(path, accessTime, modificationTime);
+        }
+        public static void Copy(const string& sourceFilePath, const string& destFilePath)
+        {
+            Copy(sourceFilePath, destFilePath, FileCopyOptions.none);
+        }
+        public static void Copy(const string& sourceFilePath, const string& destFilePath, FileCopyOptions options)
+        {
+            CopyFile(sourceFilePath, destFilePath, options);
+        }
+        public static void Remove(const string& filePath)
+        {
+            RemoveFile(filePath);
         }
         public static StreamWriter CreateText(const string& filePath)
         {
@@ -121,8 +125,16 @@ namespace System.IO
         }
         public static BinaryWriter CreateBinary(const string& filePath)
         {
-            return BinaryWriter(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(
-                new FileStream(filePath, cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate | OpenFlags.random_access))))));
+			return CreateBinary(filePath, false);
+        }
+        public static BinaryWriter CreateBinary(const string& filePath, bool randomAccess)
+        {
+			OpenFlags flags = cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate);
+			if (randomAccess)
+			{
+				flags = cast<OpenFlags>(flags | OpenFlags.random_access);
+			}
+            return BinaryWriter(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(new FileStream(filePath, flags)))));
         }
         public static StreamWriter AppendText(const string& filePath)
         {
@@ -136,8 +148,194 @@ namespace System.IO
         }
         public static BinaryReader OpenBinary(const string& filePath)
         {
-            return BinaryReader(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(
-                new FileStream(filePath, cast<OpenFlags>(OpenFlags.read | OpenFlags.random_access))))));
+            return OpenBinary(filePath, false);
         }
+        public static BinaryReader OpenBinary(const string& filePath, bool randomAccess)
+        {
+            OpenFlags flags = OpenFlags.read;
+            if (randomAccess)
+            {
+                flags = cast<OpenFlags>(flags | OpenFlags.random_access);
+            }
+            return BinaryReader(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(new FileStream(filePath, flags)))));
+        }
+    }
+    
+    public bool FileExists(const string& filePath)
+    {
+        byte[statBufSize] statBuf;
+        int result = stat(filePath.Chars(), &statBuf[0], statBufSize);
+        if (result == -1) 
+        {
+            SystemError systemError = GetSystemError();
+            if (systemError.errorCode == ENOTFOUND)
+            {
+                return false;
+            }
+            else
+            {
+                ThrowSystemError();
+            }
+        }
+        else
+        {
+            FileStatus status;
+            GetFileStatus(&statBuf[0], status);
+            if (status.fileType == FileType.regular)
+            {
+                return true;
+            }
+            else
+            {
+                throw FileSystemException("path '" + filePath + "' is not a regular file path");
+            }
+        }
+    }
+    
+    public long GetFileSize(const string& filePath)
+    {
+        if (filePath.IsEmpty())
+        {
+            throw InvalidPathException("file path is empty");
+        }
+        FileStatus status;
+        Stat(filePath.Chars(), status);
+        if (status.fileType == FileType.regular)
+        {
+            return status.fileSize;
+        }
+        else
+        {
+            throw InvalidPathException("path '" + filePath + "' is not a regular file path");
+        }
+    }
+    
+    public DateTime GetFileAccessTime(const string& filePath)
+    {
+        if (filePath.IsEmpty())
+        {
+            throw InvalidPathException("file path is empty");
+        }
+        FileStatus status;
+        Stat(filePath.Chars(), status);
+        return status.atime;
+    }
+    
+    public DateTime GetFileModificationTime(const string& filePath)
+    {
+        if (filePath.IsEmpty())
+        {
+            throw InvalidPathException("file path is empty");
+        }
+        FileStatus status;
+        Stat(filePath.Chars(), status);
+        return status.mtime;
+    }
+    
+    public void GetFileTimes(const string& path, DateTime& accessTime, DateTime& modificationTime)
+    {
+        if (path.IsEmpty())
+        {
+            throw InvalidPathException("file path is empty");
+        }
+        FileStatus status;
+        Stat(path.Chars(), status);
+        accessTime = status.atime;
+        modificationTime = status.mtime;
+    }
+    
+    public void SetFileTimes(const string& path, const DateTime& accessTime, const DateTime& modificationTime)
+    {
+        if (path.IsEmpty())
+        {
+            throw InvalidPathException("file path is empty");
+        }
+        UTime(path.Chars(), accessTime, modificationTime);
+    }
+    
+    public void CopyFile(const string& sourceFilePath, const string& destFilePath, FileCopyOptions options)
+    {
+        DateTime sourceAccessTime;
+        DateTime sourceModificationTime;
+        GetFileTimes(sourceFilePath, sourceAccessTime, sourceModificationTime);
+        bool destinationExists = File.Exists(destFilePath);
+        bool copy = false;
+        if ((options & FileCopyOptions.update) != FileCopyOptions.none)
+        {
+            if (!destinationExists)
+            {
+                copy = true;
+            }
+            else
+            {
+                DateTime destModificationTime = GetFileModificationTime(destFilePath);
+                if (sourceModificationTime > destModificationTime)
+                {
+                    copy = true;
+                }
+            }
+        }
+        if (copy)
+        {
+            bool addCrs = (options & FileCopyOptions.addCrs) != FileCopyOptions.none;
+            bool removeCrs = (options & FileCopyOptions.removeCrs) != FileCopyOptions.none;
+            if (addCrs && removeCrs)
+            {
+                throw SystemError(EPARAM, "cannot have both 'FileCopyOptions.addCrs' and 'FileCopyOptions.removeCrs' option");
+            }
+            long size = File.Size(sourceFilePath); 
+			bool bufferedCopy = (options & FileCopyOptions.noBufferedCopy) == FileCopyOptions.none && !addCrs && !removeCrs;
+			if (bufferedCopy)
+			{
+				BufferedCopy(sourceFilePath, destFilePath, size);
+			}
+			else
+			{
+				BinaryReader reader = File.OpenBinary(sourceFilePath);
+				BinaryWriter writer = File.CreateBinary(destFilePath);
+				for (long i = 0; i < size; ++i)
+				{
+					byte x = reader.ReadByte();
+					if (removeCrs && x == cast<byte>('\r'))
+					{
+						continue;
+					}
+					if (addCrs && x == cast<byte>('\n'))
+					{
+						writer.Write(cast<byte>('\r'));
+					}
+					writer.Write(x);
+				}
+			}
+        }
+        if (copy)
+        {
+            if ((options & FileCopyOptions.dontPreserveTimestamps) == FileCopyOptions.none)
+            {
+                File.SetTimes(destFilePath, sourceAccessTime, sourceModificationTime);
+            }
+            if ((options & FileCopyOptions.verbose) != FileCopyOptions.none)
+            {
+                Console.WriteLine(GetFullPath(sourceFilePath) + " -> " + GetFullPath(destFilePath));
+            }
+        }
+    }
+	
+	public void BufferedCopy(const string& sourceFilePath, const string& destFilePath, long size)
+	{
+		FileStream sourceFileStream(sourceFilePath, OpenFlags.read);
+		FileStream destFileStream(destFilePath, cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate));
+		byte[4096] buffer;
+		while (size > 0)
+		{
+			long bytesRead = sourceFileStream.Read(&buffer[0], 4096);
+			destFileStream.Write(&buffer[0], bytesRead);
+			size = size - bytesRead;
+		}
+	}
+    
+    public void RemoveFile(const string& filePath)
+    {
+        Unlink(filePath.Chars());
     }
 }

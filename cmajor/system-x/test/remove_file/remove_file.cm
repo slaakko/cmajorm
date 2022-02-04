@@ -1,0 +1,16 @@
+using System;
+using System.IO;
+
+int main()
+{
+	try
+	{
+		File.Remove("cmccs.log");
+	}
+	catch (const Exception& ex)
+	{
+		Console.Error() << ex.ToString() << endl();
+		return 1;
+	}
+	return 0;
+}

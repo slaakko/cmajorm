@@ -11,6 +11,7 @@
 namespace cmsx::kernel {
 
 class BlockFile;
+class DirFile;
 
 class CMSX_KERNEL_API Filesystem
 {
@@ -26,6 +27,8 @@ public:
     virtual INodeKey MountPoint() const { return INodeKey(); }
     virtual INodePtr SearchDirectory(const std::string& name, INode* dirINode, cmsx::machine::Process* process) = 0;
     virtual void Stat(INode* inode) = 0;
+    virtual DirFile* OpenDir(const std::string& path, INode* dirINode) = 0;
+    virtual void MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process) = 0;
 private:
     int32_t id;
 };

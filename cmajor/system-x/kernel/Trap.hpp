@@ -42,9 +42,14 @@ const uint8_t trap_unlink = 27;
 const uint8_t trap_seek = 28;
 const uint8_t trap_tell = 29;
 const uint8_t trap_stat = 30;
-const uint8_t trap_dir_stat = 31;
-const uint8_t trap_getcwd = 32;
-const uint8_t trap_chdir = 33;
+const uint8_t trap_getcwd = 31;
+const uint8_t trap_chdir = 32;
+const uint8_t trap_mkdir = 33;
+const uint8_t trap_opendir = 34;
+const uint8_t trap_closedir = 35;
+const uint8_t trap_readdir = 36;
+const uint8_t trap_utime = 37;
+const uint8_t trap_mcpy = 38;
 
 class CMSX_KERNEL_API TrapHandler
 {

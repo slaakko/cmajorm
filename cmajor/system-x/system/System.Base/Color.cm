@@ -2,37 +2,37 @@ using System;
 
 namespace System
 {
-	enum ConsoleColor : byte
-	{
-		black = 0u, darkBlue = 1u, darkGreen = 2u, darkCyan = 3u, darkRed = 4u, darkYellow = 6u, gray = 7u,
-		darkGray = 8u, blue = 9u, green = 10u, cyan = 11u, red = 12u, magenta = 13u, yellow = 14u, white = 15u
-	}
-	
-	public nothrow ConsoleColor DefaultConsoleBackColor()
-	{
-		return ConsoleColor.black;
-	}
+    enum ConsoleColor : byte
+    {
+        black = 0u, darkBlue = 1u, darkGreen = 2u, darkCyan = 3u, darkRed = 4u, darkYellow = 6u, gray = 7u,
+        darkGray = 8u, blue = 9u, green = 10u, cyan = 11u, red = 12u, magenta = 13u, yellow = 14u, white = 15u
+    }
+    
+    public nothrow ConsoleColor DefaultConsoleBackColor()
+    {
+        return ConsoleColor.black;
+    }
 
-	public nothrow ConsoleColor DefaultConsoleTextColor()
-	{
-		return ConsoleColor.gray;
-	}
+    public nothrow ConsoleColor DefaultConsoleTextColor()
+    {
+        return ConsoleColor.gray;
+    }
 
-	public const uchar colorChar = cast<uchar>(0x100000u);		// begin Unicode supplemental private use area B
-	public const uchar resetColors = cast<uchar>(0x10FFFDu); 	// end Unicode supplemental private use area B
-	
-	public nothrow uchar ColorChar(ConsoleColor foreColor, ConsoleColor backColor)
-	{
-		return cast<uchar>(cast<uint>(colorChar) | cast<uint>(cast<ushort>(cast<byte>(foregroundColor)) | (cast<ushort>(cast<byte>(backgroundColor)) << 8u)));
-	}
-	
-	public nothrow string SetColors(ConsoleColor foreColor, ConsoleColor backColor)
-	{
-		return ToUtf8(ustring(ColorChar(foreColor, backColor)));
-	}
-	
-	public nothrow string ResetColors()
-	{
-		return ToUtf8(ustring(resetColors));
-	}
+    public const uchar colorChar = cast<uchar>(0x100000u);        // begin Unicode supplemental private use area B
+    public const uchar resetColors = cast<uchar>(0x10FFFDu);     // end Unicode supplemental private use area B
+    
+    public nothrow uchar ColorChar(ConsoleColor foreColor, ConsoleColor backColor)
+    {
+        return cast<uchar>(cast<uint>(colorChar) | cast<uint>(cast<ushort>(cast<byte>(foregroundColor)) | (cast<ushort>(cast<byte>(backgroundColor)) << 8u)));
+    }
+    
+    public nothrow string SetColors(ConsoleColor foreColor, ConsoleColor backColor)
+    {
+        return ToUtf8(ustring(ColorChar(foreColor, backColor)));
+    }
+    
+    public nothrow string ResetColors()
+    {
+        return ToUtf8(ustring(resetColors));
+    }
 }

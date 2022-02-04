@@ -5,15 +5,15 @@
 
 namespace System
 {
-	public const int EFAIL = 1;
-	public const int EBADF = 2;
-	public const int EPARAM = 3;
-	public const int EMEMORYACCESS = 4;
-	public const int ENOTFOUND = 5;
-	public const int EALREADYEXISTS = 6;
-	public const int ELIMITEXCEEDED = 7;
-	public const int ENOCHILD = 8;
-	
+    public const int EFAIL = 1;
+    public const int EBADF = 2;
+    public const int EPARAM = 3;
+    public const int EMEMORYACCESS = 4;
+    public const int ENOTFOUND = 5;
+    public const int EALREADYEXISTS = 6;
+    public const int ELIMITEXCEEDED = 7;
+    public const int ENOCHILD = 8;
+    
     public class SystemError : Exception
     {
         public nothrow SystemError(int errorCode_, const string& message_) : base(message_), errorCode(errorCode_)
@@ -27,17 +27,17 @@ namespace System
         int errorCode;
         UniquePtr<byte> buffer(cast<byte*>(MemAlloc(4096)));
         if (get_system_error(&errorCode, buffer.Get(), 4096) == 0)
-		{
-			string errorMessage;
-			byte* p = buffer.Get();
-			while (*p != 0u)
-			{
-				errorMessage.Append(cast<char>(*p));
-				++p;
-			}
-			return SystemError(errorCode, errorMessage);
-		}
-		return SystemError(EFAIL, "could not get system error");
+        {
+            string errorMessage;
+            byte* p = buffer.Get();
+            while (*p != 0u)
+            {
+                errorMessage.Append(cast<char>(*p));
+                ++p;
+            }
+            return SystemError(errorCode, errorMessage);
+        }
+        return SystemError(EFAIL, "could not get system error");
     }
     
     public void ThrowSystemError()

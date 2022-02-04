@@ -25,6 +25,8 @@ CMSX_KERNEL_API bool OsReadFile(void* fileHandle, void* buffer, uint32_t numberO
 CMSX_KERNEL_API bool OsWriteFile(void* fileHandle, void* buffer, uint32_t numberOfBytesToWrite, void* overlapped);
 CMSX_KERNEL_API std::string OsGetLogicalDrives();
 CMSX_KERNEL_API uint32_t OsGetDriveType(const char* rootPathName);
+CMSX_KERNEL_API bool OsFindFirstFile(const std::string& directoryName, std::string& entry, void*& searchHandle);
+CMSX_KERNEL_API bool OsFindNextFile(void* searchHandle, std::string& entry);
 extern const uint32_t fixedDriveType;
 
 } // namespace cmsx::kernel

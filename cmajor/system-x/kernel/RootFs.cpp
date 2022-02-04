@@ -9,6 +9,7 @@
 #include <system-x/kernel/Mount.hpp>
 #include <system-x/kernel/Error.hpp>
 #include <system-x/kernel/BlockFile.hpp>
+#include <system-x/kernel/DirFile.hpp>
 #include <system-x/kernel/OsFileApi.hpp>
 #include <system-x/machine/Config.hpp>
 #include <soulng/util/Path.hpp>
@@ -90,6 +91,56 @@ int64_t RootFilesystemFile::Read(Block* block, cmsx::machine::Process* process)
 int64_t RootFilesystemFile::Write(Block* block, cmsx::machine::Process* process)
 {
     return fs->HostFile()->Write(block, process);
+}
+
+class RootFilesystemDirFile : public DirFile
+{
+public:
+    RootFilesystemDirFile(RootFilesystem* fs_, const std::string& name_, int32_t id_, const INodeKey& dirINodeKey_);
+    void Close(cmsx::machine::Process* process) override;
+    int32_t Read(DirectoryEntry& dirEntry, cmsx::machine::Process* process) override;
+    int32_t Id() const { return id; }
+private:
+    RootFilesystem* fs;
+    int32_t id;
+    INodeKey dirINodeKey;
+    int32_t logicalBlockNumber;
+    int32_t dirEntryIndex;
+};
+
+RootFilesystemDirFile::RootFilesystemDirFile(RootFilesystem* fs_, const std::string& name_, int32_t id_, const INodeKey& dirINodeKey_) :
+    DirFile(name_), fs(fs_), id(id_), dirINodeKey(dirINodeKey_), logicalBlockNumber(0), dirEntryIndex(0)
+{
+}
+
+void RootFilesystemDirFile::Close(cmsx::machine::Process* process)
+{
+    fs->CloseFile(id);
+}
+
+int32_t RootFilesystemDirFile::Read(DirectoryEntry& dirEntry, cmsx::machine::Process* process)
+{
+    INodePtr dirINodePtr = cmsx::kernel::ReadINode(dirINodeKey, process);
+    INode* dirINode = dirINodePtr.Get();
+    if (dirINode->GetFileType() != FileType::directory)
+    {
+        throw SystemError(EFAIL, "not a directory inode");
+    }
+    int32_t blockNumber = MapBlockNumber(logicalBlockNumber, dirINode, fs, process);
+    while (blockNumber != -1)
+    {
+        DirectoryBlock directoryBlock;
+        BlockPtr blockPtr = ReadDirectoryBlock(directoryBlock, blockNumber, fs, process);
+        int32_t n = directoryBlock.Entries().size();
+        if (dirEntryIndex < n)
+        {
+            dirEntry.Read(blockPtr.Get(), dirEntryIndex++);
+            return 1;
+        }
+        ++logicalBlockNumber;
+        blockNumber = MapBlockNumber(logicalBlockNumber, dirINode, fs, process);
+    }
+    return 0;
 }
 
 void MountHostDirectories(Filesystem* fs, cmsx::machine::Process* kernelProcess);
@@ -176,6 +227,7 @@ BlockFile* RootFilesystem::Open(const std::string& path, INode* dirINode, int32_
         throw SystemError(ENOTFOUND, "could not open: path '" + path + "' not found");
     }
     fileINode.Get()->IncrementReferenceCount();
+    std::lock_guard<std::recursive_mutex> lock(machine->Lock());
     RootFilesystemFile* file = new RootFilesystemFile(this, path, openFlags, fileINode.Get()->Key(), nextFileId++);
     fileMap[file->Id()] = file;
     return file;
@@ -189,6 +241,41 @@ INodePtr RootFilesystem::SearchDirectory(const std::string& name, INode* dirINod
 void RootFilesystem::Stat(INode* inode)
 {
     // status already obtained
+}
+
+DirFile* RootFilesystem::OpenDir(const std::string& path, INode* dirINode)
+{
+    std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+    RootFilesystemDirFile* dirFile = new RootFilesystemDirFile(this, path, nextFileId++, dirINode->Key());
+    fileMap[dirFile->Id()] = dirFile;
+    return dirFile;
+}
+
+void RootFilesystem::MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process)
+{
+    INodePtr dirINodePtr = AllocateINode(Id(), process);
+    INode* dirINode = dirINodePtr.Get();
+    dirINode->SetFileType(FileType::directory);
+    BlockPtr dirBlockPtr = AllocateBlock(Id(), process);
+    dirINode->SetDirectBlockNumber(dirBlockPtr.Get()->Key().blockNumber, 0);
+    DirectoryBlock dirBlock;
+    DirectoryEntry thisEntry;
+    thisEntry.SetINodeNumber(dirINode->Key().inodeNumber);
+    thisEntry.SetName(".");
+    dirBlock.AddEntry(thisEntry);
+    DirectoryEntry parentEntry;
+    parentEntry.SetINodeNumber(parentDirINode->Key().inodeNumber);
+    parentEntry.SetName("..");
+    dirBlock.AddEntry(parentEntry);
+    dirINode->SetFileSize(2 * DirectoryEntry::Size());
+    dirINode->SetCTime(GetCurrentDateTime());
+    dirINode->SetMTime(GetCurrentDateTime());
+    WriteDirectoryBlock(dirBlock, dirBlockPtr, this, process);
+    WriteINode(dirINode, process);
+    DirectoryEntry entry;
+    entry.SetName(dirName);
+    entry.SetINodeNumber(dirINode->Key().inodeNumber);
+    AddDirectoryEntry(entry, parentDirINode, this, process);
 }
 
 void RootFilesystem::CloseFile(int32_t id)

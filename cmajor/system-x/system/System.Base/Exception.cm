@@ -37,10 +37,10 @@ namespace System
     {
         ex->SetStackTrace(GetStackTrace());
         if (do_throw(ex, typeid(ex)) == -1)
-		{
-			SystemError systemError = GetSystemError();
-			Console.Error() << systemError.ToString() << endl();
-		}
+        {
+            SystemError systemError = GetSystemError();
+            Console.Error() << systemError.ToString() << endl();
+        }
     }
 
     public class NullPointerException : Exception
@@ -84,7 +84,7 @@ namespace System
     public void ThrowInvalidParameterException()
     {
         throw InvalidParameterException();
-	}
+    }
 
     public void ThrowPreconditionViolationException()
     {

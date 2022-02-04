@@ -21,6 +21,8 @@ public:
     INodePtr SearchDirectory(const std::string& name, INode* dirINode, cmsx::machine::Process* process) override;
     void Stat(INode* inode) override;
     BlockFile* HostFile() const override { return hostFile; }
+    DirFile* OpenDir(const std::string& path, INode* dirINode) override;
+    void MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process) override;
     void CloseFile(int32_t id);
 private:
     cmsx::machine::Machine* machine;

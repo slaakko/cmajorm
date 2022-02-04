@@ -48,10 +48,10 @@ namespace System.IO
         }
         public override long Read(byte* buf, long count)
         {
-			if (count < 0)
-			{
-				ThrowInvalidParameterException();
-			}
+            if (count < 0)
+            {
+                ThrowInvalidParameterException();
+            }
             Flush();
             if (bytesAvailable == 0)
             {
@@ -78,10 +78,10 @@ namespace System.IO
         }
         public override long Write(byte* buf, long count)
         {
-			if (count < 0)
-			{
-				ThrowInvalidParameterException();
-			}
+            if (count < 0)
+            {
+                ThrowInvalidParameterException();
+            }
             for (long i = 0; i < count; ++i)
             {
                 Write(buf[i]);
