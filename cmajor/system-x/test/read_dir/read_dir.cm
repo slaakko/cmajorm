@@ -1,15 +1,30 @@
 using System;
 using System.IO;
 
-int main()
+void PrintDir(const string& dir)
+{
+	Console.WriteLine(dir + ":");
+	DirectoryReader reader(dir);
+	DirectoryEntry entry;
+	while (reader.Read(entry))
+	{
+		Console.WriteLine(entry.name);
+	}
+	Console.WriteLine();
+}
+
+int main(int argc, const char** argv)
 {
 	try
 	{
-		DirectoryReader reader("/mnt/sx");
-		DirectoryEntry entry;
-		while (reader.Read(entry))
+		if (argc < 2)
 		{
-			Console.WriteLine(entry.name);
+			throw Exception("usage: read_dir <dir_name>");
+		}
+		for (int i = 1; i < argc; ++i)
+		{
+			string arg = argv[i];
+			PrintDir(arg);
 		}
 	}
 	catch (const Exception& ex)

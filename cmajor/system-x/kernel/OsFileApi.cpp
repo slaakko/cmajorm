@@ -239,4 +239,20 @@ bool OsFindNextFile(void* searchHandle, std::string& entry)
     }
 }
 
+int OsGetConsoleNumberOfColumns()
+{
+    CONSOLE_SCREEN_BUFFER_INFO info;
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
+    int columns = info.srWindow.Right - info.srWindow.Left + 1;
+    return columns;
+}
+
+int OsGetConsoleNumberOfRows()
+{
+    CONSOLE_SCREEN_BUFFER_INFO info;
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
+    int rows = info.srWindow.Bottom - info.srWindow.Top + 1;
+    return rows;
+}
+
 } // namespace cmsx::kernel

@@ -881,6 +881,7 @@ void Link(int logStreamId, const std::string& executableFilePath, const std::vec
     linkTable.CheckUnresolvedSymbols(logStreamId);
     CopyRanges(linkTable.CopyRanges());
     MakeFunctionTable(binaryFiles, *executable, linkTable);
+    ProcessResources(binaryFiles, *executable);
     executable->Finalize();
     executable->WriteFile();
     if (verbose)

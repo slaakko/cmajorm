@@ -42,6 +42,10 @@ public const byte trap_closedir = 35u;
 public const byte trap_readdir = 36u;
 public const byte trap_utime = 37u;
 public const byte trap_mcpy = 38u;
+public const byte trap_open_resource = 39u;
+public const byte trap_close_resource = 40u;
+public const byte trap_get_resource_size = 41u;
+public const byte trap_read_resource = 42u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -264,4 +268,24 @@ public cdecl nothrow int closedir(int dd)
 public cdecl nothrow int readdir(int dd, byte* dirEntryBuf, long dirEntryBufSize)
 {
     return cast<int>(trap(0u, trap_readdir, 0u, dd, dirEntryBuf, dirEntryBufSize));
+}
+
+public cdecl nothrow int open_resource(const char* resource_name)
+{
+    return cast<int>(trap(0u, trap_open_resource, 0u, resource_name));
+}
+
+public cdecl nothrow int close_resource(int rd)
+{
+    return cast<int>(trap(0u, trap_close_resource, 0u, rd));
+}
+
+public cdecl nothrow long get_resource_size(int rd)
+{
+    return cast<long>(trap(0u, trap_get_resource_size, 0u, rd));
+}
+
+public cdecl nothrow int read_resource(int rd, long offset, long length, byte* buffer)
+{
+    return cast<int>(trap(0u, trap_read_resource, 0u, rd, offset, length, buffer));
 }

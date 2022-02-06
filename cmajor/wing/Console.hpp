@@ -62,6 +62,8 @@ public:
     const std::u32string& InputLine() const { return inputLine; }
     void OutputChar(ConsoleColor textColor, ConsoleColor backColor, int handle, char32_t c);
     void OutputLines();
+    int NumColumns() const;
+    int NumRows() const;
 protected:
     void PaintContent(Graphics& graphics, const Rect& clipRect) override;
     void OnKeyDown(KeyEventArgs& args) override;

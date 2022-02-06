@@ -245,6 +245,7 @@ void AddResourcesInProjectToCurrentModule(sngcm::ast::Project& project, cmajor::
 
 void ProcessResourcesInProject(sngcm::ast::Project& project, cmajor::symbols::Module& currentModule, sngcm::ast::BackEnd backend)
 {
+    if (backend == sngcm::ast::BackEnd::cmsx) return;
     AddResourcesInProjectToCurrentModule(project, currentModule);
     if (project.GetTarget() == Target::program || project.GetTarget() == Target::winapp || project.GetTarget() == Target::winguiapp)
     {

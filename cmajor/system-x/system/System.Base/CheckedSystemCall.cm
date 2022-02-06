@@ -203,4 +203,42 @@ namespace System.Os
         }
         return result;
     }
+    
+    public int OpenResource(const char* resource_name)
+    {
+        int rd = open_resource(resource_name);
+        if (rd == -1)
+        {
+            ThrowSystemError();
+        }
+        return rd;
+    }
+    
+    public void CloseResource(int rd)
+    {
+        int result = close_resource(rd);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public long GetResourceSize(int rd)
+    {
+        long size = get_resource_size(rd);
+        if (size == -1)
+        {
+            ThrowSystemError();
+        }
+        return size;
+    }
+    
+    public void ReadResource(int rd, long offset, long size, byte* buffer)
+    {
+        int result = read_resource(rd, offset, size, buffer);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
 }

@@ -1,0 +1,64 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.Os;
+
+namespace System
+{
+    public ResourcePtr GetResource(const char* resourceName)
+    {
+        return ResourcePtr(OpenResource(resourceName));
+    }
+    
+    public class ResourcePtr
+    {
+        public ResourcePtr(int rd_) : rd(rd_), size(GetResourceSize(rd))
+        {
+            data = cast<byte*>(MemAlloc(size));
+            ReadResource(rd, 0, size, data);
+        }
+        suppress ResourcePtr(const ResourcePtr&);
+        suppress void operator=(const ResourcePtr&);
+        public nothrow ResourcePtr(ResourcePtr&& that) : rd(that.rd), size(that.size), data(that.data)
+        {
+            that.rd = -1;
+            that.size = -1;
+            that.data = null;
+        }
+        public default nothrow void operator=(ResourcePtr&& that);
+        public ~ResourcePtr()
+        {
+            if (data != null)
+            {
+                MemFree(data);
+            }
+            if (rd != -1)
+            {
+                close_resource(rd);
+            }
+        }
+        public nothrow int Descriptor() const
+        {
+            return rd;
+        }
+        public nothrow long Size() const
+        {
+            return size;
+        }
+        public nothrow byte* Data() const
+        {
+            return data;
+        }
+        public nothrow byte* ReleaseData() 
+        {
+            byte* result = data;
+            data = null;
+            return result;
+        }
+        private int rd;
+        private long size;
+        private byte* data;
+    }
+}

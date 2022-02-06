@@ -28,6 +28,7 @@ void CreateArchive(int logStreamId, const std::string& archiveFilePath, const st
             std::unique_ptr<BinaryFile> binaryFile(ReadBinaryFile(objectFilePaths[i]));
             if (binaryFile->Kind() == BinaryFileKind::objectFile)
             {
+                binaryFile->SetParent(archiveFile.get());
                 archiveFile->AddObjectFile(static_cast<ObjectFile*>(binaryFile.release()));
             }
             else

@@ -1,0 +1,14 @@
+using System;
+using System.IO;
+
+void main()
+{
+	int rd = open_resource("abc");
+	if (rd != -1)
+	{
+		long size = get_resource_size(rd);
+		Buffer buffer(size);
+		int result = read_resource(rd, 0, size, buffer.Mem());
+		close_resource(rd);
+	}
+}

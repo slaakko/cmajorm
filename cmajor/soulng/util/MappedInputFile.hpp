@@ -20,6 +20,7 @@ public:
     ~MappedInputFile();
     const char* Begin() const;
     const char* End() const;
+    const std::string& FileName() const { return fileName; }
 private:
     std::string fileName;
     MappedInputFileImpl* impl;

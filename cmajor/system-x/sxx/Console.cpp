@@ -4,6 +4,8 @@
 // =================================
 
 #include <system-x/sxx/Console.hpp>
+#include <system-x/sxx/Color.hpp>
+#include <system-x/kernel/OsFileApi.hpp>
 #include <io.h>
 #include <fcntl.h>
 
@@ -39,6 +41,16 @@ void Console::SetToTextMode()
     _setmode(2, _O_TEXT);
 }
 
+int Console::Columns() const
+{
+    return cmsx::kernel::OsGetConsoleNumberOfColumns();
+}
+
+int Console::Rows() const
+{
+    return cmsx::kernel::OsGetConsoleNumberOfRows();
+}
+
 void Console::Close(cmsx::machine::Process* process)
 {
 }
@@ -61,6 +73,16 @@ int64_t Console::Write(const std::vector<uint8_t>& buffer, cmsx::machine::Proces
             if (c < static_cast<char32_t>(0x100000u))
             {
                 utf32Chars.push_back(c);
+            }
+            else if (c < 0x10FFFD)
+            {
+                uint8_t fgColor = static_cast<uint32_t>(c) & 0xFF;
+                uint8_t bgColor = (static_cast<uint32_t>(c) >> 8) & 0xFF;
+                utf32Chars.append(SetColors(static_cast<ConsoleColor>(fgColor), static_cast<ConsoleColor>(bgColor)));
+            }
+            else if (c == 0x10FFFD)
+            {
+                utf32Chars.append(ResetColors());
             }
         }
     }

@@ -101,6 +101,10 @@ Section* ReadSection(BinaryFile* file, BinaryStreamReader& reader)
     {
         section = new DebugSection(file);
     }
+    else if (sectionName == "RSRC")
+    {
+        section = new ResourceSection(file);
+    }
     else
     {
         throw std::runtime_error("error reading '" + file->FilePath() + "': unknown section name '" + sectionName + "'");
@@ -110,7 +114,7 @@ Section* ReadSection(BinaryFile* file, BinaryStreamReader& reader)
 }
 
 Section::Section(SectionKind kind_, BinaryFile* file_) : 
-    kind(kind_), file(file_), baseAddress(0), pos(0), copyTargetSection(nullptr), removeOffset(0), dataLength(0)
+    kind(kind_), file(file_), baseAddress(0), pos(0), copyTargetSection(nullptr), removeOffset(0), dataLength(0), dataStart(0)
 {
 }
 
@@ -145,6 +149,10 @@ std::string Section::Name() const
         case SectionKind::dbug:
         {
             return "debug";
+        }
+        case SectionKind::rsrc:
+        {
+            return "resource";
         }
         default:
         {
@@ -187,9 +195,15 @@ void Section::Write(BinaryStreamWriter& writer)
             writer.Write("DBUG", false);
             break;
         }
+        case SectionKind::rsrc:
+        {
+            writer.Write("RSRC", false);
+            break;
+        }
     }
     writer.Write(Length());
     writer.Write(BaseAddress());
+    dataStart = writer.Position();
     int64_t n = Length();
     for (int64_t i = 0; i < n; ++i)
     {
@@ -553,15 +567,6 @@ SymbolSection::SymbolSection(BinaryFile* file_) : Section(SectionKind::symb, fil
 {
 }
 
-void SymbolSection::Finalize()
-{
-    if (Address() != 0)
-    {
-        throw std::runtime_error("error finalizing: pos == 0 in symbol section of file '" + File()->FilePath() + " expected");
-    }
-    EmitSymbolTable();
-}
-
 void SymbolSection::Read(BinaryStreamReader& reader)
 {
     Section::Read(reader);
@@ -572,6 +577,20 @@ void SymbolSection::Read(BinaryStreamReader& reader)
         Symbol* symbol = ReadSymbol();
         File()->GetSymbolTable().AddSymbol(symbol, false);
     }
+}
+
+void SymbolSection::Write(BinaryStreamWriter& writer)
+{
+    BinaryFile* file = File();
+    if (!file->Parent() || file->Parent()->Kind() != BinaryFileKind::archiveFile)
+    {
+        if (Address() != 0)
+        {
+            throw std::runtime_error("error finalizing: pos == 0 in symbol section of file '" + File()->FilePath() + " expected");
+        }
+        EmitSymbolTable();
+    }
+    Section::Write(writer);
 }
 
 void SymbolSection::EmitSymbolTable()
@@ -770,11 +789,79 @@ void DebugSection::Read(BinaryStreamReader& reader)
     }
 }
 
+ResourceSection::ResourceSection(BinaryFile* file_) : Section(SectionKind::rsrc, file_)
+{
+}
+
+void ResourceSection::AddResource(Resource* resource)
+{
+    resources.push_back(std::unique_ptr<Resource>(resource));
+}
+
+void ResourceSection::Finalize()
+{
+    if (File()->Kind() == BinaryFileKind::objectFile)
+    {
+        if (Address() != 0)
+        {
+            throw std::runtime_error("error finalizing: pos == 0 in resource section of file '" + File()->FilePath() + " expected");
+        }
+        EmitResources();
+    }
+}
+
+void ResourceSection::Read(BinaryStreamReader& reader)
+{
+    Section::Read(reader);
+    if (File()->Kind() == BinaryFileKind::objectFile)
+    {
+        SetPos(0);
+        uint32_t count = ReadTetra();
+        for (uint32_t i = 0; i < count; ++i)
+        {
+            std::unique_ptr<Resource> resource(new Resource());
+            resource->Read(*this);
+            AddResource(resource.release());
+        }
+    }
+}
+
+void ResourceSection::Write(BinaryStreamWriter& writer)
+{
+    Section::Write(writer);
+    int64_t dataStart = DataStart();
+    for (const auto& resourceInfo : resourceInfos)
+    {
+        Symbol* resourceSymbol = File()->GetSymbolTable().GetSymbol(resourceInfo.SymbolIndex());
+        int64_t start = dataStart + resourceInfo.Offset();
+        resourceSymbol->SetStart(start);
+    }
+}
+
+void ResourceSection::AddResourceInfo(const ResourceInfo& resourceInfo)
+{
+    resourceInfos.push_back(resourceInfo);
+}
+
+void ResourceSection::EmitResources()
+{
+    uint32_t count = resources.size();
+    EmitTetra(count);
+    for (uint32_t i = 0; i < count; ++i)
+    {
+        Resource* resource = resources[i].get();
+        resource->Emit(*this);
+    }
+}
+
 BinaryFile::BinaryFile(const std::string& filePath_, BinaryFileKind kind_) : 
-    filePath(filePath_), kind(kind_), 
+    filePath(filePath_),
+    kind(kind_),
+    parent(nullptr),
     headerSection(nullptr),
     codeSection(nullptr),
     dataSection(nullptr),
+    resourceSection(nullptr),
     symbolSection(nullptr),
     linkSection(nullptr),
     debugSection(nullptr),
@@ -817,7 +904,7 @@ void BinaryFile::Write(BinaryStreamWriter& writer)
 void BinaryFile::Read(BinaryStreamReader& reader)
 {
     int32_t numSections = reader.ReadInt();
-    if (numSections < 0 || numSections > 6)
+    if (numSections < 0 || numSections > 7)
     {
         throw std::runtime_error("invalid number of file sections: " + std::to_string(numSections));
     }
@@ -853,6 +940,11 @@ void BinaryFile::AddSection(Section* section)
             dataSection = static_cast<DataSection*>(section);
             break;
         }
+        case SectionKind::rsrc:
+        {
+            resourceSection = static_cast<ResourceSection*>(section);
+            break;
+        }
         case SectionKind::symb:
         {
             symbolSection = static_cast<SymbolSection*>(section);
@@ -885,6 +977,7 @@ void ObjectFile::CreateSections()
     AddSection(new HeaderSection(this));
     AddSection(new CodeSection(this));
     AddSection(new DataSection(this));
+    AddSection(new ResourceSection(this));
     AddSection(new SymbolSection(this));
     AddSection(new LinkSection(this));
     AddSection(new DebugSection(this));
@@ -961,6 +1054,7 @@ void ExecutableFile::CreateSections()
     AddSection(new HeaderSection(this));
     AddSection(new CodeSection(this));
     AddSection(new DataSection(this));
+    AddSection(new ResourceSection(this));
     AddSection(new SymbolSection(this));
 }
 

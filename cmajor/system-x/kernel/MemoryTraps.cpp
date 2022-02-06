@@ -7,6 +7,7 @@
 #include <system-x/kernel/Trap.hpp>
 #include <system-x/kernel/Heap.hpp>
 #include <system-x/kernel/Process.hpp>
+#include <system-x/kernel/Resource.hpp>
 
 namespace cmsx::kernel {
 
@@ -134,6 +135,99 @@ uint64_t TrapMCpyHandler::HandleTrap(cmsx::machine::Processor& processor)
     }
 }
 
+class TrapOpenResourceHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_open_resource"; }
+};
+
+uint64_t TrapOpenResourceHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* currentProcess = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        uint64_t resource_name_addr = processor.Regs().Get(cmsx::machine::regAX);
+        return OpenResource(currentProcess, resource_name_addr);
+    }
+    catch (const SystemError& error)
+    {
+        currentProcess->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapCloseResourceHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_close_resource"; }
+};
+
+uint64_t TrapCloseResourceHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* currentProcess = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t rd = processor.Regs().Get(cmsx::machine::regAX);
+        CloseResource(currentProcess, rd);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        currentProcess->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapGetResourceSizeHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_get_resource_size"; }
+};
+
+uint64_t TrapGetResourceSizeHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* currentProcess = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t rd = processor.Regs().Get(cmsx::machine::regAX);
+        return GetResourceSize(currentProcess, rd);
+    }
+    catch (const SystemError& error)
+    {
+        currentProcess->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapReadResourceHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_read_resource"; }
+};
+
+uint64_t TrapReadResourceHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* currentProcess = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t rd = processor.Regs().Get(cmsx::machine::regAX);
+        int64_t offset = processor.Regs().Get(cmsx::machine::regBX);
+        int64_t length = processor.Regs().Get(cmsx::machine::regCX);
+        int64_t buffer_addr = processor.Regs().Get(cmsx::machine::regDX);
+        ReadResource(currentProcess, rd, offset, length, buffer_addr);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        currentProcess->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
 void InitMemoryTraps()
 {
     SetTrapHandler(trap_memory_page_size, new TrapMemoryPageSizeHandler());
@@ -142,10 +236,18 @@ void InitMemoryTraps()
     SetTrapHandler(trap_allocate_memory_pages, new TrapAllocateMemoryPagesHandler());
     SetTrapHandler(trap_dump_heap, new TrapDumpHeapHandler());
     SetTrapHandler(trap_mcpy, new TrapMCpyHandler());
+    SetTrapHandler(trap_open_resource, new TrapOpenResourceHandler());
+    SetTrapHandler(trap_close_resource, new TrapCloseResourceHandler());
+    SetTrapHandler(trap_get_resource_size, new TrapGetResourceSizeHandler());
+    SetTrapHandler(trap_read_resource, new TrapReadResourceHandler());
 }
 
 void DoneMemoryTraps()
 {
+    SetTrapHandler(trap_read_resource, nullptr);
+    SetTrapHandler(trap_get_resource_size, nullptr);
+    SetTrapHandler(trap_close_resource, nullptr);
+    SetTrapHandler(trap_open_resource, nullptr);
     SetTrapHandler(trap_mcpy, nullptr);
     SetTrapHandler(trap_dump_heap, nullptr);
     SetTrapHandler(trap_allocate_memory_pages, nullptr);

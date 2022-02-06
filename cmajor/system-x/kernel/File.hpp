@@ -51,7 +51,10 @@ public:
     virtual bool IsWritable() const = 0;
     virtual bool IsConsole() const = 0;
     virtual bool IsHostTextFile() const = 0;
+    virtual bool IsResource() const = 0;
     virtual bool HasColors() const = 0;
+    virtual int Columns() const = 0;
+    virtual int Rows() const = 0;
     virtual bool IsDirFile() const { return false; }
     virtual std::vector<uint8_t> Read(int64_t count, cmsx::machine::Process* process);
     virtual int64_t Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process);

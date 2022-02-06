@@ -52,6 +52,7 @@
 #endif
 #include <system-x/object/Archive.hpp>
 #include <system-x/object/Link.hpp>
+#include <system-x/object/Resource.hpp>
 #include <system-x/intermediate/CppProjectFileGenerator.hpp>
 #include <system-x/intermediate/CppCodeGenerator.hpp>
 #include <sngjson/json/JsonLexer.hpp>
@@ -2868,6 +2869,15 @@ ProjectInfo ReadPojectInfo(Project* project, const std::string& projectInfoFileP
     return projectInfo;
 }
 
+void AddResourcesSystemX(Project* project, std::vector<std::string>& objectFilePaths)
+{
+    for (const auto& resourceFilePath : project->ResourceFilePaths())
+    {
+        std::string objectFilePath = cmsx::object::GenerateResourceUnit(resourceFilePath, project->LibraryDir());
+        objectFilePaths.push_back(objectFilePath);
+    }
+}
+
 void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& stop, bool resetRootModule, std::set<std::string>& builtProjects)
 {
     try
@@ -3084,6 +3094,10 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                     {
                         CreateMainUnitSystemX(objectFilePaths, *rootModule, emittingContext, &attributeBinder, mainObjectFilePath);
                     }
+                }
+                if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
+                {
+                    AddResourcesSystemX(project, objectFilePaths);
                 }
                 if (!objectFilePaths.empty())
                 {

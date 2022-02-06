@@ -194,6 +194,14 @@ int32_t IOCtl(Process* process, int32_t fd, int32_t item)
         {
             return static_cast<int32_t>(file->HasColors());
         }
+        case IOControlItem::columns:
+        {
+            return static_cast<int32_t>(file->Columns());
+        }
+        case IOControlItem::rows:
+        {
+            return static_cast<int32_t>(file->Rows());
+        }
         default:
         {
             throw SystemError(EPARAM, "unknown ioctl item");

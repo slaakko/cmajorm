@@ -50,6 +50,10 @@ const uint8_t trap_closedir = 35;
 const uint8_t trap_readdir = 36;
 const uint8_t trap_utime = 37;
 const uint8_t trap_mcpy = 38;
+const uint8_t trap_open_resource = 39;
+const uint8_t trap_close_resource = 40;
+const uint8_t trap_get_resource_size = 41;
+const uint8_t trap_read_resource = 42;
 
 class CMSX_KERNEL_API TrapHandler
 {

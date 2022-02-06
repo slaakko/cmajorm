@@ -2,7 +2,7 @@ using System;
 
 namespace System
 {
-    enum ConsoleColor : byte
+    public enum ConsoleColor : byte
     {
         black = 0u, darkBlue = 1u, darkGreen = 2u, darkCyan = 3u, darkRed = 4u, darkYellow = 6u, gray = 7u,
         darkGray = 8u, blue = 9u, green = 10u, cyan = 11u, red = 12u, magenta = 13u, yellow = 14u, white = 15u
@@ -23,7 +23,7 @@ namespace System
     
     public nothrow uchar ColorChar(ConsoleColor foreColor, ConsoleColor backColor)
     {
-        return cast<uchar>(cast<uint>(colorChar) | cast<uint>(cast<ushort>(cast<byte>(foregroundColor)) | (cast<ushort>(cast<byte>(backgroundColor)) << 8u)));
+        return cast<uchar>(cast<uint>(colorChar) | cast<uint>(cast<ushort>(cast<byte>(foreColor)) | (cast<ushort>(cast<byte>(backColor)) << 8u)));
     }
     
     public nothrow string SetColors(ConsoleColor foreColor, ConsoleColor backColor)

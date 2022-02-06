@@ -30,7 +30,10 @@ public:
     bool IsWritable() const override { return (flags & OpenFlags::write) != OpenFlags::none; }
     bool IsConsole() const override { return false; }
     bool IsHostTextFile() const override { return false; }
+    bool IsResource() const override { return false; }
     bool HasColors() const override { return false; }
+    int Columns() const override { return 0; }
+    int Rows() const override { return 0; }
     int32_t GetBlockNumber(INode* inode, cmsx::machine::Process* process, bool allocate) const override;
     INodePtr GetINode(cmsx::machine::Process* process) override;
     int64_t Read(Block* block, cmsx::machine::Process* process) override;
@@ -137,6 +140,7 @@ int32_t RootFilesystemDirFile::Read(DirectoryEntry& dirEntry, cmsx::machine::Pro
             dirEntry.Read(blockPtr.Get(), dirEntryIndex++);
             return 1;
         }
+        dirEntryIndex = 0;
         ++logicalBlockNumber;
         blockNumber = MapBlockNumber(logicalBlockNumber, dirINode, fs, process);
     }

@@ -19,7 +19,10 @@ public:
     bool IsWritable() const override { return false; }
     bool IsConsole() const override { return false; }
     bool IsHostTextFile() const override { return false; }
+    bool IsResource() const override { return false; }
     bool HasColors() const override { return false; }
+    int Columns() const override { return 0; }
+    int Rows() const override { return 0; }
     virtual int32_t Read(DirectoryEntry& dirEntry, cmsx::machine::Process* process) = 0;
 };
 

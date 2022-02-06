@@ -352,6 +352,18 @@ void Console::OutputLines()
     }
 }
 
+int Console::NumColumns() const
+{
+    Size sz = GetSize();
+    return static_cast<int>(sz.Width / CharWidth());
+}
+
+int Console::NumRows() const
+{
+    Size sz = GetSize();
+    return static_cast<int>(sz.Height / CharHeight());
+}
+
 void Console::AddColor(ConsoleColor color, std::vector<ColorCount>& colorLine)
 {
     if (colorLine.empty() || color != colorLine.back().color)

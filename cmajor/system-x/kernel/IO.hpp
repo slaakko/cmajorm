@@ -19,7 +19,9 @@ enum class IOControlItem : int32_t
 {
 	isConsole = 0,
 	isHostTextFile = 1,
-	hasColors = 2
+	hasColors = 2,
+    columns = 3,
+    rows = 4
 };
 
 CMSX_KERNEL_API std::vector<std::uint8_t> MakeStringBuffer(const std::string& str, int64_t maxLength);

@@ -3,6 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
+#ifndef SXX_CONSOLE_INCLUDED
+#define SXX_CONSOLE_INCLUDED
 #include <iostream>
 #include <system-x/kernel/File.hpp>
 #include <soulng/util/Unicode.hpp>
@@ -19,7 +21,10 @@ public:
     bool IsWritable() const override { return true; }
     bool IsConsole() const override { return true; }
     bool IsHostTextFile() const override { return false; }
-    bool HasColors() const override { return false; }
+    bool IsResource() const override { return false; }
+    bool HasColors() const override { return true; }
+    int Columns() const override;
+    int Rows() const override;
     void Close(cmsx::machine::Process* process) override;
     std::vector<uint8_t> Read(int64_t count, cmsx::machine::Process* process) override;
     int64_t Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process) override;
@@ -33,3 +38,5 @@ private:
 };
 
 } // namespace sxx
+
+#endif // SXX_CONSOLE_INCLUDED

@@ -30,7 +30,10 @@ public:
     bool IsWritable() const override { return (flags & OpenFlags::write) != OpenFlags::none; }
     bool IsConsole() const override { return false; }
     bool IsHostTextFile() const override { return (flags & OpenFlags::text) != OpenFlags::none; }
+    bool IsResource() const override { return false; }
     bool HasColors() const override { return false; }
+    int Columns() const override { return 0; }
+    int Rows() const override { return 0; }
     int32_t GetBlockNumber(INode* inode, cmsx::machine::Process* process, bool allocate) const override;
     INodePtr GetINode(cmsx::machine::Process* process) override;
     int64_t Read(Block* block, cmsx::machine::Process* process) override;

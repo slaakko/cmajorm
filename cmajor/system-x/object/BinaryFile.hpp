@@ -8,6 +8,7 @@
 #include <system-x/object/Symbol.hpp>
 #include <system-x/object/Link.hpp>
 #include <system-x/object/Debug.hpp>
+#include <system-x/object/Resource.hpp>
 #include <soulng/util/BinaryStreamReader.hpp>
 #include <soulng/util/BinaryStreamWriter.hpp>
 #include <string>
@@ -24,7 +25,7 @@ enum class BinaryFileKind
 
 enum class SectionKind
 {
-    fhdr, code, data, symb, link, dbug
+    fhdr, code, data, symb, link, dbug, rsrc
 };
 
 const char binary_file_version_1 = '1';
@@ -32,6 +33,7 @@ const char current_binary_file_version = binary_file_version_1;
 
 class Section;
 class BinaryFile;
+class Resource;
 
 CMSX_OBJECT_API BinaryFile* ReadBinaryFile(const std::string& filePath);
 CMSX_OBJECT_API Section* ReadSection(BinaryFile* file, BinaryStreamReader& reader);
@@ -53,6 +55,7 @@ public:
     bool IsSymbolSection() const { return kind == SectionKind::symb; }
     bool IsLinkSection() const { return kind == SectionKind::link; }
     bool IsDebugSection() const { return kind == SectionKind::dbug; }
+    bool IsResourceSection() const { return kind == SectionKind::rsrc; }
     std::string Name() const;
     virtual void Write(BinaryStreamWriter& writer);
     virtual void Read(BinaryStreamReader& reader);
@@ -90,6 +93,7 @@ public:
     void SetCopyTargetSection(Section* copyTargetSection_) { copyTargetSection = copyTargetSection_; }
     int64_t RemoveOffset() const { return removeOffset; }
     void SetRemoveOffset(int64_t removeOffset_) { removeOffset = removeOffset_; }
+    int64_t DataStart() const { return dataStart; }
 private:
     BinaryFile* file;
     SectionKind kind;
@@ -99,6 +103,7 @@ private:
     int64_t dataLength;
     Section* copyTargetSection;
     int64_t removeOffset;
+    int64_t dataStart;
 };
 
 class CMSX_OBJECT_API HeaderSection : public Section
@@ -129,8 +134,8 @@ class CMSX_OBJECT_API SymbolSection : public Section
 {
 public:
     SymbolSection(BinaryFile* file_);
-    void Finalize() override;
     void Read(BinaryStreamReader& reader) override;
+    void Write(BinaryStreamWriter& writer) override;
 private:
     void EmitSymbolTable();
     void EmitSymbol(Symbol* symbol);
@@ -172,6 +177,24 @@ private:
     std::vector<std::unique_ptr<DebugRecord>> debugRecords;
 };
 
+class CMSX_OBJECT_API ResourceSection : public Section
+{
+public:
+    ResourceSection(BinaryFile* file_);
+    ResourceSection(const ResourceSection&) = delete;
+    ResourceSection& operator=(const ResourceSection&) = delete;
+    void AddResource(Resource* resource);
+    void Finalize() override;
+    void Write(BinaryStreamWriter& writer) override;
+    void Read(BinaryStreamReader& reader) override;
+    const std::vector<std::unique_ptr<Resource>>& Resources() const { return resources; }
+    void AddResourceInfo(const ResourceInfo& resourceInfo);
+private:
+    void EmitResources();
+    std::vector<std::unique_ptr<Resource>> resources;
+    std::vector<ResourceInfo> resourceInfos;
+};
+
 class CMSX_OBJECT_API BinaryFile
 {
 public:
@@ -189,11 +212,14 @@ public:
     const std::string& FileName() const { return fileName; }
     void SetFileName(const std::string& fileName_);
     BinaryFileKind Kind() const { return kind; }
+    BinaryFile* Parent() const { return parent; }
+    void SetParent(BinaryFile* parent_) { parent = parent_; }
     int32_t SectionCount() const { return sections.size(); }
     void AddSection(Section* section);
     HeaderSection* GetHeaderSection() const { return headerSection; }
     CodeSection* GetCodeSection() const { return codeSection; }
     DataSection* GetDataSection() const { return dataSection; }
+    ResourceSection* GetResourceSection() const { return resourceSection; }
     SymbolSection* GetSymbolSection() const { return symbolSection; }
     LinkSection* GetLinkSection() const { return linkSection; }
     DebugSection* GetDebugSection() const { return debugSection; }
@@ -201,12 +227,14 @@ public:
     SymbolTable* ReleaseSymbolTable() { return symbolTable.release(); }
 private:
     BinaryFileKind kind;
+    BinaryFile* parent;
     std::string filePath;
     std::string fileName;
     std::vector<std::unique_ptr<Section>> sections;
     HeaderSection* headerSection;
     CodeSection* codeSection;
     DataSection* dataSection;
+    ResourceSection* resourceSection;
     SymbolSection* symbolSection;
     LinkSection* linkSection;
     DebugSection* debugSection;
