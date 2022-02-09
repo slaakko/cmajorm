@@ -1,0 +1,54 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/lexer/Lexeme.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/lexer/Lexeme.cpp' using cpp2cm version 1.0.0
+
+namespace System.Lex
+{
+    public class Lexeme
+    {
+        public Lexeme() :
+            begin(null), end(null)
+        {
+        }
+        public Lexeme(const uchar* begin_, const uchar* end_) :
+            begin(begin_), end(end_)
+        {
+        }
+        public ustring ToString() const
+        {
+            return ustring(begin, end);
+        }
+        public const uchar* begin;
+        public const uchar* end;
+    }
+    public inline bool operator==(const Lexeme& left, const Lexeme& right)
+    {
+        if (left.end - left.begin != right.end - right.begin) return false;
+        const uchar* p = left.begin;
+        const uchar* q = right.begin;
+        while (p != left.end)
+        {
+            if (*p != *q) return false;
+            ++p;
+            ++q;
+        }
+        return true;
+    }
+    public inline bool operator<(const Lexeme& left, const Lexeme& right)
+    {
+        const uchar* p = left.begin;
+        const uchar* q = right.begin;
+        while (p != left.end && q != right.end)
+        {
+            if (*p < *q) return true;
+            if (*p > *q) return false;
+            ++p;
+            ++q;
+        }
+        if (p == left.end) return q != right.end;
+        return false;
+    }
+} // namespace System.Lex

@@ -22,6 +22,8 @@ public void PrintUsage()
     Console.Out() << "  No predefined identifier classes" << endl();
     Console.Out() << "--no-class-map-compression | -c" << endl();
     Console.Out() << "  Do not compress class maps." << endl();
+    Console.Out() << "--system-x | -x" << endl();
+    Console.Out() << "  Generate System X compatible lexer." << endl();
 }
 public int main(int argc, const char** argv)
 {
@@ -30,6 +32,7 @@ public int main(int argc, const char** argv)
         bool verbose = false;
         bool debug = false;
         bool noClassMapCompression = false;
+        bool systemX = false;
         soulcm.scmlg.IdentifierClassKind identifierClassKind = soulcm.scmlg.IdentifierClassKind.unicode;
         string fileName;
         for (int i = 1; i < argc; ++i)
@@ -61,6 +64,10 @@ public int main(int argc, const char** argv)
                 else if (arg == "--no-class-map-compression")
                 {
                     noClassMapCompression = true;
+                }
+                else if (arg == "--system-x")
+                {
+                    systemX = true;
                 }
                 else
                 {
@@ -101,6 +108,10 @@ public int main(int argc, const char** argv)
                     {
                         noClassMapCompression = true;
                     }
+                    else if (o == 'x')
+                    {
+                        systemX = true;
+                    }
                     else
                     {
                         throw Exception("unknown option \'-" + string(o, 1) + "\'");
@@ -131,7 +142,7 @@ public int main(int argc, const char** argv)
         soulcm.scmlg.RegularExpressionParser regularExpressionParser;
         lexerContext.SetParser(&regularExpressionParser);
         string root = Path.GetDirectoryName(fileName);
-        lexerFile->Process(root, verbose, debug, noClassMapCompression, lexerContext);
+        lexerFile->Process(root, verbose, debug, noClassMapCompression, systemX, lexerContext);
     }
     catch (const Exception& ex)
     {

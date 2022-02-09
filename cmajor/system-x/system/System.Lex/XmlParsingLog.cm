@@ -1,0 +1,120 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Text;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/lexer/XmlParsingLog.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/lexer/XmlParsingLog.cpp' using cpp2cm version 1.0.0
+
+namespace System.Lex
+{
+    public class XmlParsingLog : ParsingLog
+    {
+        public XmlParsingLog(StreamWriter& stream_) :
+            base(), formatter(stream_)
+        {
+            formatter.SetIndentSize(1);
+        }
+        public XmlParsingLog(StreamWriter& stream_, int maxLineLength_) :
+            base(maxLineLength_), formatter(stream_)
+        {
+            formatter.SetIndentSize(1);
+        }
+        public CodeFormatter& Formatter()
+        {
+            return formatter;
+        }
+        public void WriteElement(const ustring& elementName, const ustring& elementContent)
+        {
+            ustring converted = XmlEscape(elementContent);
+            int convertedLength = cast<int>(converted.Length());
+            int lineLength = 2 * cast<int>(elementName.Length()) + 5 + convertedLength;
+            ustring s = converted;
+            if (lineLength > MaxLineLength())
+            {
+                lineLength = lineLength + 3;
+                s = converted.Substring(0, Max(cast<int>(0), convertedLength - (lineLength - MaxLineLength()))) + u"...";
+            }
+            Write(u"<" + elementName + u">" + s + u"</" + elementName + u">");
+        }
+        public void Write(const ustring& s)
+        {
+            formatter.WriteLine(ToUtf8(s));
+        }
+        public override void IncIndent()
+        {
+            formatter.IncIndent();
+        }
+        public override void DecIndent()
+        {
+            formatter.DecIndent();
+        }
+        public override void WriteBeginRule(const ustring& ruleName)
+        {
+            Write(u"<" + ruleName + u">");
+        }
+        public override void WriteEndRule(const ustring& ruleName)
+        {
+            Write(u"</" + ruleName + u">");
+        }
+        public override void WriteTry(const ustring& s)
+        {
+            WriteElement(u"try", s);
+        }
+        public override void WriteSuccess(const ustring& match)
+        {
+            WriteElement(u"success", match);
+        }
+        public override void WriteFail()
+        {
+            Write(u"<fail/>");
+        }
+        private CodeFormatter formatter;
+    }
+    public ustring XmlHexEscape(uchar c)
+    {
+        StringWriter writer;
+        writer << "&#x" << ToHexString(cast<uint>(c)) << ";";
+        return ToUtf32(writer.GetString());
+    }
+    public ustring XmlCharStr(uchar c)
+    {
+        switch (c)
+        {
+            case '&': return u"&amp;";
+            case '<': return u"&lt;";
+            case '>': return u"&gt;";
+            case '\a': return u"\\a";
+            case '\b': return u"\\b";
+            case '\f': return u"\\f";
+            case '\n': return u"\\n";
+            case '\r': return u"\\r";
+            case '\t': return u"\\t";
+            case '\v': return u"\\v";
+            default: 
+            {
+                if ((cast<int>(c) >= 32 && cast<int>(c) <= 126))
+                {
+                    return ustring(c, 1);
+                }
+                else
+                {
+                    return XmlHexEscape(c);
+                }
+            }
+        }
+        return ustring();
+    }
+    public ustring XmlEscape(const ustring& s)
+    {
+        ustring result;
+        result.Reserve(2 * s.Length());
+        String<uchar>.ConstIterator e = s.CEnd();
+        for (String<uchar>.ConstIterator i = s.CBegin(); i != e; ++i)
+        {
+            result.Append(XmlCharStr(*i));
+        }
+        return result;
+    }
+} // namespace System.Lex

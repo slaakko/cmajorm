@@ -32,33 +32,36 @@ void ExpandTabs(const std::string& directory, bool verbose)
         {
             int tabs = 0;
             std::string filePath = it->path().generic_string();
-            std::string s = ReadFile(filePath);
-            std::string t;
-            for (char c : s)
+            if (Path::GetExtension(filePath) == ".cm")
             {
-                if (c == '\t')
+                std::string s = ReadFile(filePath);
+                std::string t;
+                for (char c : s)
                 {
-                    ++tabs;
-                    t.append(4, ' ');
+                    if (c == '\t')
+                    {
+                        ++tabs;
+                        t.append(4, ' ');
+                    }
+                    else if (c != '\r')
+                    {
+                        t.append(1, c);
+                    }
                 }
-                else if (c != '\r')
+                if (tabs > 0 && verbose)
                 {
-                    t.append(1, c);
+                    std::cout << "file '" << it->path().generic_string() << "' contained " << tabs << " tabs" << std::endl;
                 }
+                std::time_t lastWriteTime = boost::filesystem::last_write_time(filePath);
+                std::string oldFilePath = filePath + ".old";
+                boost::filesystem::rename(filePath, oldFilePath);
+                {
+                    std::ofstream outFile(filePath);
+                    outFile << t;
+                }
+                boost::filesystem::last_write_time(filePath, lastWriteTime);
+                boost::filesystem::remove(oldFilePath);
             }
-            if (tabs > 0 && verbose)
-            {
-                std::cout << "file '" << it->path().generic_string() << "' contained " << tabs << " tabs" << std::endl;
-            }
-            std::time_t lastWriteTime = boost::filesystem::last_write_time(filePath);
-            std::string oldFilePath = filePath + ".old";
-            boost::filesystem::rename(filePath, oldFilePath);
-            {
-                std::ofstream outFile(filePath);
-                outFile << t;
-            }
-            boost::filesystem::last_write_time(filePath, lastWriteTime);
-            boost::filesystem::remove(oldFilePath);
         }
         ++it;
     }

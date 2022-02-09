@@ -45,6 +45,12 @@ void BinaryFileFormatter::Format()
         FormatSection(debugSection);
         FormatEol();
     }
+    ResourceSection* resourceSection = file->GetResourceSection();
+    if (resourceSection && resourceSection->Length() > 0)
+    {
+        FormatSection(resourceSection);
+        FormatEol();
+    }
     SymbolTable& symbolTable = file->GetSymbolTable();
     FormatSymbolTable(symbolTable);
     FormatEol();
@@ -121,6 +127,16 @@ void BinaryFileFormatter::FormatSection(DebugSection* section)
     for (const auto& debugRecord : section->DebugRecords())
     {
         FormatString(debugRecord->ToString());
+        FormatEol();
+    }
+}
+
+void BinaryFileFormatter::FormatSection(ResourceSection* section)
+{
+    currentSection = section;
+    for (const auto& resource : section->Resources())
+    {
+        FormatString(resource->ToString());
         FormatEol();
     }
 }

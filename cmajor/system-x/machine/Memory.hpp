@@ -87,6 +87,7 @@ public:
     void CopyRange(uint64_t fromRV, uint64_t toRV, uint64_t start, uint64_t length);
     void ShareRange(uint64_t fromRV, uint64_t toRV, uint64_t start, uint64_t length);
     void Copy(uint64_t rv, uint64_t sourceVirtualAddress, uint64_t targetVirtualAddress, uint64_t count);
+    void NCopy(const uint8_t* source, uint64_t rv, uint64_t targetVirtualAddress, uint64_t count);
 private:
     MemoryPage* AllocatePage();
     void FreePage(MemoryPage* page);
@@ -100,6 +101,7 @@ private:
     uint64_t ReadOcta(uint64_t address);
     void WriteOcta(uint64_t address, uint64_t value);
     uint64_t TranslateAddress(uint64_t rv, uint64_t virtualAddress, Protection access);
+    uint64_t TranslateAddress(uint64_t rv, uint64_t virtualAddress, Protection access, int64_t& pageOffset);
     Machine& machine;
     int maxProcs;
     uint64_t nextRV;

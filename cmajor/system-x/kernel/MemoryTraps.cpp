@@ -8,6 +8,7 @@
 #include <system-x/kernel/Heap.hpp>
 #include <system-x/kernel/Process.hpp>
 #include <system-x/kernel/Resource.hpp>
+#include <system-x/kernel/Compression.hpp>
 
 namespace cmsx::kernel {
 
@@ -228,6 +229,99 @@ uint64_t TrapReadResourceHandler::HandleTrap(cmsx::machine::Processor& processor
     }
 }
 
+class TrapDecompressHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_decompress"; }
+};
+
+uint64_t TrapDecompressHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* currentProcess = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int64_t buffer_addr = processor.Regs().Get(cmsx::machine::regAX);
+        int64_t count = processor.Regs().Get(cmsx::machine::regBX);
+        return Decompress(currentProcess, buffer_addr, count);
+    }
+    catch (const SystemError& error)
+    {
+        currentProcess->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapGetDecompressedDataSizeHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_get_decompressed_data_size"; }
+};
+
+uint64_t TrapGetDecompressedDataSizeHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* currentProcess = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t dd = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
+        return GetDecompressedDataSize(currentProcess, dd);
+    }
+    catch (const SystemError& error)
+    {
+        currentProcess->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapGetDecompressedDataHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_get_decompressed_data"; }
+};
+
+uint64_t TrapGetDecompressedDataHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* currentProcess = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t dd = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
+        int64_t buffer_addr = processor.Regs().Get(cmsx::machine::regBX);
+        int64_t count = processor.Regs().Get(cmsx::machine::regCX);
+        GetDecompressedData(currentProcess, dd, buffer_addr, count);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        currentProcess->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapCloseDecompressionHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_close_decompression"; }
+};
+
+uint64_t TrapCloseDecompressionHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* currentProcess = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t dd = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
+        CloseDecompression(currentProcess, dd);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        currentProcess->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
 void InitMemoryTraps()
 {
     SetTrapHandler(trap_memory_page_size, new TrapMemoryPageSizeHandler());
@@ -240,10 +334,18 @@ void InitMemoryTraps()
     SetTrapHandler(trap_close_resource, new TrapCloseResourceHandler());
     SetTrapHandler(trap_get_resource_size, new TrapGetResourceSizeHandler());
     SetTrapHandler(trap_read_resource, new TrapReadResourceHandler());
+    SetTrapHandler(trap_decompress, new TrapDecompressHandler());
+    SetTrapHandler(trap_get_decompressed_data_size, new TrapGetDecompressedDataSizeHandler());
+    SetTrapHandler(trap_get_decompressed_data, new TrapGetDecompressedDataHandler());
+    SetTrapHandler(trap_close_decompression, new TrapCloseDecompressionHandler());
 }
 
 void DoneMemoryTraps()
 {
+    SetTrapHandler(trap_decompress, nullptr);
+    SetTrapHandler(trap_get_decompressed_data_size, nullptr);
+    SetTrapHandler(trap_get_decompressed_data, nullptr);
+    SetTrapHandler(trap_close_decompression, nullptr);
     SetTrapHandler(trap_read_resource, nullptr);
     SetTrapHandler(trap_get_resource_size, nullptr);
     SetTrapHandler(trap_close_resource, nullptr);

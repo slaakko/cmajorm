@@ -1,0 +1,301 @@
+using System;
+using System.Lex;
+using RexTokens;
+
+namespace System.RegularExpressions
+{
+    public Nfa ParseRegularExpressionPattern(RexLexer& lexer, Context& context)
+    {
+        lexer.SetFlag(LexerFlags.farthestError);
+        ++lexer;
+        Nfa nfa;
+        bool matched = ParseAlternative(lexer, context, nfa);
+        if (!matched || *lexer != END)
+        {
+            lexer.ThrowFarthestError();
+        }
+        return nfa;
+    }
+    
+    public bool ParseAlternative(RexLexer& lexer, Context& context, Nfa& nfa)
+    {
+        long save = lexer.GetPos();
+        if (ParseCatenation(lexer, context, nfa))
+        {
+            while (*lexer == ALT)
+            {
+                ++lexer;
+                Nfa right;
+                if (ParseCatenation(lexer, context, right))
+                {
+                    nfa = Alt(context, nfa, right);
+                }
+                else
+                {
+                    lexer.SetPos(save);
+                    return false;
+                }
+            }
+            return true;
+        }
+        lexer.SetPos(save);
+        return false;
+    }
+    
+    public bool ParseCatenation(RexLexer& lexer, Context& context, Nfa& nfa)
+    {
+        long save = lexer.GetPos();
+        if (ParseRepetition(lexer, context, nfa))
+        {
+            Nfa right;
+            while (ParseRepetition(lexer, context, right))
+            {
+                nfa = Cat(context, nfa, right);
+                right = Nfa();
+            }
+            return true;
+        }
+        lexer.SetPos(save);
+        return false;
+    }
+    
+    public bool ParseRepetition(RexLexer& lexer, Context& context, Nfa& nfa)
+    {
+        long save = lexer.GetPos();
+        if (ParsePrimary(lexer, context, nfa))
+        {
+            switch (*lexer)
+            {
+                case STAR:
+                {
+                    ++lexer;
+                    nfa = Kleene(context, nfa);
+                    return true;
+                }
+                case PLUS:
+                {
+                    ++lexer;
+                    nfa = Pos(context, nfa);
+                    return true;
+                }
+                case QUEST:
+                {
+                    ++lexer;
+                    nfa = Opt(context, nfa);
+                    return true;
+                }
+            }
+            return true;
+        }
+        lexer.SetPos(save);
+        return false;
+    }
+    
+    public bool ParsePrimary(RexLexer& lexer, Context& context, Nfa& nfa)
+    {
+        long save = lexer.GetPos();
+        switch (*lexer)
+        {
+            case LPAREN:
+            {
+                ++lexer;
+                if (ParseAlternative(lexer, context, nfa))
+                {
+                    if (*lexer == RPAREN)
+                    {
+                        ++lexer;
+                        return true;
+                    }
+                }
+                break;
+            }
+            case ESCAPE:
+            {
+                long pos = lexer.GetPos();
+                ++lexer;
+                uchar escape = MakeEscapeValue(lexer.FileName(), lexer.GetToken(pos));
+                nfa = MakeNfa(context, context.MakeChar(escape));
+                return true;
+            }
+            case INVERSE:
+            {
+                ++lexer;
+                nfa = MakeNfa(context, context.MakeChar('^'));
+                return true;
+            }
+            case MINUS:
+            {
+                ++lexer;
+                nfa = MakeNfa(context, context.MakeChar('-'));
+                return true;
+            }
+            case CHAR:
+            {
+                long pos = lexer.GetPos();
+                ++lexer;
+                uchar ch = lexer.GetUChar(pos);
+                Symbol* symbol = context.MakeChar(ch);
+                nfa = MakeNfa(context, symbol);
+                return true;
+            }
+            case DOT:
+            {
+                ++lexer;
+                nfa = MakeNfa(context, context.MakeAny());
+                return true;
+            }
+            default:
+            {
+                Class* cls = null;
+                if (ParseClass(lexer, context, cls))
+                {
+                    nfa = MakeNfa(context, cls);
+                    return true;
+                }
+                break;
+            }
+        }
+        lexer.SetPos(save);
+        return false;
+    }
+    
+    public bool ParseClass(RexLexer& lexer, Context& context, Class*& cls)
+    {
+        long save = lexer.GetPos();
+        if (*lexer == LBRACKET)
+        {
+            ++lexer;
+            cls = context.MakeClass();
+            if (*lexer == INVERSE)
+            {
+                Class* invCls = cls;
+                invCls->SetInverse();
+                ++lexer;
+            }
+            Symbol* symbol = null;
+            while (ParseRange(lexer, context, symbol))
+            {
+                Class* symCls = cls;
+                symCls->AddSymbol(symbol);
+                symbol = null;
+            }
+            if (*lexer == RBRACKET)
+            {
+                ++lexer;
+                return true;
+            }
+        }
+        lexer.SetPos(save);
+        return false;
+    }
+    
+    public bool ParseRange(RexLexer& lexer, Context& context, Symbol*& symbol)
+    {
+        long save = lexer.GetPos();
+        uchar s;
+        if (ParseChar(lexer, context, s))
+        {
+            if (*lexer == MINUS)
+            {
+                ++lexer;
+                uchar e;
+                if (ParseChar(lexer, context, e))
+                {
+                    symbol = context.MakeRange(s, e);
+                    return true;
+                }
+            }
+            else
+            {
+                symbol = context.MakeChar(s);
+                return true;
+            }
+        }
+        lexer.SetPos(save);
+        return false;
+    }
+    
+    public bool ParseChar(RexLexer& lexer, Context& context, uchar& ch)
+    {
+        long save = lexer.GetPos();
+        switch (*lexer)
+        {
+            case LPAREN:
+            {
+                ++lexer;
+                ch = '(';
+                return true;
+            }
+            case RPAREN:
+            {
+                ++lexer;
+                ch = ')';
+                return true;
+            }
+            case LBRACKET:
+            {
+                ++lexer;
+                ch = '[';
+                return true;
+            }
+            case ALT:
+            {
+                ++lexer;
+                ch = '|';
+                return true;
+            }
+            case STAR:
+            {
+                ++lexer;
+                ch = '*';
+                return true;
+            }
+            case PLUS:
+            {
+                ++lexer;
+                ch = '+';
+                return true;
+            }
+            case QUEST:
+            {
+                ++lexer;
+                ch = '?';
+                return true;
+            }
+            case DOT:
+            {
+                ++lexer;
+                ch = '.';
+                return true;
+            }
+            case ESCAPE:
+            {
+                long pos = lexer.GetPos();
+                ++lexer;
+                ch = MakeEscapeValue(lexer.FileName(), lexer.GetToken(pos));
+                return true;
+            }
+            case INVERSE:
+            {
+                ++lexer;
+                ch = '^';
+                return true;
+            }
+            case MINUS:
+            {
+                ++lexer;
+                ch = '-';
+                return true;
+            }
+            case CHAR:
+            {
+                long pos = lexer.GetPos();
+                ++lexer;
+                ch = lexer.GetUChar(pos);
+                return true;
+            }
+        }
+        lexer.SetPos(save);
+        return false;
+    }
+}

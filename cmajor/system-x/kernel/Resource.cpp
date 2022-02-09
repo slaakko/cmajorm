@@ -35,6 +35,18 @@ uint8_t Resource::operator[](int64_t offset) const
     }
 }
 
+const uint8_t* Resource::Address(int64_t offset) const
+{
+    if (offset >= 0 && offset < length)
+    {
+        return static_cast<const uint8_t*>(static_cast<const void*>(file->Begin() + start + offset));
+    }
+    else
+    {
+        throw SystemError(EMEMORYACCESS, "invalid resource offset " + std::to_string(offset) + ", should be between 0 and " + std::to_string(length));
+    }
+}
+
 int32_t OpenResource(Process* process, uint64_t resourceNameAddr)
 {
     if (resourceNameAddr == 0)
@@ -97,12 +109,7 @@ void ReadResource(Process* process, int32_t rd, int64_t offset, int64_t length, 
         throw SystemError(EBADF, std::to_string(rd) + " is not a resource descriptor");
     }
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
-    for (int64_t i = 0; i < length; ++i)
-    {
-        int64_t ofs = offset + i;
-        uint8_t value = (*resource)[ofs];
-        mem.WriteByte(process->RV(), bufferAddr + i, value, cmsx::machine::Protection::write);
-    }
+    mem.NCopy(resource->Address(offset), process->RV(), bufferAddr, length);
 }
 
 } // namespace cmsx::kernel

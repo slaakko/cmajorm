@@ -54,6 +54,10 @@ const uint8_t trap_open_resource = 39;
 const uint8_t trap_close_resource = 40;
 const uint8_t trap_get_resource_size = 41;
 const uint8_t trap_read_resource = 42;
+const uint8_t trap_decompress = 43;
+const uint8_t trap_get_decompressed_data_size = 44;
+const uint8_t trap_get_decompressed_data = 45;
+const uint8_t trap_close_decompression = 46;
 
 class CMSX_KERNEL_API TrapHandler
 {

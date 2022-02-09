@@ -1,0 +1,24 @@
+private int* classMap = null;
+
+public static class RexClassMap
+{
+    public static void Init()
+    {
+        if (classMap == null)
+        {
+            classMap = System.Lex.ReadClassMap("RexClassMap");
+        }
+    }
+    public static int GetClass(uchar c)
+    {
+        int i = cast<int>(c);
+        if (i < 1114112)
+        {
+            return classMap[i];
+        }
+        else
+        {
+            return -1;
+        }
+    }
+}

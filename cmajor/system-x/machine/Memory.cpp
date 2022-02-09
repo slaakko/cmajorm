@@ -9,6 +9,8 @@
 #include <soulng/util/TextUtils.hpp>
 #include <Windows.h>
 #include <stdexcept>
+#undef min
+#undef max
 
 namespace cmsx::machine {
 
@@ -407,7 +409,36 @@ void Memory::Copy(uint64_t rv, uint64_t sourceVirtualAddress, uint64_t targetVir
     std::memcpy(reinterpret_cast<void*>(to), reinterpret_cast<void*>(from), count);
 }
 
+void Memory::NCopy(const uint8_t* source, uint64_t rv, uint64_t targetVirtualAddress, uint64_t count)
+{
+    if (count == 0) return;
+    int64_t pageOffset = 0;
+    uint64_t start = TranslateAddress(rv, targetVirtualAddress, Protection::write, pageOffset);
+    uint64_t end = start + std::min(count, pageSize - pageOffset);
+    int64_t n = end - start;
+    std::memcpy(reinterpret_cast<void*>(start), source, n);
+    count -= n;
+    source += n;
+    targetVirtualAddress += n;
+    while (count > 0)
+    {
+        start = TranslateAddress(rv, targetVirtualAddress, Protection::write);
+        end = start + std::min(count, pageSize);
+        n = end - start;
+        std::memcpy(reinterpret_cast<void*>(start), source, n);
+        count -= n;
+        source += n;
+        targetVirtualAddress += n;
+    }
+}
+
 uint64_t Memory::TranslateAddress(uint64_t rv, uint64_t virtualAddress, Protection access)
+{
+    int64_t pageOffset = 0;
+    return TranslateAddress(rv, virtualAddress, access, pageOffset);
+}
+
+uint64_t Memory::TranslateAddress(uint64_t rv, uint64_t virtualAddress, Protection access, int64_t& pageOffset)
 {
     if (rv >= maxProcs)
     {
@@ -421,7 +452,7 @@ uint64_t Memory::TranslateAddress(uint64_t rv, uint64_t virtualAddress, Protecti
     }
     auto& translationMap = *translationMapPtr;
     int64_t pageNumber = MakePageNumber(virtualAddress);
-    int64_t pageOffset = MakePageOffset(virtualAddress);
+    pageOffset = MakePageOffset(virtualAddress);
     auto it = translationMap.find(pageNumber);
     if (it != translationMap.cend())
     {

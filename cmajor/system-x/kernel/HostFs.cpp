@@ -31,6 +31,7 @@ public:
     bool IsConsole() const override { return false; }
     bool IsHostTextFile() const override { return (flags & OpenFlags::text) != OpenFlags::none; }
     bool IsResource() const override { return false; }
+    bool IsDecompressionFile() const override { return false; }
     bool HasColors() const override { return false; }
     int Columns() const override { return 0; }
     int Rows() const override { return 0; }

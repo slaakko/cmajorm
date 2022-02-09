@@ -91,6 +91,7 @@ void Debugger::StepOver()
         {
             uint64_t address = pc + 4;
             breakpoints.insert(address);
+            breakpointsToRemove.insert(address);
             state = DebuggerState::running;
             commandAvailable = true;
             Release();
@@ -136,6 +137,11 @@ void Debugger::Intercept()
                 uint64_t pc = processor->Regs().GetPC();
                 if (breakpoints.find(pc) != breakpoints.cend())
                 {
+                    if (breakpointsToRemove.find(pc) != breakpoints.cend())
+                    {
+                        breakpoints.erase(pc);
+                        breakpointsToRemove.erase(pc);
+                    }
                     WaitForCommand();
                 }
             }

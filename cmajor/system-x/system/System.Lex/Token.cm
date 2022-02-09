@@ -1,0 +1,67 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/lexer/Token.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/lexer/Token.cpp' using cpp2cm version 1.0.0
+
+namespace System.Lex
+{
+    public const int CONTINUE_TOKEN = -2;
+    public const int INVALID_TOKEN = -1;
+    public const int END_TOKEN = 0;
+    public class Token
+    {
+        public Token() :
+            id(INVALID_TOKEN), match(), line(1)
+        {
+        }
+        public Token(int id_) :
+            id(id_), match(), line(1)
+        {
+        }
+        public Token(int id_, const Lexeme& match_, int line_) :
+            id(id_), match(match_), line(line_)
+        {
+        }
+        public int id;
+        public Lexeme match;
+        public int line;
+    }
+    public bool NoWhiteSpaceBetweenTokens(const Token& first, const Token& second)
+    {
+        if (first.match.end == second.match.begin) return true;
+        return false;
+    }
+    public ustring GetEndTokenInfo()
+    {
+        return u"end of file";
+    }
+
+    public class TokenLine
+    {
+        public nothrow TokenLine() : tokens(), startState(0), endState(0)
+        {
+        }
+        public nothrow int TokenIndex(short columnNumber)
+        {
+            short col = 1;
+            int index = 0;
+            for (const Token& token : tokens)
+            {
+                short len = cast<short>(token.match.end - token.match.begin);
+                if (columnNumber >= col && columnNumber < col + len)
+                {
+                    return index;
+                }
+                col = col + len;
+                ++index;
+            }
+            return -1;
+        }
+        public List<Token> tokens;
+        public int startState;
+        public int endState;
+    }
+
+} // namespace System.Lex

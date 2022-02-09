@@ -22,12 +22,14 @@ public:
     bool IsConsole() const override { return false; }
     bool IsHostTextFile() const override { return false; }
     bool IsResource() const override { return true; }
+    bool IsDecompressionFile() const override { return false; }
     bool HasColors() const override { return false; }
     int Columns() const override { return 0; }
     int Rows() const override { return 0; }
     int64_t Start() const { return start; }
     int64_t Length() const { return length; }
     uint8_t operator[](int64_t offset) const;
+    const uint8_t* Address(int64_t offset) const;
 private:
     std::unique_ptr<soulng::util::MappedInputFile> file;
     int64_t start;

@@ -46,6 +46,10 @@ public const byte trap_open_resource = 39u;
 public const byte trap_close_resource = 40u;
 public const byte trap_get_resource_size = 41u;
 public const byte trap_read_resource = 42u;
+public const byte trap_decompress = 43u;
+public const byte trap_get_decompressed_data_size = 44u;
+public const byte trap_get_decompressed_data = 45u;
+public const byte trap_close_decompression = 46u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -288,4 +292,24 @@ public cdecl nothrow long get_resource_size(int rd)
 public cdecl nothrow int read_resource(int rd, long offset, long length, byte* buffer)
 {
     return cast<int>(trap(0u, trap_read_resource, 0u, rd, offset, length, buffer));
+}
+
+public cdecl nothrow int decompress(byte* buffer, long count)
+{
+    return cast<int>(trap(0u, trap_decompress, 0u, buffer, count));
+}
+
+public cdecl nothrow long get_decompressed_data_size(int dd)
+{
+    return cast<long>(trap(0u, trap_get_decompressed_data_size, 0u, dd));
+}
+
+public cdecl nothrow int get_decompressed_data(int dd, byte* buffer, long count)
+{
+    return cast<int>(trap(0u, trap_get_decompressed_data, 0u, dd, buffer, count));
+}
+
+public cdecl nothrow int close_decompression(int dd)
+{
+    return cast<int>(trap(0u, trap_close_decompression, 0u, dd));
 }

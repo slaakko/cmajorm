@@ -1,0 +1,37 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/lexer/Span.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/lexer/Span.cpp' using cpp2cm version 1.0.0
+
+namespace System.Lex
+{
+    public class Span
+    {
+        public Span() :
+            fileIndex(-1), line(-1), start(-1), end(-1)
+        {
+        }
+        public Span(int fileIndex_, int line_, int start_) :
+            fileIndex(fileIndex_), line(line_), start(start_), end(start)
+        {
+        }
+        public Span(int fileIndex_, int line_, int start_, int end_) :
+            fileIndex(fileIndex_), line(line_), start(start_), end(end_)
+        {
+        }
+        public bool Valid() const
+        {
+            return fileIndex != -1 && line != -1 && start != -1 && end != -1;
+        }
+        public int fileIndex;
+        public int line;
+        public int start;
+        public int end;
+    }
+    public bool operator==(const Span& left, const Span& right)
+    {
+        return left.fileIndex == right.fileIndex && left.line == right.line && left.start == right.start && left.end == right.end;
+    }
+} // namespace System.Lex

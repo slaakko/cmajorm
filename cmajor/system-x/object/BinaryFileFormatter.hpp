@@ -19,6 +19,7 @@ class DataSection;
 class SymbolSection;
 class LinkSection;
 class DebugSection;
+class ResourceSection;
 class SymbolTable;
 class Symbol;
 
@@ -37,6 +38,7 @@ public:
     virtual void FormatSection(SymbolSection* section);
     virtual void FormatSection(LinkSection* section);
     virtual void FormatSection(DebugSection* section);
+    virtual void FormatSection(ResourceSection* section);
     virtual void FormatSymbolTable(SymbolTable& symbolTable);
 private:
     BinaryFile* file;

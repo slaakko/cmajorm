@@ -241,4 +241,42 @@ namespace System.Os
             ThrowSystemError();
         }
     }
+    
+    public int Decompress(byte* buffer, long count)
+    {
+        int dd = decompress(buffer, count);
+        if (dd == -1)
+        {
+            ThrowSystemError();
+        }
+        return dd;
+    }
+    
+    public long GetDecompressedDataSize(int dd)
+    {
+        long size = get_decompressed_data_size(dd);
+        if (size == -1)
+        {
+            ThrowSystemError();
+        }
+        return size;
+    }
+    
+    public void GetDecompressedData(int dd, byte* buffer, long count)
+    {
+        int result = get_decompressed_data(dd, buffer, count);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public void CloseDecompression(int dd)
+    {
+        int result = close_decompression(dd);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
 }

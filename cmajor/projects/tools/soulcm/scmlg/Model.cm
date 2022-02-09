@@ -845,7 +845,7 @@ namespace soulcm.scmlg
             declarations.Add(UniquePtr<Declaration>(declaration));
             declarationMap[declaration->Name()] = declaration;
         }
-        public void Process(const string& root, bool verbose, bool debug, bool noClassMapCompression, LexerContext& lexerContext)
+        public void Process(const string& root, bool verbose, bool debug, bool noClassMapCompression, bool systemX, LexerContext& lexerContext)
         {
             for (UniquePtr<Declaration>& d : declarations)
             {
@@ -865,7 +865,14 @@ namespace soulcm.scmlg
             }
             lexerContext.MakeCanonicalClasses();
             lexerContext.MakeClassPartition(debug);
-            lexerContext.MakeClassMap(root, verbose, noClassMapCompression);
+            if (systemX)
+            {
+                lexerContext.MakeClassMapSystemX(root, verbose);
+            }
+            else
+            {
+                lexerContext.MakeClassMap(root, verbose, noClassMapCompression);
+            }
             lexerContext.GetLexer()->MakeMasterNfa(lexerContext);
             lexerContext.GetLexer()->MakeDfa(lexerContext);
             lexerContext.GetLexer()->WriteAutomaton(root, verbose, lexerContext);

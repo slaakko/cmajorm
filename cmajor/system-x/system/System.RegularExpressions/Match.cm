@@ -1,0 +1,53 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/rex/Match.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/rex/Match.cpp' using cpp2cm version 1.0.0
+
+namespace System.RegularExpressions
+{
+    public ustring MakeRegularExpressionPatternFromFilePattern(const ustring& filePattern)
+    {
+        ustring pattern;
+        for (uchar c : filePattern)
+        {
+            switch (c)
+            {
+                case '.': pattern.Append(u"\\.");
+                break;
+                case '*': pattern.Append(u".*");
+                break;
+                case '?': pattern.Append(u".");
+                break;
+                default: pattern.Append(c, 1);
+                break;
+            }
+        }
+        return pattern;
+    }
+    public bool FilePatternMatch(const ustring& filePath, const ustring& filePattern)
+    {
+        return PatternMatch(filePath, MakeRegularExpressionPatternFromFilePattern(filePattern));
+    }
+    public bool PatternMatch(const ustring& str, const ustring& regularExpressionPattern)
+    {
+        Context context;
+        Nfa nfa = CompileRegularExpressionPattern(context, regularExpressionPattern);
+        bool match = PatternMatch(str, nfa);
+        return match;
+    }
+    public Nfa CompileRegularExpressionPattern(Context& context, const ustring& regularExpressionPattern)
+    {
+        RexLexer lexer(regularExpressionPattern, "", 0);
+        return ParseRegularExpressionPattern(lexer, context);
+    }
+    public Nfa CompileFilePattern(Context& context, const ustring& filePattern)
+    {
+        return CompileRegularExpressionPattern(context, MakeRegularExpressionPatternFromFilePattern(filePattern));
+    }
+    public bool PatternMatch(const ustring& str, Nfa& nfa)
+    {
+        return Match(nfa, str);
+    }
+} // namespace System.RegularExpressions

@@ -1,14 +1,49 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
-
 // this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmlg/LexerContext.hpp' using cpp2cm version 1.0.0
 
 // this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmlg/LexerContext.cpp' using cpp2cm version 1.0.0
 
 namespace soulcm.scmlg
 {
+    public void MakeDataFiles(const List<int>& classMapVec, const string& classMapFilePath)
+    {
+        BinaryWriter uncompressedWriter = File.CreateBinary(classMapFilePath);
+        SharedPtr<ByteStream> deflateStream(new FileByteStream(classMapFilePath + ".deflate", cast<OpenMode>(OpenMode.write | OpenMode.binary)));
+        {
+            BinaryWriter w(deflateStream);
+            w.Write(cast<long>(classMapVec.Count()) * 4);
+        }
+        SharedPtr<ByteStream> compressionStream(new DeflateStream(deflateStream, CompressionMode.compress));
+        BinaryWriter compressedWriter(compressionStream);
+        for (int x : classMapVec)
+        {
+            uncompressedWriter.Write(x);
+            compressedWriter.Write(x);
+        }
+    }
+    public void MakeExtractedDataFile(const string& classMapFilePath)
+    {
+        SharedPtr<ByteStream> in(new FileByteStream(classMapFilePath + ".deflate", cast<OpenMode>(OpenMode.read | OpenMode.binary)));
+        BinaryReader r(in);
+        long size = r.ReadLong();
+        Console.Out() << size << endl();
+        DeflateStream extractStream(in, CompressionMode.decompress);
+        FileByteStream out(classMapFilePath + ".extract", cast<OpenMode>(OpenMode.write | OpenMode.binary));
+        extractStream.CopyTo(out);
+    }
+    public void MakeClassMapDataFiles(const List<int>& classMapVec, const string& classMapName, const string& classMapFilePath, const string& classMapResourceXmlFilePath)
+    {
+        MakeDataFiles(classMapVec, classMapFilePath);
+        StreamWriter classMapResourceXmlWriter = File.CreateText(classMapResourceXmlFilePath);
+        classMapResourceXmlWriter << "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << endl();
+        classMapResourceXmlWriter << "<resources>" << endl();
+        classMapResourceXmlWriter << " <resource name=\"" << classMapName << "\" type=\"binary\" file=\"" << classMapFilePath << ".deflate" << "\"/>" << endl();
+        classMapResourceXmlWriter << "</resources>" << endl();
+    }
     public enum IdentifierClassKind
     {
         none, unicode, ascii
@@ -423,6 +458,74 @@ namespace soulcm.scmlg
                     cls->Print(formatter);
                     formatter.WriteLine();
                 }
+            }
+        }
+        public void MakeClassMapSystemX(const string& root, bool verbose)
+        {
+            List<int> classMapVec(1114112, -1);
+            for (Class* cls : partition)
+            {
+                for (const Range& range : cls->Ranges())
+                {
+                    for (uchar i = range.Start(); i <= range.End(); i = cast<uchar>(cast<int>(i) + 1))
+                    {
+                        if (classMapVec[cast<int>(i)] == -1)
+                        {
+                            classMapVec[cast<int>(i)] = cls->Index();
+                        }
+                    }
+                }
+            }
+            string classMapName = "ClassMap";
+            if ((classMap != null))
+            {
+                classMapName = ToUtf8(classMap->Name());
+            }
+            string classMapFilePath = GetFullPath(Path.Combine(root, classMapName + ".classmap"));
+            string classMapResourceXmlFilePath = GetFullPath(Path.Combine(root, classMapName + ".xml"));
+            MakeClassMapDataFiles(classMapVec, classMapName, classMapFilePath, classMapResourceXmlFilePath);
+            string classMapSourceFileName = GetFullPath(Path.Combine(root, classMapName + ".cm"));
+            StreamWriter writer = File.CreateText(classMapSourceFileName);
+            CodeFormatter formatter(writer);
+            formatter.WriteLine("private int* classMap = null;");
+            formatter.WriteLine();
+            formatter.WriteLine("public static class " + classMapName);
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            formatter.WriteLine("public static void Init()");
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            formatter.WriteLine("if (classMap == null)");
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            formatter.WriteLine("classMap = System.Lex.ReadClassMap(\"" + classMapName + "\");");
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+            formatter.WriteLine("public static int GetClass(uchar c)");
+         			formatter.WriteLine("{");
+         			formatter.IncIndent();
+         			formatter.WriteLine("int i = cast<int>(c);");
+         			formatter.WriteLine("if (i < 1114112)");
+         			formatter.WriteLine("{");
+         			formatter.IncIndent();
+         			formatter.WriteLine("return classMap[i];");
+         			formatter.DecIndent();
+         			formatter.WriteLine("}");
+         			formatter.WriteLine("else");
+         			formatter.WriteLine("{");
+         			formatter.IncIndent();
+         			formatter.WriteLine("return -1;");
+         			formatter.DecIndent();
+         			formatter.WriteLine("}");
+         			formatter.DecIndent();
+         			formatter.WriteLine("}");
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+            if (verbose)
+            {
+                Console.Out() << "==> " << classMapSourceFileName << endl();
             }
         }
         public void MakeClassMap(const string& root, bool verbose, bool noClassMapCompression)

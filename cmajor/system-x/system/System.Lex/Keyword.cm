@@ -1,0 +1,59 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/lexer/Keyword.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/lexer/Keyword.cpp' using cpp2cm version 1.0.0
+
+namespace System.Lex
+{
+    public class Keyword
+    {
+        public Keyword() :
+            str(null), tokenID(INVALID_TOKEN)
+        {
+        }
+        public Keyword(const uchar* str_, int tokenID_) :
+            str(str_), tokenID(tokenID_)
+        {
+        }
+        public const uchar* str;
+        public int tokenID;
+    }
+    public class KeywordMap
+    {
+        public KeywordMap(const Keyword* keywords_) :
+            keywords(keywords_)
+        {
+            const Keyword* kw = keywords;
+            while ((kw->str != null))
+            {
+                Lexeme lexeme(kw->str, StrEnd(kw->str));
+                keywordMap[lexeme] = kw->tokenID;
+                ++kw;
+            }
+        }
+        public int GetKeywordToken(const Lexeme& lexeme) const
+        {
+            Map<Lexeme, int>.ConstIterator it = keywordMap.CFind(lexeme);
+            if (it != keywordMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return INVALID_TOKEN;
+            }
+        }
+        private const Keyword* keywords;
+        private Map<Lexeme, int> keywordMap;
+    }
+    public inline const uchar* StrEnd(const uchar* s)
+    {
+        while ((*s != u'\0'))
+        {
+            ++s;
+        }
+        return s;
+    }
+} // namespace System.Lex

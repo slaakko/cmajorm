@@ -58,6 +58,7 @@ private:
     bool exiting;
     bool commandAvailable;
     std::set<uint64_t> breakpoints;
+    std::set<uint64_t> breakpointsToRemove;
 };
 
 } // namespace cmsx::db

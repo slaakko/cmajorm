@@ -1,0 +1,64 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.Os;
+
+namespace System
+{
+    public DecompressedDataPtr Decompress(byte* buffer, long count)
+    {
+        return DecompressedDataPtr(System.Os.Decompress(buffer, count));
+    }
+    
+    public class DecompressedDataPtr
+    {
+        public DecompressedDataPtr(int dd_) : dd(dd_), size(GetDecompressedDataSize(dd))
+        {
+            data = cast<byte*>(MemAlloc(size));
+            GetDecompressedData(dd, data, size);
+        }
+        suppress DecompressedDataPtr(const DecompressedDataPtr&);
+        suppress void operator=(const DecompressedDataPtr&);
+        public nothrow DecompressedDataPtr(DecompressedDataPtr&& that) : dd(that.dd), data(that.data), size(that.size)
+        {
+            that.dd = -1;
+            that.data = null;
+            that.size = -1;
+        }
+        public default nothrow void operator=(DecompressedDataPtr&& that);
+        public ~DecompressedDataPtr()
+        {
+            if (data != null)
+            {
+                MemFree(data);
+            }
+            if (dd != -1)
+            {
+                close_decompression(dd);
+            }
+        }
+        public nothrow int Descriptor() const
+        {
+            return dd;
+        }
+        public nothrow byte* Data() const
+        {
+            return data;
+        }
+        public nothrow long Size() const
+        {
+            return size;
+        }
+        public nothrow byte* ReleaseData() 
+        {
+            byte* result = data;
+            data = null;
+            return result;
+        }
+        private int dd;
+        private byte* data;
+        private long size;
+    }
+}

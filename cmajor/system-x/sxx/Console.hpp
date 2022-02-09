@@ -8,6 +8,7 @@
 #include <iostream>
 #include <system-x/kernel/File.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <memory>
 
 namespace sxx {
 
@@ -22,6 +23,7 @@ public:
     bool IsConsole() const override { return true; }
     bool IsHostTextFile() const override { return false; }
     bool IsResource() const override { return false; }
+    bool IsDecompressionFile() const override { return false; }
     bool HasColors() const override { return true; }
     int Columns() const override;
     int Rows() const override;
@@ -31,10 +33,14 @@ public:
     void SetToUtf16Mode();
     void SetToTextMode();
 private:
+    void AllocateBuffer();
+    int bufferSize;
     Utf8ToUtf32Engine utf8Engine;
     bool stdInInUtf16Mode;
     bool stdOutInUtf16Mode;
     bool stdErrInUtf16Mode;
+    std::string stdInBuf;
+    std::unique_ptr<char16_t[]> utf16buffer;
 };
 
 } // namespace sxx

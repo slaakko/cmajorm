@@ -11,7 +11,9 @@
 
 namespace sxx {
 
-Console::Console() : cmsx::kernel::File("CONSOLE"), stdInInUtf16Mode(false), stdOutInUtf16Mode(false), stdErrInUtf16Mode(false)
+const int defaultStdBufferSize = 2048;
+
+Console::Console() : cmsx::kernel::File("CONSOLE"), stdInInUtf16Mode(false), stdOutInUtf16Mode(false), stdErrInUtf16Mode(false), bufferSize(defaultStdBufferSize)
 {
 }
 
@@ -41,6 +43,14 @@ void Console::SetToTextMode()
     _setmode(2, _O_TEXT);
 }
 
+void Console::AllocateBuffer()
+{
+    if (!utf16buffer)
+    {
+        utf16buffer.reset(new char16_t[bufferSize]);
+    }
+}
+
 int Console::Columns() const
 {
     return cmsx::kernel::OsGetConsoleNumberOfColumns();
@@ -57,8 +67,45 @@ void Console::Close(cmsx::machine::Process* process)
 
 std::vector<uint8_t> Console::Read(int64_t count, cmsx::machine::Process* process)
 {
-    // todo
-    return std::vector<uint8_t>();
+    std::vector<uint8_t> buffer;
+    int64_t result = 0;
+    if (stdInInUtf16Mode)
+    {
+        AllocateBuffer();
+        if (stdInBuf.empty())
+        {
+            int errorStringHandle = -1;
+            int result = std::fgetwc(stdin);
+            if (result == WEOF)
+            {
+                return buffer;
+            }
+            else
+            {
+                std::u16string utf16Str(1, result);
+                stdInBuf = ToUtf8(utf16Str);
+            }
+        }
+    }
+    else
+    {
+        if (stdInBuf.empty())
+        {
+            std::getline(std::cin, stdInBuf);
+        }
+    }
+    if (!stdInBuf.empty())
+    {
+        result = 0;
+        while (result < count && !stdInBuf.empty())
+        {
+            uint8_t x = static_cast<uint8_t>(stdInBuf[0]);
+            buffer.push_back(x);
+            stdInBuf.erase(stdInBuf.begin());
+            ++result;
+        }
+    }
+    return buffer;
 }
 
 int64_t Console::Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process)

@@ -1,0 +1,743 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/lexer/Lexer.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/lexer/Lexer.cpp' using cpp2cm version 1.0.0
+
+namespace System.Lex
+{
+    public enum LexerFlags : sbyte
+    {
+        none = 0, synchronize = 1 << 0, synchronized = 1 << 1, synchronizedAtLeastOnce = 1 << 2, cursorSeen = 1 << 3, farthestError = 1 << 4
+    }
+
+    public class Lexer
+    {
+        public Lexer(const ustring& content_, const string& fileName_, int fileIndex_) :
+            content(content_), fileName(fileName_), fileIndex(fileIndex_), line(1), keywordMap(null), start(content.Chars()), end(content.Chars() + content.Length()), 
+            pos(start), current(tokens.End()), log(null), countLines(true), separatorChar('\0'),
+            commentTokenId(-1), farthestPos(GetPos())
+        {
+        }
+        public Lexer(const uchar* start_, const uchar* end_, const string& fileName_, int fileIndex_) :
+            content(), fileName(fileName_), fileIndex(fileIndex_), line(1), keywordMap(null), start(start_), end(end_), pos(start), current(tokens.End()), log(null), countLines(true), separatorChar('\0'),
+            commentTokenId(-1), farthestPos(GetPos())
+        {
+        }
+        suppress Lexer(const Lexer&);
+        suppress void operator=(const Lexer&);
+        public void SetBlockCommentStates(const Set<int>& blockCommentStates_) const
+        {
+            blockCommentStates = blockCommentStates_;
+        }
+        public nothrow const Set<int>& BlockCommentStates() const
+        {
+            return blockCommentStates;
+        }
+        public nothrow void SetCommentTokenId(int commentTokenId_)
+        {
+            commentTokenId = commentTokenId_;
+        }
+        protected virtual nothrow int GetCommentTokenId() const
+        {
+            return -1;
+        }
+        public virtual ~Lexer()
+        {
+        }
+        public int operator*() const
+        {
+            return current->id;
+        }
+        public void SetKeywordMap(KeywordMap* keywordMap_)
+        {
+            keywordMap = keywordMap_;
+        }
+        public KeywordMap* GetKeywordMap()
+        {
+            return keywordMap;
+        }
+        public void Retract()
+        {
+            token.match.end = pos;
+        }
+        public const string& FileName() const
+        {
+            return fileName;
+        }
+        public Span GetSpan() const
+        {
+            return Span(fileIndex, line, cast<int>(GetPos()));
+        }
+        public void PushSpan()
+        {
+            spanStack.Push(currentSpan);
+            currentSpan = Span(fileIndex, line, -1, -1);
+        }
+        public Span PopSpan()
+        {
+            Span s = currentSpan;
+            currentSpan = spanStack.Pop();
+            return s;
+        }
+        public void SetSpan(long pos)
+        {
+            if (currentSpan.start == -1)
+            {
+                currentSpan.line = line;
+                currentSpan.start = cast<int>(pos);
+            }
+            else
+            {
+                currentSpan.end = cast<int>(pos);
+            }
+        }
+        public nothrow inline Span GetCurrentSpan() const
+        {
+            return currentSpan;
+        }
+        public void SetLine(int line_)
+        {
+            line = line_;
+        }
+        public void SetCountLines(bool countLines_)
+        {
+            countLines = countLines_;
+        }
+        public Token token;
+        public const uchar* Start() const
+        {
+            return start;
+        }
+        public const uchar* End() const
+        {
+            return end;
+        }
+        public const uchar* Pos() const
+        {
+            return pos;
+        }
+        public void SetLog(ParsingLog* log_)
+        {
+            log = log_;
+        }
+        public ParsingLog* Log() const
+        {
+            return log;
+        }
+        public void SetSeparatorChar(uchar separatorChar_)
+        {
+            separatorChar = separatorChar_;
+        }
+        public void operator++()
+        {
+            if (current != tokens.End())
+            {
+                ++current;
+            }
+            if (current == tokens.End())
+            {
+                NextToken();
+            }
+            else
+            {
+                line = current->line;
+            }
+            if (GetFlag(LexerFlags.farthestError))
+            {
+                long p = GetPos();
+                if (p > farthestPos)
+                {
+                    farthestPos = p;
+                    farthestRuleContext = ruleContext;
+                }
+            }
+        }
+        public long GetPos() const
+        {
+            int p = cast<int>(current - tokens.Begin());
+            return (cast<long>(line) << 32) | cast<long>(p);
+        }
+        public void SetPos(long pos)
+        {
+            current = tokens.Begin() + cast<int>(pos);
+            line = cast<int>(pos >> 32);
+        }
+        public void NextToken()
+        {
+            int state = 0;
+            while (true)
+            {
+                uchar c = separatorChar;
+                if (pos != end)
+                {
+                    c = *pos;
+                }
+                else if (c == '\0')
+                {
+                    break;
+                }
+                if (state == 0)
+                {
+                    lexeme.begin = pos;
+                    token.id = INVALID_TOKEN;
+                    token.line = line;
+                }
+                if (pos == end)
+                {
+                    lexeme.end = end;
+                }
+                else
+                {
+                    lexeme.end = pos + 1;
+                }
+                state = NextState(state, c);
+                if (state == -1)
+                {
+                    if (token.id == CONTINUE_TOKEN)
+                    {
+                        if (pos == end)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            pos = token.match.end;
+                        }
+                        state = 0;
+                        continue;
+                    }
+                    else if (token.id == INVALID_TOKEN)
+                    {
+                        if (pos == end)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            throw Exception("System.Lex.Lexer.NextToken(): error: invalid character \'" + ToUtf8(ustring(c, 1)) + "\' in file \'" + fileName + "\' at line " + ToString(line));
+                        }
+                    }
+                    else
+                    {
+                        tokens.Add(token);
+                        current = tokens.End() - 1;
+                        pos = token.match.end;
+                        return;
+                    }
+                }
+                if (c == '\n' && countLines)
+                {
+                    ++line;
+                }
+                ++pos;
+            }
+            token.id = INVALID_TOKEN;
+            state = NextState(state, '\0');
+            long p = -1;
+            if (token.id != INVALID_TOKEN && token.id != CONTINUE_TOKEN)
+            {
+                tokens.Add(token);
+                current = tokens.End() - 1;
+                p = GetPos();
+            }
+            Token endToken(END_TOKEN);
+            endToken.match.begin = end;
+            endToken.match.end = end;
+            tokens.Add(endToken);
+            if (p == -1)
+            {
+                current = tokens.End() - 1;
+                p = GetPos();
+            }
+            SetPos(p);
+        }
+        public int GetKeywordToken(const Lexeme& lexeme) const
+        {
+            if ((keywordMap != null))
+            {
+                return keywordMap->GetKeywordToken(lexeme);
+            }
+            else
+            {
+                return INVALID_TOKEN;
+            }
+        }
+        public void ConvertExternal(Span& span)
+        {
+            Token startToken = GetToken(span.start);
+            span.start = cast<int>(startToken.match.begin - start);
+            Token endToken = startToken;
+            if (span.end != -1)
+            {
+                endToken = GetToken(span.end);
+            }
+            span.end = cast<int>(endToken.match.end - start);
+        }
+        public Token GetToken(long pos) const
+        {
+            int tokenIndex = cast<int>(pos);
+            if (tokenIndex >= 0 && tokenIndex < tokens.Count())
+            {
+                return tokens[tokenIndex];
+            }
+            else
+            {
+                throw Exception("invalid token index");
+            }
+        }
+        public char GetChar(long pos) const
+        {
+            Token t = GetToken(pos);
+            return cast<char>(*t.match.begin);
+        }
+        public wchar GetWChar(long pos) const
+        {
+            Token t = GetToken(pos);
+            return cast<wchar>(*t.match.begin);
+        }
+        public uchar GetUChar(long pos) const
+        {
+            Token t = GetToken(pos);
+            return *t.match.begin;
+        }
+        public int GetInt(long pos) const
+        {
+            Token t = GetToken(pos);
+            return ParseInt(ToUtf8(t.match.ToString()));
+        }
+        public double GetDouble(long pos) const
+        {
+            Token t = GetToken(pos);
+            return ParseDouble(ToUtf8(t.match.ToString()));
+        }
+        public void SetTokens(const List<Token>& tokens_)
+        {
+            if (!tokens_.IsEmpty())
+            {
+                tokens.Add(tokens_.Front());
+            }
+            else
+            {
+                tokens.Add(Token(END_TOKEN, Lexeme(end, end), 1));
+            }
+            for (const Token& token : tokens_)
+            {
+                tokens.Add(token);
+            }
+            tokens.Add(Token(END_TOKEN, Lexeme(end, end), 1));
+            current = tokens.Begin();
+        }
+        public ustring GetMatch(const Span& span) const
+        {
+            ustring match;
+            Token startToken = GetToken(span.start);
+            match.Append(startToken.match.ToString());
+            const uchar* e = startToken.match.end;
+            for (int i = span.start + 1; i <= span.end; ++i)
+            {
+                Token token = GetToken(i);
+                match.Append(ustring(' ', token.match.begin - e));
+                match.Append(token.match.ToString());
+                e = token.match.end;
+            }
+            return match;
+        }
+        public ustring ErrorLines(const Token& token) const
+        {
+            ustring lines;
+            const uchar* lineStart = LineStart(start, token.match.begin);
+            const uchar* lineEnd = LineEnd(end, token.match.end);
+            lines.Append(ustring(lineStart, token.match.begin));
+            lines.Append(token.match.ToString());
+            lines.Append(ustring(token.match.end, lineEnd));
+            lines.Append('\n', 1);
+            lines.Append(' ', token.match.begin - lineStart);
+            lines.Append('^', Max(cast<long>(1), token.match.end - token.match.begin));
+            lines.Append(' ', lineEnd - token.match.end);
+            lines.Append('\n', 1);
+            return lines;
+        }
+        public ustring ErrorLines(const Span& span) const
+        {
+            ustring lines;
+            Token startToken = GetToken(span.start);
+            Token endToken = startToken;
+            const uchar* lineStart = LineStart(start, startToken.match.begin);
+            if (span.end != -1 && span.end != span.start)
+            {
+                endToken = GetToken(span.end);
+            }
+            const uchar* lineEnd = LineEnd(end, endToken.match.end);
+            lines.Append(ustring(lineStart, startToken.match.begin));
+            lines.Append(startToken.match.ToString());
+            const uchar* s = startToken.match.begin;
+            const uchar* e = startToken.match.end;
+            for (int i = span.start + 1; i <= span.end; ++i)
+            {
+                Token token = GetToken(i);
+                lines.Append(ustring(' ', token.match.begin - e));
+                lines.Append(token.match.ToString());
+                e = token.match.end;
+            }
+            lines.Append(ustring(e, lineEnd));
+            lines.Append('\n', 1);
+            lines.Append(' ', s - lineStart);
+            lines.Append('^', Max(cast<long>(1), e - s));
+            lines.Append(' ', lineEnd - e);
+            lines.Append('\n', 1);
+            return lines;
+        }
+        public void GetColumns(const Span& span, int& startCol, int& endCol) const
+        {
+            Token startToken = GetToken(span.start);
+            Token endToken = startToken;
+            const uchar* lineStart = LineStart(start, startToken.match.begin);
+            if (span.end != -1 && span.end != span.start)
+            {
+                endToken = GetToken(span.end);
+            }
+            int cols = cast<int>(startToken.match.begin - lineStart);
+            if (cols < 0)
+            {
+                cols = 0;
+            }
+            startCol = cols + 1;
+            const uchar* lineEnd = LineEnd(end, endToken.match.end);
+            if (lineEnd < lineStart)
+            {
+                lineEnd = lineStart;
+            }
+            int lineLength = cast<int>(lineEnd - lineStart);
+            int spanCols = Max(cast<int>(1), Min(span.end - span.start, lineLength - cols));
+            endCol = startCol + spanCols;
+        }
+        public void ThrowExpectationFailure(const Span& span, const ustring& name)
+        {
+            Token token = GetToken(span.start);
+            throw ParsingException("parsing error in \'" + fileName + ":" + ToString(token.line) + "\': " + ToUtf8(name) + " expected:\n" + ToUtf8(ErrorLines(span)), fileName, span);
+        }
+        public string GetFarthestError() const
+        {
+            Token token = GetToken(farthestPos);
+            string parserStateStr = GetParserStateStr();
+            return "parsing error at '" + fileName + ":" + ToString(token.line) + "':\n" + ToUtf8(ErrorLines(token)) + parserStateStr;
+        }
+        public void ThrowFarthestError()
+        {
+            throw ParsingException(GetFarthestError(), fileName);
+        }
+        public void AddError(const Span& span, const ustring& name)
+        {
+            if (GetFlag(LexerFlags.synchronize) && GetFlag(LexerFlags.synchronized))
+            {
+                SetFlag(LexerFlags.synchronizedAtLeastOnce);
+            }
+            else
+            {
+                Token token = GetToken(span.start);
+                ParsingException* error(new ParsingException("parsing error in '" + fileName + ":" + ToString(token.line) + "': " + ToUtf8(name) + " expected:\n" + ToUtf8(ErrorLines(span)), fileName, span));
+                errors.Add(UniquePtr<Exception>(error));
+            }
+        }
+        public nothrow List<UniquePtr<Exception>> Errors()
+        {
+            return Rvalue(errors);
+        }
+        public ustring RestOfLine(int maxLineLength)
+        {
+            ustring restOfLine(current->match.ToString() + ustring(current->match.end, pos) + ustring(pos, LineEnd(end, pos)));
+            if (maxLineLength != 0)
+            {
+                restOfLine = restOfLine.Substring(0, maxLineLength);
+            }
+            return restOfLine;
+        }
+        public virtual int NextState(int state, uchar c)
+        {
+            return -1;
+        }
+        public TokenLine TokenizeLine(const ustring& line, int lineNumber, int startState)
+        {
+            pos = line.Chars();
+            end = line.Chars() + line.Length();
+            TokenLine tokenLine;
+            tokenLine.startState = startState;
+            lexeme.begin = pos;
+            lexeme.end = end;
+            token.match = lexeme;
+            token.id = INVALID_TOKEN;
+            token.line = lineNumber;
+            int state = startState;
+            while (pos != end)
+            {
+                uchar c = *pos;
+                if (state == 0)
+                {
+                    lexeme.begin = pos;
+                    token.id = INVALID_TOKEN;
+                    token.line = lineNumber;
+                }
+                lexeme.end = pos + 1;
+                int prevState = state;
+                state = NextState(state, c);
+                if (state == -1)
+                {
+                    if (prevState == 0)
+                    {
+                        break;
+                    }
+                    state = 0;
+                    pos = token.match.end;
+                    tokenLine.tokens.Add(token);
+                    lexeme.begin = lexeme.end;
+                }
+                else
+                {
+                    ++pos;
+                }
+            }
+            if (state != 0 && state != -1)
+            {
+                state = NextState(state, '\r');
+            }
+            if (state != 0 && state != -1)
+            {
+                state = NextState(state, '\n');
+            }
+            if (state != 0 && state != -1)
+            {
+                if (blockCommentStates.CFind(state) != blockCommentStates.CEnd())
+                {
+                    token.id = commentTokenId;
+                    token.match.end = end;
+                    tokenLine.tokens.Add(token);
+                    tokenLine.endState = state;
+                    return tokenLine;
+                }
+            }
+            if (lexeme.begin != lexeme.end)
+            {
+                token.match = lexeme;
+                tokenLine.tokens.Add(token);
+            }
+            if (state == -1)
+            {
+                state = 0;
+            }
+            tokenLine.endState = state;
+            return tokenLine;
+        }
+        public nothrow void SetSyncTokens(const List<int>& syncTokens_)
+        {
+            syncTokens = syncTokens_;
+        }
+        public nothrow bool Synchronize()
+        {
+            if (GetFlag(LexerFlags.synchronize))
+            {
+                if (GetFlag(LexerFlags.synchronized)) return false;
+                SetFlag(LexerFlags.synchronized);
+                while (pos != end)
+                {
+                    int curToken = token.id;
+                    for (int syncToken : syncTokens)
+                    {
+                        if (curToken == syncToken)
+                        {
+                            return true;
+                        }
+                    }
+                    Lexer& lexer = *this;
+                    ++lexer;
+                }
+            }
+            return false;
+        }
+        public nothrow inline LexerFlags Flags() const
+        {
+            return flags;
+        }
+        public nothrow inline bool GetFlag(LexerFlags flag) const
+        {
+            return (flags & flag) != LexerFlags.none;
+        }
+        public nothrow inline void SetFlag(LexerFlags flag)
+        {
+            flags = cast<LexerFlags>(flags | flag);
+        }
+        public nothrow inline void ResetFlag(LexerFlags flag)
+        {
+            flags = cast<LexerFlags>(flags & ~flag);
+        }
+        public nothrow const List<int>& RuleContext() const
+        {
+            return ruleContext;
+        }
+        public nothrow const List<int>& FarthestRuleContext() const
+        {
+            return farthestRuleContext;
+        }
+        public nothrow void SetRuleNameListPtr(List<string>* ruleNameListPtr_)
+        {
+            ruleNameListPtr = ruleNameListPtr_;
+        }
+        public nothrow string GetParserStateStr() const
+        {
+            string parserStateStr;
+            long n = farthestRuleContext.Count();
+            if (ruleNameListPtr != null && n > 0)
+            {
+                parserStateStr.Append("\nParser state:\n");
+                for (long i = 0; i < n; ++i)
+                {
+                    int ruleId = farthestRuleContext[i];
+                    if (ruleId >= 0 && ruleId < ruleNameListPtr->Count())
+                    {
+                        string ruleName = (*ruleNameListPtr)[ruleId];
+                        parserStateStr.Append(ruleName).Append("\n");
+                    }
+                }
+            }
+            return parserStateStr;
+        }
+        public void PushRule(int ruleId)
+        {
+            ruleContext.Add(ruleId);
+        }
+        public void PopRule()
+        {
+            ruleContext.RemoveLast();
+        }
+        protected Lexeme lexeme;
+        protected int line;
+        private ustring content;
+        private string fileName;
+        private int fileIndex;
+        private KeywordMap* keywordMap;
+        private const uchar* start;
+        private const uchar* end;
+        private const uchar* pos;
+        private List<Token> tokens;
+        private List<Token>.Iterator current;
+        private List<UniquePtr<Exception>> errors;
+        private List<int> syncTokens;
+        private ParsingLog* log;
+        private bool countLines;
+        private uchar separatorChar;
+        private Stack<Span> spanStack;
+        private Span currentSpan;
+        private Set<int> blockCommentStates;
+        private int commentTokenId;
+        private LexerFlags flags;
+        private long farthestPos;
+        private List<int> ruleContext;
+        private List<int> farthestRuleContext;
+        private List<string>* ruleNameListPtr;
+    }
+    public const uchar* LineStart(const uchar* start, const uchar* p)
+    {
+        while (p != start && *p != '\n' && *p != '\r')
+        {
+            --p;
+        }
+        if (p != start)
+        {
+            ++p;
+        }
+        return p;
+    }
+    public const uchar* LineEnd(const uchar* end, const uchar* p)
+    {
+        while (p != end && *p != '\n' && *p != '\r')
+        {
+            ++p;
+        }
+        return p;
+    }
+    public ustring GetErrorLines(const uchar* start, const uchar* end, const Span& externalSpan)
+    {
+        const uchar* startPos = start + externalSpan.start;
+        if (startPos < start || startPos >= end)
+        {
+            return ustring();
+        }
+        const uchar* lineStart = LineStart(start, startPos);
+        int cols = cast<int>(startPos - lineStart);
+        if (cols < 0)
+        {
+            cols = 0;
+        }
+        const uchar* lineEnd = LineEnd(end, startPos);
+        if (lineEnd < lineStart)
+        {
+            lineEnd = lineStart;
+        }
+        int lineLength = cast<int>(lineEnd - lineStart);
+        ustring lines(lineStart, lineEnd);
+        int spanCols = Max(cast<int>(1), Min(externalSpan.end - externalSpan.start, lineLength - cols));
+        lines.Append('\n', 1).Append(ustring(' ', cols)).Append('^', spanCols);
+        return lines;
+    }
+    public void GetColumns(const uchar* start, const uchar* end, const Span& externalSpan, int& startCol, int& endCol)
+    {
+        startCol = 0;
+        endCol = 0;
+        const uchar* startPos = start + externalSpan.start;
+        if (startPos < start || startPos >= end)
+        {
+            return;
+        }
+        const uchar* lineStart = LineStart(start, startPos);
+        int cols = cast<int>(startPos - lineStart);
+        if (cols < 0)
+        {
+            cols = 0;
+        }
+        startCol = cols + 1;
+        const uchar* lineEnd = LineEnd(end, startPos);
+        if (lineEnd < lineStart)
+        {
+            lineEnd = lineStart;
+        }
+        int lineLength = cast<int>(lineEnd - lineStart);
+        int spanCols = Max(cast<int>(1), Min(externalSpan.end - externalSpan.start, lineLength - cols));
+        endCol = startCol + spanCols;
+    }
+    public void WriteBeginRuleToLog(Lexer& lexer, const ustring& ruleName)
+    {
+        lexer.Log()->WriteBeginRule(ruleName);
+        lexer.Log()->IncIndent();
+        lexer.Log()->WriteTry(lexer.RestOfLine(lexer.Log()->MaxLineLength()));
+        lexer.Log()->IncIndent();
+    }
+    public void WriteSuccessToLog(Lexer& lexer, const Span& matchSpan, const ustring& ruleName)
+    {
+        lexer.Log()->DecIndent();
+        lexer.Log()->WriteSuccess(lexer.GetMatch(matchSpan));
+        lexer.Log()->DecIndent();
+        lexer.Log()->WriteEndRule(ruleName);
+    }
+    public void WriteFailureToLog(Lexer& lexer, const ustring& ruleName)
+    {
+        lexer.Log()->DecIndent();
+        lexer.Log()->WriteFail();
+        lexer.Log()->DecIndent();
+        lexer.Log()->WriteEndRule(ruleName);
+    }
+
+    public class RuleGuard
+    {
+        public nothrow RuleGuard(Lexer& lexer_, int ruleId_) : lexer(lexer_)
+        {
+            lexer.PushRule(ruleId_);
+        }
+        public ~RuleGuard()
+        {
+            lexer.PopRule();
+        }
+        private Lexer& lexer;
+    }
+
+} // namespace System.Lex

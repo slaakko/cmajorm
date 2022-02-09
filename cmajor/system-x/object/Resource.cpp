@@ -19,6 +19,21 @@ namespace cmsx::object {
 
 using namespace soulng::unicode;
 
+std::string ResourceTypeStr(ResourceType type)
+{
+    switch (type)
+    {
+        case ResourceType::binary:
+        {
+            return "binary";
+        }
+        default:
+        {
+            return std::string();
+        }
+    }
+}
+
 ResourceType ParseResourceType(const std::string& typeStr, const std::string& resourceXmlFilePath)
 {
     if (typeStr == "binary")
@@ -37,6 +52,13 @@ Resource::Resource() : name(), type(), filePath()
 
 Resource::Resource(const std::string& name_, ResourceType type_, const std::string& filePath_) : name(name_), type(type_), filePath(filePath_)
 {
+}
+
+std::string Resource::ToString() const
+{
+    std::string str = "Resource";
+    str.append("(").append("name=").append(name).append(", type=").append(ResourceTypeStr(type)).append(", filePath=").append(filePath).append(")");
+    return str;
 }
 
 void Resource::Emit(ResourceSection& resourceSection)

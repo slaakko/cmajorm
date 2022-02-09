@@ -26,6 +26,7 @@ public:
     void FormatSection(SymbolSection* section) override;
     void FormatSection(LinkSection* section) override;
     void FormatSection(DebugSection* section) override;
+    void FormatSection(ResourceSection* section) override;
     void FormatCurrentAddress(uint64_t currentAddress) override;
     void FormatAssembledBytes(uint8_t opc, uint8_t x, uint8_t y, uint8_t z) override;
     void FormatLabel(uint64_t currentAddress) override;
@@ -106,6 +107,16 @@ void TextFormatter::FormatSection(DebugSection* section)
     if (section && section->Length() > 0)
     {
         formatter.WriteLine("DEBUG SECTION");
+        formatter.WriteLine();
+        BinaryFileFormatter::FormatSection(section);
+    }
+}
+
+void TextFormatter::FormatSection(ResourceSection* section)
+{
+    if (section && section->Length() > 0)
+    {
+        formatter.WriteLine("RESOURCE SECTION");
         formatter.WriteLine();
         BinaryFileFormatter::FormatSection(section);
     }

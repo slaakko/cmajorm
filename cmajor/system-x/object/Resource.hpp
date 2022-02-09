@@ -21,11 +21,15 @@ enum ResourceType : int32_t
     binary = 0
 };
 
+CMSX_OBJECT_API std::string ResourceTypeStr(ResourceType type);
+CMSX_OBJECT_API ResourceType ParseResourceType(const std::string& typeStr, const std::string& resourceXmlFilePath);
+
 class CMSX_OBJECT_API Resource
 {
 public:
     Resource();
     Resource(const std::string& name_, ResourceType type_, const std::string& filePath_);
+    std::string ToString() const;
     const std::string& Name() const { return name; }
     ResourceType Type() const { return type; }
     const std::string& FilePath() const { return filePath; }

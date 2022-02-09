@@ -22,6 +22,7 @@ public:
     bool IsConsole() const override { return true; }
     bool IsHostTextFile() const override { return false; }
     bool IsResource() const override { return false; }
+    bool IsDecompressionFile() const override { return false; }
     bool HasColors() const override { return true; }
     int Columns() const override { return console->NumColumns(); }
     int Rows() const override { return console->NumRows(); }

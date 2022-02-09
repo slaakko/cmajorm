@@ -1,0 +1,204 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/rex/Nfa.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/rex/Nfa.cpp' using cpp2cm version 1.0.0
+
+namespace System.RegularExpressions
+{
+    public class NfaEdge
+    {
+        public NfaEdge(Symbol* symbol_, NfaState* next_) :
+            symbol(symbol_), next(next_)
+        {
+        }
+        public Symbol* GetSymbol() const
+        {
+            return symbol;
+        }
+        public NfaState* Next() const
+        {
+            return next;
+        }
+        public string ToString() const
+        {
+            string s = symbol->ToString();
+            s.Append(" -> ").Append(ToString(next->Id()));
+            return s;
+        }
+        private Symbol* symbol;
+        private NfaState* next;
+    }
+    public class NfaState
+    {
+        public NfaState(int id_) :
+            id(id_), accept(false), edges()
+        {
+        }
+        public bool Accept() const
+        {
+            return accept;
+        }
+        public void SetAccept(bool accept_)
+        {
+            accept = accept_;
+        }
+        public const List<NfaEdge>& Edges() const
+        {
+            return edges;
+        }
+        public void SetEdges(const List<NfaEdge>& edges_)
+        {
+            edges = edges_;
+        }
+        public void AddEdge(const NfaEdge& edge)
+        {
+            edges.Add(edge);
+        }
+        public List<NfaState*> Next(uchar c) const
+        {
+            List<NfaState*> next;
+            for (const NfaEdge& edge : edges)
+            {
+                Symbol* symbol = edge.GetSymbol();
+                if (symbol->Match(c))
+                {
+                    next.Add(edge.Next());
+                }
+            }
+            return next;
+        }
+        public void Dump()
+        {
+            string acceptStr;
+            if (accept)
+            {
+                acceptStr = " (accepting)";
+            }
+            Console.Out() << "state " << id << acceptStr << ":" << endl();
+            for (int i = 0; i < edges.Count(); ++i)
+            {
+                const NfaEdge& edge = edges[i];
+                Console.Out() << "    " << edge.ToString() << endl();
+            }
+        }
+        public nothrow int Id() const
+        {
+            return id;
+        }
+        private int id;
+        private bool accept;
+        private List<NfaEdge> edges;
+    }
+    public class Nfa
+    {
+        public Nfa() :
+            start(null), end(null)
+        {
+        }
+        public Nfa(NfaState* start_, NfaState* end_) :
+            start(start_), end(end_)
+        {
+        }
+        public NfaState* Start() const
+        {
+            return start;
+        }
+        public void SetStart(NfaState* start_)
+        {
+            start = start_;
+        }
+        public NfaState* End() const
+        {
+            return end;
+        }
+        public void SetEnd(NfaState* end_)
+        {
+            end = end_;
+        }
+        public void Dump()
+        {
+            Console.Out() << "NFA(" << start->Id() << ", " << end->Id() << ")" << endl();
+        }
+        private NfaState* start;
+        private NfaState* end;
+    }
+    public Nfa MakeNfa(Context& context, Symbol* symbol)
+    {
+        NfaState* start = context.MakeNfaState();
+        NfaState* end = context.MakeNfaState();
+        end->SetAccept(true);
+        start->AddEdge(NfaEdge(symbol, end));
+        return Nfa(start, end);
+    }
+    public Nfa Cat(const Nfa& left, const Nfa& right)
+    {
+        Nfa cat(left);
+        NfaState* leftEnd = cat.End();
+        leftEnd->SetAccept(false);
+        NfaState* rightStart = right.Start();
+        leftEnd->SetEdges(rightStart->Edges());
+        cat.SetEnd(right.End());
+        return cat;
+    }
+    public Nfa Alt(Context& context, const Nfa& left, const Nfa& right)
+    {
+        NfaState* leftStart = left.Start();
+        NfaState* leftEnd = left.End();
+        NfaState* rightStart = right.Start();
+        NfaState* rightEnd = right.End();
+        NfaState* start = context.MakeNfaState();
+        NfaState* end = context.MakeNfaState();
+        end->SetAccept(true);
+        start->AddEdge(NfaEdge(context.MakeEpsilon(), leftStart));
+        start->AddEdge(NfaEdge(context.MakeEpsilon(), rightStart));
+        Nfa alt;
+        alt.SetStart(start);
+        leftEnd->SetAccept(false);
+        leftEnd->AddEdge(NfaEdge(context.MakeEpsilon(), end));
+        rightEnd->SetAccept(false);
+        rightEnd->AddEdge(NfaEdge(context.MakeEpsilon(), end));
+        alt.SetEnd(end);
+        return alt;
+    }
+    public Nfa Kleene(Context& context, const Nfa& nfa)
+    {
+        Nfa kleene;
+        NfaState* start = context.MakeNfaState();
+        NfaState* end = context.MakeNfaState();
+        end->SetAccept(true);
+        start->AddEdge(NfaEdge(context.MakeEpsilon(), end));
+        kleene.SetStart(start);
+        NfaState* nfaStart = nfa.Start();
+        start->AddEdge(NfaEdge(context.MakeEpsilon(), nfaStart));
+        NfaState* nfaEnd = nfa.End();
+        nfaEnd->SetAccept(false);
+        nfaEnd->AddEdge(NfaEdge(context.MakeEpsilon(), end));
+        nfaEnd->AddEdge(NfaEdge(context.MakeEpsilon(), nfaStart));
+        kleene.SetEnd(end);
+        return kleene;
+    }
+    public Nfa Pos(Context& context, const Nfa& nfa)
+    {
+        Nfa pos;
+        NfaState* start = context.MakeNfaState();
+        NfaState* end = context.MakeNfaState();
+        end->SetAccept(true);
+        pos.SetStart(start);
+        NfaState* nfaStart = nfa.Start();
+        start->AddEdge(NfaEdge(context.MakeEpsilon(), nfaStart));
+        NfaState* nfaEnd = nfa.End();
+        nfaEnd->SetAccept(false);
+        nfaEnd->AddEdge(NfaEdge(context.MakeEpsilon(), end));
+        nfaEnd->AddEdge(NfaEdge(context.MakeEpsilon(), nfaStart));
+        pos.SetEnd(end);
+        return pos;
+    }
+    public Nfa Opt(Context& context, const Nfa& nfa)
+    {
+        Nfa opt(nfa);
+        opt.Start()->AddEdge(NfaEdge(context.MakeEpsilon(), opt.End()));
+        return opt;
+    }
+} // namespace System.RegularExpressions

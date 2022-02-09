@@ -1,0 +1,54 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/lexer/ParsingException.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/lexer/ParsingException.cpp' using cpp2cm version 1.0.0
+
+namespace System.Lex
+{
+    public class ParsingException : Exception
+    {
+        public ParsingException(const string& message_, const string& fileName_, const Span& span_) :
+            base(message_), message(message_), fileName(fileName_), span(span_), mod(null)
+        {
+        }
+        public ParsingException(const string& message_, const string& fileName_) : 
+            base(message_), message(message_), fileName(fileName_), span(), mod(null)
+        {
+        }
+        public const string& Project() const
+        {
+            return project;
+        }
+        public const string& Message() const
+        {
+            return message;
+        }
+        public const string& FileName() const
+        {
+            return fileName;
+        }
+        public const Span& GetSpan() const
+        {
+            return span;
+        }
+        public void* Module() const
+        {
+            return mod;
+        }
+        public void SetModule(void* mod_)
+        {
+            mod = mod_;
+        }
+        public void SetProject(const string& project_)
+        {
+            project = project_;
+        }
+        private string project;
+        private string message;
+        private string fileName;
+        private Span span;
+        private void* mod;
+    }
+} // namespace System.Lex

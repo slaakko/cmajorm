@@ -52,6 +52,7 @@ public:
     virtual bool IsConsole() const = 0;
     virtual bool IsHostTextFile() const = 0;
     virtual bool IsResource() const = 0;
+    virtual bool IsDecompressionFile() const = 0;
     virtual bool HasColors() const = 0;
     virtual int Columns() const = 0;
     virtual int Rows() const = 0;
