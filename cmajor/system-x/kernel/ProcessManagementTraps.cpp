@@ -31,6 +31,31 @@ uint64_t TrapForkHandler::HandleTrap(cmsx::machine::Processor& processor)
     }
 }
 
+class TrapExecHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_exec"; }
+};
+
+uint64_t TrapExecHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int64_t filePathAddress = processor.Regs().Get(cmsx::machine::regAX);
+        int64_t argvAddress = processor.Regs().Get(cmsx::machine::regBX);
+        int64_t envpAddress = processor.Regs().Get(cmsx::machine::regCX);
+        Exec(process, filePathAddress, argvAddress, envpAddress);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
 class TrapWaitHandler : public TrapHandler
 {
 public:
@@ -81,6 +106,7 @@ uint64_t TrapGetPidHandler::HandleTrap(cmsx::machine::Processor& processor)
 void InitProcessManagementTraps()
 {
     SetTrapHandler(trap_fork, new TrapForkHandler());
+    SetTrapHandler(trap_exec, new TrapExecHandler());
     SetTrapHandler(trap_wait, new TrapWaitHandler());
     SetTrapHandler(trap_getpid, new TrapGetPidHandler());
 }
@@ -89,6 +115,7 @@ void DoneProcessManagementTraps()
 {
     SetTrapHandler(trap_getpid, nullptr);
     SetTrapHandler(trap_wait, nullptr);
+    SetTrapHandler(trap_exec, nullptr);
     SetTrapHandler(trap_fork, nullptr);
 }
 

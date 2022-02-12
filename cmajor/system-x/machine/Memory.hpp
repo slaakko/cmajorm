@@ -81,6 +81,7 @@ public:
     uint64_t ReadOcta(uint64_t rv, uint64_t virtualAddress, Protection protection);
     void WriteOcta(uint64_t rv, uint64_t virtualAddress, uint64_t value, Protection protection);
     uint64_t AllocateTranslationMap();
+    void AllocateTranslationMap(uint64_t rv);
     void FreeMemory(uint64_t rv);
     void AllocateRange(uint64_t rv, uint64_t start, uint64_t length);
     void FreeRange(uint64_t rv, uint64_t start, uint64_t length);

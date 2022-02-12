@@ -1,0 +1,117 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>System.Base/AtExit.cm</title>
+  <link href="../../../style/code.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2022&nbsp;Seppo&nbsp;Laakko
+</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license
+</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="keyword">namespace</span>&nbsp;<span class="identifier">System</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">delegate</span>&nbsp;<span class="keyword">void</span>&nbsp;<a href="../doc/ns_System.html#delegate_ExitFunc_FC75BCFFAE4C32F5A4266617812F4B93EEAEA6BA">ExitFunc</a><span class="other">(</span><span class="keyword">void</span><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">);</span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_ExitEntry_2DE20ADE92FE07CC8521F49D5D9A76EEB51F2B54.html">ExitEntry</a></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<a href="../doc/class_ExitEntry_2DE20ADE92FE07CC8521F49D5D9A76EEB51F2B54.html#default_constructor_ExitEntry_94B2EE0BD718C0C22905E5B12D909F9D5C99367E">ExitEntry</a><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">fun</span><span class="other">(</span><span class="keyword">null</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">arg</span><span class="other">(</span><span class="keyword">null</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">next</span><span class="other">(</span><span class="keyword">null</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">void</span><span class="other">*</span>&nbsp;<span class="identifier">fun</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">void</span><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<a href="../doc/class_ExitEntry_2DE20ADE92FE07CC8521F49D5D9A76EEB51F2B54.html">ExitEntry</a><span class="other">*</span>&nbsp;<span class="identifier">next</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">private</span>&nbsp;<span class="identifier">ExitEntry</span><span class="other">*</span>&nbsp;<span class="identifier">atExitList</span>&nbsp;<span class="other">=</span>&nbsp;<span class="keyword">null</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">void</span>&nbsp;<a href="../doc/ns_System.html#function_AtExit_66779D06DE1108B26587EF3E35C073BF5A10A774">AtExit</a><span class="other">(</span><a href="../doc/class_ExitEntry_2DE20ADE92FE07CC8521F49D5D9A76EEB51F2B54.html">ExitEntry</a><span class="other">*</span>&nbsp;<span class="identifier">entry</span><span class="other">,&nbsp;</span><span class="keyword">void</span><span class="other">*</span>&nbsp;<span class="identifier">fun</span><span class="other">,&nbsp;</span><span class="keyword">void</span><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">entry</span><span class="other">-></span><span class="identifier">fun</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">fun</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">entry</span><span class="other">-></span><span class="identifier">arg</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">arg</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">entry</span><span class="other">-></span><span class="identifier">next</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">atExitList</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">atExitList</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">entry</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">void</span>&nbsp;<a href="../doc/ns_System.html#function_RunAtExits_EE0635003AFED5D20B943B20B65641505ABBB324">RunAtExits</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_ExitEntry_2DE20ADE92FE07CC8521F49D5D9A76EEB51F2B54.html">ExitEntry</a><span class="other">*</span>&nbsp;<span class="identifier">entry</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">atExitList</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">while</span>&nbsp;<span class="other">(</span><span class="identifier">entry</span><span class="other">&nbsp;!=&nbsp;</span><span class="keyword">null</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">atExitList</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">entry</span><span class="other">-></span><span class="identifier">next</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/ns_System.html#delegate_ExitFunc_FC75BCFFAE4C32F5A4266617812F4B93EEAEA6BA">ExitFunc</a>&nbsp;<span class="identifier">fun</span><span class="other">&nbsp;=&nbsp;</span><span class="keyword">cast</span><span class="other">&lt;</span><a href="../doc/ns_System.html#delegate_ExitFunc_FC75BCFFAE4C32F5A4266617812F4B93EEAEA6BA">ExitFunc</a><span class="other">></span><span class="other">(</span><span class="identifier">entry</span><span class="other">-></span><span class="identifier">fun</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">void</span><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">entry</span><span class="other">-></span><span class="identifier">arg</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">fun</span><span class="other">(</span><span class="identifier">arg</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">entry</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">atExitList</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">cdecl</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">void</span>&nbsp;<a href="../index.html#at_exit">at_exit</a><span class="other">(</span><span class="identifier">System</span><span class="other">.</span><a href="../doc/class_ExitEntry_2DE20ADE92FE07CC8521F49D5D9A76EEB51F2B54.html">ExitEntry</a><span class="other">*</span>&nbsp;<span class="identifier">entry</span><span class="other">,&nbsp;</span><span class="keyword">void</span><span class="other">*</span>&nbsp;<span class="identifier">fun</span><span class="other">,&nbsp;</span><span class="keyword">void</span><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">System</span><span class="other">.</span><a href="../doc/ns_System.html#function_AtExit_66779D06DE1108B26587EF3E35C073BF5A10A774">AtExit</a><span class="other">(</span><span class="identifier">entry</span><span class="other">,&nbsp;</span><span class="identifier">fun</span><span class="other">,&nbsp;</span><span class="identifier">arg</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">cdecl</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">void</span>&nbsp;<a href="../index.html#run_at_exits">run_at_exits</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">System</span><span class="other">.</span><a href="../doc/ns_System.html#function_RunAtExits_EE0635003AFED5D20B943B20B65641505ABBB324">RunAtExits</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

@@ -1,0 +1,2044 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>System X Virtual Machine Instruction Set Reference</title>
+    <link href="../style/style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <h1>System X Virtual Machine Instruction Set Reference</h1>
+	
+	<p>
+		The instruction set of the System X virtual machine is based on Donald Knuth's imaginary MMIX computer architecture.
+		The instructions are interpreted and executed by the System X virtual machine written in C++.
+	</p>
+	
+	<p>
+		MMIX instructions operate with different kinds of values:
+		<ul>
+			<li>A <span class="kw">byte</span> is an 8-bit value</li>
+			<li>A <span class="kw">wyde</span> is a 16-bit value</li>
+			<li>A <span class="kw">tetra</span> is a 32-bit value</li>
+			<li>An <span class="kw">octa</span> is a 64-bit value</li>
+		</ul>
+	</p>
+	
+	<p>
+		Notation:
+		<ul>
+			<li>$X denotes a register number X where X can be a byte 0...255.
+			<li>RA denotes a relative address 4 * (256 * Y + Z), where Y and Z are operands of an instruction</li>
+			<li>LRA denotes a long relative address 4 * (256 * 256 * X + 256 * Y + Z), where X, Y and Z are operands of an instruction</li>
+			<li>@ (at) denotes the location of the current instruction</li>
+		</ul>
+	</p>
+
+	<h2>
+		Instruction Formats
+	</h2>
+	
+	<p>
+		MMIX instructions have four bytes: 
+		<ol>
+			<li>the first byte is an operation code 0...255 denoted as OP</li>
+			<li>the second byte is the X operand of the instruction</li>
+			<li>the third byte is the Y operand of the instruction</li>
+			<li>the fourth byte is the Z operand of the instruction</li>
+		</ol>
+		
+		The interpretation of X, Y and Z depend on the operation code OP.
+	</p>
+
+	<p>
+		The instructions have the following formats:
+	</p>
+	
+	<ol>
+		<li>OP $X, $Y, $Z</li> <!-- 1. -->
+		<p>
+			$X, $Y and $Z are register operands.
+			For example LDO $X, $Y, $Z instruction loads an octabyte value from address $Y + $Z and sets it as the value of register $X.
+		</p>
+		<li>OP $X, $Y, Z</li> <!-- 2. -->
+		<p>
+			$X and $Y are register operands, and Z is an immediate byte operand.
+			For example LDOI $X, $Y, Z instruction loads an octabyte value from memory address $Y + Z and sets it as the value of register $X.
+		</p>
+		<li>OP X, Y, Z</li> <!-- 3. -->
+		<p>
+			X, Y and Z byte operands.
+			For example TRAP X, Y, Z instruction calls operating system trap number X, Y, Z where X, Y and Z are interpreted as immediate bytes. 
+			Currently in System X bytes X and Z are zeros and Y is the number of virtual operating system function called.
+		</p>
+		<li>OP $X, $Z</li> <!-- 4. -->
+		<p>
+			$X and $Z are register operands.
+			For example FIX $X, $Z instruction converts value of register $Z interpreted as a <span class="kw">double</span> to an integer octabyte value and places it as the value of register $X.
+		</p>
+		<li>OP $X, Z</li> <!-- 5. -->
+		<p>
+			$X is a register operand and Z is immediate byte operand.
+			For example FLOTI $X, Z instruction converts a integer byte Z to a floating-point number and sets it as the value of register $X.
+		</p>
+		<li>OP $X, Y, $Z</li> <!-- 6. -->
+		<p>
+			$X is a register operand, Y is an immediate byte operand, and $Z is a register operand.
+			For example NEG $X, Y, $Z instruction subtracts the value of register $Z from immediate byte Y and sets is as the value of register $X.
+		</p>
+		<li>OP $X, Y, Z</li> <!-- 7. -->
+		<p>
+			$X is a register operand, and Y and Z are an immediate byte operands.
+			For example NEGI $X, Y, Z instruction subtracts immediate byte Z from immediate byte Y and sets is as the value of register $X.
+		</p>
+		<li>OP $X, RA</li> <!-- 8. -->
+		<p>
+			$X is a register operand, and RA = 4 * (256 * Y + Z) is a relative address.
+			For example BN $X, RA instruction branches to an instruction whose address is RA bytes ahead of the current instruction position if the value of register $X is negative.
+		</p>
+		<li>OP X, $Y, $Z</li> <!-- 9. -->
+		<p>
+			X is immediate byte operand, $Y and $Z are register operands.
+			For example the STCO X, $Y, $Z instruction stores a constant byte value X to a memory address $Y + $Z, where $Y and $Z are values of registers $Y and $Z respectively.
+		</p>
+		<li>OP X, $Y, Z</li> <!-- 10. -->
+		<p>
+			X and Z are immediate byte operands, and $Y is a register operand
+			For example the STCOI X, $Y, Z instruction stores a constant byte value X to a memoy address $Y + Z, where $Y is the value of register $Y and Z is an immediate byte value.
+		</p>
+		<li>OP $X, YZ</li> <!-- 11. -->
+		<p>
+			$X is a register operand and YZ is interpreted as the wyde value 256 * Y + Z.
+			For example the SETH $X, YZ instruction sets the value YZ as the high wyde value of register $X.
+		</p>
+		<li>OP LRA</li> <!-- 12. -->
+		<p>
+			Operands X, Y and Z are interpreted as a long relative address LRA = 4 * (256 * 256 * X + 256 * Y + Z).
+			For example the JMP LRA instruction jumps to an instruction whose address is LRA bytes ahead a of the current instruction position.
+		</p>
+		<li>OP X, $Z</li> <!-- 13. -->
+		<p>
+			X is an immediate byte operand and $Z is a register operand.
+			For example the PUT X, $Z instruction puts the value of register $Z as the value of the special registers number X.
+		</p>
+		<li>OP X, Z</li> <!-- 14. -->
+		<p>
+			X and Z are immediate byte operands.
+			For example PUTI X, Z instruction puts the value Z as the v alue of the special register number X.
+		</p>
+		<li>OP</li> <!-- 15. -->
+		<p>
+			Instruction OP has no operands.
+			For example the SWYM instruction is a no-operation regardless of the operands X, Y, and Z.
+		</p>
+	</ol>
+	
+	<h2>
+		Changes to the MMIX instruction set.
+	</h2>
+	
+	<p>
+		Instructions CALL, CALLI and RET have changed semantics with respect to the original PUSHGO, PUSHGOI and POP instructions so they have been renamed.
+	</p>
+	
+	<h3>
+		CALL Instruction
+	</h3>
+	
+	<p>
+		The CALL instruction has format 9: CALL X, $Y, $Z.
+		It 
+		<ul>
+		<li>pushes the values of local register numbers 0...X - 1 to the stack</li>
+		<li>pushes the value X interpreted as an octabyte to the stack</li>
+		<li>pushes the value of special register rL to the stack</li>
+		<li>pushes the return address @+4 to the stack</li>
+		<li>zeros the value of the special register rL</li>
+		<li>transfers control to the memory address $Y + $Z</li>
+		</ul>
+	</p>
+
+	<h3>
+		CALLI Instruction
+	</h3>
+	
+	<p>
+		The CALLI instruction has format 9: CALL X, $Y, Z.
+		It operates the same way as the CALL instruction except it treats the Z as an immediate byte, so it transfers control to memory address $Y + Z.
+	</p>
+
+	<h3>
+		RET Instruction
+	</h3>
+	
+	<p>
+		The RET instruction has format 15: RET.
+		It 
+		<ul>
+		<li>pops the return addresss from the stack</li>
+		<li>pops and sets the value of the special register rL from the stack</li>
+		<li>pops the number of local registers X pushed from the stack</li>
+		<li>pops and sets the values of the local registers 0...X - 1 from the stack</li>
+		<li>transfers control to the return address</li>
+		</ul>
+	</p>
+
+	<h2>
+		Registers
+	</h2>
+	
+	<p>
+		MMIX has 256 global registers of which the first 32 are special and have special names.
+		The values of the special registers can be set using the PUT instruction and read using the GET instruction.
+	</p>
+	
+	<p>
+		MMIX has 256 local registers numbered $0, $1, ..., $255.
+	</p>
+	
+	<h3>
+		Used Special Registers
+	</h3>
+	
+	<p>
+		<ul>
+		<li>The special register <span class="kw">rD</span>, dividend register, is used in the implementation of the DIVU and DIVUI instructions.</li>
+		<li>The special register <span class="kw">rG</span>, global threshold register, has value 248.</li>
+		<li>The special register <span class="kw">rH</span>, himult register, is used in the implementation of the MULU and MULUI instructions.</li>
+		<li>The special register <span class="kw">rL</span>, local threshold register, keeps track of the number of used local registers.</li>
+		<li>The special registers <span class="kw">rQ</span> and <span class="kw">rK</span>, interrupt request register and interrupt mask register, is used in the implementation of the virtual machine interrupts.</li>
+		<li>The special register <span class="kw">rR</span>, remainder register, is used in the implementation of the DIV and DIVI, DIVU and DIVUI instructions.</li>
+		<li>The special register <span class="kw">rV</span>, virtual translation register, identifies the process owning a memory page when the virtual machine memory unit calculates a memory page address. 
+			It runs from 0 onwards.</li>
+		</ul>
+	</p>
+
+	<h3>
+		Extensions to the MMIX Register Set
+	</h3>
+	
+	<p>
+		Global register:
+		<ul>
+		<li>$255 is named <span class="kw">ax</span></li>
+		<li>$254 is named <span class="kw">bx</span></li>
+		<li>$253 is named <span class="kw">cx</span></li>
+		<li>$252 is named <span class="kw">dx</span></li>
+		<li>$251 is named <span class="kw">ex</span></li>
+		<li>$250 is named <span class="kw">sp</span></li>
+		<li>$249 is named <span class="kw">fp</span></li>
+		<li>$248 is named <span class="kw">ix</span></li>
+		</ul>
+	</p>
+	
+	<p>
+		Register usage:
+		<ul>
+		<li>
+		Registers <span class="kw">ax</span>, <span class="kw">bx</span>, <span class="kw">cx</span> and <span class="kw">dx</span>
+		are used for passing arguments to virtual machine traps. Register <span class="kw">ax</span> is used for holding trap return value.
+		</li>
+
+		<li>
+		The values of the registers <span class="kw">ax</span>, <span class="kw">bx</span>, <span class="kw">cx</span>, <span class="kw">dx</span>, 
+		<span class="kw">ex</span> and <span class="kw">ix</span> are not saved across function calls. They are used as scratch registers in the implementation of
+		the System X intermediate language instructions.
+		</li>
+		
+		<li>
+			The register <span class="kw">sp</span> is used as a stack pointer.
+		</li>
+
+		<li>
+			The register <span class="kw">fp</span> is used as a frame pointer.
+		</li>
+		</ul>
+	</p>
+
+	<p>
+		The number of local registers used in the intermediate language implementation can be configured in the <span class="kw">sx.machine.config.xml</span> file that is located in the <strong>cmajor/config</strong> subdirectory.
+		The default number of local registers used is <span class="kw">numLocalRegs</span>=8.
+	</p>
+
+	<h2>
+		Instruction Set
+	</h2>
+
+	<p>
+		implementation status: Y = implemented, N = not implemented, C = semantics changed
+	</p>
+	
+	<table class="type">
+		<tr>
+			<th>OP</th>
+			<th>code</th>
+			<th>implementation status</th>
+			<th>instruction name</th>
+			<th>instruction format</th>
+		</tr>
+		<tr>
+			<td><span class="kw">TRAP</span></td>
+			<td>#00</td>
+			<td>Y</td>
+			<td>operating system trap</td>
+			<td>3.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">FCMP</span></td>
+			<td>#01</td>
+			<td>Y</td>
+			<td>floating compare</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">FUN</span></td>
+			<td>#02</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">FEQL</span></td>
+			<td>#03</td>
+			<td>Y</td>
+			<td>floating equal</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">FADD</span></td>
+			<td>#04</td>
+			<td>Y</td>
+			<td>floating add</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">FIX</span></td>
+			<td>#05</td>
+			<td>Y</td>
+			<td>floating to fixed</td>
+			<td>4.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">FSUB</span></td>
+			<td>#06</td>
+			<td>Y</td>
+			<td>floating subtract</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">FIXU</span></td>
+			<td>#07</td>
+			<td>Y</td>
+			<td>floating to fixed unsigned</td>
+			<td>4.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">FLOT</span></td>
+			<td>#08</td>
+			<td>Y</td>
+			<td>fixed to floating</td>
+			<td>4.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">FLOTI</span></td>
+			<td>#09</td>
+			<td>Y</td>
+			<td>fixed to floating immediate</td>
+			<td>5.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">FLOTU</span></td>
+			<td>#0A</td>
+			<td>Y</td>
+			<td>fixed to floating unsigned</td>
+			<td>4.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">FLOTUI</span></td>
+			<td>#0B</td>
+			<td>Y</td>
+			<td>fixed to floating unsigned immediate</td>
+			<td>5.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SFLOT</span></td>
+			<td>#0C</td>
+			<td>Y</td>
+			<td>fixed to short float</td>
+			<td>4.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SFLOTI</span></td>
+			<td>#0D</td>
+			<td>Y</td>
+			<td>fixed to short float immediate</td>
+			<td>5.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SFLOTU</span></td>
+			<td>#0E</td>
+			<td>Y</td>
+			<td>fixed to short float unsigned</td>
+			<td>4.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SFLOTUI</span></td>
+			<td>#0F</td>
+			<td>Y</td>
+			<td>fixed to short float unsigned immediate</td>
+			<td>5.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">FMUL</span></td>
+			<td>#10</td>
+			<td>Y</td>
+			<td>floating multiply</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">FCMPE</span></td>
+			<td>#11</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">FUNE</span></td>
+			<td>#12</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">FEQLE</span></td>
+			<td>#13</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">FDIV</span></td>
+			<td>#14</td>
+			<td>Y</td>
+			<td>floating division</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">FSQRT</span></td>
+			<td>#15</td>
+			<td>Y</td>
+			<td>floating square root</td>
+			<td>4.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">FREM</span></td>
+			<td>#16</td>
+			<td>Y</td>
+			<td>floating remainder</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">FINT</span></td>
+			<td>#17</td>
+			<td>Y</td>
+			<td>floating integer</td>
+			<td>4.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">MUL</span></td>
+			<td>#18</td>
+			<td>Y</td>
+			<td>multiply</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">MULI</span></td>
+			<td>#19</td>
+			<td>Y</td>
+			<td>multiply immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">MULU</span></td>
+			<td>#1A</td>
+			<td>Y</td>
+			<td>multiply unsigned</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">MULUI</span></td>
+			<td>#1B</td>
+			<td>Y</td>
+			<td>multiply unsigned immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">DIV</span></td>
+			<td>#1C</td>
+			<td>Y</td>
+			<td>divide</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">DIVI</span></td>
+			<td>#1D</td>
+			<td>Y</td>
+			<td>divide immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">DIVU</span></td>
+			<td>#1E</td>
+			<td>Y</td>
+			<td>divide unsigned</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">DIVUI</span></td>
+			<td>#1F</td>
+			<td>Y</td>
+			<td>divide unsigned immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ADD</span></td>
+			<td>#20</td>
+			<td>Y</td>
+			<td>add</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ADDI</span></td>
+			<td>#21</td>
+			<td>Y</td>
+			<td>add immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ADDU</span></td>
+			<td>#22</td>
+			<td>Y</td>
+			<td>add unsigned</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ADDUI</span></td>
+			<td>#23</td>
+			<td>Y</td>
+			<td>add unsigned immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SUB</span></td>
+			<td>#24</td>
+			<td>Y</td>
+			<td>subtract</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SUBI</span></td>
+			<td>#25</td>
+			<td>Y</td>
+			<td>subtract immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SUBU</span></td>
+			<td>#26</td>
+			<td>Y</td>
+			<td>subtract unsigned</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SUBUI</span></td>
+			<td>#27</td>
+			<td>Y</td>
+			<td>subtract unsigned immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">2ADDU</span></td>
+			<td>#28</td>
+			<td>Y</td>
+			<td>times 2 and add unsigned</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">2ADDUI</span></td>
+			<td>#29</td>
+			<td>Y</td>
+			<td>times 2 and add unsigned immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">4ADDU</span></td>
+			<td>#2A</td>
+			<td>Y</td>
+			<td>times 4 and add unsigned</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">4ADDUI</span></td>
+			<td>#2B</td>
+			<td>Y</td>
+			<td>times 4 and add unsigned immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">8ADDU</span></td>
+			<td>#2C</td>
+			<td>Y</td>
+			<td>times 8 and add unsigned</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">8ADDUI</span></td>
+			<td>#2D</td>
+			<td>Y</td>
+			<td>times 8 and add unsigned immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">16ADDU</span></td>
+			<td>#2E</td>
+			<td>Y</td>
+			<td>times 16 and add unsigned</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">16ADDUI</span></td>
+			<td>#2F</td>
+			<td>Y</td>
+			<td>times 16 and add unsigned immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CMP</span></td>
+			<td>#30</td>
+			<td>Y</td>
+			<td>compare</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CMPI</span></td>
+			<td>#31</td>
+			<td>Y</td>
+			<td>compare immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CMPU</span></td>
+			<td>#32</td>
+			<td>Y</td>
+			<td>compare unsigned</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CMPUI</span></td>
+			<td>#33</td>
+			<td>Y</td>
+			<td>compare unsigned immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">NEG</span></td>
+			<td>#34</td>
+			<td>Y</td>
+			<td>negate</td>
+			<td>6.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">NEGI</span></td>
+			<td>#35</td>
+			<td>Y</td>
+			<td>negate immediate</td>
+			<td>7.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">NEGU</span></td>
+			<td>#36</td>
+			<td>Y</td>
+			<td>negate unsigned</td>
+			<td>6.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">NEGUI</span></td>
+			<td>#37</td>
+			<td>Y</td>
+			<td>negate unsigned immediate</td>
+			<td>7.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SL</span></td>
+			<td>#38</td>
+			<td>Y</td>
+			<td>shift left</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SLI</span></td>
+			<td>#39</td>
+			<td>Y</td>
+			<td>shift left immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SLU</span></td>
+			<td>#3A</td>
+			<td>Y</td>
+			<td>shift left unsigned</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SLUI</span></td>
+			<td>#3B</td>
+			<td>Y</td>
+			<td>shift left unsigned immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SR</span></td>
+			<td>#3C</td>
+			<td>Y</td>
+			<td>shift right</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SRI</span></td>
+			<td>#3D</td>
+			<td>Y</td>
+			<td>shift right immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SRU</span></td>
+			<td>#3E</td>
+			<td>Y</td>
+			<td>shift right unsigned</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SRUI</span></td>
+			<td>#3F</td>
+			<td>Y</td>
+			<td>shift right unsigned immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">BN</span></td>
+			<td>#40</td>
+			<td>Y</td>
+			<td>branch if negative</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">BNB</span></td>
+			<td>#41</td>
+			<td>Y</td>
+			<td>branch if negative backwards</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">BZ</span></td>
+			<td>#42</td>
+			<td>Y</td>
+			<td>branch if zero</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">BZB</span></td>
+			<td>#43</td>
+			<td>Y</td>
+			<td>branch if zero backwards</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">BP</span></td>
+			<td>#44</td>
+			<td>Y</td>
+			<td>branch if positive</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">BPB</span></td>
+			<td>#45</td>
+			<td>Y</td>
+			<td>branch if positive backwards</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">BOD</span></td>
+			<td>#46</td>
+			<td>Y</td>
+			<td>branch if odd</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">BODB</span></td>
+			<td>#47</td>
+			<td>Y</td>
+			<td>branch if odd backwards</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">BNN</span></td>
+			<td>#48</td>
+			<td>Y</td>
+			<td>branch if nonnegative</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">BNNB</span></td>
+			<td>#49</td>
+			<td>Y</td>
+			<td>branch if nonnegative backwards</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">BNZ</span></td>
+			<td>#4A</td>
+			<td>Y</td>
+			<td>branch if nonzero</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">BNZB</span></td>
+			<td>#4B</td>
+			<td>Y</td>
+			<td>branch if nonzero backwards</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">BNP</span></td>
+			<td>#4C</td>
+			<td>Y</td>
+			<td>branch if nonpositive</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">BNPB</span></td>
+			<td>#4D</td>
+			<td>Y</td>
+			<td>branch if nonpositive backwards</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">BEV</span></td>
+			<td>#4E</td>
+			<td>Y</td>
+			<td>branch if even</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">BEVB</span></td>
+			<td>#4F</td>
+			<td>Y</td>
+			<td>branch if even backwards</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PBN</span></td>
+			<td>#50</td>
+			<td>Y</td>
+			<td>probable branch if negative</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PBNB</span></td>
+			<td>#51</td>
+			<td>Y</td>
+			<td>probable branch if negative backwards</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PBZ</span></td>
+			<td>#52</td>
+			<td>Y</td>
+			<td>probable branch if zero</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PBZB</span></td>
+			<td>#53</td>
+			<td>Y</td>
+			<td>probable branch if zero backwards</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PBP</span></td>
+			<td>#54</td>
+			<td>Y</td>
+			<td>probable branch if positive</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PBPB</span></td>
+			<td>#55</td>
+			<td>Y</td>
+			<td>probable branch if positive backwards</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PBOD</span></td>
+			<td>#56</td>
+			<td>Y</td>
+			<td>probable branch if odd</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PBODB</span></td>
+			<td>#57</td>
+			<td>Y</td>
+			<td>probable branch if odd backwards</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PBNN</span></td>
+			<td>#58</td>
+			<td>Y</td>
+			<td>probable branch if nonnegative</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PBNNB</span></td>
+			<td>#59</td>
+			<td>Y</td>
+			<td>probable branch if nonnegative backwards</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PBNZ</span></td>
+			<td>#5A</td>
+			<td>Y</td>
+			<td>probable branch if nonzero</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PBNZB</span></td>
+			<td>#5B</td>
+			<td>Y</td>
+			<td>probable branch if nonzero backwards</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PBNP</span></td>
+			<td>#5C</td>
+			<td>Y</td>
+			<td>probable branch if nonpositive</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PBNPB</span></td>
+			<td>#5D</td>
+			<td>Y</td>
+			<td>probable branch if nonpositive backwards</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PBEV</span></td>
+			<td>#5E</td>
+			<td>Y</td>
+			<td>probable branch if even</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PBEVB</span></td>
+			<td>#5F</td>
+			<td>Y</td>
+			<td>probable branch if even backwards</td>
+			<td>8.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CSN</span></td>
+			<td>#60</td>
+			<td>Y</td>
+			<td>conditional set if negative</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CSNI</span></td>
+			<td>#61</td>
+			<td>Y</td>
+			<td>conditional set if negative immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CSZ</span></td>
+			<td>#62</td>
+			<td>Y</td>
+			<td>conditional set if zero</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CSZI</span></td>
+			<td>#63</td>
+			<td>Y</td>
+			<td>conditional set if zero immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CSP</span></td>
+			<td>#64</td>
+			<td>Y</td>
+			<td>conditional set if positive</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CSPI</span></td>
+			<td>#65</td>
+			<td>Y</td>
+			<td>conditional set if positive immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CSOD</span></td>
+			<td>#66</td>
+			<td>Y</td>
+			<td>conditional set if odd</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CSODI</span></td>
+			<td>#67</td>
+			<td>Y</td>
+			<td>conditional set if odd immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CSNN</span></td>
+			<td>#68</td>
+			<td>Y</td>
+			<td>conditional set if nonnegative</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CSNNI</span></td>
+			<td>#69</td>
+			<td>Y</td>
+			<td>conditional set if nonnegative immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CSNZ</span></td>
+			<td>#6A</td>
+			<td>Y</td>
+			<td>conditional set if nonzero</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CSNZI</span></td>
+			<td>#6B</td>
+			<td>Y</td>
+			<td>conditional set if nonzero immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CSNP</span></td>
+			<td>#6C</td>
+			<td>Y</td>
+			<td>conditional set if nonpositive</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CSNPI</span></td>
+			<td>#6D</td>
+			<td>Y</td>
+			<td>conditional set if nonpositive immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CSEV</span></td>
+			<td>#6E</td>
+			<td>Y</td>
+			<td>conditional set if even</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CSEVI</span></td>
+			<td>#6F</td>
+			<td>Y</td>
+			<td>conditional set if even immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ZSN</span></td>
+			<td>#70</td>
+			<td>Y</td>
+			<td>zero or set if negative</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ZSNI</span></td>
+			<td>#71</td>
+			<td>Y</td>
+			<td>zero or set if negative immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ZSZ</span></td>
+			<td>#72</td>
+			<td>Y</td>
+			<td>zero or set if zero</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ZSZI</span></td>
+			<td>#73</td>
+			<td>Y</td>
+			<td>zero or set if zero immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ZSP</span></td>
+			<td>#74</td>
+			<td>Y</td>
+			<td>zero or set if positive</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ZSPI</span></td>
+			<td>#75</td>
+			<td>Y</td>
+			<td>zero or set if positive immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ZSOD</span></td>
+			<td>#76</td>
+			<td>Y</td>
+			<td>zero or set if odd</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ZSODI</span></td>
+			<td>#77</td>
+			<td>Y</td>
+			<td>zero or set if odd immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ZSNN</span></td>
+			<td>#78</td>
+			<td>Y</td>
+			<td>zero or set if nonnegative</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ZSNNI</span></td>
+			<td>#79</td>
+			<td>Y</td>
+			<td>zero or set if nonnegative immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ZSNZ</span></td>
+			<td>#7A</td>
+			<td>Y</td>
+			<td>zero or set if nonzero</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ZSNZI</span></td>
+			<td>#7B</td>
+			<td>Y</td>
+			<td>zero or set if nonzero immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ZSNP</span></td>
+			<td>#7C</td>
+			<td>Y</td>
+			<td>zero or set if nonpositive</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ZSNPI</span></td>
+			<td>#7D</td>
+			<td>Y</td>
+			<td>zero or set if nonpositive immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ZSEV</span></td>
+			<td>#7E</td>
+			<td>Y</td>
+			<td>zero or set if even</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ZSEVI</span></td>
+			<td>#7F</td>
+			<td>Y</td>
+			<td>zero or set if even immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDB</span></td>
+			<td>#80</td>
+			<td>Y</td>
+			<td>load byte</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDBI</span></td>
+			<td>#81</td>
+			<td>Y</td>
+			<td>load byte immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDBU</span></td>
+			<td>#82</td>
+			<td>Y</td>
+			<td>load byte unsigned</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDBUI</span></td>
+			<td>#83</td>
+			<td>Y</td>
+			<td>load byte unsigned immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDW</span></td>
+			<td>#84</td>
+			<td>Y</td>
+			<td>load wyde</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDWI</span></td>
+			<td>#85</td>
+			<td>Y</td>
+			<td>load wyde immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDWU</span></td>
+			<td>#86</td>
+			<td>Y</td>
+			<td>load wyde unsigned</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDWUI</span></td>
+			<td>#87</td>
+			<td>Y</td>
+			<td>load wyde unsigned immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDT</span></td>
+			<td>#88</td>
+			<td>Y</td>
+			<td>load tetra</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDTI</span></td>
+			<td>#89</td>
+			<td>Y</td>
+			<td>load tetra immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDTU</span></td>
+			<td>#8A</td>
+			<td>Y</td>
+			<td>load tetra unsigned</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDTUI</span></td>
+			<td>#8B</td>
+			<td>Y</td>
+			<td>load tetra unsigned immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDO</span></td>
+			<td>#8C</td>
+			<td>Y</td>
+			<td>load octa</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDOI</span></td>
+			<td>#8D</td>
+			<td>Y</td>
+			<td>load octa immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDOU</span></td>
+			<td>#8E</td>
+			<td>Y</td>
+			<td>load octa unsigned</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDOUI</span></td>
+			<td>#8F</td>
+			<td>Y</td>
+			<td>load octa unsigned immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDSF</span></td>
+			<td>#90</td>
+			<td>Y</td>
+			<td>load short float</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDSFI</span></td>
+			<td>#91</td>
+			<td>Y</td>
+			<td>load short float immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDHT</span></td>
+			<td>#92</td>
+			<td>Y</td>
+			<td>load high tetra</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDHTI</span></td>
+			<td>#93</td>
+			<td>Y</td>
+			<td>load high tetra immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CSWAP</span></td>
+			<td>#94</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CSWAPI</span></td>
+			<td>#95</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDUNC</span></td>
+			<td>#96</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDUNCI</span></td>
+			<td>#97</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDVTS</span></td>
+			<td>#98</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">LDVTSI</span></td>
+			<td>#99</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PRELD</span></td>
+			<td>#9A</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PRELDI</span></td>
+			<td>#9B</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PREGO</span></td>
+			<td>#9C</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PREGOI</span></td>
+			<td>#9D</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">GO</span></td>
+			<td>#9E</td>
+			<td>Y</td>
+			<td>go</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">GOI</span></td>
+			<td>#9F</td>
+			<td>Y</td>
+			<td>go immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STB</span></td>
+			<td>#A0</td>
+			<td>Y</td>
+			<td>store byte</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STBI</span></td>
+			<td>#A1</td>
+			<td>Y</td>
+			<td>store byte immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STBU</span></td>
+			<td>#A2</td>
+			<td>Y</td>
+			<td>store byte unsigned</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STBUI</span></td>
+			<td>#A3</td>
+			<td>Y</td>
+			<td>store byte unsigned immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STW</span></td>
+			<td>#A4</td>
+			<td>Y</td>
+			<td>store wyde</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STWI</span></td>
+			<td>#A5</td>
+			<td>Y</td>
+			<td>store wyde immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STWU</span></td>
+			<td>#A6</td>
+			<td>Y</td>
+			<td>store wyde unsigned</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STWUI</span></td>
+			<td>#A7</td>
+			<td>Y</td>
+			<td>store wyde unsigned immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STT</span></td>
+			<td>#A8</td>
+			<td>Y</td>
+			<td>store tetra</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STTI</span></td>
+			<td>#A9</td>
+			<td>Y</td>
+			<td>store tetra immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STTU</span></td>
+			<td>#AA</td>
+			<td>Y</td>
+			<td>store tetra unsigned</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STTUI</span></td>
+			<td>#AB</td>
+			<td>Y</td>
+			<td>store tetra unsigned immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STO</span></td>
+			<td>#AC</td>
+			<td>Y</td>
+			<td>store octa</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STOI</span></td>
+			<td>#AD</td>
+			<td>Y</td>
+			<td>store octa immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STOU</span></td>
+			<td>#AE</td>
+			<td>Y</td>
+			<td>store octa unsigned</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STOUI</span></td>
+			<td>#AF</td>
+			<td>Y</td>
+			<td>store octa unsigned immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STSF</span></td>
+			<td>#B0</td>
+			<td>Y</td>
+			<td>store short float</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STSFI</span></td>
+			<td>#B1</td>
+			<td>Y</td>
+			<td>store short float immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STHT</span></td>
+			<td>#B2</td>
+			<td>Y</td>
+			<td>store high tetra</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STHTI</span></td>
+			<td>#B3</td>
+			<td>Y</td>
+			<td>store high tetra immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STCO</span></td>
+			<td>#B4</td>
+			<td>Y</td>
+			<td>store constant</td>
+			<td>9.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STCOI</span></td>
+			<td>#B5</td>
+			<td>Y</td>
+			<td>store constant immediate</td>
+			<td>10.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STUNC</span></td>
+			<td>#B6</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">STUNCI</span></td>
+			<td>#B7</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SYNCD</span></td>
+			<td>#B8</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SYNCDI</span></td>
+			<td>#B9</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PREST</span></td>
+			<td>#BA</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">PRESTI</span></td>
+			<td>#BB</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SYNCID</span></td>
+			<td>#BC</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">SYNCIDI</span></td>
+			<td>#BD</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CALL</span></td>
+			<td>#BE</td>
+			<td>C</td>
+			<td>call subroutine</td>
+			<td>9.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">CALLI</span></td>
+			<td>#BF</td>
+			<td>C</td>
+			<td>call subroutine immediate</td>
+			<td>10.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">OR</span></td>
+			<td>#C0</td>
+			<td>Y</td>
+			<td>bitwise or</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ORI</span></td>
+			<td>#C1</td>
+			<td>Y</td>
+			<td>bitwise or immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ORN</span></td>
+			<td>#C2</td>
+			<td>Y</td>
+			<td>bitwise or not</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ORNI</span></td>
+			<td>#C3</td>
+			<td>Y</td>
+			<td>bitwise or not immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">NOR</span></td>
+			<td>#C4</td>
+			<td>Y</td>
+			<td>bitwise not or</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">NORI</span></td>
+			<td>#C5</td>
+			<td>Y</td>
+			<td>bitwise not or immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">XOR</span></td>
+			<td>#C6</td>
+			<td>Y</td>
+			<td>bitwise exclusive or</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">XORI</span></td>
+			<td>#C7</td>
+			<td>Y</td>
+			<td>bitwise exclusive or immediate</td>
+			<td>2.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">AND</span></td>
+			<td>#C8</td>
+			<td>Y</td>
+			<td>bitwise and</td>
+			<td>1.</td>
+		</tr>
+		<tr>
+			<td><span class="kw">ANDI</span></td>
+			<td>#C9</td>
+			<td>Y</td>
+			<td>bitwise and immediate</td>
+			<td>2.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">ANDN</span></td>
+			<td>#CA</td>
+			<td>Y</td>
+			<td>bitwise and not</td>
+			<td>1.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">ANDNI</span></td>
+			<td>#CB</td>
+			<td>Y</td>
+			<td>bitwise and not immediate</td>
+			<td>2.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">NAND</span></td>
+			<td>#CC</td>
+			<td>Y</td>
+			<td>bitwise not and</td>
+			<td>1.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">NANDI</span></td>
+			<td>#CD</td>
+			<td>Y</td>
+			<td>bitwise not and immediate</td>
+			<td>2.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">NXOR</span></td>
+			<td>#CE</td>
+			<td>Y</td>
+			<td>bitwise not exclusive or</td>
+			<td>1.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">NXORI</span></td>
+			<td>#CF</td>
+			<td>Y</td>
+			<td>bitwise not exclusive or immediate</td>
+			<td>2.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">BDIF</span></td>
+			<td>#D0</td>
+			<td>Y</td>
+			<td>byte difference</td>
+			<td>1.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">BDIFI</span></td>
+			<td>#D1</td>
+			<td>Y</td>
+			<td>byte difference immediate</td>
+			<td>2.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">WDIF</span></td>
+			<td>#D2</td>
+			<td>Y</td>
+			<td>wyde difference</td>
+			<td>1.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">WDIFI</span></td>
+			<td>#D3</td>
+			<td>Y</td>
+			<td>wyde difference immediate</td>
+			<td>2.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">TDIF</span></td>
+			<td>#D4</td>
+			<td>Y</td>
+			<td>tetra difference</td>
+			<td>1.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">TDIFI</span></td>
+			<td>#D5</td>
+			<td>Y</td>
+			<td>tetra difference immediate</td>
+			<td>2.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">ODIF</span></td>
+			<td>#D6</td>
+			<td>Y</td>
+			<td>octa difference</td>
+			<td>1.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">ODIFI</span></td>
+			<td>#D7</td>
+			<td>Y</td>
+			<td>octa difference immediate</td>
+			<td>2.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">MUX</span></td>
+			<td>#D8</td>
+			<td>Y</td>
+			<td>bitwise multiplex</td>
+			<td>1.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">MUXI</span></td>
+			<td>#D9</td>
+			<td>Y</td>
+			<td>bitwise multiplex immediate</td>
+			<td>2.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">SADD</span></td>
+			<td>#DA</td>
+			<td>Y</td>
+			<td>sideways add</td>
+			<td>1.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">SADDI</span></td>
+			<td>#DB</td>
+			<td>Y</td>
+			<td>sideways add immediate</td>
+			<td>2.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">MOR</span></td>
+			<td>#DC</td>
+			<td>Y</td>
+			<td>multiple or</td>
+			<td>1.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">MORI</span></td>
+			<td>#DD</td>
+			<td>Y</td>
+			<td>multiple or immediate</td>
+			<td>2.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">MXOR</span></td>
+			<td>#DE</td>
+			<td>Y</td>
+			<td>multiple excludive or</td>
+			<td>1.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">MXORI</span></td>
+			<td>#DF</td>
+			<td>Y</td>
+			<td>multiple excludive or immediate</td>
+			<td>2.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">SETH</span></td>
+			<td>#E0</td>
+			<td>Y</td>
+			<td>set high wyde</td>
+			<td>11.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">SETMH</span></td>
+			<td>#E1</td>
+			<td>Y</td>
+			<td>set medium high wyde</td>
+			<td>11.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">SETML</span></td>
+			<td>#E2</td>
+			<td>Y</td>
+			<td>set medium low wyde</td>
+			<td>11.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">SETL</span></td>
+			<td>#E3</td>
+			<td>Y</td>
+			<td>set low wyde</td>
+			<td>11.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">INCH</span></td>
+			<td>#E4</td>
+			<td>Y</td>
+			<td>increment high wyde</td>
+			<td>11.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">INCMH</span></td>
+			<td>#E5</td>
+			<td>Y</td>
+			<td>increment medium high wyde</td>
+			<td>11.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">INCML</span></td>
+			<td>#E6</td>
+			<td>Y</td>
+			<td>increment medium low wyde</td>
+			<td>11.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">INCL</span></td>
+			<td>#E7</td>
+			<td>Y</td>
+			<td>increment low wyde</td>
+			<td>11.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">ORH</span></td>
+			<td>#E8</td>
+			<td>Y</td>
+			<td>bitwise or high wyde</td>
+			<td>11.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">ORMH</span></td>
+			<td>#E9</td>
+			<td>Y</td>
+			<td>bitwise or medium high wyde</td>
+			<td>11.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">ORML</span></td>
+			<td>#EA</td>
+			<td>Y</td>
+			<td>bitwise or medium low wyde</td>
+			<td>11.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">ORL</span></td>
+			<td>#EB</td>
+			<td>Y</td>
+			<td>bitwise or low wyde</td>
+			<td>11.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">ANDNH</span></td>
+			<td>#EC</td>
+			<td>Y</td>
+			<td>bitwise and not high wyde</td>
+			<td>11.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">ANDNMH</span></td>
+			<td>#ED</td>
+			<td>Y</td>
+			<td>bitwise and not medium high wyde</td>
+			<td>11.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">ANDNML</span></td>
+			<td>#EE</td>
+			<td>Y</td>
+			<td>bitwise and not medium low wyde</td>
+			<td>11.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">ANDNL</span></td>
+			<td>#EF</td>
+			<td>Y</td>
+			<td>bitwise and not low wyde</td>
+			<td>11.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">JMP</span></td>
+			<td>#F0</td>
+			<td>Y</td>
+			<td>jump</td>
+			<td>12.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">JMPB</span></td>
+			<td>#F1</td>
+			<td>Y</td>
+			<td>jump backwards</td>
+			<td>12.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">PUSHJ</span></td>
+			<td>#F2</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">PUSHJB</span></td>
+			<td>#F3</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">GETA</span></td>
+			<td>#F4</td>
+			<td>Y</td>
+			<td>get address</td>
+			<td>8.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">GETAB</span></td>
+			<td>#F5</td>
+			<td>Y</td>
+			<td>get address backwards</td>
+			<td>8.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">PUT</span></td>
+			<td>#F6</td>
+			<td>Y</td>
+			<td>put to special register</td>
+			<td>13.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">PUTI</span></td>
+			<td>#F7</td>
+			<td>N</td>
+			<td>put special register immediate</td>
+			<td>14.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">RET</span></td>
+			<td>#F8</td>
+			<td>C</td>
+			<td>return from subroutine</td>
+			<td>15.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">RESUME</span></td>
+			<td>#F9</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">SAVE</span></td>
+			<td>#FA</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">UNSAVE</span></td>
+			<td>#FB</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">SYNC</span></td>
+			<td>#FC</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">SWYM</span></td>
+			<td>#FD</td>
+			<td>Y</td>
+			<td>sympathize with your machinery</td>
+			<td>15.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">GET</span></td>
+			<td>#FE</td>
+			<td>Y</td>
+			<td>get from special register</td>
+			<td>5.</td>
+		</tr>	
+		<tr>
+			<td><span class="kw">TRIP</span></td>
+			<td>#FF</td>
+			<td>N</td>
+			<td>-</td>
+		</tr>	
+	</table>
+</body>
+</html>

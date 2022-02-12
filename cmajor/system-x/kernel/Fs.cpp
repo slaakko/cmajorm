@@ -914,6 +914,13 @@ bool DirectoryExists(const std::string& path, Filesystem* fs, cmsx::machine::Pro
     return false;
 }
 
+std::string GetHostFilePath(const INodeKey& key)
+{
+    int32_t fsNumber = key.fsNumber;
+    Filesystem* fs = GetFs(fsNumber);
+    return fs->GetHostFilePath(key.inodeNumber);
+}
+
 INodePtr PathToINode(const std::string& path, Filesystem* fs, cmsx::machine::Process* process)
 {
     return PathToINode(path, fs, process, PathToINodeFlags::none);

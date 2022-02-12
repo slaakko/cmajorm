@@ -40,6 +40,7 @@ public:
     Region GetRegion(RegionId id) const;
     void SetRegion(const Region& region);
     void AddRegion(const Region& region);
+    void FreeRegions();
 private:
     std::vector<Region> regions;
 };

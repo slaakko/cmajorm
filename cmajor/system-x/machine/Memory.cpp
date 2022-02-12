@@ -247,6 +247,12 @@ uint64_t Memory::AllocateTranslationMap()
     return rv;
 }
 
+void Memory::AllocateTranslationMap(uint64_t rv)
+{
+    std::lock_guard<std::recursive_mutex> lock(machine.Lock());
+    translationMaps[rv].reset(new std::map<uint64_t, MemoryPage*>());
+}
+
 void Memory::FreeMemory(uint64_t rv)
 {
     std::lock_guard<std::recursive_mutex> lock(machine.Lock());
@@ -404,9 +410,25 @@ void Memory::ShareRange(uint64_t fromRV, uint64_t toRV, uint64_t start, uint64_t
 
 void Memory::Copy(uint64_t rv, uint64_t sourceVirtualAddress, uint64_t targetVirtualAddress, uint64_t count)
 {
-    uint64_t from = TranslateAddress(rv, sourceVirtualAddress, cmsx::machine::Protection::read);
-    uint64_t to = TranslateAddress(rv, targetVirtualAddress, cmsx::machine::Protection::write);
-    std::memcpy(reinterpret_cast<void*>(to), reinterpret_cast<void*>(from), count);
+    if (count == 0) return;
+    int64_t fromPageOffset = 0;
+    uint64_t from = TranslateAddress(rv, sourceVirtualAddress, cmsx::machine::Protection::read, fromPageOffset);
+    int64_t toPageOffset = 0;
+    uint64_t to = TranslateAddress(rv, targetVirtualAddress, cmsx::machine::Protection::write, toPageOffset);
+    while (count > 0)
+    {
+        int64_t n = std::min(count, pageSize - fromPageOffset);
+        n = std::min(n, static_cast<int64_t>(pageSize) - toPageOffset);
+        std::memcpy(reinterpret_cast<void*>(to), reinterpret_cast<void*>(from), n);
+        count -= n;
+        if (count == 0) break;
+        sourceVirtualAddress += n;
+        targetVirtualAddress += n;
+        fromPageOffset = 0;
+        from = TranslateAddress(rv, sourceVirtualAddress, cmsx::machine::Protection::read, fromPageOffset);
+        toPageOffset = 0;
+        to = TranslateAddress(rv, targetVirtualAddress, cmsx::machine::Protection::write, toPageOffset);
+    }
 }
 
 void Memory::NCopy(const uint8_t* source, uint64_t rv, uint64_t targetVirtualAddress, uint64_t count)

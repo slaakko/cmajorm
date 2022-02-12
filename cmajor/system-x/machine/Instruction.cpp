@@ -1525,11 +1525,11 @@ void Slu::Format(Formatter& formatter, uint8_t x, uint8_t y, uint8_t z)
     formatter.Format(*this, x, y, z);
 }
 
-Sluí::Sluí() : Instruction(SLUI)
+Slui::Slui() : Instruction(SLUI)
 {
 }
 
-void Sluí::Execute(Processor& processor, uint8_t x, uint8_t y, uint8_t z)
+void Slui::Execute(Processor& processor, uint8_t x, uint8_t y, uint8_t z)
 {
     uint64_t yy = processor.Regs().Get(y);
     uint64_t zz = z;
@@ -1538,7 +1538,7 @@ void Sluí::Execute(Processor& processor, uint8_t x, uint8_t y, uint8_t z)
     processor.Regs().Set(x, xx);
 }
 
-void Sluí::Format(Formatter& formatter, uint8_t x, uint8_t y, uint8_t z)
+void Slui::Format(Formatter& formatter, uint8_t x, uint8_t y, uint8_t z)
 {
     formatter.Format(*this, x, y, z);
 }

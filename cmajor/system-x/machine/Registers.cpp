@@ -16,6 +16,7 @@ Registers::Registers() : pc(0)
         localRegs[i] = 0;
         globalRegs[i] = 0;
     }
+    SetSpecial(rG, firstGlobalReg);
 }
 
 void Registers::SetInterrupt(uint64_t interruptBit)

@@ -35,6 +35,23 @@ void DoneApplication()
     soulng::util::Done();
 }
 
+const char* version = "4.3.0";
+
+void PrintHelp()
+{
+    std::cout << "System X Executor version " << version << std::endl;
+    std::cout << std::endl;
+    std::cout << "Usage: sxx [options] FILE.x [ arguments for FILE.x ]" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Run FILE.x in the System X virtual machine." << std::endl;
+    std::cout << std::endl;
+    std::cout << "Options:" << std::endl;
+    std::cout << "--help | -h" << std::endl;
+    std::cout << "  Print help and exit." << std::endl;
+    std::cout << "--verbose | -v" << std::endl;
+    std::cout << "  Be verbose." << std::endl;
+}
+
 int main(int argc, const char** argv)
 {
     sxx::Console console;
@@ -51,7 +68,12 @@ int main(int argc, const char** argv)
             std::string arg = argv[i];
             if (!programFileSeen && arg.starts_with("--"))
             {
-                if (arg == "--verbose")
+                if (arg == "--help")
+                {
+                    PrintHelp();
+                    return 1;
+                }
+                else if (arg == "--verbose")
                 {
                     verbose = true;
                 }
@@ -67,6 +89,11 @@ int main(int argc, const char** argv)
                 {
                     switch (o)
                     {
+                        case 'h':
+                        {
+                            PrintHelp();
+                            return 1;
+                        }
                         case 'v':
                         {
                             verbose = true;
@@ -114,6 +141,7 @@ int main(int argc, const char** argv)
             }
             catch (const std::exception& ex)
             {
+                console.SetToTextMode();
                 std::cout << ex.what() << std::endl;
             }
         }

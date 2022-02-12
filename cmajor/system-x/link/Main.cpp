@@ -42,8 +42,10 @@ void PrintHelp()
     std::cout << "  Print help and exit." << std::endl;
     std::cout << "--verbose | -v" << std::endl;
     std::cout << "  Be verbose." << std::endl;
+    std::cout << "--clsid CLASSID_FILE.clsid | -c CLASSID_FILE.clsid" << std::endl;
+    std::cout << "  Read class identifiers from CLASSID_FILE.clsid" << std::endl;
     std::cout << "--executable FILE.x | -x FILE.x" << std::endl;
-    std::cout << "  Set executable output file." << std::endl;
+    std::cout << "  Set executable output file name to FILE.x." << std::endl;
 }
 
 int main(int argc, const char** argv)
@@ -52,6 +54,7 @@ int main(int argc, const char** argv)
     {
         InitApplication();
         bool verbose = false;
+        bool prevWasClsId = false;
         bool prevWasExecutable = false;
         std::string executableFilePath;
         std::string clsIdFileName;
@@ -69,6 +72,10 @@ int main(int argc, const char** argv)
                 {
                     PrintHelp();
                     return 1;
+                }
+                else if (arg == "--clsid")
+                {
+                    prevWasClsId = true;
                 }
                 else if (arg == "--executable")
                 {
@@ -96,6 +103,11 @@ int main(int argc, const char** argv)
                             verbose = true;
                             break;
                         }
+                        case 'c':
+                        {
+                            prevWasClsId = true;
+                            break;
+                        }
                         case 'x':
                         {
                             prevWasExecutable = true;
@@ -107,6 +119,11 @@ int main(int argc, const char** argv)
                         }
                     }
                 }
+            }
+            else if (prevWasClsId)
+            {
+                prevWasClsId = false;
+                clsIdFileName = GetFullPath(arg);
             }
             else if (prevWasExecutable)
             {

@@ -19,7 +19,7 @@ class Debugger;
 
 enum class ProcessState
 {
-    created, asleep, runnableInUser, runnableInKernel, running, zombie
+    created, exec, asleep, runnableInUser, runnableInKernel, running, zombie
 };
 
 class CMSX_MACHINE_API Process

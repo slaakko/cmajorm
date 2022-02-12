@@ -111,7 +111,7 @@ public:
     void Format(Sl& inst, uint8_t x, uint8_t y, uint8_t z) override;
     void Format(Sli& inst, uint8_t x, uint8_t y, uint8_t z) override;
     void Format(Slu& inst, uint8_t x, uint8_t y, uint8_t z) override;
-    void Format(Sluí& inst, uint8_t x, uint8_t y, uint8_t z) override;
+    void Format(Slui& inst, uint8_t x, uint8_t y, uint8_t z) override;
     void Format(Sr& inst, uint8_t x, uint8_t y, uint8_t z) override;
     void Format(Sri& inst, uint8_t x, uint8_t y, uint8_t z) override;
     void Format(Sru& inst, uint8_t x, uint8_t y, uint8_t z) override;

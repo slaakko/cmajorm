@@ -93,7 +93,7 @@ void ClockInterruptHandler::HandleInterrupt(cmsx::machine::Processor& processor)
     if (currentProcess && currentProcess->State() != cmsx::machine::ProcessState::zombie && currentProcess->State() != cmsx::machine::ProcessState::asleep)
     {
         Scheduler::Instance().AddRunnableProcess(processor.CurrentProcess(), cmsx::machine::ProcessState::runnableInUser);
-        processor.ResetCurrentProcess(true);
+        processor.ResetCurrentProcess(true, true);
     }
 }
 

@@ -99,6 +99,24 @@ int64_t WriteString(Process* process, const std::string& s, int64_t address, cms
     return address;
 }
 
+std::vector<std::string> ReadStringPointerArray(Process* process, int64_t arrayAddress, cmsx::machine::Memory& mem)
+{
+    std::vector<std::string> strings;
+    std::vector<uint8_t> stringAddrItem = ReadProcessMemory(process, arrayAddress, 8);
+    MemoryReader reader(stringAddrItem.data(), 8);
+    int64_t stringAddr = reader.ReadLong();
+    while (stringAddr != 0)
+    {
+        std::string s = ReadString(process, stringAddr, mem);
+        strings.push_back(std::move(s));
+        arrayAddress += 8;
+        stringAddrItem = ReadProcessMemory(process, arrayAddress, 8);
+        MemoryReader reader(stringAddrItem.data(), 8);
+        stringAddr = reader.ReadLong();
+    }
+    return strings;
+}
+
 int32_t Create(Process* process, int64_t pathAddr, int32_t mode)
 {
     if (pathAddr == 0)
@@ -495,6 +513,19 @@ void UTime(Process* process, int64_t pathAddr, int64_t timeBufAddr, int64_t time
     {
         throw SystemError(ENOTFOUND, "path '" + path + "' not found");
     }
+}
+
+std::vector<uint8_t> ReadFile(Process* process, int64_t pathAddr)
+{
+    std::vector<uint8_t> content;
+    int32_t fd = Open(process, pathAddr, static_cast<int32_t>(OpenFlags::read), 0); // todo mode
+    ProcessFileTable& fileTable = process->GetFileTable();
+    File* file = fileTable.GetFile(fd);
+    int64_t fileSize = Seek(process, fd, 0, static_cast<int32_t>(Origin::seekEnd));
+    Seek(process, fd, 0, static_cast<int32_t>(Origin::seekSet));
+    content = file->Read(fileSize, process);
+    Close(process, fd);
+    return content;
 }
 
 } // namespace cmsx::kernel

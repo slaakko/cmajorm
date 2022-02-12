@@ -325,6 +325,7 @@ DirFile* HostFilesystem::OpenDir(const std::string& path, INode* dirINode)
 void HostFilesystem::MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process)
 {
     // todo
+    throw SystemError(EFAIL, "not implemented");
 }
 
 void HostFilesystem::CloseDir(int32_t dirId)
@@ -336,6 +337,20 @@ void HostFilesystem::CloseDir(int32_t dirId)
         DirFile* dir = it->second;
         dirFileMap.erase(dirId);
         delete dir;
+    }
+}
+
+std::string HostFilesystem::GetHostFilePath(int32_t inodeNumber) const
+{
+    auto it = inodePathMap.find(inodeNumber);
+    if (it != inodePathMap.cend())
+    {
+        std::string fullPath = it->second;
+        return fullPath;
+    }
+    else
+    {
+        return std::string();
     }
 }
 

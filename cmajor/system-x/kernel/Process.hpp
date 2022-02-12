@@ -131,6 +131,7 @@ private:
 
 CMSX_KERNEL_API int32_t Fork(Process* parent);
 CMSX_KERNEL_API int32_t Wait(Process* parent, int64_t childExitCodeAddress);
+CMSX_KERNEL_API void Exec(Process* process, int64_t filePathAddress, int64_t argvAddress, int64_t envpAddress);
 
 } // namespace cmsx::kernel
 

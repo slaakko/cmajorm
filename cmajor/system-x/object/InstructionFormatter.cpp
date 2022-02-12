@@ -855,7 +855,7 @@ void InstructionFormatter::Format(Slu& inst, uint8_t x, uint8_t y, uint8_t z)
     FormatRegOperand(z);
 }
 
-void InstructionFormatter::Format(Sluí& inst, uint8_t x, uint8_t y, uint8_t z)
+void InstructionFormatter::Format(Slui& inst, uint8_t x, uint8_t y, uint8_t z)
 {
     FormatOpCode(GetOpCodeName(inst.OpCode()));
     FormatRegOperand(x);

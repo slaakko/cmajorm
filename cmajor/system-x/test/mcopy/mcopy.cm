@@ -1,0 +1,21 @@
+using System;
+
+int main()
+{
+	try
+	{
+		byte* s = cast<byte*>(MemAlloc(8123));
+		byte* d = cast<byte*>(MemAlloc(8123));
+		int result = mcpy(s, d, 8123);
+		if (result != 0)
+		{
+			throw GetSystemError();
+		}
+	}
+	catch (const Exception& ex)
+	{
+		Console.Error() << ex.ToString() << endl();
+		return 1;
+	}
+	return 0;
+}

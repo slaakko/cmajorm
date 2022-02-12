@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>System X Linker</title>
+    <link rel="stylesheet" type="text/css" href="../../style/style.css" />
+</head>
+<body>
+	<h1>
+		System X Linker
+	</h1>
+
+    <p>
+		The System X Linker links System X object files (*.o) and archive files (*.a) and generates a System X executable EXECUTABLE.x.
+    </p>
+
+	<p>
+        Usage: <b>sxlink [options] { FILE.o | FILE.a }</b>
+    </p>
+	
+	<table class="type">
+		<tr>
+			<th>long option</th>
+			<th>short option</th>
+			<th>description</th>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;help</td>
+			<td>&#8209;h</td>
+			<td>Print help and exit.</td>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;verbose</td>
+			<td>&#8209;v</td>
+			<td>Be verbose.</td>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;clsid CLASSID_FILE.clsid</td>
+			<td>&#8209;c CLASSID_FILE.clsid</td>
+			<td>Set class ID input file name to CLASSID_FILE.clsid.</td>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;executable EXECUTABLE.x</td>
+			<td>&#8209;x EXECUTABLE.x</td>
+			<td>Set generated executable file name to EXECUTABLE.x.</td>
+		</tr>
+	</table>
+	
+	<p>
+		For example linking a program <b>write_numbers</b> in the test/write_numbers/lib directory:
+		<br/>
+sxlink -v -c write_numbers.clsid -x write_numbers.x write_numbers.a __main__.o %CMAJOR_ROOT%\system-x\system\Main\Main.o %CMAJOR_ROOT%\system-x\system\lib\debug\System.Base.a %CMAJOR_ROOT%\system-x\system\lib\debug\System.Lex.a %CMAJOR_ROOT%\system-x\system\lib\debug\System.RegularExpressions.a	</p>
+</body>
+</html>

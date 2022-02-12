@@ -10,7 +10,6 @@
 #include <system-x/kernel/Trap.hpp>
 #include <system-x/kernel/Scheduler.hpp>
 #include <system-x/machine/Registers.hpp>
-#include <system-x/object/BinaryFile.hpp>
 #include <soulng/util/Util.hpp>
 
 namespace cmsx::kernel {
@@ -101,14 +100,20 @@ int64_t SetupEnv(Process* process, int64_t address, const std::vector<std::strin
 
 void Load(Process* process, const std::vector<std::string>& args, const std::vector<std::string>& env, cmsx::machine::Machine& machine)
 {
-    cmsx::machine::Registers regs;
     uint64_t rv = machine.Mem().AllocateTranslationMap();
+    std::unique_ptr<cmsx::object::BinaryFile> binaryFile(cmsx::object::ReadBinaryFile(process->FilePath()));
+    Load(process, binaryFile.get(), args, env, machine, rv, true);
+}
+
+void Load(Process* process, cmsx::object::BinaryFile* binaryFile,
+    const std::vector<std::string>& args, const std::vector<std::string>& env, cmsx::machine::Machine& machine, uint64_t rv, bool addRunnable)
+{
+    cmsx::machine::Registers regs;
     process->SetRV(rv);
     int argCount = args.size();
-    std::unique_ptr<cmsx::object::BinaryFile> binaryFile(cmsx::object::ReadBinaryFile(process->FilePath()));
     if (binaryFile->Kind() == cmsx::object::BinaryFileKind::executableFile)
     {
-        cmsx::object::ExecutableFile* executable = static_cast<cmsx::object::ExecutableFile*>(binaryFile.get());
+        cmsx::object::ExecutableFile* executable = static_cast<cmsx::object::ExecutableFile*>(binaryFile);
         regs.Set(cmsx::machine::regSP, cmsx::machine::stackSegmentBaseAddress);
         SetupCode(executable, machine.Mem(), rv);
         Region textRegion(RegionId::text, executable->GetCodeSection()->BaseAddress(), executable->GetCodeSection()->Length());
@@ -153,8 +158,11 @@ void Load(Process* process, const std::vector<std::string>& args, const std::vec
             AddTrapsToSymbolTable(*process->GetSymbolTable());
             regs.Set(cmsx::machine::regSP, cmsx::machine::stackSegmentBaseAddress);
             process->SaveContext(machine, regs);
-            ProcessManager::Instance().IncrementRunnableProcesses();
-            Scheduler::Instance().AddRunnableProcess(process, cmsx::machine::ProcessState::runnableInUser);
+            if (addRunnable)
+            {
+                ProcessManager::Instance().IncrementRunnableProcesses();
+                Scheduler::Instance().AddRunnableProcess(process, cmsx::machine::ProcessState::runnableInUser);
+            }
         }
         else
         {

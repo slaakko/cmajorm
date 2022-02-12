@@ -1,0 +1,551 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>System.Base/Functional.cm</title>
+  <link href="../../../style/code.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2022&nbsp;Seppo&nbsp;Laakko
+</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license
+</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="keyword">using</span>&nbsp;<span class="identifier">System.Concepts</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="keyword">namespace</span>&nbsp;<span class="identifier">System</span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_UnaryFun_Argument_Result_E072A5660996486516C5B6B1316D83709BA12761.html">UnaryFun</a><span class="other">&lt;</span><span class="identifier">Argument</span><span class="other">,&nbsp;</span><span class="identifier">Result</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_UnaryFun_Argument_Result_E072A5660996486516C5B6B1316D83709BA12761.html#19f09068-8216-4683-ad9f-073e2569b08c">Argument</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_Semiregular_E2C46E5F0F7E452605B56E425903C7CB77E861C7.html">Semiregular</a></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">typedef</span>&nbsp;<span class="identifier">Argument</span>&nbsp;<span class="identifier">ArgumentType</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">typedef</span>&nbsp;<span class="identifier">Result</span>&nbsp;<span class="identifier">ResultType</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_BinaryFun_Argument1_Argument2_Result_C08E8CBE9076AC91A0EC9B3BC2A455014F71ED1F.html">BinaryFun</a><span class="other">&lt;</span><span class="identifier">Argument1</span><span class="other">,&nbsp;</span><span class="identifier">Argument2</span><span class="other">,&nbsp;</span><span class="identifier">Result</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_BinaryFun_Argument1_Argument2_Result_C08E8CBE9076AC91A0EC9B3BC2A455014F71ED1F.html#edefd311-9280-4708-a048-cdc2842dd9a1">Argument1</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_Semiregular_E2C46E5F0F7E452605B56E425903C7CB77E861C7.html">Semiregular</a><span class="keyword">&nbsp;and&nbsp;</span><a href="../doc/class_BinaryFun_Argument1_Argument2_Result_C08E8CBE9076AC91A0EC9B3BC2A455014F71ED1F.html#6addca14-287f-47a8-a119-5db649d16adb">Argument2</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_Semiregular_E2C46E5F0F7E452605B56E425903C7CB77E861C7.html">Semiregular</a></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">typedef</span>&nbsp;<span class="identifier">Argument1</span>&nbsp;<span class="identifier">FirstArgumentType</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">typedef</span>&nbsp;<span class="identifier">Argument2</span>&nbsp;<span class="identifier">SecondArgumentType</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">typedef</span>&nbsp;<span class="identifier">Result</span>&nbsp;<span class="identifier">ResultType</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_Plus_T_6DE5E429D028D7343BC491CB6AA869D7DF7D5121.html">Plus</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryFun</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_Plus_T_6DE5E429D028D7343BC491CB6AA869D7DF7D5121.html#2eb34acf-850f-4230-be34-c75f76cd3ca4">T</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_AdditiveSemigroup_A6AEA5AA906561975AEB0E030818D6AB2DFEE63A.html">AdditiveSemigroup</a></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="identifier">T</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">a</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">b</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">a</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">b</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="type">T</span>&nbsp;<a href="../doc/ns_System.html#function_IdentityElement_23689A4B2BEF9D589506E8CBC556B86C244DFBDC">IdentityElement</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">(</span><a href="../doc/class_Plus_T_6DE5E429D028D7343BC491CB6AA869D7DF7D5121.html">Plus</a><span class="other">&lt;</span><span class="type">T</span><span class="other">></span><span class="other">)</span>&nbsp;<span class="keyword">where</span>&nbsp;<span class="identifier">T</span><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_AdditiveMonoid_8D82C7092F575679F72B0CA8C2989C67C1966F37.html">AdditiveMonoid</a></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">T</span><span class="other">(</span><span class="number">0</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_Negate_T_0968FCEADBF1F3ACFE5962D8AA44DA01A314480E.html">Negate</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">UnaryFun</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_Negate_T_0968FCEADBF1F3ACFE5962D8AA44DA01A314480E.html#47db4420-804a-4142-9d16-8e3693e81b87">T</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_AdditiveGroup_F97CD80E909011A4ADD1F7D285678312B63559D8.html">AdditiveGroup</a></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="identifier">T</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">a</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="other">-</span><span class="identifier">a</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_Minus_T_C7D959DFE0FDC4A65AAF0525637E69033072BBD4.html">Minus</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryFun</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_Minus_T_C7D959DFE0FDC4A65AAF0525637E69033072BBD4.html#cd5d265e-df4c-4a83-b5ca-a2f446f4b1f7">T</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_AdditiveGroup_F97CD80E909011A4ADD1F7D285678312B63559D8.html">AdditiveGroup</a></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="identifier">T</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">a</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">b</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">a</span><span class="other">&nbsp;-&nbsp;</span><span class="identifier">b</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_Multiplies_T_DDF4693577D1A42BE4AFA2F1B93B740D8B5ED381.html">Multiplies</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryFun</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_Multiplies_T_DDF4693577D1A42BE4AFA2F1B93B740D8B5ED381.html#d51a53fa-555f-4c43-a738-b05d65e97258">T</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_MultiplicativeSemigroup_E0D9C06FDD3386C79EFB595ABA20C0B553593F5B.html">MultiplicativeSemigroup</a></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="identifier">T</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">a</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">b</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">a</span><span class="other">&nbsp;*&nbsp;</span><span class="identifier">b</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="type">T</span>&nbsp;<a href="../doc/ns_System.html#function_IdentityElement_195932E6859B059A3783365AEBD2B1F1F9ECFC72">IdentityElement</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">(</span><a href="../doc/class_Multiplies_T_DDF4693577D1A42BE4AFA2F1B93B740D8B5ED381.html">Multiplies</a><span class="other">&lt;</span><span class="type">T</span><span class="other">></span><span class="other">)</span>&nbsp;<span class="keyword">where</span>&nbsp;<span class="identifier">T</span><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_MultiplicativeMonoid_2EC49957FA822229E3BB5F5014BA5E03C5EACC11.html">MultiplicativeMonoid</a></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">T</span><span class="other">(</span><span class="number">1</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_Divides_T_530729138FA61A92115CAFDE4F9DB24081BF2E73.html">Divides</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryFun</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_Divides_T_530729138FA61A92115CAFDE4F9DB24081BF2E73.html#02f06440-c686-4d75-8fa3-87b56c12511d">T</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_MultiplicativeGroup_157A1A41F23EF7E4F09D855F82CBFB2C95135E91.html">MultiplicativeGroup</a></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="identifier">T</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">a</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">b</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">a</span><span class="other">&nbsp;/&nbsp;</span><span class="identifier">b</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_Remainder_T_CBAFA68783451F41CF284DE14A39D96BDD4AFAFE.html">Remainder</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryFun</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_Remainder_T_CBAFA68783451F41CF284DE14A39D96BDD4AFAFE.html#eeaad7dc-be44-4719-9b33-75e388f42001">T</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_EuclideanSemiring_0963A0023F004A1F3DA33F82504C5F5A55402241.html">EuclideanSemiring</a></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="identifier">T</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">a</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">b</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">a</span><span class="other">&nbsp;%&nbsp;</span><span class="identifier">b</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_UnaryPred_Argument_09B1A6B80A77304079E63811295D476D692E47B7.html">UnaryPred</a><span class="other">&lt;</span><span class="identifier">Argument</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">UnaryFun</span><span class="other">&lt;</span><span class="identifier">Argument</span><span class="other">,&nbsp;</span><span class="keyword">bool</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_UnaryPred_Argument_09B1A6B80A77304079E63811295D476D692E47B7.html#ee7d8619-ff39-4db8-b7e7-43f24b37aa19">Argument</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_Semiregular_E2C46E5F0F7E452605B56E425903C7CB77E861C7.html">Semiregular</a></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_BinaryPred_Argument1_Argument2_0A37E09D22B252A20EF8DF63EF9141AFCB031BB4.html">BinaryPred</a><span class="other">&lt;</span><span class="identifier">Argument1</span><span class="other">,&nbsp;</span><span class="identifier">Argument2</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryFun</span><span class="other">&lt;</span><span class="identifier">Argument1</span><span class="other">,&nbsp;</span><span class="identifier">Argument2</span><span class="other">,&nbsp;</span><span class="keyword">bool</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_BinaryPred_Argument1_Argument2_0A37E09D22B252A20EF8DF63EF9141AFCB031BB4.html#728528dd-482f-4465-9407-dfd43db82a78">Argument1</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_Semiregular_E2C46E5F0F7E452605B56E425903C7CB77E861C7.html">Semiregular</a><span class="keyword">&nbsp;and&nbsp;</span><a href="../doc/class_BinaryPred_Argument1_Argument2_0A37E09D22B252A20EF8DF63EF9141AFCB031BB4.html#59701e18-87d3-42a7-8f87-df93ba420c6e">Argument2</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_Semiregular_E2C46E5F0F7E452605B56E425903C7CB77E861C7.html">Semiregular</a></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_Rel_Argument_E8617BA707A447FA873DA26388F823802164C257.html">Rel</a><span class="other">&lt;</span><span class="identifier">Argument</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryPred</span><span class="other">&lt;</span><span class="identifier">Argument</span><span class="other">,&nbsp;</span><span class="identifier">Argument</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_Rel_Argument_E8617BA707A447FA873DA26388F823802164C257.html#3ccd26b7-1be2-4271-a822-f1127dbf02df">Argument</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_Semiregular_E2C46E5F0F7E452605B56E425903C7CB77E861C7.html">Semiregular</a></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">typedef</span>&nbsp;<span class="identifier">Argument</span>&nbsp;<span class="identifier">Domain</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_Identity_T_88B6920757B097108E06B2CB21F8C2B6DE39E909.html">Identity</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">UnaryFun</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_Identity_T_88B6920757B097108E06B2CB21F8C2B6DE39E909.html#45cfe413-301f-4669-a528-3abd011fe8b5">T</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_Semiregular_E2C46E5F0F7E452605B56E425903C7CB77E861C7.html">Semiregular</a></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">x</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">x</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_EqualTo_T_763B7164C155EA5D8436A30331F33E4E7267599E.html">EqualTo</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">Rel</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_EqualTo_T_763B7164C155EA5D8436A30331F33E4E7267599E.html#070c7985-e096-456d-8cc8-bb4b65d62ec4">T</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_Regular_A56EC84F9A51535281FA2B6B074E90F9B3BBCCC1.html">Regular</a></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">bool</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">left</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_EqualTo_T_U_5246CB25ED487120E98F2B8A0E795C0CF03A3C9D.html">EqualTo</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">U</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryPred</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">U</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/concept_EqualityComparable_DDA76B65E48DE418ED1651912DC91E6BCF9A6B60.html">EqualityComparable</a><span class="other">&lt;</span><a href="../doc/class_EqualTo_T_U_5246CB25ED487120E98F2B8A0E795C0CF03A3C9D.html#2b3ab167-e5e4-44f9-b75d-c35c83999707">T</a><span class="other">,&nbsp;</span><a href="../doc/class_EqualTo_T_U_5246CB25ED487120E98F2B8A0E795C0CF03A3C9D.html#aaaec26b-e8b1-42f6-b021-32fb4b41ae41">U</a><span class="other">></span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">bool</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">U</span><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">left</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_NotEqualTo_T_5131DE08AD9F14B6E85B01ACCD186B5825A00C59.html">NotEqualTo</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">Rel</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_NotEqualTo_T_5131DE08AD9F14B6E85B01ACCD186B5825A00C59.html#5b284ef7-e5c9-4ea6-b0fb-a2d09014bced">T</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_Regular_A56EC84F9A51535281FA2B6B074E90F9B3BBCCC1.html">Regular</a></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">bool</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">left</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_NotEqualTo_T_U_4F5ED40C402A34550F8A6C43C05A6CE2A0895409.html">NotEqualTo</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">U</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryPred</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">U</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/concept_EqualityComparable_DDA76B65E48DE418ED1651912DC91E6BCF9A6B60.html">EqualityComparable</a><span class="other">&lt;</span><a href="../doc/class_NotEqualTo_T_U_4F5ED40C402A34550F8A6C43C05A6CE2A0895409.html#aa2997dc-0ed7-4162-ae52-24dc172281db">T</a><span class="other">,&nbsp;</span><a href="../doc/class_NotEqualTo_T_U_4F5ED40C402A34550F8A6C43C05A6CE2A0895409.html#5b2b56bc-c3c6-4d3f-8c12-363d39d874b2">U</a><span class="other">></span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">bool</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">U</span><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">left</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_Less_T_8CD4E14D3B6BEACE17051A75B9F36A9125F2842B.html">Less</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">Rel</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_Less_T_8CD4E14D3B6BEACE17051A75B9F36A9125F2842B.html#28cd50c9-20fa-435e-bc6d-7e3b5057f13e">T</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_LessThanComparable_90ED44B8D61617C1FB8517CD74D7D087E77A0AA5.html">LessThanComparable</a></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">bool</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">left</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_Less_T_U_4BF240D04EE3CC14E87CD6D7F17521A032D30FB3.html">Less</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">U</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryPred</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">U</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/concept_LessThanComparable_1379E4E0FDC9326039B5F717F269D6FD46537B48.html">LessThanComparable</a><span class="other">&lt;</span><a href="../doc/class_Less_T_U_4BF240D04EE3CC14E87CD6D7F17521A032D30FB3.html#0e4c9d45-7644-4151-b2cf-494930bca734">T</a><span class="other">,&nbsp;</span><a href="../doc/class_Less_T_U_4BF240D04EE3CC14E87CD6D7F17521A032D30FB3.html#34544260-0746-413a-a7f9-62ae59fa6fc2">U</a><span class="other">></span></span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">bool</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">U</span><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">left</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_Greater_T_3C4BC43027D3C4A3059EDB4FD3D95FBE491F04EB.html">Greater</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">Rel</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_Greater_T_3C4BC43027D3C4A3059EDB4FD3D95FBE491F04EB.html#f148dcaf-fd47-4337-9132-38117596c0b4">T</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_LessThanComparable_90ED44B8D61617C1FB8517CD74D7D087E77A0AA5.html">LessThanComparable</a></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">bool</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">left</span><span class="other">&nbsp;>&nbsp;</span><span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_Greater_T_U_20894328C5991937D304402D5BB48ACBCF150664.html">Greater</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">U</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryPred</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">U</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/concept_LessThanComparable_1379E4E0FDC9326039B5F717F269D6FD46537B48.html">LessThanComparable</a><span class="other">&lt;</span><a href="../doc/class_Greater_T_U_20894328C5991937D304402D5BB48ACBCF150664.html#9ae77ad6-550d-45ac-8501-180642299d58">T</a><span class="other">,&nbsp;</span><a href="../doc/class_Greater_T_U_20894328C5991937D304402D5BB48ACBCF150664.html#c2f2bac6-41c3-4c57-87c5-4dbbc45042a6">U</a><span class="other">></span></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">bool</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">U</span><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">left</span><span class="other">&nbsp;>&nbsp;</span><span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_LessOrEqualTo_T_38A01AF022D23F43DB10172F664C64FD6BEC5451.html">LessOrEqualTo</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">Rel</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_LessOrEqualTo_T_38A01AF022D23F43DB10172F664C64FD6BEC5451.html#c1b6fa13-adbc-4559-b794-4ef9d1cf4597">T</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_LessThanComparable_90ED44B8D61617C1FB8517CD74D7D087E77A0AA5.html">LessThanComparable</a></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">bool</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">left</span><span class="other">&nbsp;&lt;=&nbsp;</span><span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_LessOrEqualTo_T_U_6B4FD2EAAF9B57919CFBF0B07D5B83DFBE7C1C83.html">LessOrEqualTo</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">U</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryPred</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">U</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/concept_LessThanComparable_1379E4E0FDC9326039B5F717F269D6FD46537B48.html">LessThanComparable</a><span class="other">&lt;</span><a href="../doc/class_LessOrEqualTo_T_U_6B4FD2EAAF9B57919CFBF0B07D5B83DFBE7C1C83.html#b356ba9e-3906-4c53-b1d8-b13478207cc3">T</a><span class="other">,&nbsp;</span><a href="../doc/class_LessOrEqualTo_T_U_6B4FD2EAAF9B57919CFBF0B07D5B83DFBE7C1C83.html#19d76509-8f73-4e02-ba2c-10952135abca">U</a><span class="other">></span></span>
+  <br/>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">bool</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">U</span><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">left</span><span class="other">&nbsp;&lt;=&nbsp;</span><span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_GreaterOrEqualTo_T_63B80274B5FA0BEE2887E0B5DC6572B68763325F.html">GreaterOrEqualTo</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">Rel</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_GreaterOrEqualTo_T_63B80274B5FA0BEE2887E0B5DC6572B68763325F.html#7cb08015-14d9-4d33-a94f-fe90e2d83f3c">T</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_LessThanComparable_90ED44B8D61617C1FB8517CD74D7D087E77A0AA5.html">LessThanComparable</a></span>
+  <br/>
+  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="184" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">bool</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="185" xml:space="preserve"><span class="lineNumber">185</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="186" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">left</span><span class="other">&nbsp;>=&nbsp;</span><span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="187" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="188" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="189" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="190" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_GreaterOrEqualTo_T_U_B4DE9B7C0C023429948DD3D6C6018755B584012D.html">GreaterOrEqualTo</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">U</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryPred</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">U</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/concept_LessThanComparable_1379E4E0FDC9326039B5F717F269D6FD46537B48.html">LessThanComparable</a><span class="other">&lt;</span><a href="../doc/class_GreaterOrEqualTo_T_U_B4DE9B7C0C023429948DD3D6C6018755B584012D.html#66ceb562-ad0a-413e-a5b2-680a64fe5e9b">T</a><span class="other">,&nbsp;</span><a href="../doc/class_GreaterOrEqualTo_T_U_B4DE9B7C0C023429948DD3D6C6018755B584012D.html#7726d928-119e-4e60-8866-ab04a44902c2">U</a><span class="other">></span></span>
+  <br/>
+  <span class="code" id="191" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">bool</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">U</span><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="194" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">left</span><span class="other">&nbsp;>=&nbsp;</span><span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="195" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="196" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="197" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="198" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_LogicalAnd_T_E35A5C58E5FFDEFC94BC4F4A396B315039492654.html">LogicalAnd</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">&nbsp;=&nbsp;</span><span class="keyword">bool</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryPred</span><span class="other">&lt;</span><span class="keyword">bool</span><span class="other">,&nbsp;</span><span class="keyword">bool</span><span class="other">></span></span>
+  <br/>
+  <span class="code" id="199" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="200" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">bool</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">bool</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="keyword">bool</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="201" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="202" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">left</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="203" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="204" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="205" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="206" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_LogicalOr_T_7F2F87F001DF8F564ABE5F63CCA120661CE54294.html">LogicalOr</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">&nbsp;=&nbsp;</span><span class="keyword">bool</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryPred</span><span class="other">&lt;</span><span class="keyword">bool</span><span class="other">,&nbsp;</span><span class="keyword">bool</span><span class="other">></span></span>
+  <br/>
+  <span class="code" id="207" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="208" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">bool</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">bool</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="keyword">bool</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="209" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="210" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">left</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="211" xml:space="preserve"><span class="lineNumber">211</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="212" xml:space="preserve"><span class="lineNumber">212</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="213" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="214" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_LogicalNot_T_8969C1691917DD5CA5D11CA01EF0BFCBDC2D486E.html">LogicalNot</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">&nbsp;=&nbsp;</span><span class="keyword">bool</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">UnaryPred</span><span class="other">&lt;</span><span class="keyword">bool</span><span class="other">></span></span>
+  <br/>
+  <span class="code" id="215" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="216" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="keyword">bool</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">bool</span>&nbsp;<span class="identifier">operand</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="217" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="218" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="other">!</span><span class="identifier">operand</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="219" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="220" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="221" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="222" xml:space="preserve"><span class="lineNumber">222</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_BitAnd_T_0B974EDF5B13F707B3D0529DD839ED0DA8511E14.html">BitAnd</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryFun</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_BitAnd_T_0B974EDF5B13F707B3D0529DD839ED0DA8511E14.html#2eb2a3b7-6a08-4ed6-8474-d6ebf2996e7a">T</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_Semiregular_E2C46E5F0F7E452605B56E425903C7CB77E861C7.html">Semiregular</a></span>
+  <br/>
+  <span class="code" id="223" xml:space="preserve"><span class="lineNumber">223</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="224" xml:space="preserve"><span class="lineNumber">224</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="identifier">T</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="225" xml:space="preserve"><span class="lineNumber">225</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="226" xml:space="preserve"><span class="lineNumber">226</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">left</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="227" xml:space="preserve"><span class="lineNumber">227</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="228" xml:space="preserve"><span class="lineNumber">228</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="229" xml:space="preserve"><span class="lineNumber">229</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="230" xml:space="preserve"><span class="lineNumber">230</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_BitOr_T_B976CF7C6B6789B7F1A19FB9E214F89FD71DA9EB.html">BitOr</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryFun</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_BitOr_T_B976CF7C6B6789B7F1A19FB9E214F89FD71DA9EB.html#34f04e03-ea07-421e-80e8-d0b2a3800ebd">T</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_Semiregular_E2C46E5F0F7E452605B56E425903C7CB77E861C7.html">Semiregular</a></span>
+  <br/>
+  <span class="code" id="231" xml:space="preserve"><span class="lineNumber">231</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="232" xml:space="preserve"><span class="lineNumber">232</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="identifier">T</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="233" xml:space="preserve"><span class="lineNumber">233</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="234" xml:space="preserve"><span class="lineNumber">234</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">left</span><span class="other">&nbsp;|&nbsp;</span><span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="235" xml:space="preserve"><span class="lineNumber">235</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="236" xml:space="preserve"><span class="lineNumber">236</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="237" xml:space="preserve"><span class="lineNumber">237</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="238" xml:space="preserve"><span class="lineNumber">238</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_BitXor_T_0258B89E5A321BD9AB4D3B5311B00B81711F9DB5.html">BitXor</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryFun</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_BitXor_T_0258B89E5A321BD9AB4D3B5311B00B81711F9DB5.html#d763f122-1846-4a99-ad88-046020f3f70e">T</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_Semiregular_E2C46E5F0F7E452605B56E425903C7CB77E861C7.html">Semiregular</a></span>
+  <br/>
+  <span class="code" id="239" xml:space="preserve"><span class="lineNumber">239</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="240" xml:space="preserve"><span class="lineNumber">240</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="identifier">T</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="241" xml:space="preserve"><span class="lineNumber">241</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="242" xml:space="preserve"><span class="lineNumber">242</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">left</span><span class="other">&nbsp;^&nbsp;</span><span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="243" xml:space="preserve"><span class="lineNumber">243</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="244" xml:space="preserve"><span class="lineNumber">244</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="245" xml:space="preserve"><span class="lineNumber">245</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="246" xml:space="preserve"><span class="lineNumber">246</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_BitNot_T_3C7F4E874164C72710B960115CB74428CB60AB9D.html">BitNot</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">UnaryFun</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_BitNot_T_3C7F4E874164C72710B960115CB74428CB60AB9D.html#da53998d-5aa1-426a-b2e5-024f3fa3f3eb">T</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_Semiregular_E2C46E5F0F7E452605B56E425903C7CB77E861C7.html">Semiregular</a></span>
+  <br/>
+  <span class="code" id="247" xml:space="preserve"><span class="lineNumber">247</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="248" xml:space="preserve"><span class="lineNumber">248</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="identifier">T</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">operand</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="249" xml:space="preserve"><span class="lineNumber">249</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="250" xml:space="preserve"><span class="lineNumber">250</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="other">~</span><span class="identifier">operand</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="251" xml:space="preserve"><span class="lineNumber">251</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="252" xml:space="preserve"><span class="lineNumber">252</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="253" xml:space="preserve"><span class="lineNumber">253</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="254" xml:space="preserve"><span class="lineNumber">254</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_ShiftLeft_T_4B434B98FFB676F6F792A4AB1E0D383CBE5C8264.html">ShiftLeft</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryFun</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_ShiftLeft_T_4B434B98FFB676F6F792A4AB1E0D383CBE5C8264.html#903506a8-e9f0-459e-b462-634e48e26386">T</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_Semiregular_E2C46E5F0F7E452605B56E425903C7CB77E861C7.html">Semiregular</a></span>
+  <br/>
+  <span class="code" id="255" xml:space="preserve"><span class="lineNumber">255</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="256" xml:space="preserve"><span class="lineNumber">256</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="identifier">T</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="257" xml:space="preserve"><span class="lineNumber">257</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="258" xml:space="preserve"><span class="lineNumber">258</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">left</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="259" xml:space="preserve"><span class="lineNumber">259</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="260" xml:space="preserve"><span class="lineNumber">260</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="261" xml:space="preserve"><span class="lineNumber">261</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="262" xml:space="preserve"><span class="lineNumber">262</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<a href="../doc/class_ShiftRight_T_689A2C425B99A5563C21C4722BF0C2D361AA9D30.html">ShiftRight</a><span class="other">&lt;</span><span class="identifier">T</span><span class="other">></span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">BinaryFun</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">,&nbsp;</span><span class="identifier">T</span><span class="other">></span>&nbsp;<span class="keyword">where</span>&nbsp;<a href="../doc/class_ShiftRight_T_689A2C425B99A5563C21C4722BF0C2D361AA9D30.html#2ce08120-1dcc-4c1a-89dd-7fb57e85c1c2">T</a><span class="keyword">&nbsp;is&nbsp;</span><a href="../doc/concept_Semiregular_E2C46E5F0F7E452605B56E425903C7CB77E861C7.html">Semiregular</a></span>
+  <br/>
+  <span class="code" id="263" xml:space="preserve"><span class="lineNumber">263</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="264" xml:space="preserve"><span class="lineNumber">264</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">inline</span>&nbsp;<span class="keyword">nothrow</span>&nbsp;<span class="identifier">T</span>&nbsp;<span class="keyword">operator</span><span class="other">()</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="identifier">T</span><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="keyword">const</span></span>
+  <br/>
+  <span class="code" id="265" xml:space="preserve"><span class="lineNumber">265</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="266" xml:space="preserve"><span class="lineNumber">266</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">left</span><span class="other">&nbsp;>>&nbsp;</span><span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="267" xml:space="preserve"><span class="lineNumber">267</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="268" xml:space="preserve"><span class="lineNumber">268</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="269" xml:space="preserve"><span class="lineNumber">269</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

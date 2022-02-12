@@ -64,6 +64,11 @@ BinaryFile* ReadBinaryFile(const std::string& filePath)
     FileStream fileStream(filePath, OpenMode::read | OpenMode::binary);
     BufferedStream bufferedStream(fileStream);
     BinaryStreamReader reader(bufferedStream);
+    return ReadBinaryFile(reader, filePath);
+}
+
+BinaryFile* ReadBinaryFile(BinaryStreamReader& reader, const std::string& filePath)
+{
     BinaryFile* file = ReadBinaryFileHeader(reader, filePath);
     file->Read(reader);
     return file;

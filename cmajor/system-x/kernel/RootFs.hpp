@@ -24,6 +24,7 @@ public:
     DirFile* OpenDir(const std::string& path, INode* dirINode) override;
     void MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process) override;
     void CloseFile(int32_t id);
+    std::string GetHostFilePath(int32_t inodeNumber) const override { return std::string(); }
 private:
     cmsx::machine::Machine* machine;
     Filesystem* hostFs;

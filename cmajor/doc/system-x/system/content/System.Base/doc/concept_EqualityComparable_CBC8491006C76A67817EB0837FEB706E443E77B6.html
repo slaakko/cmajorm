@@ -1,0 +1,68 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>EqualityComparable&lt;T> Concept</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>EqualityComparable&lt;T> Concept</h1>
+  <h2>Definition</h2>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Concept.cm.html#62">62</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Concept.cm.html">System.Base/Concept.cm</a></span>
+  <h2>Type Parameters</h2>
+  <table>
+   <tr id="203d62db-20cb-4fb5-a7ab-a53c2dd30443">
+    <td class="rightAlignedCol" xml:space="preserve">T</td>
+    <td xml:space="preserve"/>
+   </tr>
+  </table>
+  <h2>Constraints</h2>
+  <span class="indent" xml:space="preserve">bool operator==(T, T)</span>
+  <br/>
+  <h2>Axioms</h2>
+  <span class="indent" xml:space="preserve"><span class="kw" xml:space="preserve">axiom</span>&nbsp;equal(T&nbsp;a, T&nbsp;b)<br/>
+  </span>
+  <span class="indent" xml:space="preserve">{<br/>
+  </span>
+  <span class="indent" xml:space="preserve">&nbsp;&nbsp;&nbsp;&nbsp;a == b &lt;=> eq(a, b);<br/>
+  </span>
+  <span class="indent" xml:space="preserve">}<br/>
+  </span>
+  <br/>
+  <span class="indent" xml:space="preserve"><span class="kw" xml:space="preserve">axiom</span>&nbsp;reflexive(T&nbsp;a)<br/>
+  </span>
+  <span class="indent" xml:space="preserve">{<br/>
+  </span>
+  <span class="indent" xml:space="preserve">&nbsp;&nbsp;&nbsp;&nbsp;a == a;<br/>
+  </span>
+  <span class="indent" xml:space="preserve">}<br/>
+  </span>
+  <br/>
+  <span class="indent" xml:space="preserve"><span class="kw" xml:space="preserve">axiom</span>&nbsp;symmetric(T&nbsp;a, T&nbsp;b)<br/>
+  </span>
+  <span class="indent" xml:space="preserve">{<br/>
+  </span>
+  <span class="indent" xml:space="preserve">&nbsp;&nbsp;&nbsp;&nbsp;a == b => b == a;<br/>
+  </span>
+  <span class="indent" xml:space="preserve">}<br/>
+  </span>
+  <br/>
+  <span class="indent" xml:space="preserve"><span class="kw" xml:space="preserve">axiom</span>&nbsp;transitive(T&nbsp;a, T&nbsp;b, T&nbsp;c)<br/>
+  </span>
+  <span class="indent" xml:space="preserve">{<br/>
+  </span>
+  <span class="indent" xml:space="preserve">&nbsp;&nbsp;&nbsp;&nbsp;a == b &amp;&amp; b == c => a == c;<br/>
+  </span>
+  <span class="indent" xml:space="preserve">}<br/>
+  </span>
+  <br/>
+  <span class="indent" xml:space="preserve"><span class="kw" xml:space="preserve">axiom</span>&nbsp;notEqualTo(T&nbsp;a, T&nbsp;b)<br/>
+  </span>
+  <span class="indent" xml:space="preserve">{<br/>
+  </span>
+  <span class="indent" xml:space="preserve">&nbsp;&nbsp;&nbsp;&nbsp;a != b &lt;=> !(a == b);<br/>
+  </span>
+  <span class="indent" xml:space="preserve">}<br/>
+  </span>
+  <br/>
+ </body>
+</html>

@@ -40,6 +40,21 @@ void TrapAdder(cmsx::object::SymbolTable& symbolTable)
     cmsx::kernel::AddTrapsToSymbolTable(symbolTable);
 }
 
+void PrintHelp()
+{
+    std::cout << "System X Dump" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Usage: sxdump [options] { FILE.o | FILE.x }" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Print the contents of FILE.o or FILE.x as text to FILE.o.txt or FILE.x.txt" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Options:" << std::endl;
+    std::cout << "--help | -h" << std::endl;
+    std::cout << "  Print help and exit." << std::endl;
+    std::cout << "--verbose | -v" << std::endl;
+    std::cout << "  Be verbose." << std::endl;
+}
+
 int main(int argc, const char** argv)
 {
     try
@@ -53,7 +68,12 @@ int main(int argc, const char** argv)
             std::string arg = argv[i];
             if (arg.starts_with("--"))
             {
-                if (arg == "--verbose")
+                if (arg == "--help")
+                {
+                    PrintHelp();
+                    return 1;
+                }
+                else if (arg == "--verbose")
                 {
                     verbose = true;
                 }
@@ -69,6 +89,11 @@ int main(int argc, const char** argv)
                 {
                     switch (o)
                     {
+                        case 'h':
+                        {
+                            PrintHelp();
+                            return 1;
+                        }
                         case 'v':
                         {
                             verbose = true;

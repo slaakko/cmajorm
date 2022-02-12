@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>System X Intermediate Compiler</title>
+    <link rel="stylesheet" type="text/css" href="../../style/style.css" />
+</head>
+<body>
+	<h1>
+		System X Intermediate Compiler
+	</h1>
+
+    <p>
+		The System X Intermediate Compiler processes System X intermediate code files (*.i), optimizes and generates System X assembly code (*.s) from them.
+    </p>
+
+	<p>
+        Usage: <b>sxic [options] { FILE.i }</b>
+    </p>
+	
+	<table class="type">
+		<tr>
+			<th>long option</th>
+			<th>short option</th>
+			<th>description</th>
+			<th>note</th>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;help</td>
+			<td>&#8209;h</td>
+			<td>Print help and exit.</td>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;verbose</td>
+			<td>&#8209;v</td>
+			<td>Be verbose.</td>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;config=CONFIG</td>
+			<td>&#8209;c=CONFIG</td>
+			<td>Set configuration to CONFIG (<strong>debug</strong> | <strong>release</strong>). Default is <strong>debug</strong>.</td>
+			<td>Release mode not yet implemented.</td>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;optimization&#8209;level=LEVEL</td>
+			<td>&#8209;O=LEVEL</td>
+			<td>Set optimization level to LEVEL=0-3. Defaults debug=0, release=2.</td>
+			<td>Has no effect currently because optimizer not yet implemented.</td>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;pass=PASS</td>
+			<td>&#8209;p=PASS</td>
+			<td>Run pass PASS against FILE.i.</td>
+			<td>Has no effect currently because no passes except assembly code generation not implemented yet.</td>
+		</tr>
+	</table>
+</body>
+</html>

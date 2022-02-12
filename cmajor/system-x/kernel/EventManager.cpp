@@ -65,7 +65,7 @@ void Sleep(const cmsx::machine::Event& evnt, cmsx::machine::Process* process, st
     cmsx::machine::Processor* processor = process->GetProcessor();
     if (processor)
     {
-        processor->ResetCurrentProcess(true);
+        processor->ResetCurrentProcess(true, true);
     }
     Scheduler::Instance().CheckRunnable();
     EventManager::Instance().SleepOn(evnt, process, lock);

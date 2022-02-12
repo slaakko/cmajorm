@@ -48,6 +48,8 @@ void PrintHelp()
     std::cout << "  optimize output generation" << std::endl;
     std::cout << "--build-threads=N (-bt=N)" << std::endl;
     std::cout << "  set number of build threads to N\n" << std::endl;
+    std::cout << "--system-x (-x)" << std::endl;
+    std::cout << "  set backend to 'cmsx'" << std::endl;
 }
 
 using namespace cmajor::cmdoclib;
@@ -81,6 +83,10 @@ int main(int argc, const char** argv)
                 else if (arg == "--optimize" || arg == "-o")
                 {
                     SetGlobalFlag(GlobalFlags::optimizeCmDoc);
+                }
+                else if (arg == "--system-x" || arg == "-x")
+                {
+                    SetBackEnd(cmajor::symbols::BackEnd::cmsx);
                 }
                 else if (arg.find('=') != std::string::npos)
                 {

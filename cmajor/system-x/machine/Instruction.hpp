@@ -627,10 +627,10 @@ public:
     void Format(Formatter& formatter, uint8_t x, uint8_t y, uint8_t z) override;
 };
 
-class CMSX_MACHINE_API Sluí : public Instruction
+class CMSX_MACHINE_API Slui : public Instruction
 {
 public:
-    Sluí();
+    Slui();
     void Execute(Processor& processor, uint8_t x, uint8_t y, uint8_t z) override;
     void Format(Formatter& formatter, uint8_t x, uint8_t y, uint8_t z) override;
 };

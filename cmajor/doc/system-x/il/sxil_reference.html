@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <title>System X Intermediate Language Reference</title>
-    <link href="style/style.css" rel="stylesheet" type="text/css" />
+    <link href="../style/style.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
     <h1>System X Intermediate Language Reference</h1>
@@ -509,6 +509,11 @@
 		</tr>
 	</table>
 
+	<p>
+		The <span class="kw">once</span> flag denotes that identical data definitions may occur many times in different translation units.
+		The linker chooses one of them and throws the rest away.
+	</p>
+
 	<h3 id="constants">Constants</h3>
 	
 	<h4>Syntax</h4>
@@ -715,7 +720,7 @@
 				<span class="rule"><a href="#rule.type-ref">type&#8209;ref</a></span>
 				<span class="kw">clsid</span>
 				<span class="mono">(</span>
-				<span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>+
+				(<span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span> | <span class="mono">-</span>)+
 				<span class="mono">)</span>
 			</td>
 		</tr>
@@ -838,7 +843,12 @@
 			</td>
 		</tr>
 	</table>
-	
+
+	<p>
+		The <span class="kw">once</span> flag denotes that identical function definitions may occur many times in different translation units.
+		The linker chooses one of them and throws the rest away.
+	</p>
+
 	<h2>Instructions</h2>
 	
 	<h3>Syntax</h3>
@@ -1031,7 +1041,14 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'add' instruction adds two values.
+		The 'add' instruction sets the result to the sum of its operands.
+	</p>
+
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the result and the types of the operands must be the same.
+		The type must be an arithmetic type.
 	</p>
 
 	<h3 id="and">'and' Instruction</h3>
@@ -1065,7 +1082,14 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'and' instruction returns the bitwise AND of its left and right operands.
+		The 'and' instruction sets the result to the bitwise AND of its left and right operands.
+	</p>
+
+    <h4>Constraints</h4>
+	
+	<p>
+		The type of the result and the types of the operands must be the same.
+		The type must be an integer type.
 	</p>
 	
 	<h3 id="arg">'arg' Instruction</h3>
@@ -1096,7 +1120,13 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'arg' instruction passes a function argument to a following <a href="#function-call">function call</a> or <a href="#procedure-call">procedure call</a>.
+		The 'arg' instruction passes a function argument to a following <a href="#function-call">function call</a>, <a href="#procedure-call">procedure call</a> or <a href="#trap">trap</a>.
+	</p>
+
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the operand must be an aritmetic, pointer or Boolean type.
 	</p>
 
 	<h3 id="bitcast">'bitcast' Instruction</h3>
@@ -1128,7 +1158,14 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'bitcast' instruction converts its operand to a target type without changing the bits of the operand.
+		The 'bitcast' instruction sets the result to its operand converted to a target type without changing the bits of the operand.
+	</p>
+
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the operand must be an aritmetic, pointer, function or Boolean type.
+		The type of the result must be an arithmetic, pointer, function or Boolean type.
 	</p>
 
 	<h3 id="branch">'branch' Instruction</h3>
@@ -1169,6 +1206,12 @@
 		intermedite instruction that has the false-target label if condition is <strong>false</strong>.
 	</p>
 	
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the operand must be a Boolean type.
+	</p>
+
 	<h3 id="function-call">'call' Instruction (Function Call)</h3>
 	
 	<h4>Syntax</h4>
@@ -1217,6 +1260,12 @@
 		The function call 'call' instruction calls the 'callee' function that returns a result.
 	</p>
 	
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the 'callee' must be a function or a pointer to function type. The type of the result must be the type returned by the 'callee' function.
+	</p>
+	
 	<h3 id="procedure-call">'call' Instruction (Procedure Call)</h3>
 	
 	<h4>Syntax</h4>
@@ -1262,6 +1311,12 @@
 		The procedure call 'call' instruction calls the void 'callee' function.
 	</p>
 
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the 'callee' must be a function or a pointer to function type.
+	</p>
+
 	<h3 id="div">'div' Instruction</h3>
 	
 	<h4>Syntax</h4>
@@ -1293,7 +1348,14 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'div' instruction divides its left operand by its right operand.
+		The 'div' instruction sets the result to the quotient of its left operand divided by its right operand.
+	</p>
+
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the result and the types of the operands must be the same.
+		The type must be an arithmetic type.
 	</p>
 
 	<h3 id="elemaddr">'elemaddr' Instruction</h3>
@@ -1330,7 +1392,13 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'elemaddr' instruction returns an address of an index'th element from an aggregate pointed by ptr.
+		The 'elemaddr' instruction sets the result to an address of an index'th element from an aggregate pointed by ptr.
+	</p>
+
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the 'ptr' must be a a pointer type. The type of the result must be a pointer to the element type.
 	</p>
 
 	<h3 id="equal">'equal' Instruction</h3>
@@ -1364,7 +1432,14 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'equal' instruction returns <strong>true</strong> if its left and right operands are equal and <strong>false</strong> otherwise.
+		The 'equal' instruction sets the result to <strong>true</strong> if its left and right operands are equal and <strong>false</strong> otherwise.
+	</p>
+
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the operands must be the same. The type of the operands must be an arithmetic, pointer of Boolean type.
+		The type of the result must be a Boolean type.
 	</p>
 
 	<h3 id="floattoint">'floattoint' Instruction</h3>
@@ -1396,7 +1471,14 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'floattoint' instruction converts its floating-point type operand to an integer type.
+		The 'floattoint' instruction sets the result to its floating-point type operand converted to an integer type.
+	</p>
+	
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the operand must be a floating-point type.
+		The type of the result must be an integer type.
 	</p>
 
 	<h3 id="inttofloat">'inttofloat' Instruction</h3>
@@ -1428,7 +1510,14 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'inttofloat' instruction converts its integer type operand to a floating-point type.
+		The 'inttofloat' instruction sets the result to its integer type operand converted to a floating-point type.
+	</p>
+
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the operand must be an integer type.
+		The type of the result must be a floating-point type.
 	</p>
 
 	<h3 id="inttoptr">'inttoptr' Instruction</h3>
@@ -1460,7 +1549,14 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'inttoptr' instruction converts its integer type operand to a pointer type.
+		The 'inttoptr' instruction sets the result to its integer type operand converted to a pointer type.
+	</p>
+
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the operand must be an integer type.
+		The type of the result must be a pointer type.
 	</p>
 
 	<h3 id="jmp">'jmp' Instruction</h3>
@@ -1523,7 +1619,14 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'less' instruction returns <strong>true</strong> if its left operand is less than its right operand and <strong>false</strong> otherwise.
+		The 'less' instruction sets the result to <strong>true</strong> if its left operand is less than its right operand and <strong>false</strong> otherwise.
+	</p>
+
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the operands must be the same. The type of the operands must be an arithmetic or pointer type.
+		The type of the result must be a Boolean type.
 	</p>
 
 	<h3 id="load">'load' Instruction</h3>
@@ -1559,6 +1662,13 @@
 		The 'load' instruction reads from memory.
 	</p>
 	
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the operand must be a pointer type.
+		The type of the result must be the type of the value pointed by the 'from' pointer.
+	</p>
+	
 	<h3 id="local">'local' Instruction</h3>
 	
 	<h4>Syntax</h4>
@@ -1589,6 +1699,12 @@
 	
 	<p>
 		The 'local' instruction allocates space for a local variable from a function frame.
+	</p>
+
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the result must a pointer to a local variable type.
 	</p>
 
 	<h3 id="mod">'mod' Instruction</h3>
@@ -1622,9 +1738,16 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'mod' instruction returns the remainder of the division of its left and right operands.
+		The 'mod' instruction sets the result to the remainder of the division of its left and right operands.
 	</p>
+
+    <h4>Constraints</h4>
 	
+	<p>
+		The type of the result and the types of the operands must be the same.
+		The type must be an integer type.
+	</p>
+
 	<h3 id="mul">'mul' Instruction</h3>
 	
 	<h4>Syntax</h4>
@@ -1656,7 +1779,14 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'mul' instruction multiplies two values.
+		The 'mul' instruction sets the result to the product of its operands.
+	</p>
+
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the result and the types of the operands must be the same.
+		The type must be an arithmetic type.
 	</p>
 
 	<h3 id="neg">'neg' Instruction</h3>
@@ -1688,7 +1818,7 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'neg' instruction returns its operand subtracted from zero.
+		The 'neg' instruction sets the result to its operand subtracted from zero.
 	</p>
 
 	<h3 id="nop">'nop' Instruction</h3>
@@ -1747,7 +1877,15 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'not' instruction returns <strong>true</strong> if its operand is <strong>false</strong> and <strong>false</strong> if its operand is <strong>true</strong>.
+		If the operand of the 'not' instruction is a Boolean value, the instruction sets a Boolean type result to <strong>true</strong> if its operand is <strong>false</strong> and <strong>false</strong> 
+		if its operand is <strong>true</strong>.
+		If the operand of the 'not' instruction is a an integer value, the instruction sets an integer type result to the bitwise complement of its operand.
+	</p>
+
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the result and the type of the operand must be the same. The type of the operand must be an integer or a Boolean type.
 	</p>
 
 	<h3 id="or">'or' Instruction</h3>
@@ -1781,7 +1919,14 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'or' instruction returns the bitwise OR of its left and right operands.
+		The 'or' instruction sets the result to the bitwise OR of its left and right operands.
+	</p>
+	
+    <h4>Constraints</h4>
+	
+	<p>
+		The type of the result and the types of the operands must be the same.
+		The type must be an integer type.
 	</p>
 	
 	<h3 id="param">'param' Instruction</h3>
@@ -1848,7 +1993,13 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'ptrdiff' instruction returns the number of elements between pointers left-ptr and right-ptr.
+		The 'ptrdiff' instruction sets the result to the number of elements between pointers left-ptr and right-ptr.
+	</p>
+
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the operands must be the same. The type of the operands must be a pointer type. The type of the result must be an integer type.
 	</p>
 
 	<h3 id="ptroffset">'ptroffset' Instruction</h3>
@@ -1885,7 +2036,13 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'ptroffset' instruction returns an address of an element having given offset added to pointer ptr.
+		The 'ptroffset' instruction sets the result to an address of an element having given offset added to pointer ptr.
+	</p>
+
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the left operand must be a pointer type. The type of the 'offset' must be an integer type. The type of the result must be a pointer type.
 	</p>
 
 	<h3 id="ptrtoint">'ptrtoint' Instruction</h3>
@@ -1918,6 +2075,13 @@
 	
 	<p>
 		The 'ptrtoint' instruction converts its pointer type operand to an integer type.
+	</p>
+
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the operand must be a pointer type.
+		The type of the result must be an integer type.
 	</p>
 
 	<h3 id="ret">'ret' instruction</h3>
@@ -1982,7 +2146,14 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'shl' instruction returns its left operand shifted left by the number of bit positions indicated by its right operand.
+		The 'shl' instruction sets the result to its left operand shifted left by the number of bit positions indicated by its right operand.
+	</p>
+
+    <h4>Constraints</h4>
+	
+	<p>
+		The type of the result and the types of the operands must be the same.
+		The type must be an integer type.
 	</p>
 
 	<h3 id="shr">'shr' Instruction</h3>
@@ -2016,7 +2187,14 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'shr' instruction returns its left operand shifted right by the number of bit positions indicated by its right operand.
+		The 'shr' instruction sets the result to its left operand shifted right by the number of bit positions indicated by its right operand.
+	</p>
+
+    <h4>Constraints</h4>
+	
+	<p>
+		The type of the result and the types of the operands must be the same.
+		The type must be an integer type.
 	</p>
 
 	<h3 id="signextend">'signextend' Instruction</h3>
@@ -2052,6 +2230,13 @@
 		If the operand is non-negative the vacant most significant bit positions of the result are filled with zero bits,
 		otherwise the vacant most significant bit positions of the result are fillled with one bits.
 	</p>
+	
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the result and the type of the operand must be the same. 
+		The type must be an aritmetic type.
+	</p>
 
 	<h3 id="store">'store' Instruction</h3>
 	
@@ -2086,7 +2271,13 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'store' instruction writes a value to the memory location indicated by ptr.
+		The 'store' instruction writes a value to the memory location pointed by ptr.
+	</p>
+	
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the 'ptr' must be a pointer type.
 	</p>
 	
 	<h3 id="sub">'sub' Instruction</h3>
@@ -2118,6 +2309,17 @@
 	</span>
 	
 	<h4>Description</h4>
+	
+	<p>
+		The 'sub' instruction sets the result to the difference of its operands.
+	</p>
+	
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the result and the types of the operands must be the same.
+		The type must be an arithmetic type.
+	</p>
 	
 	<h3 id="switch">'switch' Instruction</h3>
 	
@@ -2177,6 +2379,14 @@
 		The 'switch' instruction transfers control to an instruction having a label case-target if the condition is equal to the value associated with the case-target.
 		If none of the values associated with case-targets match the condition, control is transfered to the instruction having label default-target.
 	</p>
+	
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the 'condition' must be an integer or Boolean type.
+		The type of each case value must be the same as the type of the condition.
+	</p>
+
 
 	<h3 id="trap">'trap' Instruction</h3>
 	
@@ -2219,9 +2429,18 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'trap' instruction calls the operating system.
+		The 'trap' instruction calls a virtual operating system trap.
+		See <a href="../kernel/traps.html">System X Kernel Traps</a>.
 	</p>
-
+	
+	<h4>Constrains</h4>
+	
+	<p>
+		The types of the operands shall be <span class="kw">byte</span>.
+		The second byte operand shall contain the number of the virtual operating system trap to be called, the first and the third byte operands shall be zero.
+		The arguments to the trap function shall be passed using the <a href="#arg"><span class="kw">arg</span></a>  instruction.
+	</p>
+	
 	<h3 id="truncate">'truncate' Instruction</h3>
 	
 	<h4>Syntax</h4>
@@ -2252,6 +2471,13 @@
 	
 	<p>
 		The 'truncate' instruction truncates its operand by throwing away the most significant bits of the operand so that it fits the type of the result.
+	</p>
+	
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the operand must be an aritmetic type.
+		The type of the result must be an arithmetic or Boolean type.
 	</p>
 
 	<h3 id="xor">'xor' Instruction</h3>
@@ -2285,7 +2511,14 @@
 	<h4>Description</h4>
 	
 	<p>
-		The 'xor' instruction returns the bitwise exclusive OR of its left and right operands.
+		The 'xor' instruction sets the result to the bitwise exclusive OR of its left and right operands.
+	</p>
+
+    <h4>Constraints</h4>
+	
+	<p>
+		The type of the result and the types of the operands must be the same.
+		The type must be an integer type.
 	</p>
 
 	<h3 id="zeroextend">'zeroextend' Instruction</h3>
@@ -2318,6 +2551,13 @@
 	
 	<p>
 		The 'zeroextend' instruction increases the number of bits of its operand by adding zero bits to the vacant most significant bit positions of the result.
+	</p>
+	
+	<h4>Constraints</h4>
+	
+	<p>
+		The type of the operand must be an aritmetic or Boolean type.
+		The type of the result must be an arithmetic type.
 	</p>
 
 	<h2 id="metadata">Metadata</h2>
@@ -2394,4 +2634,3 @@
 	</table>
 </body>
 </html>
-

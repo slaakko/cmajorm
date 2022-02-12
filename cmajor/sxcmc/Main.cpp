@@ -103,10 +103,6 @@ void PrintHelp()
         "   debug parsing to stdout\n" <<
         "--define SYMBOL (-D SYMBOL)\n" <<
         "   define a conditional compilation symbol SYMBOL.\n" <<
-        "--gen-debug-info (-g)\n" <<
-        "   generate debug info (on by default in debug configuration)\n" <<
-        "--no-debug-info (-n)\n" <<
-        "   don't generate debug info even for debug build\n" <<
         "--build-threads=N (-bt=N)\n" <<
         "   set number of build threads to N\n" <<
         "--disable-module-cache (-dm)\n" <<

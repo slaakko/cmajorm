@@ -29,6 +29,7 @@ public:
     virtual void Stat(INode* inode) = 0;
     virtual DirFile* OpenDir(const std::string& path, INode* dirINode) = 0;
     virtual void MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process) = 0;
+    virtual std::string GetHostFilePath(int32_t inodeNumber) const = 0;
 private:
     int32_t id;
 };
@@ -173,6 +174,7 @@ CMSX_KERNEL_API void AddDirectoryEntry(const DirectoryEntry& entry, INode* dirIN
 CMSX_KERNEL_API void RemoveDirectoryEntry(const std::string& name, INode* dirINode, Filesystem* fs, cmsx::machine::Process* process);
 CMSX_KERNEL_API INodePtr MakeDirectory(const std::string& path, Filesystem* fs, cmsx::machine::Process* process);
 CMSX_KERNEL_API bool DirectoryExists(const std::string& path, Filesystem* fs, cmsx::machine::Process* process);
+CMSX_KERNEL_API std::string GetHostFilePath(const INodeKey& key);
 
 enum class PathToINodeFlags : int32_t
 {

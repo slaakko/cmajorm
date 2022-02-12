@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>System X Executor</title>
+    <link rel="stylesheet" type="text/css" href="../../style/style.css" />
+</head>
+<body>
+	<h1>
+		System X Executor
+	</h1>
+	
+	<p>
+        Usage: <b>sxx [options] FILE.x [ arguments for FILE.x ]</b>
+    </p>
+	
+	<p>
+		Run from a Windows Terminal or command prompt window.
+	</p>
+	
+	<table class="type">
+		<tr>
+			<th>long option</th>
+			<th>short option</th>
+			<th>description</th>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;help</td>
+			<td>&#8209;h</td>
+			<td>Print help and exit.</td>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;verbose</td>
+			<td>&#8209;v</td>
+			<td>Be verbose.</td>
+		</tr>
+	</table>
+	
+	<p>
+		If <b>--verbose</b> option is given, the executor prints execution statistics after the command has been run:
+		
+<pre>
+    sxx -v fibonacci.x
+    running '.../fibonacci.x'...
+    21
+    '.../fibonacci.x' exited with code 0
+
+    user time:   00:00:00.000.904 (54.1173%)
+    sleep time:  00:00:00.000.000 (0%)
+    system time: 00:00:00.000.766 (45.8827%)
+    total time:  00:00:00.001.671
+</pre>
+	</p>
+	
+	<table class="type">
+		<tr>
+			<th>value</th>
+			<th>description</th>
+		</tr>
+		<tr>
+			<td>user time</td>
+			<td>the duration that the virtual machine processor threads has executed the user process</td>
+		<tr>
+		<tr>
+			<td>sleep time</td>
+			<td>the duration that the user process has been asleep waiting for I/O</td>
+		<tr>
+		<tr>
+			<td>system time</td>
+			<td>the duration that the virtual machine processor threads has executed kernel interrupts</td>
+		</tr>
+	</table>
+</body>
+</html>

@@ -22,34 +22,35 @@ public const byte trap_resume = 15u;
 public const byte trap_stack_trace = 16u;
 public const byte trap_get_system_error = 17u;
 public const byte trap_fork = 18u;
-public const byte trap_wait = 19u;
-public const byte trap_getpid = 20u;
-public const byte trap_create = 21u;
-public const byte trap_open = 22u;
-public const byte trap_close = 23u;
-public const byte trap_read = 24u;
-public const byte trap_write = 25u;
-public const byte trap_ioctl = 26u;
-public const byte trap_unlink = 27u;
-public const byte trap_seek = 28u;
-public const byte trap_tell = 29u;
-public const byte trap_stat = 30u;
-public const byte trap_getcwd = 31u;
-public const byte trap_chdir = 32u;
-public const byte trap_mkdir = 33u;
-public const byte trap_opendir = 34u;
-public const byte trap_closedir = 35u;
-public const byte trap_readdir = 36u;
-public const byte trap_utime = 37u;
-public const byte trap_mcpy = 38u;
-public const byte trap_open_resource = 39u;
-public const byte trap_close_resource = 40u;
-public const byte trap_get_resource_size = 41u;
-public const byte trap_read_resource = 42u;
-public const byte trap_decompress = 43u;
-public const byte trap_get_decompressed_data_size = 44u;
-public const byte trap_get_decompressed_data = 45u;
-public const byte trap_close_decompression = 46u;
+public const byte trap_exec = 19u;
+public const byte trap_wait = 20u;
+public const byte trap_getpid = 21u;
+public const byte trap_create = 22u;
+public const byte trap_open = 23u;
+public const byte trap_close = 24u;
+public const byte trap_read = 25u;
+public const byte trap_write = 26u;
+public const byte trap_ioctl = 27u;
+public const byte trap_unlink = 28u;
+public const byte trap_seek = 29u;
+public const byte trap_tell = 30u;
+public const byte trap_stat = 31u;
+public const byte trap_getcwd = 32u;
+public const byte trap_chdir = 33u;
+public const byte trap_mkdir = 34u;
+public const byte trap_opendir = 35u;
+public const byte trap_closedir = 36u;
+public const byte trap_readdir = 37u;
+public const byte trap_utime = 38u;
+public const byte trap_mcpy = 39u;
+public const byte trap_open_resource = 40u;
+public const byte trap_close_resource = 41u;
+public const byte trap_get_resource_size = 42u;
+public const byte trap_read_resource = 43u;
+public const byte trap_decompress = 44u;
+public const byte trap_get_decompressed_data_size = 45u;
+public const byte trap_get_decompressed_data = 46u;
+public const byte trap_close_decompression = 47u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -148,6 +149,11 @@ public cdecl nothrow int get_system_error(int* errorCode, void* buffer, long buf
 public cdecl nothrow int fork()
 {
     return cast<int>(trap(0u, trap_fork, 0u));
+}
+
+public cdecl nothrow int exec(const char* file, const char** argv, const char** envp)
+{
+	return cast<int>(trap(0u, trap_exec, 0u, file, argv, envp));
 }
 
 public cdecl nothrow int wait(byte* exitCode)

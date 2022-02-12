@@ -62,6 +62,11 @@ void RegionTable::AddRegion(const Region& region)
     regions.push_back(region);
 }
 
+void RegionTable::FreeRegions()
+{
+    regions.clear();
+}
+
 void FreeRegion(Region& region, Process* fromProcess)
 {
     cmsx::machine::Memory& mem = fromProcess->GetProcessor()->GetMachine()->Mem();

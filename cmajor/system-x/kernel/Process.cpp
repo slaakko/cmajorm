@@ -10,12 +10,15 @@
 #include <system-x/kernel/Kernel.hpp>
 #include <system-x/kernel/Mount.hpp>
 #include <system-x/kernel/Fs.hpp>
+#include <system-x/kernel/IO.hpp>
+#include <system-x/kernel/Load.hpp>
 #include <system-x/machine/Config.hpp>
 #include <system-x/machine/Machine.hpp>
 #include <system-x/machine/Memory.hpp>
 #include <system-x/machine/Registers.hpp>
 #include <system-x/machine/Processor.hpp>
 #include <soulng/util/Fiber.hpp>
+#include <soulng/util/MemoryStream.hpp>
 
 namespace cmsx::kernel {
 
@@ -376,6 +379,24 @@ int32_t Wait(Process* parent, int64_t childExitCodeAddress)
         child = child->NextSibling();
     }
     throw SystemError(ENOCHILD, "no child in zombie state");
+}
+
+void Exec(Process* process, int64_t filePathAddress, int64_t argvAddress, int64_t envpAddress)
+{
+    cmsx::machine::Machine* machine = process->GetProcessor()->GetMachine();
+    cmsx::machine::Memory& mem = machine->Mem();
+    std::string filePath = ReadString(process, filePathAddress, mem);
+    std::vector<uint8_t> content = ReadFile(process, filePathAddress);
+    std::vector<std::string> args = ReadStringPointerArray(process, argvAddress, mem);
+    std::vector<std::string> env = ReadStringPointerArray(process, envpAddress, mem);
+    mem.FreeMemory(process->RV());
+    mem.AllocateTranslationMap(process->RV());
+    process->GetRegionTable().FreeRegions();
+    process->SetState(cmsx::machine::ProcessState::exec);
+    soulng::util::MemoryStream memoryStream(content.data(), content.size());
+    soulng::util::BinaryStreamReader reader(memoryStream);
+    std::unique_ptr<cmsx::object::BinaryFile> binaryFile(cmsx::object::ReadBinaryFile(reader, filePath));
+    Load(process, binaryFile.get(), args, env, *machine, process->RV(), false);
 }
 
 } // namespace cmsx::kernel

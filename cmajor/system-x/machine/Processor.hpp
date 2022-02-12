@@ -29,7 +29,7 @@ public:
     void Run();
     void EnableInterrupts();
     UserProcess* CurrentProcess() const { return currentProcess; }
-    void ResetCurrentProcess(bool addSystemTime);
+    void ResetCurrentProcess(bool addSystemTime, bool saveContext);
     void CheckException();
     void RunKernel();
     void* MainFiber() const { return mainFiber; }

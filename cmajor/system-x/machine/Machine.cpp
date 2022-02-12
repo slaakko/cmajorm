@@ -100,7 +100,7 @@ Machine::Machine() : clock(), scheduler(nullptr), processors(), memory(*this), i
     SetInstruction(new Sl());
     SetInstruction(new Sli());
     SetInstruction(new Slu());
-    SetInstruction(new Sluí());
+    SetInstruction(new Slui());
     SetInstruction(new Sr());
     SetInstruction(new Sri());
     SetInstruction(new Sru());

@@ -85,7 +85,7 @@ class Negui;
 class Sl;
 class Sli;
 class Slu;
-class Sluí;
+class Slui;
 class Sr;
 class Sri;
 class Sru;
@@ -312,7 +312,7 @@ public:
     virtual void Format(Sl& inst, uint8_t x, uint8_t y, uint8_t z) {}
     virtual void Format(Sli& inst, uint8_t x, uint8_t y, uint8_t z) {}
     virtual void Format(Slu& inst, uint8_t x, uint8_t y, uint8_t z) {}
-    virtual void Format(Sluí& inst, uint8_t x, uint8_t y, uint8_t z) {}
+    virtual void Format(Slui& inst, uint8_t x, uint8_t y, uint8_t z) {}
     virtual void Format(Sr& inst, uint8_t x, uint8_t y, uint8_t z) {}
     virtual void Format(Sri& inst, uint8_t x, uint8_t y, uint8_t z) {}
     virtual void Format(Sru& inst, uint8_t x, uint8_t y, uint8_t z) {}

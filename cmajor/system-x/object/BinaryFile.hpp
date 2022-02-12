@@ -36,6 +36,7 @@ class BinaryFile;
 class Resource;
 
 CMSX_OBJECT_API BinaryFile* ReadBinaryFile(const std::string& filePath);
+CMSX_OBJECT_API BinaryFile* ReadBinaryFile(BinaryStreamReader& reader, const std::string& filePath);
 CMSX_OBJECT_API Section* ReadSection(BinaryFile* file, BinaryStreamReader& reader);
 
 class CMSX_OBJECT_API Section

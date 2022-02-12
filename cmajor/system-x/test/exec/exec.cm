@@ -1,0 +1,29 @@
+using System;
+
+typedef const char* const_char_ptr;
+
+int main()
+{
+	try
+	{
+		const char* file = "/mnt/sx/test/write_numbers/bin/debug/write_numbers.x";
+		const_char_ptr[2] args;
+		args[0] = file;
+		args[1] = null;
+		const_char_ptr* argv = &args[0];
+		const_char_ptr[1] envs;
+		envs[0] = null;
+		const_char_ptr* envp = &envs[0];
+		int x = exec(file, argv, envp);
+		if (x == -1)
+		{
+			ThrowSystemError();
+		}
+	}
+	catch (const Exception& ex)
+	{
+		Console.Error() << ex.ToString() << endl();
+		return 1;
+	}
+	return 0;
+}

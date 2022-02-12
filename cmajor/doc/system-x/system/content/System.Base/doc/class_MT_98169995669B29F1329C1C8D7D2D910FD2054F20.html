@@ -1,0 +1,117 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>MT Class</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>MT Class</h1>
+  <h2>Definition</h2>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Random.cm.html#8">8</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Random.cm.html">System.Base/Random.cm</a></span>
+  <h2>Constructors &amp; Destructor</h2>
+  <table>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span></td>
+    <td xml:space="preserve"><a href="../../System.Base/doc/class_MT_98169995669B29F1329C1C8D7D2D910FD2054F20.html#default_constructor_MT_2A9EFB4F097E4407D88C2178C675BDDC3C03E0FC">MT</a>()</td>
+   </tr>
+  </table>
+  <h2>Member Functions</h2>
+  <table>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">uint</span></td>
+    <td xml:space="preserve"><a href="../../System.Base/doc/class_MT_98169995669B29F1329C1C8D7D2D910FD2054F20.html#member_function_GenRand_MT_C1EE99F5A8BF7C1272577E9C54DC4CA4CC932A43">GenRand</a>()</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../System.Base/doc/class_MT_98169995669B29F1329C1C8D7D2D910FD2054F20.html#member_function_Init_MT_662F612BECD3A17A6E0701AD924F7FA9E50C2A96">Init</a>(<span class="kw">uint</span>&nbsp;seed)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../System.Base/doc/class_MT_98169995669B29F1329C1C8D7D2D910FD2054F20.html#member_function_InitWithRandomSeed_MT_FA1D2B0881A64E7E6E320522A814FC133D5B2803">InitWithRandomSeed</a>()</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve"><a href="../../System.Base/doc/class_MT_98169995669B29F1329C1C8D7D2D910FD2054F20.html#member_function_Initialized_MT_0E050B5AC7416E3323A4ECA55CFFB61630BE05C7">Initialized</a>()</td>
+   </tr>
+  </table>
+  <h2>Constants</h2>
+  <table>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">uint</span></td>
+    <td xml:space="preserve">lowerMask = 0x7fffffffu</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">m = 397</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">uint</span></td>
+    <td xml:space="preserve">matrixA = 0x9908b0dfu</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">n = 624</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">uint</span></td>
+    <td xml:space="preserve">upperMask = 0x80000000u</td>
+   </tr>
+  </table>
+  <h2>Member Variables</h2>
+  <table>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve">initialized</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">uint</span>[2]</td>
+    <td xml:space="preserve">mag</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">uint</span>[624]</td>
+    <td xml:space="preserve">mt</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">mti</td>
+   </tr>
+  </table>
+  <h2>Constructor&amp; Destructor Details</h2>
+  <h3 id="default_constructor_MT_2A9EFB4F097E4407D88C2178C675BDDC3C03E0FC" xml:space="preserve">MT&nbsp;Constructor</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;MT()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Random.cm.html#15">15</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Random.cm.html">System.Base/Random.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h2>Member Function Details</h2>
+  <h3 id="member_function_GenRand_MT_C1EE99F5A8BF7C1272577E9C54DC4CA4CC932A43" xml:space="preserve">GenRand&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">uint</span>&nbsp;GenRand()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Random.cm.html#38">38</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Random.cm.html">System.Base/Random.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_Init_MT_662F612BECD3A17A6E0701AD924F7FA9E50C2A96" xml:space="preserve">Init&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;Init(<span class="kw">uint</span>&nbsp;seed)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Random.cm.html#27">27</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Random.cm.html">System.Base/Random.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_InitWithRandomSeed_MT_FA1D2B0881A64E7E6E320522A814FC133D5B2803" xml:space="preserve">InitWithRandomSeed&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;InitWithRandomSeed()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Random.cm.html#22">22</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Random.cm.html">System.Base/Random.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_Initialized_MT_0E050B5AC7416E3323A4ECA55CFFB61630BE05C7" xml:space="preserve">Initialized&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;Initialized()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Random.cm.html#18">18</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Random.cm.html">System.Base/Random.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+ </body>
+</html>

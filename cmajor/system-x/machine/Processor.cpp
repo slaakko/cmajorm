@@ -156,13 +156,16 @@ void Processor::EnableInterrupts()
     registers.SetSpecial(rK, ALL_INTERRUPT_BITS);
 }
 
-void Processor::ResetCurrentProcess(bool addSystemTime)
+void Processor::ResetCurrentProcess(bool addSystemTime, bool saveContext)
 {
     if (addSystemTime)
     {
         currentProcess->AddSystemTime();
     }
-    currentProcess->SaveContext(*machine, registers);
+    if (saveContext)
+    {
+        currentProcess->SaveContext(*machine, registers);
+    }
     currentProcess->ResetProcessor();
     currentProcess = nullptr;
 }
@@ -192,8 +195,9 @@ void Processor::RunKernel()
             }
             if (currentProcess && currentProcess->State() != ProcessState::zombie)
             {
+                bool exec = currentProcess->State() == ProcessState::exec;
                 machine->GetScheduler()->AddRunnableProcess(currentProcess, ProcessState::runnableInUser);
-                ResetCurrentProcess(false);
+                ResetCurrentProcess(false, !exec);
             }
             machine->GetScheduler()->CheckRunnable();
         }

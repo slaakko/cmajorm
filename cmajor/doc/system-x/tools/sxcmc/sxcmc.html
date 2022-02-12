@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>System X Cmajor Compiler</title>
+    <link rel="stylesheet" type="text/css" href="../../style/style.css" />
+</head>
+<body>
+	<h1>
+		System X Cmajor Compiler
+	</h1>
+
+    <p>
+        <span class="kw">sxcmc</span> is the System X Cmajor command-line compiler for Windows.
+        It compiles Cmajor code to System X <a href="../../il/sxil_reference.html">intermediate code</a> (*.i) that 
+		is then compiled to System X assembly code (*.s) and then to System X <a href="../../vm/sxvm_reference.html">object code</a> (*.o) using 
+		System X intermediate code compiler and assembler.
+		The object code files are archived to System X libraries (*.a) using the System X archiver that is run automatically by the <span class="kw">sxcmc</span></a>.
+		Libraries and object code files are linked together to System X executables (*.x) using the System X linker that is run automatically by the <span class="kw">sxcmc</span></a>.
+		The executable files can be executed in a System X virtual machine using System X executor 
+		<a href="../sxx/sxx.html"><span class="kw">sxx</span></a> and debugged using graphical System X debugger 
+		<a href="../sxdb/sxdb.html"><span class="kw">sxdb</span></a>.
+    </p>
+
+	<p>
+        Usage: <b>sxcmc [options] { project.cmp | solution.cms }</b>
+    </p>
+	
+	<table class="type">
+		<tr>
+			<th>long option</th>
+			<th>short option</th>
+			<th>description</th>
+			<th>note</th>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;help</td>
+			<td>&#8209;h</td>
+			<td>Print help and exit.</td>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;verbose</td>
+			<td>&#8209;v</td>
+			<td>Be verbose.</td>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;config=CONFIG</td>
+			<td>&#8209;c=CONFIG</td>
+			<td>Set configuration to CONFIG (<strong>debug</strong> | <strong>release</strong>). Default is <strong>debug</strong>.</td>
+			<td>Release mode not yet implemented.</td>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;optimization&#8209;level=LEVEL</td>
+			<td>&#8209;O=LEVEL</td>
+			<td>Set optimization level to LEVEL=0-3. Defaults debug=0, release=2.</td>
+			<td>Has no effect currently because System X optimizer not yet implemented.</td>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;rebuild</td>
+			<td>&#8209;u</td>
+			<td>Build although sources not changed.</td>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;clean</td>
+			<td>&#8209;e</td>
+			<td>Clean given projects and solutions.</td>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;build-threads=N</td>
+			<td>&#8209;bt=N</td>
+			<td>Set number of build threads to N. By default projects in a solution are built using a separate thread for each project up to the number of cores in the machine.</td>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;single-threaded-compile</td>
+			<td>&#8209;st</td>
+			<td>Compile all source files in a project using a single thread. By default each source file is compiled using a separate thread for each source file up to the number of cores in the machine.</td>
+		</tr>
+		<tr>
+			<td>&#8209;&#8209;pass=PASS</td>
+			<td>&#8209;p=PASS</td>
+			<td>Process intermediate code by running PASS.</td>
+			<td>No passes except code generation pass currently implemented.</td>
+		</tr>
+	</table>
+</body>
+</html>
