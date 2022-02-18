@@ -63,10 +63,15 @@ int64_t GetLastHostErrorCode()
     return GetLastError();
 }
 
-void ThrowLastHostError()
+void ThrowLastHostError(const std::string& filePath)
 {
     int64_t hostErrorCode = GetLastHostErrorCode();
-    SystemError systemError(EHOST, HostErrorMessage(hostErrorCode));
+    std::string file;
+    if (!filePath.empty())
+    {
+        file = " (file='" + filePath + "')";
+    }
+    SystemError systemError(EHOST, HostErrorMessage(hostErrorCode) + file);
     systemError.SetHostErrorCode(hostErrorCode);
     throw systemError;
 }

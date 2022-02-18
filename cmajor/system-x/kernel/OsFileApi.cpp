@@ -8,6 +8,7 @@
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Path.hpp>
 #include <Windows.h>
+#include <lmcons.h>
 #include <cstring>
 
 namespace cmsx::kernel {
@@ -27,7 +28,7 @@ void* OsCreateHostFile(const char* filePath, bool randomAccess)
     HANDLE handle = CreateFileA(filePath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL | accessFlag | FILE_FLAG_OVERLAPPED, NULL);
     if (handle == INVALID_HANDLE_VALUE)
     {
-        ThrowLastHostError();
+        ThrowLastHostError(filePath);
         return nullptr;
     }
     else
@@ -46,7 +47,7 @@ void* OsOpenHostFile(const char* filePath, bool randomAccess)
     HANDLE handle = CreateFileA(filePath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | accessFlag | FILE_FLAG_OVERLAPPED, NULL);
     if (handle == INVALID_HANDLE_VALUE)
     {
-        ThrowLastHostError();
+        ThrowLastHostError(filePath);
         return nullptr;
     }
     else
@@ -65,7 +66,7 @@ void* OsCreateIoCompletionPort()
     HANDLE handle = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 0);
     if (handle == NULL)
     {
-        ThrowLastHostError();
+        ThrowLastHostError(std::string());
         return nullptr;
     }
     else
@@ -79,7 +80,7 @@ void* OsAssociateFileWithCompletionPort(void* fileHandle, void* completionPort, 
     HANDLE handle = CreateIoCompletionPort(fileHandle, completionPort, completionKey, 0);
     if (handle == NULL)
     {
-        ThrowLastHostError();
+        ThrowLastHostError(std::string());
         return nullptr;
     }
     else
@@ -111,7 +112,7 @@ bool OsPostQueuedCompletionStatus(void* completionPortHandle, uint64_t numberOfB
     bool retval = PostQueuedCompletionStatus(completionPortHandle, numberOfBytes, completionKey, NULL);
     if (!retval)
     {
-        ThrowLastHostError();
+        ThrowLastHostError(std::string());
         return false;
     }
     return retval;
@@ -144,7 +145,7 @@ bool OsReadFile(void* fileHandle, void* buffer, uint32_t numberOfBytesToRead, vo
         }
         else
         {
-            ThrowLastHostError();
+            ThrowLastHostError(std::string());
         }
     }
     return retval;
@@ -162,7 +163,7 @@ bool OsWriteFile(void* fileHandle, void* buffer, uint32_t numberOfBytesToWrite, 
         }
         else
         {
-            ThrowLastHostError();
+            ThrowLastHostError(std::string());
         }
     }
     return retval;
@@ -253,6 +254,22 @@ int OsGetConsoleNumberOfRows()
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
     int rows = info.srWindow.Bottom - info.srWindow.Top + 1;
     return rows;
+}
+
+std::string OsGetComputerName()
+{
+    char buf[MAX_COMPUTERNAME_LENGTH + 1];
+    DWORD size = MAX_COMPUTERNAME_LENGTH + 1;
+    GetComputerNameExA(ComputerNameDnsHostname, & buf[0], &size);
+    return std::string(&buf[0]);
+}
+
+std::string OsGetUserName()
+{
+    char buf[UNLEN + 1];
+    DWORD size = UNLEN + 1;
+    GetUserNameA(&buf[0], &size);
+    return std::string(&buf[0]);
 }
 
 } // namespace cmsx::kernel

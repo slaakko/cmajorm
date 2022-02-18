@@ -49,6 +49,15 @@ using namespace soulng::rex;
 using namespace soulng::util;
 using namespace soulng::unicode;
 
+bool ContainsPatternChars(const std::string& str)
+{
+    for (char c : str)
+    {
+        if (c == '*' || c == '?' || c == '[') return true;
+    }
+    return false;
+}
+
 void CopyFile(const std::string& source, const std::string& dest, bool force, bool verbose)
 {
     if (!boost::filesystem::exists(source))
@@ -160,26 +169,33 @@ int main(int argc, const char** argv)
                 {
                     paths.push_back(path);
                 }
-                else
+                else 
                 {
                     std::string dir = Path::GetDirectoryName(path);
                     if (boost::filesystem::exists(dir))
                     {
                         std::string fileMask = Path::GetFileName(path);
-                        boost::filesystem::directory_iterator it(dir);
-                        while (it != boost::filesystem::directory_iterator())
+                        if (!ContainsPatternChars(fileMask))
                         {
-                            boost::filesystem::directory_entry entry(*it);
-                            if (boost::filesystem::is_regular_file(entry.path()))
+                            paths.push_back(path);
+                        }
+                        else
+                        {
+                            boost::filesystem::directory_iterator it(dir);
+                            while (it != boost::filesystem::directory_iterator())
                             {
-                                std::string fileName = Path::GetFileName(entry.path().generic_string());
-                                if (FilePatternMatch(ToUtf32(fileName), ToUtf32(fileMask)))
+                                boost::filesystem::directory_entry entry(*it);
+                                if (boost::filesystem::is_regular_file(entry.path()))
                                 {
-                                    std::string path = Path::Combine(dir, fileName);
-                                    paths.push_back(path);
+                                    std::string fileName = Path::GetFileName(entry.path().generic_string());
+                                    if (FilePatternMatch(ToUtf32(fileName), ToUtf32(fileMask)))
+                                    {
+                                        std::string path = Path::Combine(dir, fileName);
+                                        paths.push_back(path);
+                                    }
                                 }
+                                ++it;
                             }
-                            ++it;
                         }
                     }
                     else
@@ -195,10 +211,9 @@ int main(int argc, const char** argv)
         }
         if (paths.size() < 2)
         {
-            PrintHelp();
             return 1;
         }
-        if (paths.size() == 2 && boost::filesystem::is_regular_file(paths.front()) && boost::filesystem::is_regular_file(paths.back()))
+        if (paths.size() == 2 && boost::filesystem::is_regular_file(paths.front()) && (!boost::filesystem::exists(paths.back()) || boost::filesystem::is_regular_file(paths.back())))
         {
             std::string source = GetFullPath(paths.front());
             std::string dest = GetFullPath(paths.back());
@@ -216,7 +231,6 @@ int main(int argc, const char** argv)
         }
         else
         {
-            PrintHelp();
             return 1;
         }
     }

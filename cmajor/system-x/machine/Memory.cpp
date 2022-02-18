@@ -16,6 +16,10 @@ namespace cmsx::machine {
 
 using namespace soulng::util;
 
+MemoryError::MemoryError(const std::string& message_) : std::runtime_error(message_)
+{
+}
+
 inline uint64_t MakePageNumber(uint64_t virtualAddress)
 {
     return virtualAddress / pageSize;
@@ -26,6 +30,10 @@ inline uint64_t MakePageOffset(uint64_t virtualAddress)
     return virtualAddress & (pageSize - 1);
 }
 
+MemoryTranslationMap::MemoryTranslationMap() : flags(MemoryTranslationFlags::none)
+{
+}
+
 void MemoryPage::DecUse()
 {
     --useCount;
@@ -34,7 +42,7 @@ void MemoryPage::DecUse()
         bool retval = VirtualFree(reinterpret_cast<void*>(address), 0, MEM_RELEASE);
         if (!retval)
         {
-            throw std::runtime_error("free page failed");
+            throw MemoryError("free page failed");
         }
         address = 0;
     }
@@ -44,7 +52,7 @@ Memory::Memory(Machine& machine_) : machine(machine_), maxProcs(MaxProcs()), nex
 {
     if (maxProcs <= 0 || maxProcs > 64 * 1024)
     {
-        throw std::runtime_error("invalid 'maxProcs' (" + std::to_string(maxProcs) + ") in '" + ConfigFilePath() + "': value should be in range 1..." + std::to_string(64 * 1024));
+        throw MemoryError("invalid 'maxProcs' (" + std::to_string(maxProcs) + ") in '" + ConfigFilePath() + "': value should be in range 1..." + std::to_string(64 * 1024));
     }
     translationMaps.resize(maxProcs);
 }
@@ -110,7 +118,7 @@ MemoryPage* Memory::AllocatePage()
     uint64_t pageAddr = reinterpret_cast<uint64_t>(VirtualAlloc(nullptr, pageSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE));
     if (pageAddr == 0)
     {
-        throw std::runtime_error("out of memory");
+        throw MemoryError("out of memory");
     }
     return new MemoryPage(pageAddr);
 }
@@ -240,17 +248,35 @@ uint64_t Memory::AllocateTranslationMap()
     }
     if (nextRV >= maxProcs)
     {
-        throw std::runtime_error("all memory translation maps in use");
+        throw MemoryError("all memory translation maps in use");
     }
     uint64_t rv = nextRV++;
-    translationMaps[rv].reset(new std::map<uint64_t, MemoryPage*>());
+    translationMaps[rv].reset(new MemoryTranslationMap());
     return rv;
 }
 
 void Memory::AllocateTranslationMap(uint64_t rv)
 {
     std::lock_guard<std::recursive_mutex> lock(machine.Lock());
-    translationMaps[rv].reset(new std::map<uint64_t, MemoryPage*>());
+    translationMaps[rv].reset(new MemoryTranslationMap());
+}
+
+void Memory::SetTextSegmentReadOnly(uint64_t rv, bool readOnly)
+{
+    auto& translationMapPtr = translationMaps[rv];
+    if (!translationMapPtr)
+    {
+        throw MemoryError("translation map for virtual translation register (rV) value #" + ToHexString(rv) + " not allocated");
+    }
+    auto& translationMap = *translationMapPtr;
+    if (readOnly)
+    {
+        translationMap.flags = translationMap.flags | MemoryTranslationFlags::textSegmentProtected;
+    }
+    else
+    {
+        translationMap.flags = translationMap.flags & ~MemoryTranslationFlags::textSegmentProtected;
+    }
 }
 
 void Memory::FreeMemory(uint64_t rv)
@@ -258,14 +284,14 @@ void Memory::FreeMemory(uint64_t rv)
     std::lock_guard<std::recursive_mutex> lock(machine.Lock());
     if (rv >= maxProcs)
     {
-        throw std::runtime_error("invalid virtual translation register (rV) value #" + ToHexString(rv) + ": value greater than or equal to maxProcs (#" +
+        throw MemoryError("invalid virtual translation register (rV) value #" + ToHexString(rv) + ": value greater than or equal to maxProcs (#" +
             ToHexString(static_cast<uint32_t>(maxProcs)) + ")");
     }
     auto& translationMapPtr = translationMaps[rv];
     if (translationMapPtr)
     {
         auto& translationMap = *translationMapPtr;
-        for (auto& p : translationMap)
+        for (auto& p : translationMap.pageMap)
         {
             MemoryPage* page = p.second;
             FreePage(page);
@@ -281,13 +307,13 @@ void Memory::AllocateRange(uint64_t rv, uint64_t start, uint64_t length)
     std::lock_guard<std::recursive_mutex> lock(machine.Lock());
     if (rv >= maxProcs)
     {
-        throw std::runtime_error("invalid virtual translation register (rV) value #" + ToHexString(rv) + ": value greater than or equal to maxProcs (#" +
+        throw MemoryError("invalid virtual translation register (rV) value #" + ToHexString(rv) + ": value greater than or equal to maxProcs (#" +
             ToHexString(static_cast<uint32_t>(maxProcs)) + ")");
     }
     auto& translationMapPtr = translationMaps[rv];
     if (!translationMapPtr)
     {
-        throw std::runtime_error("translation map for virtual translation register (rV) value #" + ToHexString(rv) + " not allocated");
+        throw MemoryError("translation map for virtual translation register (rV) value #" + ToHexString(rv) + " not allocated");
     }
     auto& translationMap = *translationMapPtr;
     int64_t s = MakePageNumber(start);
@@ -296,11 +322,11 @@ void Memory::AllocateRange(uint64_t rv, uint64_t start, uint64_t length)
     for (int64_t i = 0; i < n; ++i)
     {
         int64_t pageNumber = s + i;
-        auto it = translationMap.find(pageNumber);
-        if (it == translationMap.cend())
+        auto it = translationMap.pageMap.find(pageNumber);
+        if (it == translationMap.pageMap.cend())
         {
             MemoryPage* page = AllocatePage();
-            translationMap[pageNumber] = page;
+            translationMap.pageMap[pageNumber] = page;
         }
     }
 }
@@ -311,13 +337,13 @@ void Memory::FreeRange(uint64_t rv, uint64_t start, uint64_t length)
     std::lock_guard<std::recursive_mutex> lock(machine.Lock());
     if (rv >= maxProcs)
     {
-        throw std::runtime_error("invalid virtual translation register (rV) value #" + ToHexString(rv) + ": value greater than or equal to maxProcs (#" +
+        throw MemoryError("invalid virtual translation register (rV) value #" + ToHexString(rv) + ": value greater than or equal to maxProcs (#" +
             ToHexString(static_cast<uint32_t>(maxProcs)) + ")");
     }
     auto& translationMapPtr = translationMaps[rv];
     if (!translationMapPtr)
     {
-        throw std::runtime_error("translation map for virtual translation register (rV) value #" + ToHexString(rv) + " not allocated");
+        throw MemoryError("translation map for virtual translation register (rV) value #" + ToHexString(rv) + " not allocated");
     }
     auto& translationMap = *translationMapPtr;
     int64_t s = MakePageNumber(start);
@@ -326,12 +352,12 @@ void Memory::FreeRange(uint64_t rv, uint64_t start, uint64_t length)
     for (int64_t i = 0; i < n; ++i)
     {
         int64_t pageNumber = s + i;
-        auto it = translationMap.find(pageNumber);
-        if (it != translationMap.cend())
+        auto it = translationMap.pageMap.find(pageNumber);
+        if (it != translationMap.pageMap.cend())
         {
             MemoryPage* page = it->second;
             FreePage(page);
-            translationMap[pageNumber] = nullptr;
+            translationMap.pageMap[pageNumber] = nullptr;
         }
     }
 }
@@ -343,13 +369,13 @@ void Memory::CopyRange(uint64_t fromRV, uint64_t toRV, uint64_t start, uint64_t 
     auto& fromTranslationMapPtr = translationMaps[fromRV];
     if (!fromTranslationMapPtr)
     {
-        throw std::runtime_error("translation map for virtual translation register (rV) value #" + ToHexString(fromRV) + " not allocated");
+        throw MemoryError("translation map for virtual translation register (rV) value #" + ToHexString(fromRV) + " not allocated");
     }
     auto& fromTranslationMap = *fromTranslationMapPtr;
     auto& toTranslationMapPtr = translationMaps[toRV];
     if (!toTranslationMapPtr)
     {
-        throw std::runtime_error("translation map for virtual translation register (rV) value #" + ToHexString(toRV) + " not allocated");
+        throw MemoryError("translation map for virtual translation register (rV) value #" + ToHexString(toRV) + " not allocated");
     }
     auto& toTranslationMap = *toTranslationMapPtr;
     int64_t s = MakePageNumber(start);
@@ -358,16 +384,16 @@ void Memory::CopyRange(uint64_t fromRV, uint64_t toRV, uint64_t start, uint64_t 
     for (int64_t i = 0; i < n; ++i)
     {
         int64_t pageNumber = s + i;
-        auto it = fromTranslationMap.find(pageNumber);
-        if (it != fromTranslationMap.cend())
+        auto it = fromTranslationMap.pageMap.find(pageNumber);
+        if (it != fromTranslationMap.pageMap.cend())
         {
             MemoryPage* from = it->second;
             MemoryPage* page = CopyPage(from);
-            toTranslationMap[pageNumber] = page;
+            toTranslationMap.pageMap[pageNumber] = page;
         }
         else
         {
-            throw std::runtime_error("page #" + ToHexString(static_cast<uint64_t>(i)) + " not found from memory translation map #" + ToHexString(fromRV));
+            throw MemoryError("page #" + ToHexString(static_cast<uint64_t>(i)) + " not found from memory translation map #" + ToHexString(fromRV));
         }
     }
 }
@@ -379,13 +405,13 @@ void Memory::ShareRange(uint64_t fromRV, uint64_t toRV, uint64_t start, uint64_t
     auto& fromTranslationMapPtr = translationMaps[fromRV];
     if (!fromTranslationMapPtr)
     {
-        throw std::runtime_error("translation map for virtual translation register (rV) value #" + ToHexString(fromRV) + " not allocated");
+        throw MemoryError("translation map for virtual translation register (rV) value #" + ToHexString(fromRV) + " not allocated");
     }
     auto& fromTranslationMap = *fromTranslationMapPtr;
     auto& toTranslationMapPtr = translationMaps[toRV];
     if (!toTranslationMapPtr)
     {
-        throw std::runtime_error("translation map for virtual translation register (rV) value #" + ToHexString(toRV) + " not allocated");
+        throw MemoryError("translation map for virtual translation register (rV) value #" + ToHexString(toRV) + " not allocated");
     }
     auto& toTranslationMap = *toTranslationMapPtr;
     int64_t s = MakePageNumber(start);
@@ -394,16 +420,16 @@ void Memory::ShareRange(uint64_t fromRV, uint64_t toRV, uint64_t start, uint64_t
     for (int64_t i = 0; i < n; ++i)
     {
         int64_t pageNumber = s + i;
-        auto it = fromTranslationMap.find(pageNumber);
-        if (it != fromTranslationMap.cend())
+        auto it = fromTranslationMap.pageMap.find(pageNumber);
+        if (it != fromTranslationMap.pageMap.cend())
         {
             MemoryPage* page = it->second;
             page->AddUse();
-            toTranslationMap[pageNumber] = page;
+            toTranslationMap.pageMap[pageNumber] = page;
         }
         else
         {
-            throw std::runtime_error("page #" + ToHexString(static_cast<uint64_t>(i)) + " not found from memory translation map #" + ToHexString(fromRV));
+            throw MemoryError("page #" + ToHexString(static_cast<uint64_t>(i)) + " not found from memory translation map #" + ToHexString(fromRV));
         }
     }
 }
@@ -464,19 +490,23 @@ uint64_t Memory::TranslateAddress(uint64_t rv, uint64_t virtualAddress, Protecti
 {
     if (rv >= maxProcs)
     {
-        throw std::runtime_error("invalid virtual translation register (rV) value #" + ToHexString(rv) + ": value greater than or equal to maxProcs (#" + 
+        throw MemoryError("invalid virtual translation register (rV) value #" + ToHexString(rv) + ": value greater than or equal to maxProcs (#" + 
             ToHexString(static_cast<uint32_t>(maxProcs)) + ")");
     }
     auto& translationMapPtr = translationMaps[rv];
     if (!translationMapPtr)
     {
-        throw std::runtime_error("translation map for virtual translation register (rV) value #" + ToHexString(rv) + " not allocated");
+        throw MemoryError("translation map for virtual translation register (rV) value #" + ToHexString(rv) + " not allocated");
     }
     auto& translationMap = *translationMapPtr;
+    if ((access & Protection::write) != Protection::notPresent && virtualAddress >= textSegmentBaseAddress && virtualAddress < dataSegmentBaseAddress)
+    {
+        CheckWriteToTextSegment(translationMap, rv, virtualAddress);
+    }
     int64_t pageNumber = MakePageNumber(virtualAddress);
     pageOffset = MakePageOffset(virtualAddress);
-    auto it = translationMap.find(pageNumber);
-    if (it != translationMap.cend())
+    auto it = translationMap.pageMap.find(pageNumber);
+    if (it != translationMap.pageMap.cend())
     {
         MemoryPage* page = it->second;
         return page->Address() + pageOffset;
@@ -484,12 +514,21 @@ uint64_t Memory::TranslateAddress(uint64_t rv, uint64_t virtualAddress, Protecti
     if ((access & Protection::write) != Protection::notPresent)
     {
         MemoryPage* page = AllocatePage();
-        translationMap[pageNumber] = page;
+        translationMap.pageMap[pageNumber] = page;
         return page->Address() + pageOffset;
     }
     else
     {
-        throw std::runtime_error("virtual address #" + ToHexString(virtualAddress) + " not found from memory translation map #" + ToHexString(rv));
+        throw MemoryError("virtual address #" + ToHexString(virtualAddress) + " not found from memory translation map #" + ToHexString(rv));
+    }
+}
+
+void Memory::CheckWriteToTextSegment(MemoryTranslationMap& translationMap, uint64_t rv, uint64_t virtualAddress)
+{
+    if ((translationMap.flags & MemoryTranslationFlags::textSegmentProtected) != MemoryTranslationFlags::none)
+    {
+        throw MemoryError("access violation: tried to write to read-only text segment: " 
+            "virtual translation register (rV) value=#" + ToHexString(rv) + ", virtual address=#" + ToHexString(virtualAddress));
     }
 }
 

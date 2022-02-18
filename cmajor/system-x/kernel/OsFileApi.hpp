@@ -29,6 +29,8 @@ CMSX_KERNEL_API bool OsFindFirstFile(const std::string& directoryName, std::stri
 CMSX_KERNEL_API bool OsFindNextFile(void* searchHandle, std::string& entry);
 CMSX_KERNEL_API int OsGetConsoleNumberOfColumns();
 CMSX_KERNEL_API int OsGetConsoleNumberOfRows();
+CMSX_KERNEL_API std::string OsGetComputerName();
+CMSX_KERNEL_API std::string OsGetUserName();
 extern const uint32_t fixedDriveType;
 
 } // namespace cmsx::kernel

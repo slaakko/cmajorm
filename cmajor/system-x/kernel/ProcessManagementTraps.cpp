@@ -6,6 +6,8 @@
 #include <system-x/kernel/ProcessManagementTraps.hpp>
 #include <system-x/kernel/Process.hpp>
 #include <system-x/kernel/Trap.hpp>
+#include <system-x/kernel/OsFileApi.hpp>
+#include <system-x/kernel/IO.hpp>
 #include <system-x/machine/Processor.hpp>
 
 namespace cmsx::kernel {
@@ -103,12 +105,98 @@ uint64_t TrapGetPidHandler::HandleTrap(cmsx::machine::Processor& processor)
     }
 }
 
+class TrapGetComputerNameHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_get_computer_name"; }
+};
+
+uint64_t TrapGetComputerNameHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int64_t bufferAddress = processor.Regs().Get(cmsx::machine::regAX);
+        if (bufferAddress == 0)
+        {
+            throw SystemError(EPARAM, "buffer is null");
+        }
+        int64_t bufferSize = processor.Regs().Get(cmsx::machine::regBX);
+        std::string computerName = OsGetComputerName();
+        std::vector<uint8_t> buffer;
+        for (char c : computerName)
+        {
+            buffer.push_back(static_cast<uint8_t>(c));
+        }
+        buffer.push_back(static_cast<uint8_t>(0));
+        if (bufferSize >= buffer.size())
+        {
+            WriteProcessMemory(process, bufferAddress, buffer);
+        }
+        else
+        {
+            throw SystemError(EPARAM, "buffer too small");
+        }
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapGetUserNameHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_get_user_name"; }
+};
+
+uint64_t TrapGetUserNameHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int64_t bufferAddress = processor.Regs().Get(cmsx::machine::regAX);
+        if (bufferAddress == 0)
+        {
+            throw SystemError(EPARAM, "buffer is null");
+        }
+        int64_t bufferSize = processor.Regs().Get(cmsx::machine::regBX);
+        std::string userName = OsGetUserName();
+        std::vector<uint8_t> buffer;
+        for (char c : userName)
+        {
+            buffer.push_back(static_cast<uint8_t>(c));
+        }
+        buffer.push_back(static_cast<uint8_t>(0));
+        if (bufferSize >= buffer.size())
+        {
+            WriteProcessMemory(process, bufferAddress, buffer);
+        }
+        else
+        {
+            throw SystemError(EPARAM, "buffer too small");
+        }
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
 void InitProcessManagementTraps()
 {
     SetTrapHandler(trap_fork, new TrapForkHandler());
     SetTrapHandler(trap_exec, new TrapExecHandler());
     SetTrapHandler(trap_wait, new TrapWaitHandler());
     SetTrapHandler(trap_getpid, new TrapGetPidHandler());
+    SetTrapHandler(trap_get_computer_name, new TrapGetComputerNameHandler());
+    SetTrapHandler(trap_get_user_name, new TrapGetUserNameHandler());
 }
 
 void DoneProcessManagementTraps()

@@ -12,12 +12,16 @@
 #include <sngxml/xpath/InitDone.hpp>
 #include <system-x/machine/InitDone.hpp>
 #include <system-x/kernel/InitDone.hpp>
+#include <system-x/kernel/OsFileApi.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Time.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <boost/filesystem.hpp>
 #include <iostream>
 #include <stdexcept>
 
 using namespace soulng::util;
+using namespace soulng::unicode;
 
 void InitApplication()
 {
@@ -52,8 +56,37 @@ void PrintHelp()
     std::cout << "  Be verbose." << std::endl;
 }
 
+std::string SearchBin(const std::string& fileName)
+{
+    if (boost::filesystem::exists(fileName))
+    {
+        return fileName;
+    }
+    std::string binDirectory = GetFullPath(Path::Combine(Path::Combine(CmajorRoot(), "system-x"), "bin"));
+    std::string fullPath;
+    if (!Path::HasExtension(fileName))
+    {
+        fullPath = Path::Combine(binDirectory, fileName + ".x");
+    }
+    else
+    {
+        fullPath = Path::Combine(binDirectory, fileName);
+    }
+    if (boost::filesystem::exists(fullPath))
+    {
+        return fullPath;
+    }
+    else
+    {
+        throw std::runtime_error("executable '" + fileName + "' not found");
+    }
+}
+
 int main(int argc, const char** argv)
 {
+    std::string computerName = cmsx::kernel::OsGetComputerName();
+    std::string userName = cmsx::kernel::OsGetUserName();
+    uint8_t exitCode = 0;
     sxx::Console console;
     try
     {
@@ -109,7 +142,8 @@ int main(int argc, const char** argv)
             else if (!programFileSeen)
             {
                 programFileSeen = true;
-                args.push_back(GetFullPath(arg));
+                std::string filePath = SearchBin(arg);
+                args.push_back(filePath);
             }
             else
             {
@@ -141,16 +175,19 @@ int main(int argc, const char** argv)
             }
             catch (const std::exception& ex)
             {
+                exitCode = 255;
                 console.SetToTextMode();
                 std::cout << ex.what() << std::endl;
             }
         }
         if (verbose)
         {
-            uint8_t exitCode = 255;
             if (process)
             {
-                exitCode = process->ExitCode();
+                if (exitCode == 0)
+                {
+                    exitCode = process->ExitCode();
+                }
             }
             console.SetToTextMode();
             std::cout << "'" << args[0] << "' exited with code " << static_cast<int>(exitCode) << std::endl;
@@ -159,9 +196,15 @@ int main(int argc, const char** argv)
             std::chrono::steady_clock::duration sleepTime = process->SleepTime();
             std::chrono::steady_clock::duration systemTime = process->SystemTime();
             std::chrono::steady_clock::duration totalTime = userTime + sleepTime + systemTime;
-            double userTimePercent = (100.0 * userTime) / totalTime;
-            double sleepTimePercent = (100.0 * sleepTime) / totalTime;
-            double systemTimePercent = (100.0 * systemTime) / totalTime;
+            double userTimePercent = 0.0; 
+            double sleepTimePercent = 0.0;
+            double systemTimePercent = 0.0;
+            if (totalTime.count() > 0)
+            {
+                userTimePercent = (100.0 * userTime) / totalTime;
+                sleepTimePercent = (100.0 * sleepTime) / totalTime;
+                systemTimePercent = (100.0 * systemTime) / totalTime;
+            }
             std::cout << "user time:   " << DurationStr(userTime) << " (" << userTimePercent << "%)" << std::endl;
             std::cout << "sleep time:  " << DurationStr(sleepTime) << " (" << sleepTimePercent << "%)" << std::endl;
             std::cout << "system time: " << DurationStr(systemTime) << " (" << systemTimePercent << "%)" << std::endl;
@@ -178,5 +221,5 @@ int main(int argc, const char** argv)
         return 1;
     }
     DoneApplication();
-    return 0;
+    return exitCode;
 }

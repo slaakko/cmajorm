@@ -18,6 +18,14 @@ MountTable::MountTable(cmsx::machine::Machine* machine_) : machine(machine_), ne
 {
 }
 
+void MountTable::ClearProcessData(cmsx::machine::Process* process)
+{
+    for (auto& fs : filesystems)
+    {
+        fs->ClearProcessData(process);
+    }
+}
+
 void MountTable::AddFilesystem(Filesystem* filesystem)
 {
     filesystem->SetMachine(machine);

@@ -14,6 +14,16 @@
 
 namespace cmsx::kernel {
 
+TextSegmentWriteProtectionGuard::TextSegmentWriteProtectionGuard(uint64_t rv_, cmsx::machine::Memory& mem_) : rv(rv_), mem(mem_)
+{
+    mem.SetTextSegmentReadOnly(rv, false);
+}
+
+TextSegmentWriteProtectionGuard::~TextSegmentWriteProtectionGuard()
+{
+    mem.SetTextSegmentReadOnly(rv, true);
+}
+
 void SetupCode(cmsx::object::ExecutableFile* executable, cmsx::machine::Memory& memory, uint64_t rv)
 {
     cmsx::object::CodeSection* codeSection = executable->GetCodeSection();
@@ -108,6 +118,7 @@ void Load(Process* process, const std::vector<std::string>& args, const std::vec
 void Load(Process* process, cmsx::object::BinaryFile* binaryFile,
     const std::vector<std::string>& args, const std::vector<std::string>& env, cmsx::machine::Machine& machine, uint64_t rv, bool addRunnable)
 {
+    TextSegmentWriteProtectionGuard guard(rv, machine.Mem());
     cmsx::machine::Registers regs;
     process->SetRV(rv);
     int argCount = args.size();

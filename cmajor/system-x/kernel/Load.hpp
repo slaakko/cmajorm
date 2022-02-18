@@ -13,6 +13,17 @@ namespace cmsx::kernel {
 
 class Process;
 
+class TextSegmentWriteProtectionGuard
+{
+public:
+    TextSegmentWriteProtectionGuard(uint64_t rv_, cmsx::machine::Memory& mem_);
+    ~TextSegmentWriteProtectionGuard();
+private:
+    uint64_t rv;
+    cmsx::machine::Memory& mem;
+};
+
+
 CMSX_KERNEL_API void Load(Process* process, const std::vector<std::string>& args, const std::vector<std::string>& env, cmsx::machine::Machine& machine);
 CMSX_KERNEL_API void Load(Process* process, cmsx::object::BinaryFile* binaryFile,
     const std::vector<std::string>& args, const std::vector<std::string>& env, cmsx::machine::Machine& machine, uint64_t rv, bool addRunnable);

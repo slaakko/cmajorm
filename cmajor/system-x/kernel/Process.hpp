@@ -31,7 +31,7 @@ public:
     uint64_t AXAddress() const { return axAddress; }
     uint64_t BXAddress() const { return bxAddress; }
     uint64_t CXAddress() const { return cxAddress; }
-    const std::string& FilePath() const { return filePath; }
+    std::string FilePath() const override { return filePath; }
     void SetFilePath(const std::string& filePath_);
     cmsx::machine::ProcessState State() const override { return state; }
     void SetState(cmsx::machine::ProcessState state_);
@@ -124,7 +124,6 @@ private:
     uint64_t currentExceptionAddress;
     uint64_t currentExceptionClassId;
     cmsx::object::TryRecord* currentTryRecord;
-    void* userFiber;
     void* kernelFiber;
     uint64_t inodeKeyOfWorkingDirAsULong;
 };

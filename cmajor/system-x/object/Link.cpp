@@ -344,6 +344,7 @@ LinkCommand* LinkClsIdCommand::Clone() const
 void LinkClsIdCommand::Apply(ObjectFile* objectFile, uint64_t value)
 {
     objectFile->GetDataSection()->EmitOcta(Address(), value);
+    objectFile->GetDataSection()->EmitOcta(Address() + 8, 0);
 }
 
 std::string LinkClsIdCommand::ToString() const

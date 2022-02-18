@@ -6,9 +6,10 @@
 #include <system-x/kernel/INodeManager.hpp>
 #include <system-x/kernel/EventManager.hpp>
 #include <system-x/kernel/BlockManager.hpp>
+#include <system-x/kernel/Process.hpp>
+#include <system-x/kernel/DebugHelp.hpp>
 #include <system-x/machine/Config.hpp>
 #include <system-x/machine/Event.hpp>
-#include <system-x/kernel/Process.hpp>
 #include <soulng/util/MemoryReader.hpp>
 #include <soulng/util/MemoryWriter.hpp>
 
@@ -168,7 +169,7 @@ int32_t INode::NumberOfBlocks() const
     {
         return 0;
     }
-    return static_cast<int32_t>((fileSize - 1) / Block::Size() + 1);
+    return static_cast<int32_t>(fileSize / Block::Size());
 }
 
 void INode::WriteStat(MemoryWriter& writer)
@@ -333,11 +334,19 @@ void INodeManager::RemoveFromHashQueue(INode* inode)
     {
         int hashQueueIndex = GetHashQueueNumber(inode->Key());
         auto& hashQueue = hashQueues[hashQueueIndex];
-        for (auto it = hashQueue.begin(); it != hashQueue.end(); ++it)
+        auto it = hashQueue.begin();
+        while (it != hashQueue.end())
         {
             if (inode == it->inode)
             {
+                auto next = it;
+                ++next;
                 hashQueue.erase(it);
+                it = next;
+            }
+            else
+            {
+                ++it;
             }
         }
     }
@@ -432,6 +441,7 @@ INodePtr GetINode(INodeKey inodeKey, cmsx::machine::Process* process)
             {
                 INode* inode = inodeManager.GetINodeFromFreeList();
                 inodeManager.RemoveFromHashQueue(inode);
+                *inode = INode();
                 inode->SetKey(inodeKey);
                 inodeManager.InsertIntoHashQueue(inode);
                 inode->ResetValid();

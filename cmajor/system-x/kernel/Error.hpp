@@ -42,7 +42,7 @@ private:
     std::string message;
 };
 
-CMSX_KERNEL_API void ThrowLastHostError();
+CMSX_KERNEL_API void ThrowLastHostError(const std::string& filePath);
 
 } // namespace cmsx::kernel
 

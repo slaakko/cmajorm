@@ -51,6 +51,8 @@ public const byte trap_decompress = 44u;
 public const byte trap_get_decompressed_data_size = 45u;
 public const byte trap_get_decompressed_data = 46u;
 public const byte trap_close_decompression = 47u;
+public const byte trap_get_computer_name = 48u;
+public const byte trap_get_user_name = 49u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -153,7 +155,7 @@ public cdecl nothrow int fork()
 
 public cdecl nothrow int exec(const char* file, const char** argv, const char** envp)
 {
-	return cast<int>(trap(0u, trap_exec, 0u, file, argv, envp));
+    return cast<int>(trap(0u, trap_exec, 0u, file, argv, envp));
 }
 
 public cdecl nothrow int wait(byte* exitCode)
@@ -207,7 +209,9 @@ public enum IOControlItem : int
 {
     isConsole = 0,
     isHostTextFile = 1,
-    hasColors = 2
+    hasColors = 2,
+	columns = 3,
+	rows = 4
 }
 
 public cdecl nothrow int ioctl(int fd, IOControlItem item)
@@ -318,4 +322,14 @@ public cdecl nothrow int get_decompressed_data(int dd, byte* buffer, long count)
 public cdecl nothrow int close_decompression(int dd)
 {
     return cast<int>(trap(0u, trap_close_decompression, 0u, dd));
+}
+
+public cdecl nothrow int get_computer_name(char* buffer, long bufSize)
+{
+	return cast<int>(trap(0u, trap_get_computer_name, 0u, buffer, bufSize));
+}
+
+public cdecl nothrow int get_user_name(char* buffer, long bufSize)
+{
+	return cast<int>(trap(0u, trap_get_user_name, 0u, buffer, bufSize));
 }

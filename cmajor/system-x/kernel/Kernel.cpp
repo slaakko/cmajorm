@@ -60,13 +60,19 @@ void Kernel::Done()
     instance.reset();
 }
 
-Kernel::Kernel() : machine(nullptr), kernelProcess(new KernelProcess()), wakeup(false)
+Kernel::Kernel() : machine(nullptr), kernelProcess(new KernelProcess()), wakeup(false), inodeKeyOfRootDir()
 {
 }
 
 cmsx::machine::Process* Kernel::GetKernelProcess() const
 {
     return kernelProcess.get();
+}
+
+void Kernel::ClearProcessData(cmsx::machine::Process* process)
+{
+    MountTable& mountTable = GetMountTable();
+    mountTable.ClearProcessData(process);
 }
 
 void Kernel::SetMachine(cmsx::machine::Machine* machine_)

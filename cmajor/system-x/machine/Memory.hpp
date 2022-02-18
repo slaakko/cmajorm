@@ -52,6 +52,41 @@ const uint64_t m2mask = ~static_cast<uint64_t>(1);
 const uint64_t m4mask = ~static_cast<uint64_t>(3);
 const uint64_t m8mask = ~static_cast<uint64_t>(7);
 
+enum class MemoryTranslationFlags : int32_t
+{
+    none = 0, textSegmentProtected = 1 << 0
+};
+
+CMSX_MACHINE_API inline MemoryTranslationFlags operator|(MemoryTranslationFlags left, MemoryTranslationFlags right)
+{
+    return MemoryTranslationFlags(int32_t(left) | int32_t(right));
+}
+
+CMSX_MACHINE_API inline MemoryTranslationFlags operator&(MemoryTranslationFlags left, MemoryTranslationFlags right)
+{
+    return MemoryTranslationFlags(int32_t(left) & int32_t(right));
+}
+
+CMSX_MACHINE_API inline MemoryTranslationFlags operator~(MemoryTranslationFlags flags)
+{
+    return MemoryTranslationFlags(~int32_t(flags));
+}
+
+class CMSX_MACHINE_API MemoryError : public std::runtime_error
+{
+public:
+    MemoryError(const std::string& message_);
+};
+
+class MemoryPage;
+
+struct CMSX_MACHINE_API MemoryTranslationMap
+{
+    MemoryTranslationMap();
+    MemoryTranslationFlags flags;
+    std::map<uint64_t, MemoryPage*> pageMap;
+};
+
 class CMSX_MACHINE_API MemoryPage
 {
 public:
@@ -82,6 +117,7 @@ public:
     void WriteOcta(uint64_t rv, uint64_t virtualAddress, uint64_t value, Protection protection);
     uint64_t AllocateTranslationMap();
     void AllocateTranslationMap(uint64_t rv);
+    void SetTextSegmentReadOnly(uint64_t rv, bool readOnly);
     void FreeMemory(uint64_t rv);
     void AllocateRange(uint64_t rv, uint64_t start, uint64_t length);
     void FreeRange(uint64_t rv, uint64_t start, uint64_t length);
@@ -103,10 +139,11 @@ private:
     void WriteOcta(uint64_t address, uint64_t value);
     uint64_t TranslateAddress(uint64_t rv, uint64_t virtualAddress, Protection access);
     uint64_t TranslateAddress(uint64_t rv, uint64_t virtualAddress, Protection access, int64_t& pageOffset);
+    void CheckWriteToTextSegment(MemoryTranslationMap& translationMap, uint64_t rv, uint64_t virtualAddress);
     Machine& machine;
     int maxProcs;
     uint64_t nextRV;
-    std::vector<std::unique_ptr<std::map<uint64_t, MemoryPage*>>> translationMaps;
+    std::vector<std::unique_ptr<MemoryTranslationMap>> translationMaps;
 };
 
 } // cmsx::machine

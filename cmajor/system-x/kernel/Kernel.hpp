@@ -17,6 +17,7 @@ class KernelProcess : public cmsx::machine::Process
 {
 public:
     int32_t Id() const { return 0; }
+    std::string FilePath() const override { return "KERNEL"; }
     void Sleep() override;
     void Wakeup(cmsx::machine::Scheduler* scheduler) override;
     cmsx::machine::Processor* GetProcessor() const override;
@@ -41,6 +42,7 @@ public:
     MountTable& GetMountTable() { return *mountTable; }
     uint64_t GetINodeKeyOfRootDir() const { return inodeKeyOfRootDir; }
     void SetINodeKeyOfRootDir(uint64_t inodeKeyOfRootDir_) { inodeKeyOfRootDir = inodeKeyOfRootDir_; }
+    void ClearProcessData(cmsx::machine::Process* process);
 private:
     Kernel();
     static std::unique_ptr<Kernel> instance;

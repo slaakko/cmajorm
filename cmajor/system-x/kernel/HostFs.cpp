@@ -193,11 +193,22 @@ BlockFile* HostFilesystem::Create(const std::string& path, INode* dirINode, int3
 BlockFile* HostFilesystem::Open(const std::string& path, INode* dirINode, int32_t flags, int32_t mode, cmsx::machine::Process* process)
 {
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+    ProcessHostFilesystemData* data = nullptr;
+    auto it = processDataMap.find(process->Id());
+    if (it != processDataMap.cend())
+    {
+        data = it->second;
+    }
+    else
+    {
+        data = new ProcessHostFilesystemData();
+        processDataMap[process->Id()] = data;
+    }
     std::string fullPath;
     if (dirINode)
     {
-        auto it = inodePathMap.find(dirINode->Key().inodeNumber);
-        if (it != inodePathMap.cend())
+        auto it = data->inodePathMap.find(dirINode->Key().inodeNumber);
+        if (it != data->inodePathMap.cend())
         {
             fullPath = Path::Combine(it->second, path);
         }
@@ -210,14 +221,26 @@ BlockFile* HostFilesystem::Open(const std::string& path, INode* dirINode, int32_
     {
         fullPath = Path::Combine(prefix, path);
     }
+    OpenFlags openFlags = static_cast<OpenFlags>(flags);
+    if ((openFlags & OpenFlags::truncate) != OpenFlags::none)
+    {
+        if (boost::filesystem::exists(fullPath))
+        {
+            boost::system::error_code ec;
+            boost::filesystem::remove(fullPath, ec);
+            if (ec)
+            {
+                throw SystemError(EFAIL, "could not remove file '" + fullPath + "' from host file system: " + soulng::util::PlatformStringToUtf8(ec.message()));
+            }
+        }
+    }
     int32_t fileId = nextINodeId++;
     INodeKey inodeKey(Id(), fileId);
     INodePtr inodePtr = GetINode(inodeKey, process);
     INode* inode = inodePtr.Get();
     inode->IncrementReferenceCount();
     inode->SetValid();
-    OpenFlags openFlags = static_cast<OpenFlags>(flags);
-    inodePathMap[inode->Key().inodeNumber] = fullPath;
+    data->inodePathMap[inode->Key().inodeNumber] = fullPath;
     HostFilesystemFile* file = new HostFilesystemFile(this, fileId, fullPath, openFlags, inodeKey);
     fileMap[fileId] = file;
     return file;
@@ -226,6 +249,17 @@ BlockFile* HostFilesystem::Open(const std::string& path, INode* dirINode, int32_
 INodePtr HostFilesystem::SearchDirectory(const std::string& name, INode* dirINode, cmsx::machine::Process* process)
 {
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+    ProcessHostFilesystemData* data = nullptr;
+    auto it = processDataMap.find(process->Id());
+    if (it != processDataMap.cend())
+    {
+        data = it->second;
+    }
+    else
+    {
+        data = new ProcessHostFilesystemData();
+        processDataMap[process->Id()] = data;
+    }
     std::string fullPath;
     if (dirINode->Key() == mountPoint)
     {
@@ -233,8 +267,8 @@ INodePtr HostFilesystem::SearchDirectory(const std::string& name, INode* dirINod
     }
     else if (dirINode->Key().fsNumber == Id())
     {
-        auto it = inodePathMap.find(dirINode->Key().inodeNumber);
-        if (it != inodePathMap.cend())
+        auto it = data->inodePathMap.find(dirINode->Key().inodeNumber);
+        if (it != data->inodePathMap.cend())
         {
             fullPath = Path::Combine(it->second, name);
         }
@@ -242,9 +276,9 @@ INodePtr HostFilesystem::SearchDirectory(const std::string& name, INode* dirINod
     if (boost::filesystem::exists(fullPath))
     {
         INodeKey inodeKey(Id(), nextINodeId++);
-        inodePathMap[inodeKey.inodeNumber] = fullPath;
+        data->inodePathMap[inodeKey.inodeNumber] = fullPath;
         INodePtr inode = GetINode(inodeKey, process);
-        Stat(inode.Get());
+        Stat(inode.Get(), process);
         return inode;
     }
     else
@@ -253,34 +287,43 @@ INodePtr HostFilesystem::SearchDirectory(const std::string& name, INode* dirINod
     }
 }
 
-void HostFilesystem::Stat(INode* inode)
+void HostFilesystem::Stat(INode* inode, cmsx::machine::Process* process)
 {
-    auto it = inodePathMap.find(inode->Key().inodeNumber);
-    if (it != inodePathMap.cend())
+    auto it = processDataMap.find(process->Id());
+    if (it != processDataMap.cend())
     {
-        std::string fullPath = it->second;
-        boost::filesystem::file_status status = boost::filesystem::status(fullPath);
-        if (status.type() == boost::filesystem::file_type::regular_file)
+        ProcessHostFilesystemData* data = it->second;
+        auto it = data->inodePathMap.find(inode->Key().inodeNumber);
+        if (it != data->inodePathMap.cend())
         {
-            inode->SetFileType(FileType::regular);
-            inode->SetFileSize(boost::filesystem::file_size(fullPath));
-        }
-        else if (status.type() == boost::filesystem::file_type::directory_file)
-        {
-            inode->SetFileType(FileType::directory);
+            std::string fullPath = it->second;
+            boost::filesystem::file_status status = boost::filesystem::status(fullPath);
+            if (status.type() == boost::filesystem::file_type::regular_file)
+            {
+                inode->SetFileType(FileType::regular);
+                inode->SetFileSize(boost::filesystem::file_size(fullPath));
+            }
+            else if (status.type() == boost::filesystem::file_type::directory_file)
+            {
+                inode->SetFileType(FileType::directory);
+            }
+            else
+            {
+                throw SystemError(EFAIL, "path '" + fullPath + "' has unknown file type");
+            }
+            inode->SetNLinks(1);
+            std::time_t lastWriteTime = boost::filesystem::last_write_time(fullPath);
+            DateTime mtime = ToDateTime(lastWriteTime);
+            inode->SetMTime(mtime);
         }
         else
         {
-            throw SystemError(EFAIL, "path '" + fullPath + "' has unknown file type");
+            throw SystemError(ENOTFOUND, "path not found");
         }
-        inode->SetNLinks(1);
-        std::time_t lastWriteTime = boost::filesystem::last_write_time(fullPath);
-        DateTime mtime = ToDateTime(lastWriteTime);
-        inode->SetMTime(mtime);
     }
     else
     {
-        throw SystemError(ENOTFOUND, "path not found");
+        throw SystemError(ENOTFOUND, "process data for PID " + std::to_string(process->Id()) + " not found from host filesystem ");
     }
 }
 
@@ -305,27 +348,59 @@ BlockFile* HostFilesystem::HostFile() const
     throw SystemError(EFAIL, "host filesystem does not provide a host file");
 }
 
-DirFile* HostFilesystem::OpenDir(const std::string& path, INode* dirINode)
+DirFile* HostFilesystem::OpenDir(const std::string& path, INode* dirINode, cmsx::machine::Process* process)
 {
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
-    auto it = inodePathMap.find(dirINode->Key().inodeNumber);
-    if (it != inodePathMap.cend())
+    auto it = processDataMap.find(process->Id());
+    if (it != processDataMap.cend())
     {
-        std::string fullPath = it->second;
-        HostFilesystemDirFile* dirFile = new HostFilesystemDirFile(this, fullPath, nextDirId++);
-        dirFileMap[dirFile->Id()] = dirFile;
-        return dirFile;
+        ProcessHostFilesystemData* data = it->second;
+        auto it = data->inodePathMap.find(dirINode->Key().inodeNumber);
+        if (it != data->inodePathMap.cend())
+        {
+            std::string fullPath = it->second;
+            HostFilesystemDirFile* dirFile = new HostFilesystemDirFile(this, fullPath, nextDirId++);
+            dirFileMap[dirFile->Id()] = dirFile;
+            return dirFile;
+        }
+        else
+        {
+            throw SystemError(ENOTFOUND, "path not found from inode path map with inode number " + std::to_string(dirINode->Key().inodeNumber));
+        }
     }
     else
     {
-        throw SystemError(ENOTFOUND, "path not found from inode path map with inode number " + std::to_string(dirINode->Key().inodeNumber));
+        throw SystemError(ENOTFOUND, "process data for PID " + std::to_string(process->Id()) + " not found from host filesystem ");
     }
 }
 
 void HostFilesystem::MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process)
 {
-    // todo
-    throw SystemError(EFAIL, "not implemented");
+    std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+    auto it = processDataMap.find(process->Id());
+    if (it != processDataMap.cend())
+    {
+        ProcessHostFilesystemData* data = it->second;
+        auto it = data->inodePathMap.find(parentDirINode->Key().inodeNumber);
+        if (it != data->inodePathMap.cend())
+        {
+            std::string fullPath = Path::Combine(it->second, dirName);
+            boost::system::error_code ec;
+            boost::filesystem::create_directory(fullPath, ec);
+            if (ec)
+            {
+                throw SystemError(EHOST, "could not create host directory '" + fullPath + "': " + PlatformStringToUtf8(ec.message()));
+            }
+        }
+        else
+        {
+            throw SystemError(ENOTFOUND, "path not found from inode path map with inode number " + std::to_string(parentDirINode->Key().inodeNumber));
+        }
+    }
+    else
+    {
+        throw SystemError(ENOTFOUND, "process data for PID " + std::to_string(process->Id()) + " not found from host filesystem ");
+    }
 }
 
 void HostFilesystem::CloseDir(int32_t dirId)
@@ -340,17 +415,66 @@ void HostFilesystem::CloseDir(int32_t dirId)
     }
 }
 
-std::string HostFilesystem::GetHostFilePath(int32_t inodeNumber) const
+std::string HostFilesystem::GetHostFilePath(int32_t inodeNumber, cmsx::machine::Process* process) 
 {
-    auto it = inodePathMap.find(inodeNumber);
-    if (it != inodePathMap.cend())
+    std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+    ProcessHostFilesystemData* data = nullptr;
+    auto it = processDataMap.find(process->Id());
+    if (it != processDataMap.end())
     {
-        std::string fullPath = it->second;
+        data = it->second;
+    }
+    else
+    {
+        data = new ProcessHostFilesystemData();
+        processDataMap[process->Id()] = data;
+    }
+    auto iti = data->inodePathMap.find(inodeNumber);
+    if (iti != data->inodePathMap.cend())
+    {
+        std::string fullPath = iti->second;
         return fullPath;
     }
     else
     {
         return std::string();
+    }
+}
+
+INodePtr HostFilesystem::ReadINode(INodeKey inodeKey, cmsx::machine::Process* process)
+{
+    std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+    auto it = processDataMap.find(process->Id());
+    if (it != processDataMap.cend())
+    {
+        ProcessHostFilesystemData* data = it->second;
+        auto it = data->inodePathMap.find(inodeKey.inodeNumber);
+        if (it != data->inodePathMap.cend())
+        {
+            INodePtr inode = GetINode(inodeKey, process);
+            Stat(inode.Get(), process);
+            return inode;
+        }
+        else
+        {
+            throw SystemError(EFAIL, "host file system could not retrieve inode");
+        }
+    }
+    else
+    {
+        throw SystemError(ENOTFOUND, "process data for PID " + std::to_string(process->Id()) + " not found from host filesystem ");
+    }
+}
+
+void HostFilesystem::ClearProcessData(cmsx::machine::Process* process)
+{
+    std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+    auto it = processDataMap.find(process->Id());
+    if (it != processDataMap.cend())
+    {
+        ProcessHostFilesystemData* data = it->second;
+        delete data;
+        processDataMap.erase(process->Id());
     }
 }
 

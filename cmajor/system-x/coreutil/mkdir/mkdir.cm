@@ -1,0 +1,28 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Os;
+using System.IO;
+
+void MakeDirectory(const string& path, bool parents, bool verbose, int mode)
+{
+    if (parents)
+    {
+        CreateDirectories(path, mode);
+        if (verbose)
+        {
+            Console.Out() << "directory '" + path + "' created" << endl();
+        }
+    }
+    else
+    {
+        CreateDirectory(path, mode);
+        if (verbose)
+        {
+            Console.Out() << "directory '" + path + "' created" << endl();
+        }
+    }
+}

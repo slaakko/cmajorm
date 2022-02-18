@@ -23,6 +23,61 @@ namespace System.Os
         return result;
     }
     
+    public void Exec(const string& program, const List<string>& args)
+    {
+        long size = program.Length() + 1 + 16;
+        for (const string& arg : args)
+        {
+            size = size + arg.Length() + 1 + 16;
+        }
+        size = size + 16;
+        Environment& environment = Environment.Instance();
+        size = size + environment.Size();
+        size = size + 16;
+        UniquePtr<byte> block = cast<byte*>(MemAlloc(size));
+        MemoryWriter writer(block.Get(), size);
+        const char** argv = cast<const char**>(cast<void*>(block.Get()));
+        writer.Write(cast<long>(0));
+        for (const string& arg : args)
+        {
+            writer.Write(cast<long>(0));
+        }
+        writer.Write(cast<long>(0));
+        const char** envp = cast<const char**>(cast<void*>(block.Get() + writer.Offset()));
+        for (const Pair<string, string>& v : environment.Variables())
+        {
+            writer.Write(cast<long>(0));
+        }
+        writer.Write(cast<long>(0));
+        List<byte*> addresses;
+        addresses.Add(block.Get() + writer.Offset());
+        writer.Write(program);
+        for (const string& arg : args)
+        {
+            addresses.Add(block.Get() + writer.Offset());
+            writer.Write(arg);
+        }
+        addresses.Add(null);
+        for (const Pair<string, string>& v : environment.Variables())
+        {
+            string env = v.first;
+            env.Append('=').Append(v.second);
+            addresses.Add(block.Get() + writer.Offset());
+            writer.Write(env);
+        }
+        addresses.Add(null);
+        MemoryWriter headerWriter(block.Get(), size);
+        for (byte* address : addresses)
+        {
+            headerWriter.Write(cast<ulong>(cast<void*>(address)));
+        }
+        int result = exec(program.Chars(), argv, envp);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
     public int Wait(byte* exitCode)
     {
         int result = wait(exitCode);
@@ -157,6 +212,11 @@ namespace System.Os
         }
     }
     
+    public void MkDir(const char* path)
+    {
+        MkDir(path, 0);
+    }
+    
     public void MkDir(const char* path, int mode)
     {
         int result = mkdir(path, mode);
@@ -279,4 +339,26 @@ namespace System.Os
             ThrowSystemError();
         }
     }
+	
+	public string GetComputerName()
+	{
+		char[256] buffer;
+		int result = get_computer_name(&buffer[0], 256);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+		return string(&buffer[0]);
+	}
+	
+	public string GetUserName()
+	{
+		char[256] buffer;
+		int result = get_user_name(&buffer[0], 256);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+		return string(&buffer[0]);
+	}	
 }

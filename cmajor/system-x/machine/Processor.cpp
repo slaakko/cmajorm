@@ -10,10 +10,13 @@
 #include <system-x/machine/Debugger.hpp>
 #include <system-x/machine/Config.hpp>
 #include <soulng/util/Fiber.hpp>
+#include <soulng/util/TextUtils.hpp>
 
 namespace cmsx::machine {
 
 void RunKernel();
+
+using namespace soulng::util;
 
 Scheduler::~Scheduler()
 {
@@ -81,11 +84,20 @@ void Processor::Run()
                 uint8_t x = 0;
                 uint8_t y = 0;
                 uint8_t z = 0;
-                Instruction* inst = FetchInstruction(pc, x, y, z);
-                inst->Execute(*this, x, y, z);
-                SetPC(inst, pc, prevPC);
-                CheckInterrupts();
-                pc = registers.GetPC();
+                try
+                {
+                    Instruction* inst = FetchInstruction(pc, x, y, z);
+                    inst->Execute(*this, x, y, z);
+                    SetPC(inst, pc, prevPC);
+                    CheckInterrupts();
+                    pc = registers.GetPC();
+                }
+                catch (const MemoryError& memoryError)
+                {
+                    throw MemoryError("memory error: " + std::string(memoryError.what()) +
+                        std::string(": PID=" + std::to_string(currentProcess->Id()) + ", process='" + currentProcess->FilePath() +
+                            "', PC = #" + ToHexString(registers.GetPC()) + ", rW = #" + ToHexString(registers.GetSpecial(rW))));
+                }
             }
         }
     }

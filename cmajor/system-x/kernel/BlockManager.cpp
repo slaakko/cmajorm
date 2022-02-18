@@ -283,6 +283,7 @@ BlockPtr GetBlock(BlockKey blockKey, cmsx::machine::Process* process)
             {
                 Block* block = blockManager.GetBlockFromFreeList();
                 blockManager.RemoveFromHashQueue(block);
+                *block = Block();
                 block->SetKey(blockKey);
                 blockManager.InsertIntoHashQueue(block);
                 block->ResetValid();

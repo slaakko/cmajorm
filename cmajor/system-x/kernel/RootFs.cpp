@@ -11,6 +11,7 @@
 #include <system-x/kernel/BlockFile.hpp>
 #include <system-x/kernel/DirFile.hpp>
 #include <system-x/kernel/OsFileApi.hpp>
+#include <system-x/kernel/DebugHelp.hpp>
 #include <system-x/machine/Config.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/TextUtils.hpp>
@@ -243,12 +244,12 @@ INodePtr RootFilesystem::SearchDirectory(const std::string& name, INode* dirINod
     return cmsx::kernel::SearchDirectory(name, dirINode, this, process);
 }
 
-void RootFilesystem::Stat(INode* inode)
+void RootFilesystem::Stat(INode* inode, cmsx::machine::Process* process)
 {
     // status already obtained
 }
 
-DirFile* RootFilesystem::OpenDir(const std::string& path, INode* dirINode)
+DirFile* RootFilesystem::OpenDir(const std::string& path, INode* dirINode, cmsx::machine::Process* process)
 {
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
     RootFilesystemDirFile* dirFile = new RootFilesystemDirFile(this, path, nextFileId++, dirINode->Key());
@@ -293,6 +294,15 @@ void RootFilesystem::CloseFile(int32_t id)
         fileMap.erase(id);
         delete file;
     }
+}
+
+INodePtr RootFilesystem::ReadINode(INodeKey inodeKey, cmsx::machine::Process* process)
+{
+    return cmsx::kernel::ReadINode(inodeKey, process);
+}
+
+void RootFilesystem::ClearProcessData(cmsx::machine::Process* process)
+{
 }
 
 std::string RootFsHostFilePath()

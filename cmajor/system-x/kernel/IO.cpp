@@ -390,6 +390,10 @@ void MkDir(Process* process, int64_t pathAddr, int32_t mode)
     Filesystem* fs = GetFs(rootFSNumber);
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::string path = ReadString(process, pathAddr, mem);
+    if (DirectoryExists(path, fs, process))
+    {
+        throw SystemError(EALREADYEXISTS, "directory path '" + path + "' already exists");
+    }
     std::string parentPath = Path::GetDirectoryName(path);
     std::string dirName = Path::GetFileName(path);
     INodePtr inodePtr = PathToINode(parentPath, fs, process);
@@ -417,7 +421,7 @@ int32_t OpenDir(Process* process, int64_t pathAddr)
     if (inodePtr.Get())
     {
         Filesystem* ds = GetFs(inodePtr.Get()->Key().fsNumber);
-        DirFile* dirFile = ds->OpenDir(path, inodePtr.Get());
+        DirFile* dirFile = ds->OpenDir(path, inodePtr.Get(), process);
         ProcessFileTable& fileTable = process->GetFileTable();
         int32_t dd = fileTable.AddFile(dirFile);
         if (dd == -1)
@@ -460,16 +464,20 @@ int32_t ReadDir(Process* process, int32_t dfd, int64_t dirEntryBufAddr, int64_t 
         {
             return result;
         }
-        std::vector<uint8_t> buffer(DirectoryEntry::Size(), static_cast<uint8_t>(0));
-        MemoryWriter writer(buffer.data(), DirectoryEntry::Size());
+        std::vector<uint8_t> buffer;
+        buffer.push_back(0);
+        buffer.push_back(0);
+        buffer.push_back(0);
+        buffer.push_back(0);
+        MemoryWriter writer(buffer.data(), 4);
         writer.Write(dirEntry.INodeNumber());
         std::string name = dirEntry.Name();
         for (char c : name)
         {
             uint8_t b = static_cast<uint8_t>(c);
-            writer.Write(b);
+            buffer.push_back(b);
         }
-        writer.Write(static_cast<uint8_t>(0));
+        buffer.push_back(static_cast<uint8_t>(0));
         WriteProcessMemory(process, dirEntryBufAddr, buffer);
         return 1;
     }

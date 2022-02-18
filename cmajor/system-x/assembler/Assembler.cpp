@@ -1268,6 +1268,7 @@ void Assembler::EmitClsIdCommmand(uint64_t typeIdIndex, const SourcePos& sourceP
             currentStructureSymbol->AddLinkCommandId(linkCommandId);
         }
         objectFile->GetDataSection()->EmitOcta(static_cast<uint64_t>(cmsx::object::undefinedValue));
+        objectFile->GetDataSection()->EmitOcta(static_cast<uint64_t>(0));
     }
     else
     {

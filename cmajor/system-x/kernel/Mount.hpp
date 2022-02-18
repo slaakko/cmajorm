@@ -29,6 +29,7 @@ public:
     Filesystem* GetFilesystem(int32_t fsNumber) const;
     Filesystem* GetMountedFilesystem(INodeKey mountPoint) const;
     int32_t NextFileSystemId() { return nextFileSystemId++; }
+    void ClearProcessData(cmsx::machine::Process* process);
 private:
     int32_t nextFileSystemId;
     cmsx::machine::Machine* machine;

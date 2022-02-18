@@ -223,7 +223,7 @@ bool Path::HasExtension(const std::string& path)
     {
         std::string::size_type lastColon = path.find(':', lastDotPos + 1);
         std::string::size_type lastDirSep = path.find('/', lastDotPos + 1);
-        if (lastColon > lastDotPos || lastDirSep > lastDotPos)
+        if (lastColon != std::string::npos && lastColon > lastDotPos || lastDirSep != std::string::npos && lastDirSep > lastDotPos)
         {
             return false;
         }

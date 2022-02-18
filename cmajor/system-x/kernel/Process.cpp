@@ -26,7 +26,7 @@ Process::Process(int32_t id_) :
     soulng::util::IntrusiveListNode<Process>(this), id(id_), rv(static_cast<uint64_t>(-1)), kernelSP(cmsx::machine::kernelBaseAddress), axAddress(0), bxAddress(0), cxAddress(0),
     state(cmsx::machine::ProcessState::created), entryPoint(-1), argumentsStartAddress(-1), argumentsLength(0), environmentStartAddress(-1), environmentLength(0), 
     heapStartAddress(-1), heapLength(0), stackStartAddress(-1), startUserTime(), startSleepTime(), startSystemTime(), userTime(0), sleepTime(0), systemTime(0),
-    exitCode(0), debugger(nullptr), processor(nullptr), currentExceptionAddress(0), currentExceptionClassId(0), currentTryRecord(nullptr), userFiber(nullptr), kernelFiber(nullptr),
+    exitCode(0), debugger(nullptr), processor(nullptr), currentExceptionAddress(0), currentExceptionClassId(0), currentTryRecord(nullptr), kernelFiber(nullptr),
     inodeKeyOfWorkingDirAsULong(-1)
 {
     SetINodeKeyOfWorkingDir(Kernel::Instance().GetINodeKeyOfRootDir());
@@ -148,6 +148,7 @@ void Process::Exit(uint8_t exitCode_)
     symbolTable.reset();
     functionTable.reset();
     fileTable.CloseFiles(this);
+    Kernel::Instance().ClearProcessData(this);
     Process* parent = Parent();
     if (parent)
     {
@@ -327,6 +328,7 @@ int32_t Fork(Process* parent)
     child->SetProcessor(processor);
     uint64_t rv = machine->Mem().AllocateTranslationMap();
     child->SetRV(rv);
+    TextSegmentWriteProtectionGuard guard(rv, machine->Mem());
     SetupRegions(parent, child);
     child->GetFileTable().CopyFrom(parent->GetFileTable());
     child->SetAddressesFrom(parent);

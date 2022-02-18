@@ -27,6 +27,18 @@ namespace System.IO
         {
             return DirectoryExists(directoryPath);
         }
+		public static bool IsEmpty(const string& directoryPath)
+		{
+			return IsDirectoryEmpty(directoryPath);
+		}
+        public static void Create(const string& directoryPath)
+        {
+            Create(directoryPath, 0);
+        }
+        public static void Create(const string& directoryPath, int mode)
+        {
+            CreateDirectory(directoryPath, mode);
+        }
         public static DateTime AccessTime(const string& directoryPath)
         {
             return GetDirectoryAccessTime(directoryPath);
@@ -47,6 +59,16 @@ namespace System.IO
         {
             RemoveDirectory(directoryPath);
         }
+    }
+    
+    public void CreateDirectory(const string& directoryPath)
+    {
+        CreateDirectory(directoryPath, 0);
+    }
+    
+    public void CreateDirectory(const string& directoryPath, int mode)
+    {
+        MkDir(directoryPath.Chars(), mode);
     }
   
     public void CreateDirectories(const string& directoryPath)
@@ -118,6 +140,25 @@ namespace System.IO
             }
         }
     }
+	
+	public bool IsDirectoryEmpty(const string& dirPath)
+	{
+		if (!DirectoryExists(dirPath))
+		{
+			throw FileSystemException("directory path '" + dirPath + "' does not exist");
+		}
+		DirectoryEntry entry;
+		DirectoryReader reader(dirPath);
+		while (reader.Read(entry))
+		{
+			if (entry.IsDot() || entry.IsDotDot())
+			{
+				continue;
+			}
+			return false;
+		}
+		return true;
+	}
     
     public DateTime GetDirectoryAccessTime(const string& dirPath)
     {
@@ -163,6 +204,9 @@ namespace System.IO
         public nothrow DirectoryEntry() : inodeNumber(-1), name()
         {
         }
+		public nothrow DirectoryEntry(int inodeNumber_, const string& name_) : inodeNumber(inodeNumber_), name(name_)
+		{
+		}
         public nothrow bool IsDot() const
         {
             return name == ".";
@@ -188,10 +232,10 @@ namespace System.IO
             int result = ReadDir(dfd, &dirEntryBuf[0], directoryEntrySize);
             if (result == 1)
             {
-                MemoryReader reader(&dirEntryBuf[0], directoryEntrySize);
+				MemoryReader reader(&dirEntryBuf[0], directoryEntrySize);
                 dirEntry.inodeNumber = reader.ReadInt();
                 dirEntry.name = reader.ReadString();
-                return true;
+				return true;
             }
             return false;
         }

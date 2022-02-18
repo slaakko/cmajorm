@@ -49,7 +49,7 @@ int32_t GetClassNameVmtIndexOffset()
     }
     else if (GetBackEnd() == BackEnd::cmsx)
     {
-        return 1;
+        return 2;
     }
     else
     {
@@ -65,7 +65,7 @@ int32_t GetImtsVmtIndexOffset()
     }
     else if (GetBackEnd() == BackEnd::cmsx)
     {
-        return 2;
+        return 3;
     }
     else
     {
@@ -81,7 +81,7 @@ int32_t GetFunctionVmtIndexOffset()
     }
     else if (GetBackEnd() == BackEnd::cmsx)
     {
-        return 3;
+        return 4;
     }
     else
     {
@@ -353,6 +353,10 @@ const int maxStaticLayoutSize = maxObjectLayoutSize;
 
 void ClassTypeSymbol::Read(SymbolReader& reader)
 {
+    if (FullName().find(U"FileSystemException") != std::u32string::npos)
+    {
+        int x = 0;
+    }
     TypeSymbol::Read(reader);
     groupName = reader.GetBinaryReader().ReadUtf32String();
     flags = static_cast<ClassTypeSymbolFlags>(reader.GetBinaryReader().ReadUShort());
@@ -1577,7 +1581,7 @@ void* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
     {
         emitter.SetVmtObjectCreated(this);
         bool specialization = GetSymbolType() == SymbolType::classTemplateSpecializationSymbol;
-        if (GetBackEnd() == BackEnd::cmcpp && !specialization)
+        if ((GetBackEnd() == BackEnd::cmcpp || GetBackEnd() == BackEnd::cmsx) && !specialization)
         {
             if (VmtEmitted())
             {

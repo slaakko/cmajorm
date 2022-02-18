@@ -7,8 +7,109 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Os;
+using paths;
 
-void Copy(const List<string>& files, const string& target, bool verbose, bool recursive, FileCopyOptions copyOptions)
+bool TargetIsDirectory(const string& target) 
 {
+    byte[statBufSize] statBuf;
+    int result = stat(target.Chars(), &statBuf[0], statBufSize);
+    if (result == -1)
+    {
+        return false;
+    }
+    FileStatus status;
+    GetFileStatus(&statBuf[0], status);
+    return status.fileType == FileType.directory;
+}
 
+void CopyFiles(const List<string>& files, const string& target, const List<FileType>& fileTypes,
+    bool targetDirExists, bool recursive, FileCopyOptions copyOptions)
+{
+    long n = files.Count();
+    for (long i = 0; i < n; ++i)
+    {
+        const string& file = files[i];
+        FileType fileType = fileTypes[i];
+        if (fileType == FileType.directory)
+        {
+            DirectoryReader reader(file);
+            DirectoryEntry dirEntry;
+            List<string> sourceFilePaths;
+            while (reader.Read(dirEntry))
+            {
+                if (dirEntry.IsDot() || dirEntry.IsDotDot())
+                {
+                    continue;
+                }
+                string sourceFilePath = Path.Combine(file, dirEntry.name);
+                sourceFilePaths.Add(sourceFilePath);
+            }
+            string targetDir = target;
+            if (targetDirExists)
+            {
+                targetDir = Path.Combine(target, Path.GetFileName(file));
+                if (!Directory.Exists(targetDir))
+                {
+                    MkDir(targetDir.Chars());
+                }
+                if ((copyOptions & FileCopyOptions.dontPreserveTimestamps) == FileCopyOptions.none)
+                {
+                    DateTime accessTime;
+                    DateTime modificationTime;
+                    Directory.GetTimes(file, accessTime, modificationTime);
+                    Directory.SetTimes(targetDir, accessTime, modificationTime);
+                }
+            }
+            Copy(sourceFilePaths, targetDir, recursive, copyOptions);
+        }
+        else if (fileType == FileType.regular)
+        {
+            string targetFilePath = Path.Combine(target, Path.GetFileName(file));
+            File.Copy(file, targetFilePath, copyOptions);
+        }
+        else
+        {
+            throw Exception("'" + file + "' not regular or directory");
+        }
+    }
+}
+
+void Copy(const List<string>& files, const string& target, bool recursive, FileCopyOptions copyOptions)
+{
+    if (!TargetIsDirectory(target))
+    {
+        if (files.Count() == 1)
+        {
+            string file = files.Front();
+            FileStatus status;
+            Stat(file.Chars(), status);
+            if (status.fileType == FileType.directory)
+            {
+                if (!recursive)
+                {
+                    throw Exception("'" + file + "' is directory and not --recursive specified");
+                }
+            }
+            else if (status.fileType == FileType.regular)
+            {
+                File.Copy(file, target, copyOptions);
+                return;
+            }
+            else
+            {
+                throw Exception("'" + file + "' not regular or directory");
+            }
+        }
+        else if (files.Count() > 1)
+        {
+            throw Exception("'" + target + "' not directory");
+        }
+    }
+    List<FileType> fileTypes = GetFileTypes(files, recursive);
+    bool targetDirExists = Directory.Exists(target);
+    if (!targetDirExists)
+    {
+        MkDir(target.Chars());
+    }
+    CopyFiles(files, target, fileTypes, targetDirExists, recursive, copyOptions);
 }

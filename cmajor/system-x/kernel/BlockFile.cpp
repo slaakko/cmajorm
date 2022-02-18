@@ -6,6 +6,7 @@
 #include <system-x/kernel/BlockFile.hpp>
 #include <system-x/kernel/BlockManager.hpp>
 #include <system-x/kernel/Fs.hpp>
+#include <soulng/util/Path.hpp>
 
 namespace cmsx::kernel {
 
@@ -66,12 +67,15 @@ std::vector<uint8_t> BlockFile::Read(int64_t count, cmsx::machine::Process* proc
     return data;
 }
 
+void foo(std::vector<uint8_t>& buf);
+
 int64_t BlockFile::Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process)
 {
     int64_t bytesWritten = File::Write(buffer, process);
     INodePtr inodePtr(nullptr);
     INode* inode = nullptr;
     int64_t count = buffer.size();
+    int32_t inodeNumBlocks = 0;
     if (count > 0)
     {
         inodePtr = GetINode(process);

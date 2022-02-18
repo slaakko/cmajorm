@@ -1,0 +1,161 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+using System.RegularExpressions;
+using System.Os;
+
+namespace paths
+{
+    public List<FileType> GetFileTypes(const List<string>& files, bool recursive)
+    {
+        List<FileType> fileTypes;
+        for (const string& file : files)
+        {
+            FileStatus status;
+            Stat(file.Chars(), status);
+            if (status.fileType == FileType.directory)
+            {
+                if (!recursive)
+                {
+                    throw Exception("'" + file + "' is directory and not --recursive specified");
+                }
+            }
+            else if (status.fileType != FileType.regular)
+            {
+                throw Exception("'" + file + "' not regular or directory");
+            }
+            fileTypes.Add(status.fileType);
+        }
+        return fileTypes;
+    }
+
+    public bool ContainsPatternChar(const ustring& str)
+    {
+        for (uchar c : str)
+        {
+            if (c == '*' || c == '?' || c == '[') return true;
+        }
+        return false;
+    }
+
+    public List<string> GetMatchingNames(const List<string>& names, const ustring& pattern, Context& context)
+    {
+        List<string> matchingNames;
+        Nfa nfa = CompileFilePattern(context, pattern);
+        for (const string& name : names)
+        {
+            ustring nm = ToUtf32(name);
+            if (PatternMatch(nm, nfa))
+            {
+                matchingNames.Add(name);
+            }
+        }
+        return matchingNames;
+    }
+
+    public List<string> Expand(const List<string>& pathNames)
+    {
+        Context context;
+        List<string> expanded;
+        for (const string& pathName : pathNames)
+        {
+            List<string> components = pathName.Split('/');
+            List<string> paths = Combine(string(), components, context);
+            for (const string& path : paths)
+            {
+                expanded.Add(path);
+            }
+        }
+        return expanded;
+    }
+
+    public List<string> Combine(const string& prefix, const List<string>& components, Context& context)
+    {
+        List<string> allCombinations;
+        string pre = prefix;
+        bool expanded = false;
+        long n = components.Count();
+        for (long i = 0; i < n; ++i)
+        {
+            if (prefix.IsEmpty() && i == 0 && components[i].IsEmpty())
+            {
+                pre.Append('/');
+            }
+            else
+            {
+                ustring comp = ToUtf32(components[i]);
+                if (ContainsPatternChar(comp))
+                {
+                    List<string> prefixes = Expand(pre, comp, context);
+                    List<string> suffix;
+                    for (long j = i + 1; j < n; ++j)
+                    {
+                        suffix.Add(components[j]);
+                    }
+                    for (const string& prefix : prefixes)
+                    {
+                        List<string> combinations = Combine(prefix, suffix, context);
+                        for (const string& c : combinations)
+                        {
+                            allCombinations.Add(c);
+                        }
+                    }
+                    expanded = true;
+                }
+                else if (pre.IsEmpty() || pre[pre.Length() - 1] == '/')
+                {
+                    pre.Append(components[i]);
+                }
+                else
+                {
+                    pre.Append('/').Append(components[i]);
+                }
+            }
+        }
+        if (!expanded)
+        {
+            allCombinations.Add(pre);
+        }
+        return allCombinations;
+    }
+
+    public List<string> Expand(const string& prefix, const ustring& pattern, Context& context)
+    {
+        string dirPath = prefix;
+        if (dirPath.IsEmpty())
+        {
+            dirPath = ".";
+        }
+        List<string> names;
+        DirectoryEntry entry;
+        DirectoryReader reader(dirPath);
+        while (reader.Read(entry))
+        {
+            if (entry.IsDot() || entry.IsDotDot())
+            {
+                continue;
+            }
+            names.Add(entry.name);
+        }
+        List<string> matchingNames = GetMatchingNames(names, pattern, context);
+        Sort(matchingNames);
+        List<string> expanded;
+        for (const string& name : matchingNames)
+        {
+            if (prefix.IsEmpty())
+            {
+                expanded.Add(name);
+            }
+            else
+            {
+                expanded.Add(Path.Combine(prefix, name));
+            }
+        }
+        return expanded;
+    }
+}

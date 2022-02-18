@@ -914,11 +914,11 @@ bool DirectoryExists(const std::string& path, Filesystem* fs, cmsx::machine::Pro
     return false;
 }
 
-std::string GetHostFilePath(const INodeKey& key)
+std::string GetHostFilePath(const INodeKey& key, cmsx::machine::Process* process)
 {
     int32_t fsNumber = key.fsNumber;
     Filesystem* fs = GetFs(fsNumber);
-    return fs->GetHostFilePath(key.inodeNumber);
+    return fs->GetHostFilePath(key.inodeNumber, process);
 }
 
 INodePtr PathToINode(const std::string& path, Filesystem* fs, cmsx::machine::Process* process)
@@ -934,7 +934,7 @@ INodePtr PathToINode(const std::string& path, Filesystem* fs, cmsx::machine::Pro
     if (path.empty() || path == "/")
     {
         INodeKey rootDirINodeKey = MakeINodeKey(rootFSNumber, superBlock.INodeNumberOfRootDirectory());
-        INodePtr inode = ReadINode(rootDirINodeKey, process);
+        INodePtr inode = rootFs->ReadINode(rootDirINodeKey, process);
         return inode;
     }
     INodeKey inodeKey;
@@ -948,11 +948,13 @@ INodePtr PathToINode(const std::string& path, Filesystem* fs, cmsx::machine::Pro
     {
         inodeKey = ToINodeKey(process->GetINodeKeyOfWorkingDir());
     }
-    INodePtr inode = ReadINode(inodeKey, process);
+    fs = GetFs(inodeKey.fsNumber);
+    INodePtr inode = fs->ReadINode(inodeKey, process);
     std::vector<std::string> components = Split(path, '/');
     for (int i = start; i < components.size(); ++i)
     {
         const std::string& name = components[i];
+        fs = GetFs(inode.Get()->Key().fsNumber);
         inode = fs->SearchDirectory(name, inode.Get(), process);
         if (!inode.Get())
         {
@@ -979,7 +981,7 @@ INodePtr PathToINode(const std::string& path, Filesystem* fs, cmsx::machine::Pro
     if (inode.Get() && (flags & PathToINodeFlags::stat) != PathToINodeFlags::none)
     {
         Filesystem* fs = GetFs(inode.Get()->Key().fsNumber);
-        fs->Stat(inode.Get());
+        fs->Stat(inode.Get(), process);
     }
     return inode;
 }

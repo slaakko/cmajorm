@@ -1,0 +1,59 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+using System.Os;
+using paths;
+
+void RemoveFiles(const List<string>& files, const List<FileType>& fileTypes, bool verbose, bool recursive)
+{
+    long n = files.Count();
+    for (long i = 0; i < n; ++i)
+    {
+        FileType fileType = fileTypes[i];
+        const string& path = files[i];
+        if (fileType == FileType.directory)
+        {
+            DirectoryReader reader(path);
+            DirectoryEntry entry;
+            List<string> filePaths;
+            while (reader.Read(entry))
+            {
+                if (entry.IsDot() || entry.IsDotDot())
+                {
+                    continue;
+                }
+                string filePath = Path.Combine(path, entry.name);
+                filePaths.Add(filePath);
+            }
+            Remove(filePaths, verbose, recursive);
+            Directory.Remove(path);
+            if (verbose)
+            {
+                Console.Out() << path << " removed" << endl();
+            }
+        }
+        else if (fileType == FileType.regular)
+        {
+            File.Remove(path);
+            if (verbose)
+            {
+                Console.Out() << path << " removed" << endl();
+            }
+        }
+        else
+        {
+            throw FileSystemException("'" + path + "' not directory or regular");
+        }
+    }
+}
+
+void Remove(const List<string>& files, bool verbose, bool recursive)
+{
+    List<FileType> fileTypes = GetFileTypes(files, recursive);
+    RemoveFiles(files, fileTypes, verbose, recursive);
+}

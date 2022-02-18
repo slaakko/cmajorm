@@ -59,6 +59,8 @@ const uint8_t trap_decompress = 44;
 const uint8_t trap_get_decompressed_data_size = 45;
 const uint8_t trap_get_decompressed_data = 46;
 const uint8_t trap_close_decompression = 47;
+const uint8_t trap_get_computer_name = 48;
+const uint8_t trap_get_user_name = 49;
 
 class CMSX_KERNEL_API TrapHandler
 {
