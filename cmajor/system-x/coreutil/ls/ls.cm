@@ -10,617 +10,617 @@ using System.Text;
 
 enum Fields
 {
-	none = 0, fs = 1 << 0, inode = 1 << 1, access = 1 << 2, nlinks = 1 << 3, user = 1 << 4, uid = 1 << 5, group = 1 << 6, gid = 1 << 7, size = 1 << 8, 
-	ctime = 1 << 9, mtime = 1 << 10, atime = 1 << 11, name = 1 << 12
+    none = 0, fs = 1 << 0, inode = 1 << 1, access = 1 << 2, nlinks = 1 << 3, user = 1 << 4, uid = 1 << 5, group = 1 << 6, gid = 1 << 7, size = 1 << 8, 
+    ctime = 1 << 9, mtime = 1 << 10, atime = 1 << 11, name = 1 << 12
 }
 
 class FieldValue
 {
-	public nothrow FieldValue(const ustring& text_, Fields field_) : text(text_), length(cast<int>(text.Length())), field(field_)
-	{
-	}
-	public ustring text;
-	public int length;
-	public Fields field;
+    public nothrow FieldValue(const ustring& text_, Fields field_) : text(text_), length(cast<int>(text.Length())), field(field_)
+    {
+    }
+    public ustring text;
+    public int length;
+    public Fields field;
 }
 
 enum FileKind
 {
-	regular, executable, directory, fifo
+    regular, executable, directory, fifo
 }
 
 enum Flags
 {
-	none = 0, all = 1 << 0, longFormat = 1 << 1, humanReadableSize = 1 << 2, hasColors = 1 << 3, reverse = 1 << 4
+    none = 0, all = 1 << 0, longFormat = 1 << 1, humanReadableSize = 1 << 2, hasColors = 1 << 3, reverse = 1 << 4
 }
 
 FieldValue MakeIntFieldValue(int n, Fields field)
 {
-	return FieldValue(ToUtf32(ToString(n)), field);
+    return FieldValue(ToUtf32(ToString(n)), field);
 }
 
 FieldValue MakeStringFieldValue(const string& s, Fields field)
 {
-	return FieldValue(ToUtf32(s), field);
+    return FieldValue(ToUtf32(s), field);
 }
 
 FieldValue MakeTimeFieldValue(const DateTime& dateTime, Fields field)
 {
-	return FieldValue(ToUtf32(dateTime.ToString()), field);
+    return FieldValue(ToUtf32(dateTime.ToString()), field);
 }
 
 FieldValue MakeSizeFieldValue(long size, bool humanReadableSize)
 {
-	if (!humanReadableSize)
-	{
-		return FieldValue(ToUtf32(ToString(size)), Fields.size);
-	}
-	else
-	{
-		long g = size / 1024 / 1024 / 1024;
-		if (g > 0)
-		{
-			long s = (size - 1) / 1024 / 1024 / 1024 + 1;
-			return FieldValue(ToUtf32(ToString(s) + "G"), Fields.size);
-		}
-		else
-		{
-			long m = size / 1024 / 1024;
-			if (m > 0)
-			{
-				long s = (size - 1) / 1024 / 1024 + 1;
-				return FieldValue(ToUtf32(ToString(s) + "M"), Fields.size);
-			}
-			else
-			{
-				long k = size / 1024;
-				if (k > 0)
-				{
-					long s = (size - 1) / 1024 + 1;
-					return FieldValue(ToUtf32(ToString(s) + "K"), Fields.size);
-				}
-				else
-				{
-					return FieldValue(ToUtf32(ToString(size)), Fields.size);
-				}
-			}
-		}
-	}
+    if (!humanReadableSize)
+    {
+        return FieldValue(ToUtf32(ToString(size)), Fields.size);
+    }
+    else
+    {
+        long g = size / 1024 / 1024 / 1024;
+        if (g > 0)
+        {
+            long s = (size - 1) / 1024 / 1024 / 1024 + 1;
+            return FieldValue(ToUtf32(ToString(s) + "G"), Fields.size);
+        }
+        else
+        {
+            long m = size / 1024 / 1024;
+            if (m > 0)
+            {
+                long s = (size - 1) / 1024 / 1024 + 1;
+                return FieldValue(ToUtf32(ToString(s) + "M"), Fields.size);
+            }
+            else
+            {
+                long k = size / 1024;
+                if (k > 0)
+                {
+                    long s = (size - 1) / 1024 + 1;
+                    return FieldValue(ToUtf32(ToString(s) + "K"), Fields.size);
+                }
+                else
+                {
+                    return FieldValue(ToUtf32(ToString(size)), Fields.size);
+                }
+            }
+        }
+    }
 }
 
 string AccessStr(Access access)
 {
-	string accessStr;
-	if ((access & Access.read) != Access.none)
-	{
-		accessStr.Append('r');
-	}
-	else
-	{
-		accessStr.Append('-');
-	}
-	if ((access & Access.write) != Access.none)
-	{
-		accessStr.Append('w');
-	}
-	else
-	{
-		accessStr.Append('-');
-	}
-	if ((access & Access.execute) != Access.none)
-	{
-		accessStr.Append('x');
-	}
-	else
-	{
-		accessStr.Append('-');
-	}
-	return accessStr;
+    string accessStr;
+    if ((access & Access.read) != Access.none)
+    {
+        accessStr.Append('r');
+    }
+    else
+    {
+        accessStr.Append('-');
+    }
+    if ((access & Access.write) != Access.none)
+    {
+        accessStr.Append('w');
+    }
+    else
+    {
+        accessStr.Append('-');
+    }
+    if ((access & Access.execute) != Access.none)
+    {
+        accessStr.Append('x');
+    }
+    else
+    {
+        accessStr.Append('-');
+    }
+    return accessStr;
 }
 
 FieldValue MakeAccessFieldValue(const FileStatus& fileStatus)
 {
-	string accessStr;
-	if (fileStatus.fileType == FileType.directory)
-	{
-		accessStr.Append('d');
-	}
-	else
-	{
-		accessStr.Append('-');
-	}
-	accessStr.Append(AccessStr(fileStatus.ownerAccess));
-	accessStr.Append(AccessStr(fileStatus.groupAccess));
-	accessStr.Append(AccessStr(fileStatus.otherAccess));
-	return FieldValue(ToUtf32(accessStr), Fields.access);
+    string accessStr;
+    if (fileStatus.fileType == FileType.directory)
+    {
+        accessStr.Append('d');
+    }
+    else
+    {
+        accessStr.Append('-');
+    }
+    accessStr.Append(AccessStr(fileStatus.ownerAccess));
+    accessStr.Append(AccessStr(fileStatus.groupAccess));
+    accessStr.Append(AccessStr(fileStatus.otherAccess));
+    return FieldValue(ToUtf32(accessStr), Fields.access);
 }
 
 FormatJustify GetFieldJustification(Fields field)
 {
-	switch (field)
-	{
-		case Fields.fs:
-		case Fields.inode:
-		case Fields.nlinks:
-		case Fields.uid:
-		case Fields.gid:
-		case Fields.size:
-		{
-			return FormatJustify.right;
-		}
-	}
-	return FormatJustify.left;
+    switch (field)
+    {
+        case Fields.fs:
+        case Fields.inode:
+        case Fields.nlinks:
+        case Fields.uid:
+        case Fields.gid:
+        case Fields.size:
+        {
+            return FormatJustify.right;
+        }
+    }
+    return FormatJustify.left;
 }
 
 nothrow Fields ShortFields()
 {
-	return Fields.name;
+    return Fields.name;
 }
 
 nothrow Fields LongFields()
 {
-	return cast<Fields>(Fields.access | Fields.nlinks | Fields.user | Fields.group | Fields.size | Fields.mtime | Fields.name);
+    return cast<Fields>(Fields.access | Fields.nlinks | Fields.user | Fields.group | Fields.size | Fields.mtime | Fields.name);
 }
 
 class FileInfo
 {
-	public nothrow FileInfo(const FileStatus& fileStatus_, const DirectoryEntry& entry_) : fileStatus(fileStatus_), entry(entry_)
-	{
-	}
-	public int FieldWidth(int fieldNr) const
-	{
-		if (fieldNr >= 0 && fieldNr < fieldValues.Count())
-		{
-			return fieldValues[fieldNr].length;
-		}
-		return 0;
-	}
-	public FileKind Kind() const
-	{
-		if (fileStatus.fileType == FileType.directory) return FileKind.directory;
-		if (fileStatus.fileType == FileType.fifo) return FileKind.fifo;
-		if (fileStatus.fileType == FileType.regular) 
-		{
-			if ((fileStatus.ownerAccess & Access.execute) != Access.none)
-			{
-				return FileKind.executable;
-			}
-		}
-		return FileKind.regular;		
-	}
-	public const FieldValue& GetFieldValue(int fieldIndex) const
-	{
-		return fieldValues[fieldIndex];
-	}
-	public FileStatus fileStatus;
-	public DirectoryEntry entry;
-	public List<FieldValue> fieldValues;
-	public long nameFieldIndex;
+    public nothrow FileInfo(const FileStatus& fileStatus_, const DirectoryEntry& entry_) : fileStatus(fileStatus_), entry(entry_)
+    {
+    }
+    public int FieldWidth(int fieldNr) const
+    {
+        if (fieldNr >= 0 && fieldNr < fieldValues.Count())
+        {
+            return fieldValues[fieldNr].length;
+        }
+        return 0;
+    }
+    public FileKind Kind() const
+    {
+        if (fileStatus.fileType == FileType.directory) return FileKind.directory;
+        if (fileStatus.fileType == FileType.fifo) return FileKind.fifo;
+        if (fileStatus.fileType == FileType.regular) 
+        {
+            if ((fileStatus.ownerAccess & Access.execute) != Access.none)
+            {
+                return FileKind.executable;
+            }
+        }
+        return FileKind.regular;        
+    }
+    public const FieldValue& GetFieldValue(int fieldIndex) const
+    {
+        return fieldValues[fieldIndex];
+    }
+    public FileStatus fileStatus;
+    public DirectoryEntry entry;
+    public List<FieldValue> fieldValues;
+    public long nameFieldIndex;
 }
 
 enum SortField
 {
-	name, inode, nlinks, user, size, time
+    name, inode, nlinks, user, size, time
 }
 
 class SortBy : Rel<FileInfo>
 {
-	public SortBy(SortField sortField_) : sortField(sortField_)
-	{
-	}
-	public bool operator()(const FileInfo& left, const FileInfo& right) const
-	{
-		switch (sortField)
-		{
-			case SortField.inode:
-			{
-				if (left.fileStatus.inodeNumber < right.fileStatus.inodeNumber) return true;
-				if (left.fileStatus.inodeNumber > right.fileStatus.inodeNumber) return false;
-				break;
-			}
-			case SortField.nlinks:
-			{
-				if (left.fileStatus.nlinks < right.fileStatus.nlinks) return true;
-				if (left.fileStatus.nlinks > right.fileStatus.nlinks) return false;
-				break;
-			}
-			case SortField.user:
-			{
-				// todo
-				break;
-			}
-			case SortField.size:
-			{
-				if (left.fileStatus.fileSize > right.fileStatus.fileSize) return true;
-				if (left.fileStatus.fileSize < right.fileStatus.fileSize) return false;
-				break;
-			}
-			case SortField.time:
-			{
-				if (left.fileStatus.mtime < right.fileStatus.mtime) return true;
-				if (left.fileStatus.mtime > right.fileStatus.mtime) return false;
-				break;
-			}
-		}
-		return left.fieldValues[left.nameFieldIndex].text < right.fieldValues[right.nameFieldIndex].text;
-	}
-	private SortField sortField;
+    public SortBy(SortField sortField_) : sortField(sortField_)
+    {
+    }
+    public bool operator()(const FileInfo& left, const FileInfo& right) const
+    {
+        switch (sortField)
+        {
+            case SortField.inode:
+            {
+                if (left.fileStatus.inodeNumber < right.fileStatus.inodeNumber) return true;
+                if (left.fileStatus.inodeNumber > right.fileStatus.inodeNumber) return false;
+                break;
+            }
+            case SortField.nlinks:
+            {
+                if (left.fileStatus.nlinks < right.fileStatus.nlinks) return true;
+                if (left.fileStatus.nlinks > right.fileStatus.nlinks) return false;
+                break;
+            }
+            case SortField.user:
+            {
+                // todo
+                break;
+            }
+            case SortField.size:
+            {
+                if (left.fileStatus.fileSize > right.fileStatus.fileSize) return true;
+                if (left.fileStatus.fileSize < right.fileStatus.fileSize) return false;
+                break;
+            }
+            case SortField.time:
+            {
+                if (left.fileStatus.mtime < right.fileStatus.mtime) return true;
+                if (left.fileStatus.mtime > right.fileStatus.mtime) return false;
+                break;
+            }
+        }
+        return left.fieldValues[left.nameFieldIndex].text < right.fieldValues[right.nameFieldIndex].text;
+    }
+    private SortField sortField;
 }
 
 void Sort(List<FileInfo>& fileInfos, SortField sortField)
 {
-	System.Sort(fileInfos, SortBy(sortField));
+    System.Sort(fileInfos, SortBy(sortField));
 }
 
 string GetColorString(const FileInfo& fileInfo, bool hasColors)
 {
-	if (!hasColors)
-	{
-		return string();
-	}
-	switch (fileInfo.Kind())
-	{
-		case FileKind.regular:
-		{
-			return SetColors(ConsoleColor.white, DefaultConsoleBackColor());
-		}
-		case FileKind.executable:
-		{
-			return SetColors(ConsoleColor.green, DefaultConsoleBackColor());
-		}
-		case FileKind.directory:
-		{
-			return SetColors(ConsoleColor.cyan, DefaultConsoleBackColor());
-		}
-		case FileKind.fifo:
-		{
-			return SetColors(ConsoleColor.red, DefaultConsoleBackColor());
-		}
-	}
-	return SetColors(ConsoleColor.white, DefaultConsoleBackColor());
+    if (!hasColors)
+    {
+        return string();
+    }
+    switch (fileInfo.Kind())
+    {
+        case FileKind.regular:
+        {
+            return SetColors(ConsoleColor.white, DefaultConsoleBackColor());
+        }
+        case FileKind.executable:
+        {
+            return SetColors(ConsoleColor.green, DefaultConsoleBackColor());
+        }
+        case FileKind.directory:
+        {
+            return SetColors(ConsoleColor.cyan, DefaultConsoleBackColor());
+        }
+        case FileKind.fifo:
+        {
+            return SetColors(ConsoleColor.red, DefaultConsoleBackColor());
+        }
+    }
+    return SetColors(ConsoleColor.white, DefaultConsoleBackColor());
 }
 
 string ResetColorString(bool hasColors)
 {
-	if (!hasColors)
-	{
-		return string();
-	}
-	return ResetColors();
+    if (!hasColors)
+    {
+        return string();
+    }
+    return ResetColors();
 }
 
 void MakeFileInfo(FileInfo& fileInfo, Fields fields, bool humanReadableSize)
 {
-	if ((fields & Fields.fs) != Fields.none)
-	{
-		fileInfo.fieldValues.Add(MakeIntFieldValue(fileInfo.fileStatus.fileSystemNumber, Fields.fs));
-	}
-	if ((fields & Fields.inode) != Fields.none)
-	{
-		fileInfo.fieldValues.Add(MakeIntFieldValue(fileInfo.fileStatus.inodeNumber, Fields.inode));
-	}
-	if ((fields & Fields.access) != Fields.none)
-	{
-		fileInfo.fieldValues.Add(MakeAccessFieldValue(fileInfo.fileStatus));
-	}
-	if ((fields & Fields.nlinks) != Fields.none)
-	{
-		fileInfo.fieldValues.Add(MakeIntFieldValue(fileInfo.fileStatus.nlinks, Fields.nlinks));
-	}
-	if ((fields & Fields.user) != Fields.none)
-	{
-		// todo
-	}
-	if ((fields & Fields.uid) != Fields.none)
-	{
-		// todo
-	}
-	if ((fields & Fields.group) != Fields.none)
-	{
-		// todo
-	}
-	if ((fields & Fields.gid) != Fields.none)
-	{
-		// todo
-	}
-	if ((fields & Fields.size) != Fields.none)
-	{
-		fileInfo.fieldValues.Add(MakeSizeFieldValue(fileInfo.fileStatus.fileSize, humanReadableSize));
-	}
-	if ((fields & Fields.ctime) != Fields.none)
-	{
-		fileInfo.fieldValues.Add(MakeTimeFieldValue(fileInfo.fileStatus.ctime, Fields.ctime));
-	}
-	if ((fields & Fields.mtime) != Fields.none)
-	{
-		fileInfo.fieldValues.Add(MakeTimeFieldValue(fileInfo.fileStatus.mtime, Fields.mtime));
-	}
-	if ((fields & Fields.atime) != Fields.none)
-	{
-		fileInfo.fieldValues.Add(MakeTimeFieldValue(fileInfo.fileStatus.atime, Fields.atime));
-	}
-	if ((fields & Fields.name) != Fields.none)
-	{
-		fileInfo.nameFieldIndex = fileInfo.fieldValues.Count();
-		fileInfo.fieldValues.Add(MakeStringFieldValue(fileInfo.entry.name, Fields.name));
-	}
+    if ((fields & Fields.fs) != Fields.none)
+    {
+        fileInfo.fieldValues.Add(MakeIntFieldValue(fileInfo.fileStatus.fileSystemNumber, Fields.fs));
+    }
+    if ((fields & Fields.inode) != Fields.none)
+    {
+        fileInfo.fieldValues.Add(MakeIntFieldValue(fileInfo.fileStatus.inodeNumber, Fields.inode));
+    }
+    if ((fields & Fields.access) != Fields.none)
+    {
+        fileInfo.fieldValues.Add(MakeAccessFieldValue(fileInfo.fileStatus));
+    }
+    if ((fields & Fields.nlinks) != Fields.none)
+    {
+        fileInfo.fieldValues.Add(MakeIntFieldValue(fileInfo.fileStatus.nlinks, Fields.nlinks));
+    }
+    if ((fields & Fields.user) != Fields.none)
+    {
+        // todo
+    }
+    if ((fields & Fields.uid) != Fields.none)
+    {
+        // todo
+    }
+    if ((fields & Fields.group) != Fields.none)
+    {
+        // todo
+    }
+    if ((fields & Fields.gid) != Fields.none)
+    {
+        // todo
+    }
+    if ((fields & Fields.size) != Fields.none)
+    {
+        fileInfo.fieldValues.Add(MakeSizeFieldValue(fileInfo.fileStatus.fileSize, humanReadableSize));
+    }
+    if ((fields & Fields.ctime) != Fields.none)
+    {
+        fileInfo.fieldValues.Add(MakeTimeFieldValue(fileInfo.fileStatus.ctime, Fields.ctime));
+    }
+    if ((fields & Fields.mtime) != Fields.none)
+    {
+        fileInfo.fieldValues.Add(MakeTimeFieldValue(fileInfo.fileStatus.mtime, Fields.mtime));
+    }
+    if ((fields & Fields.atime) != Fields.none)
+    {
+        fileInfo.fieldValues.Add(MakeTimeFieldValue(fileInfo.fileStatus.atime, Fields.atime));
+    }
+    if ((fields & Fields.name) != Fields.none)
+    {
+        fileInfo.nameFieldIndex = fileInfo.fieldValues.Count();
+        fileInfo.fieldValues.Add(MakeStringFieldValue(fileInfo.entry.name, Fields.name));
+    }
 }
 
 void MakeFileInfos(List<FileInfo>& fileInfos, Fields fields, bool humanReadableSize)
 {
-	for (FileInfo& fileInfo : fileInfos)
-	{
-		MakeFileInfo(fileInfo, fields, humanReadableSize);
-	}
+    for (FileInfo& fileInfo : fileInfos)
+    {
+        MakeFileInfo(fileInfo, fields, humanReadableSize);
+    }
 }
 
 int NumberOfLines(int numberOfFileInfos, int numberOfColumns)
 {
-	if (numberOfFileInfos > 0)
-	{
-		return (numberOfFileInfos - 1) / numberOfColumns + 1;
-	}
-	else
-	{
-		return 0;
-	}
+    if (numberOfFileInfos > 0)
+    {
+        return (numberOfFileInfos - 1) / numberOfColumns + 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 int NumberOfFields(Fields fields)
 {
-	int nfields = 0;
-	if ((fields & Fields.fs) != Fields.none)
-	{
-		++nfields;
-	}
-	if ((fields & Fields.inode) != Fields.none)
-	{
-		++nfields;
-	}
-	if ((fields & Fields.access) != Fields.none)
-	{
-		++nfields;
-	}
-	if ((fields & Fields.nlinks) != Fields.none)
-	{
-		++nfields;
-	}
-	if ((fields & Fields.user) != Fields.none)
-	{
-		// todo
-	}
-	if ((fields & Fields.uid) != Fields.none)
-	{
-		// todo
-	}
-	if ((fields & Fields.group) != Fields.none)
-	{
-		// todo
-	}
-	if ((fields & Fields.gid) != Fields.none)
-	{
-		// todo
-	}
-	if ((fields & Fields.size) != Fields.none)
-	{
-		++nfields;
-	}
-	if ((fields & Fields.ctime) != Fields.none)
-	{
-		++nfields;
-	}
-	if ((fields & Fields.mtime) != Fields.none)
-	{
-		++nfields;
-	}
-	if ((fields & Fields.atime) != Fields.none)
-	{
-		++nfields;
-	}
-	if ((fields & Fields.name) != Fields.none)
-	{
-		++nfields;
-	}
-	return nfields;
+    int nfields = 0;
+    if ((fields & Fields.fs) != Fields.none)
+    {
+        ++nfields;
+    }
+    if ((fields & Fields.inode) != Fields.none)
+    {
+        ++nfields;
+    }
+    if ((fields & Fields.access) != Fields.none)
+    {
+        ++nfields;
+    }
+    if ((fields & Fields.nlinks) != Fields.none)
+    {
+        ++nfields;
+    }
+    if ((fields & Fields.user) != Fields.none)
+    {
+        // todo
+    }
+    if ((fields & Fields.uid) != Fields.none)
+    {
+        // todo
+    }
+    if ((fields & Fields.group) != Fields.none)
+    {
+        // todo
+    }
+    if ((fields & Fields.gid) != Fields.none)
+    {
+        // todo
+    }
+    if ((fields & Fields.size) != Fields.none)
+    {
+        ++nfields;
+    }
+    if ((fields & Fields.ctime) != Fields.none)
+    {
+        ++nfields;
+    }
+    if ((fields & Fields.mtime) != Fields.none)
+    {
+        ++nfields;
+    }
+    if ((fields & Fields.atime) != Fields.none)
+    {
+        ++nfields;
+    }
+    if ((fields & Fields.name) != Fields.none)
+    {
+        ++nfields;
+    }
+    return nfields;
 }
 
 int CalculateFieldWidth(const List<FileInfo>& fileInfos, int columnNr, int fieldNr, int numberOfLines)
 {
-	int fieldWidth = 0;
-	for (int i = 0; i < numberOfLines; ++i)
-	{
-		int fileInfoIndex = columnNr * numberOfLines + i;
-		if (fileInfoIndex < fileInfos.Count())
-		{
-			const FileInfo& fileInfo = fileInfos[fileInfoIndex];
-			int w = fileInfo.FieldWidth(fieldNr);
-			if (w > fieldWidth)
-			{
-				fieldWidth = w;
-			}
-		}
-	}
-	return fieldWidth;
+    int fieldWidth = 0;
+    for (int i = 0; i < numberOfLines; ++i)
+    {
+        int fileInfoIndex = columnNr * numberOfLines + i;
+        if (fileInfoIndex < fileInfos.Count())
+        {
+            const FileInfo& fileInfo = fileInfos[fileInfoIndex];
+            int w = fileInfo.FieldWidth(fieldNr);
+            if (w > fieldWidth)
+            {
+                fieldWidth = w;
+            }
+        }
+    }
+    return fieldWidth;
 }
 
 int CalculateColumnWidth(const List<FileInfo>& fileInfos, int columnNr, int numberOfLines, int numberOfFields)
 {
-	int columnWidth = 0;
-	for (int f = 0; f < numberOfFields; ++f)
-	{
-		if (f > 0)
-		{
-			++columnWidth;
-		}
-		int fieldWidth = CalculateFieldWidth(fileInfos, columnNr, f, numberOfLines);
-		columnWidth = columnWidth + fieldWidth;
-	}
-	return columnWidth;
+    int columnWidth = 0;
+    for (int f = 0; f < numberOfFields; ++f)
+    {
+        if (f > 0)
+        {
+            ++columnWidth;
+        }
+        int fieldWidth = CalculateFieldWidth(fileInfos, columnNr, f, numberOfLines);
+        columnWidth = columnWidth + fieldWidth;
+    }
+    return columnWidth;
 }
 
 int CalculateLineLength(const List<FileInfo>& fileInfos, int numberOfColumns, int numberOfFields, int screenWidth)
 {
-	int lineLength = 0;
-	int numberOfLines = NumberOfLines(cast<int>(fileInfos.Count()), numberOfColumns);
-	for (int c = 0; c < numberOfColumns; ++c)
-	{
-		if (c > 0)
-		{
-			++lineLength;
-			++lineLength;
-		}
-		int columnWidth = CalculateColumnWidth(fileInfos, c, numberOfLines, numberOfFields);
-		lineLength = lineLength + columnWidth;
-		if (lineLength >= screenWidth)
-		{
-			break;
-		}
-	}
-	return lineLength;
+    int lineLength = 0;
+    int numberOfLines = NumberOfLines(cast<int>(fileInfos.Count()), numberOfColumns);
+    for (int c = 0; c < numberOfColumns; ++c)
+    {
+        if (c > 0)
+        {
+            ++lineLength;
+            ++lineLength;
+        }
+        int columnWidth = CalculateColumnWidth(fileInfos, c, numberOfLines, numberOfFields);
+        lineLength = lineLength + columnWidth;
+        if (lineLength >= screenWidth)
+        {
+            break;
+        }
+    }
+    return lineLength;
 }
 
 string MakeLine(const List<FileInfo>& fileInfos, int lineNr, int numberOfLines, int numberOfColumns, int numberOfFields, bool hasColors, const Map<Pair<int, int>, int>& fieldWidths)
 {
-	string line;
-	for (int c = 0; c < numberOfColumns; ++c)
-	{
-		if (c > 0)
-		{
-			line.Append("  ");
-		}
-		int fileInfoIndex = c * numberOfLines + lineNr;
-		if (fileInfoIndex < fileInfos.Count())
-		{
-			const FileInfo& fileInfo = fileInfos[fileInfoIndex];
-			for (int f = 0; f < numberOfFields; ++f)
-			{
-				if (f > 0)
-				{
-					line.Append(' ');
-				}
-				const FieldValue& fieldValue = fileInfo.GetFieldValue(f);
-				FormatJustify justify = GetFieldJustification(fieldValue.field);
-				ustring text = Format(fieldValue.text, fieldWidths[MakePair(c, f)], justify);
-				if (fieldValue.field == Fields.name)
-				{
-					line.Append(GetColorString(fileInfo, hasColors)).Append(ToUtf8(text)).Append(ResetColorString(hasColors));
-				}
-				else
-				{
-					line.Append(ToUtf8(text));
-				}
-			}
-		}
-	}
-	return line;
+    string line;
+    for (int c = 0; c < numberOfColumns; ++c)
+    {
+        if (c > 0)
+        {
+            line.Append("  ");
+        }
+        int fileInfoIndex = c * numberOfLines + lineNr;
+        if (fileInfoIndex < fileInfos.Count())
+        {
+            const FileInfo& fileInfo = fileInfos[fileInfoIndex];
+            for (int f = 0; f < numberOfFields; ++f)
+            {
+                if (f > 0)
+                {
+                    line.Append(' ');
+                }
+                const FieldValue& fieldValue = fileInfo.GetFieldValue(f);
+                FormatJustify justify = GetFieldJustification(fieldValue.field);
+                ustring text = Format(fieldValue.text, fieldWidths[MakePair(c, f)], justify);
+                if (fieldValue.field == Fields.name)
+                {
+                    line.Append(GetColorString(fileInfo, hasColors)).Append(ToUtf8(text)).Append(ResetColorString(hasColors));
+                }
+                else
+                {
+                    line.Append(ToUtf8(text));
+                }
+            }
+        }
+    }
+    return line;
 }
 
 List<string> MakeLines(List<FileInfo>& fileInfos, SortField sortField, Fields fields, Flags flags, int screenWidth)
 {
-	MakeFileInfos(fileInfos, fields, (flags & Flags.humanReadableSize) != Flags.none);
-	Sort(fileInfos, sortField);
-	if ((flags & Flags.reverse) != Flags.none)
-	{
-		Reverse(fileInfos.Begin(), fileInfos.End());
-	}
-	int numberOfFields = NumberOfFields(fields);
-	int numberOfColumns = 1;
-	int lineLength = 0;
-	int ncols = numberOfColumns;
-	if (screenWidth > 0 && (flags & Flags.longFormat) == Flags.none)
-	{
-		while (ncols < screenWidth)
-		{
-			int len = CalculateLineLength(fileInfos, ncols, numberOfFields, screenWidth);
-			if (len >= screenWidth)
-			{	
-				break;
-			}
-			else
-			{
-				numberOfColumns = ncols;
-				lineLength = len;
-				++ncols;
-			}
-		}
-	}
-	int numberOfLines = NumberOfLines(cast<int>(fileInfos.Count()), numberOfColumns);
-	Map<Pair<int, int>, int> fieldWidths;
-	for (int c = 0; c < numberOfColumns; ++c)
-	{
-		for (int f = 0; f < numberOfFields; ++f)
-		{
-			int w = CalculateFieldWidth(fileInfos, c, f, numberOfLines);
-			fieldWidths[MakePair(c, f)] = w;
-		}
-	}
-	List<string> lines;
-	for (int i = 0; i < numberOfLines; ++i)
-	{
-		lines.Add(MakeLine(fileInfos, i, numberOfLines, numberOfColumns, numberOfFields, (flags & Flags.hasColors) != Flags.none, fieldWidths));
-	}
-	return lines;
+    MakeFileInfos(fileInfos, fields, (flags & Flags.humanReadableSize) != Flags.none);
+    Sort(fileInfos, sortField);
+    if ((flags & Flags.reverse) != Flags.none)
+    {
+        Reverse(fileInfos.Begin(), fileInfos.End());
+    }
+    int numberOfFields = NumberOfFields(fields);
+    int numberOfColumns = 1;
+    int lineLength = 0;
+    int ncols = numberOfColumns;
+    if (screenWidth > 0 && (flags & Flags.longFormat) == Flags.none)
+    {
+        while (ncols < screenWidth)
+        {
+            int len = CalculateLineLength(fileInfos, ncols, numberOfFields, screenWidth);
+            if (len >= screenWidth)
+            {    
+                break;
+            }
+            else
+            {
+                numberOfColumns = ncols;
+                lineLength = len;
+                ++ncols;
+            }
+        }
+    }
+    int numberOfLines = NumberOfLines(cast<int>(fileInfos.Count()), numberOfColumns);
+    Map<Pair<int, int>, int> fieldWidths;
+    for (int c = 0; c < numberOfColumns; ++c)
+    {
+        for (int f = 0; f < numberOfFields; ++f)
+        {
+            int w = CalculateFieldWidth(fileInfos, c, f, numberOfLines);
+            fieldWidths[MakePair(c, f)] = w;
+        }
+    }
+    List<string> lines;
+    for (int i = 0; i < numberOfLines; ++i)
+    {
+        lines.Add(MakeLine(fileInfos, i, numberOfLines, numberOfColumns, numberOfFields, (flags & Flags.hasColors) != Flags.none, fieldWidths));
+    }
+    return lines;
 }
 
 void PrintLines(const List<string>& lines)
 {
-	for (const string& line : lines)
-	{
-		Console.Out() << line << endl();
-	}
+    for (const string& line : lines)
+    {
+        Console.Out() << line << endl();
+    }
 }
 
 void ListFiles(const List<string>& files, SortField sortField, Fields additionalFields, Flags flags, int screenWidth)
 {
-	Fields fields;
-	if ((flags & Flags.longFormat) != Flags.none)
-	{
-		fields = LongFields();
-	}
-	else
-	{
-		fields = ShortFields();
-	}
-	fields = cast<Fields>(fields | additionalFields);
-	List<FileInfo> fileInfos;
-	DirectoryEntry dirEntry;
-	for (const string& file : files)
-	{
-		FileStatus fileStatus;
-		Stat(file.Chars(), fileStatus);
-		DirectoryEntry entry(fileStatus.inodeNumber, file);
-		if (fileStatus.fileType == FileType.regular)
-		{
-			fileInfos.Add(FileInfo(fileStatus, entry));
-		}
-		else if (fileStatus.fileType == FileType.directory)
-		{
-			List<FileInfo> dirFileInfos;
-			DirectoryReader reader(file);
-			while (reader.Read(dirEntry))
-			{
-				if (dirEntry.name.StartsWith("."))
-				{
-					if ((flags & Flags.all) == Flags.none)
-					{
-						continue;
-					}
-				}
-				string path = Path.Combine(file, dirEntry.name);
-				FileStatus status;
-				Stat(path.Chars(), status);
-				dirFileInfos.Add(FileInfo(status, dirEntry));
-			}
-			if (!dirFileInfos.IsEmpty())
-			{
-				List<string> lines = MakeLines(dirFileInfos, sortField, fields, flags, screenWidth);
-				PrintLines(lines);
-			}
-		}
-	}
-	if (!fileInfos.IsEmpty())
-	{
-		List<string> lines = MakeLines(fileInfos, sortField, fields, flags, screenWidth);
-		PrintLines(lines);
-	}
+    Fields fields;
+    if ((flags & Flags.longFormat) != Flags.none)
+    {
+        fields = LongFields();
+    }
+    else
+    {
+        fields = ShortFields();
+    }
+    fields = cast<Fields>(fields | additionalFields);
+    List<FileInfo> fileInfos;
+    DirectoryEntry dirEntry;
+    for (const string& file : files)
+    {
+        FileStatus fileStatus;
+        Stat(file.Chars(), fileStatus);
+        DirectoryEntry entry(fileStatus.inodeNumber, file);
+        if (fileStatus.fileType == FileType.regular)
+        {
+            fileInfos.Add(FileInfo(fileStatus, entry));
+        }
+        else if (fileStatus.fileType == FileType.directory)
+        {
+            List<FileInfo> dirFileInfos;
+            DirectoryReader reader(file);
+            while (reader.Read(dirEntry))
+            {
+                if (dirEntry.name.StartsWith("."))
+                {
+                    if ((flags & Flags.all) == Flags.none)
+                    {
+                        continue;
+                    }
+                }
+                string path = Path.Combine(file, dirEntry.name);
+                FileStatus status;
+                Stat(path.Chars(), status);
+                dirFileInfos.Add(FileInfo(status, dirEntry));
+            }
+            if (!dirFileInfos.IsEmpty())
+            {
+                List<string> lines = MakeLines(dirFileInfos, sortField, fields, flags, screenWidth);
+                PrintLines(lines);
+            }
+        }
+    }
+    if (!fileInfos.IsEmpty())
+    {
+        List<string> lines = MakeLines(fileInfos, sortField, fields, flags, screenWidth);
+        PrintLines(lines);
+    }
 }

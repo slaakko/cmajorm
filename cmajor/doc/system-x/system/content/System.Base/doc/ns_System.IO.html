@@ -148,6 +148,14 @@
     <td xml:space="preserve"><a href="../../System.Base/doc/ns_System.IO.html#function_CreateDirectories_D091315521DBCD7241313C800DF28A0F71F3F3C1">CreateDirectories</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;directoryPath, <span class="kw">int</span>&nbsp;mode)</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../System.Base/doc/ns_System.IO.html#function_CreateDirectory_53D8633A9E166D07C99A753EFBF54446F9BF68C3">CreateDirectory</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;directoryPath)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../System.Base/doc/ns_System.IO.html#function_CreateDirectory_DC3852A3DADBD0EB7A66A944D39AF79A5D002014">CreateDirectory</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;directoryPath, <span class="kw">int</span>&nbsp;mode)</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">bool</span></td>
     <td xml:space="preserve"><a href="../../System.Base/doc/ns_System.IO.html#function_DirectoryExists_7862E5E97A3F9810108DF0324084EB25D3A819C2">DirectoryExists</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;dirPath)</td>
    </tr>
@@ -194,6 +202,10 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>></td>
     <td xml:space="preserve"><a href="../../System.Base/doc/ns_System.IO.html#function_GetFullPath_EEDC0F2DAF1CAE05BDA99910401713E2A0C46CB4">GetFullPath</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;path)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve"><a href="../../System.Base/doc/ns_System.IO.html#function_IsDirectoryEmpty_4939F0A7FF8E5A1BF339A661D87600F6E0D2A006">IsDirectoryEmpty</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;dirPath)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>></td>
@@ -366,7 +378,7 @@
   <h3 id="function_BufferedCopy_300DBAB3423ADACDDF2ADA58675217D28289B606" xml:space="preserve">BufferedCopy&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;BufferedCopy(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;sourceFilePath, <span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;destFilePath, <span class="kw">long</span>&nbsp;size)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#324">324</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#328">328</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -380,21 +392,35 @@
   <h3 id="function_CreateDirectories_80F4FCD3BB7650129B5E5EF6061FBF4E630FF404" xml:space="preserve">CreateDirectories&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;CreateDirectories(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;directoryPath)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#52">52</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#74">74</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_CreateDirectories_D091315521DBCD7241313C800DF28A0F71F3F3C1" xml:space="preserve">CreateDirectories&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;CreateDirectories(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;directoryPath, <span class="kw">int</span>&nbsp;mode)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#57">57</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#79">79</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="function_CreateDirectory_53D8633A9E166D07C99A753EFBF54446F9BF68C3" xml:space="preserve">CreateDirectory&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;CreateDirectory(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;directoryPath)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#64">64</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="function_CreateDirectory_DC3852A3DADBD0EB7A66A944D39AF79A5D002014" xml:space="preserve">CreateDirectory&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;CreateDirectory(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;directoryPath, <span class="kw">int</span>&nbsp;mode)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#69">69</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_DirectoryExists_7862E5E97A3F9810108DF0324084EB25D3A819C2" xml:space="preserve">DirectoryExists&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">bool</span>&nbsp;DirectoryExists(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;dirPath)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#91">91</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#113">113</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -415,21 +441,21 @@
   <h3 id="function_GetDirectoryAccessTime_4D1888984B6DD5765D19104F749218B3A4248BA5" xml:space="preserve">GetDirectoryAccessTime&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html">DateTime</a>&nbsp;GetDirectoryAccessTime(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;dirPath)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#122">122</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#163">163</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_GetDirectoryModificationTime_66EABC48CEA38AB665818127867D5950D929188B" xml:space="preserve">GetDirectoryModificationTime&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html">DateTime</a>&nbsp;GetDirectoryModificationTime(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;dirPath)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#133">133</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#174">174</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_GetDirectoryTimes_07EC9589722ECC4EBE5A7FD2EA2A4FEFCC1D4423" xml:space="preserve">GetDirectoryTimes&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;GetDirectoryTimes(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;dirPath, <a href="../../System.Base/doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html">DateTime</a>&amp;&nbsp;accessTime, <a href="../../System.Base/doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html">DateTime</a>&amp;&nbsp;modificationTime)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#144">144</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#185">185</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -475,6 +501,13 @@
   <br/>
   <br/>
   <hr/>
+  <h3 id="function_IsDirectoryEmpty_4939F0A7FF8E5A1BF339A661D87600F6E0D2A006" xml:space="preserve">IsDirectoryEmpty&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">bool</span>&nbsp;IsDirectoryEmpty(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;dirPath)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#144">144</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
   <h3 id="function_OpenFlagStr_534CD8FF65F108DEA3CE4B0824A5755A6946BB22" xml:space="preserve">OpenFlagStr&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&nbsp;OpenFlagStr(<a href="../../System.Base/doc/enumerated_type_OpenFlags_9D05E67CB814B4A03C090249266BE907B55BCBE1.html">OpenFlags</a>&nbsp;flags)</h4>
   <h5>Definition</h5>
@@ -485,21 +518,21 @@
   <h3 id="function_RemoveDirectory_CC9C6243AE1462254A750AD6E8B7809E3FD08517" xml:space="preserve">RemoveDirectory&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;RemoveDirectory(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;dirPath)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#211">211</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#255">255</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_RemoveFile_7BF6AC59F924FE462AE619C3AF8ADB10F1C42342" xml:space="preserve">RemoveFile&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;RemoveFile(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;filePath)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#337">337</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#341">341</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_SetDirectoryTimes_EB0EF867C188E03FCEB26C2ABF7BF815054BB5D2" xml:space="preserve">SetDirectoryTimes&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;SetDirectoryTimes(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;dirPath, <span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html">DateTime</a>&amp;&nbsp;accessTime, <span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html">DateTime</a>&amp;&nbsp;modificationTime)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#156">156</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#197">197</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
   <br/>
   <br/>
   <hr/>

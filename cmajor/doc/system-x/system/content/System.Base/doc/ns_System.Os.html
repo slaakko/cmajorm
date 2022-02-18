@@ -37,6 +37,10 @@
     <td xml:space="preserve"><a href="../../System.Base/doc/ns_System.Os.html#function_Decompress_6E0DA9D26C584DFB2C4DC4DA204690F9D411E10A">Decompress</a>(<span class="kw">byte</span>*&nbsp;buffer, <span class="kw">long</span>&nbsp;count)</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../System.Base/doc/ns_System.Os.html#function_Exec_8FF0ABC2A565A3D465DCFBBA25A3A66FF5E46F1A">Exec</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;program, <span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a>&lt;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>>&amp;&nbsp;args)</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
     <td xml:space="preserve"><a href="../../System.Base/doc/ns_System.Os.html#function_Exit_A5181ED0DAE5F3185294F890CBC82B738D42368D">Exit</a>(<span class="kw">byte</span>&nbsp;exitCode)</td>
    </tr>
@@ -47,6 +51,10 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span></td>
     <td xml:space="preserve"><a href="../../System.Base/doc/ns_System.Os.html#function_GetCWD_B56C3284FC322D068FF52C0E239C65A26117001C">GetCWD</a>(<span class="kw">char</span>*&nbsp;pathBuf, <span class="kw">long</span>&nbsp;bufSize)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>></td>
+    <td xml:space="preserve"><a href="../../System.Base/doc/ns_System.Os.html#function_GetComputerName_8BBF39D3EE952578313EA418355070E07D2DD1FE">GetComputerName</a>()</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span></td>
@@ -65,8 +73,16 @@
     <td xml:space="preserve"><a href="../../System.Base/doc/ns_System.Os.html#function_GetResourceSize_DC2EB2CA537A7F3A6F9F4F3A4719627AA1FECD88">GetResourceSize</a>(<span class="kw">int</span>&nbsp;rd)</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>></td>
+    <td xml:space="preserve"><a href="../../System.Base/doc/ns_System.Os.html#function_GetUserName_AB5035E20DE8DFB14F18CDC3111F68A6D04C65A1">GetUserName</a>()</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">int</span></td>
     <td xml:space="preserve"><a href="../../System.Base/doc/ns_System.Os.html#function_IOCtl_0BA334C5C449D6E149A019F61E2B58B18280E161">IOCtl</a>(<span class="kw">int</span>&nbsp;fd, <a href="../../System.Base/doc/enumerated_type_IOControlItem_E6B4446ED212043875E89529FB9663CC63F814F8.html">IOControlItem</a>&nbsp;item)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../System.Base/doc/ns_System.Os.html#function_MkDir_ABC3AFCA2B37987A5FD36E6E2CD33F7D7B4315BB">MkDir</a>(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;path)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span></td>
@@ -125,49 +141,56 @@
   <h3 id="function_ChDir_BF08997984098D7CA7116658C3428EB6416752BD" xml:space="preserve">ChDir&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;ChDir(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;path)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#151">151</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#206">206</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_Close_B9DD6838859BB941A14A978329188C1089CC0B3E" xml:space="preserve">Close&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;Close(<span class="kw">int</span>&nbsp;fd)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#74">74</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#129">129</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_CloseDecompression_3CACCF12D7765BF46BF7820CA9990D93FA73E946" xml:space="preserve">CloseDecompression&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;CloseDecompression(<span class="kw">int</span>&nbsp;dd)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#274">274</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#334">334</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_CloseDir_A07BEEA270997A68F5705B603F149D2F8A699755" xml:space="preserve">CloseDir&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;CloseDir(<span class="kw">int</span>&nbsp;dfd)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#188">188</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#248">248</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_CloseResource_DCD5A079CDD1620213E4A67BE41E2D92C195A706" xml:space="preserve">CloseResource&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;CloseResource(<span class="kw">int</span>&nbsp;rd)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#217">217</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#277">277</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_Create_2B523BEBEB06B110A773014DD9BCF9FCA7D50047" xml:space="preserve">Create&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">int</span>&nbsp;Create(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;path, <span class="kw">int</span>&nbsp;mode)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#54">54</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#109">109</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_Decompress_6E0DA9D26C584DFB2C4DC4DA204690F9D411E10A" xml:space="preserve">Decompress&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">int</span>&nbsp;Decompress(<span class="kw">byte</span>*&nbsp;buffer, <span class="kw">long</span>&nbsp;count)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#245">245</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#305">305</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="function_Exec_8FF0ABC2A565A3D465DCFBBA25A3A66FF5E46F1A" xml:space="preserve">Exec&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;Exec(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;program, <span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a>&lt;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>>&amp;&nbsp;args)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#26">26</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -188,133 +211,154 @@
   <h3 id="function_GetCWD_B56C3284FC322D068FF52C0E239C65A26117001C" xml:space="preserve">GetCWD&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;GetCWD(<span class="kw">char</span>*&nbsp;pathBuf, <span class="kw">long</span>&nbsp;bufSize)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#142">142</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#197">197</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="function_GetComputerName_8BBF39D3EE952578313EA418355070E07D2DD1FE" xml:space="preserve">GetComputerName&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&nbsp;GetComputerName()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#343">343</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_GetDecompressedData_A8B215D97480A1E7C25E8A516F565F9B33486D26" xml:space="preserve">GetDecompressedData&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;GetDecompressedData(<span class="kw">int</span>&nbsp;dd, <span class="kw">byte</span>*&nbsp;buffer, <span class="kw">long</span>&nbsp;count)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#265">265</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#325">325</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_GetDecompressedDataSize_66720E4CBB1CA6F1A808DB102973FDED037BD9C1" xml:space="preserve">GetDecompressedDataSize&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">long</span>&nbsp;GetDecompressedDataSize(<span class="kw">int</span>&nbsp;dd)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#255">255</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#315">315</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_GetPid_8575998D70B69086A7F604D3A0A80C7ED7950529" xml:space="preserve">GetPid&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">int</span>&nbsp;GetPid()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#44">44</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#99">99</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_GetResourceSize_DC2EB2CA537A7F3A6F9F4F3A4719627AA1FECD88" xml:space="preserve">GetResourceSize&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">long</span>&nbsp;GetResourceSize(<span class="kw">int</span>&nbsp;rd)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#226">226</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#286">286</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="function_GetUserName_AB5035E20DE8DFB14F18CDC3111F68A6D04C65A1" xml:space="preserve">GetUserName&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&nbsp;GetUserName()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#354">354</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_IOCtl_0BA334C5C449D6E149A019F61E2B58B18280E161" xml:space="preserve">IOCtl&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">int</span>&nbsp;IOCtl(<span class="kw">int</span>&nbsp;fd, <a href="../../System.Base/doc/enumerated_type_IOControlItem_E6B4446ED212043875E89529FB9663CC63F814F8.html">IOControlItem</a>&nbsp;item)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#103">103</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#158">158</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="function_MkDir_ABC3AFCA2B37987A5FD36E6E2CD33F7D7B4315BB" xml:space="preserve">MkDir&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;MkDir(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;path)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#215">215</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_MkDir_A9CB74C127D55839732F585A8B4E54622336A140" xml:space="preserve">MkDir&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;MkDir(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;path, <span class="kw">int</span>&nbsp;mode)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#160">160</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#220">220</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_Open_784F49F6373924DC618AF854F2756039C0FCC2F5" xml:space="preserve">Open&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">int</span>&nbsp;Open(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;path, <a href="../../System.Base/doc/enumerated_type_OpenFlags_9D05E67CB814B4A03C090249266BE907B55BCBE1.html">OpenFlags</a>&nbsp;flags, <span class="kw">int</span>&nbsp;mode)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#64">64</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#119">119</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_OpenDir_7B0CB965F218F4EB4E815777FDE46EA250D36B6C" xml:space="preserve">OpenDir&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">int</span>&nbsp;OpenDir(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;dirPath)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#178">178</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#238">238</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_OpenResource_B65A2D6C761CBA40335BE4A0EC9547811D707209" xml:space="preserve">OpenResource&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">int</span>&nbsp;OpenResource(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;resource_name)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#207">207</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#267">267</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_Read_25A7DE408F93570C56F0715B971B8FCE4F508286" xml:space="preserve">Read&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">long</span>&nbsp;Read(<span class="kw">int</span>&nbsp;fd, <span class="kw">void</span>*&nbsp;buffer, <span class="kw">long</span>&nbsp;count)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#83">83</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#138">138</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_ReadDir_F97E10DE458B2A0FB02A1C072861E9DE6EDD2488" xml:space="preserve">ReadDir&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">int</span>&nbsp;ReadDir(<span class="kw">int</span>&nbsp;dfd, <span class="kw">byte</span>*&nbsp;dirEntryBuf, <span class="kw">long</span>&nbsp;dirEntryBufSize)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#197">197</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#257">257</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_ReadResource_1986C97BF1788159798F762EC8EF2A1F9EA0EC10" xml:space="preserve">ReadResource&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;ReadResource(<span class="kw">int</span>&nbsp;rd, <span class="kw">long</span>&nbsp;offset, <span class="kw">long</span>&nbsp;size, <span class="kw">byte</span>*&nbsp;buffer)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#236">236</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#296">296</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_Seek_41383BD6576CAE475B9BA35F9DD1E2576C97225C" xml:space="preserve">Seek&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">long</span>&nbsp;Seek(<span class="kw">int</span>&nbsp;fd, <span class="kw">long</span>&nbsp;pos, <a href="../../System.Base/doc/enumerated_type_Origin_591F1BAE6B47F96A0C7B90DDE546DA143B032841.html">Origin</a>&nbsp;origin)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#113">113</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#168">168</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_Tell_BDC3C698D360401EA3FCEDF14E8A5B416FB73A1E" xml:space="preserve">Tell&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">long</span>&nbsp;Tell(<span class="kw">int</span>&nbsp;fd)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#123">123</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#178">178</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_UTime_7BFBC8FEAEB0E6D90EDBC0A4FC5D5C9995F23E6F" xml:space="preserve">UTime&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;UTime(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;path, <span class="kw">byte</span>*&nbsp;timeBuf, <span class="kw">long</span>&nbsp;timeBufSize)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#169">169</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#229">229</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_Unlink_C35BFD2D6FA0976689D0A603C9268C687818DF8C" xml:space="preserve">Unlink&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;Unlink(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;path)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#133">133</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#188">188</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_Wait_F837B782ADEC0BCE2B7BB46CAEB1F4E7D7F0D828" xml:space="preserve">Wait&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">int</span>&nbsp;Wait(<span class="kw">byte</span>*&nbsp;exitCode)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#26">26</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#81">81</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_Write_8DD23C26A2DD9A8FE8F199851B9C5C4C1EB74203" xml:space="preserve">Write&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">long</span>&nbsp;Write(<span class="kw">int</span>&nbsp;fd, <span class="kw">void</span>*&nbsp;buffer, <span class="kw">long</span>&nbsp;count)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#93">93</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html#148">148</a>&nbsp;of&nbsp;<a href="../../System.Base/file/CheckedSystemCall.cm.html">System.Base/CheckedSystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>

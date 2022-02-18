@@ -339,26 +339,26 @@ namespace System.Os
             ThrowSystemError();
         }
     }
-	
-	public string GetComputerName()
-	{
-		char[256] buffer;
-		int result = get_computer_name(&buffer[0], 256);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-		return string(&buffer[0]);
-	}
-	
-	public string GetUserName()
-	{
-		char[256] buffer;
-		int result = get_user_name(&buffer[0], 256);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-		return string(&buffer[0]);
-	}	
+    
+    public string GetComputerName()
+    {
+        char[256] buffer;
+        int result = get_computer_name(&buffer[0], 256);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return string(&buffer[0]);
+    }
+    
+    public string GetUserName()
+    {
+        char[256] buffer;
+        int result = get_user_name(&buffer[0], 256);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return string(&buffer[0]);
+    }    
 }

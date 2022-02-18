@@ -71,17 +71,17 @@ int main(int argc, const char** argv)
             }
             else
             {
-				if (directory.IsEmpty())
-				{
-					directory = arg;
-				}
-				else
-				{
-					throw Exception("directory argument already specified");
-				}
+                if (directory.IsEmpty())
+                {
+                    directory = arg;
+                }
+                else
+                {
+                    throw Exception("directory argument already specified");
+                }
             }
         }
-		RemoveDirectory(directory, verbose);
+        RemoveDirectory(directory, verbose);
     }
     catch (const Exception& ex)
     {

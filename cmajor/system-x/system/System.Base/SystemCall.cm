@@ -210,8 +210,8 @@ public enum IOControlItem : int
     isConsole = 0,
     isHostTextFile = 1,
     hasColors = 2,
-	columns = 3,
-	rows = 4
+    columns = 3,
+    rows = 4
 }
 
 public cdecl nothrow int ioctl(int fd, IOControlItem item)
@@ -326,10 +326,10 @@ public cdecl nothrow int close_decompression(int dd)
 
 public cdecl nothrow int get_computer_name(char* buffer, long bufSize)
 {
-	return cast<int>(trap(0u, trap_get_computer_name, 0u, buffer, bufSize));
+    return cast<int>(trap(0u, trap_get_computer_name, 0u, buffer, bufSize));
 }
 
 public cdecl nothrow int get_user_name(char* buffer, long bufSize)
 {
-	return cast<int>(trap(0u, trap_get_user_name, 0u, buffer, bufSize));
+    return cast<int>(trap(0u, trap_get_user_name, 0u, buffer, bufSize));
 }

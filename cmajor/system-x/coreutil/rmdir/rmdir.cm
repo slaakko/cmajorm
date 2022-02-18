@@ -8,16 +8,16 @@ using System.IO;
 
 void RemoveDirectory(const string& dirPath, bool verbose)
 {
-	if (IsDirectoryEmpty(dirPath))
-	{
-		System.IO.RemoveDirectory(dirPath);
-		if (verbose)
-		{
-			Console.Out() << "directory '" << dirPath << "' removed" << endl();
-		}
-	}
-	else
-	{
-		throw FileSystemException("directory '" + dirPath + "' is not empty");
-	}
+    if (IsDirectoryEmpty(dirPath))
+    {
+        System.IO.RemoveDirectory(dirPath);
+        if (verbose)
+        {
+            Console.Out() << "directory '" << dirPath << "' removed" << endl();
+        }
+    }
+    else
+    {
+        throw FileSystemException("directory '" + dirPath + "' is not empty");
+    }
 }

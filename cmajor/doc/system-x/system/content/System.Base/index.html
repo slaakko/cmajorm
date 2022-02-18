@@ -330,6 +330,10 @@
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Base/doc/../index.html#get_computer_name">get_computer_name</a>(<span class="kw">char</span>*&nbsp;buffer, <span class="kw">long</span>&nbsp;bufSize)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
     <td xml:space="preserve"><a href="doc/../../System.Base/doc/../index.html#get_decompressed_data">get_decompressed_data</a>(<span class="kw">int</span>&nbsp;dd, <span class="kw">byte</span>*&nbsp;buffer, <span class="kw">long</span>&nbsp;count)</td>
    </tr>
    <tr>
@@ -343,6 +347,10 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
     <td xml:space="preserve"><a href="doc/../../System.Base/doc/../index.html#get_system_error">get_system_error</a>(<span class="kw">int</span>*&nbsp;errorCode, <span class="kw">void</span>*&nbsp;buffer, <span class="kw">long</span>&nbsp;bufferSize)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Base/doc/../index.html#get_user_name">get_user_name</a>(<span class="kw">char</span>*&nbsp;buffer, <span class="kw">long</span>&nbsp;bufSize)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
@@ -540,6 +548,10 @@
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">byte</span></td>
+    <td xml:space="preserve">trap_get_computer_name = 48u</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">byte</span></td>
     <td xml:space="preserve">trap_get_decompressed_data = 46u</td>
    </tr>
    <tr>
@@ -553,6 +565,10 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">byte</span></td>
     <td xml:space="preserve">trap_get_system_error = 17u</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">byte</span></td>
+    <td xml:space="preserve">trap_get_user_name = 49u</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">byte</span></td>
@@ -671,7 +687,7 @@
   <h3 id="allocate_memory_pages" xml:space="preserve">allocate_memory_pages&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">long</span>&nbsp;allocate_memory_pages(<span class="kw">int</span>&nbsp;numPages)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#76">76</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#78">78</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -685,259 +701,273 @@
   <h3 id="chdir" xml:space="preserve">chdir&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;chdir(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;path)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#248">248</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#252">252</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="close" xml:space="preserve">close&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;close(<span class="kw">int</span>&nbsp;fd)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#191">191</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#193">193</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="close_decompression" xml:space="preserve">close_decompression&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;close_decompression(<span class="kw">int</span>&nbsp;dd)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#318">318</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#322">322</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="close_resource" xml:space="preserve">close_resource&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;close_resource(<span class="kw">int</span>&nbsp;rd)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#288">288</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#292">292</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="closedir" xml:space="preserve">closedir&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;closedir(<span class="kw">int</span>&nbsp;dd)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#273">273</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#277">277</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="create" xml:space="preserve">create&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;create(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;path, <span class="kw">int</span>&nbsp;mode)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#169">169</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#171">171</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="current_date" xml:space="preserve">current_date&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;current_date(<span class="kw">short</span>*&nbsp;y, <span class="kw">sbyte</span>*&nbsp;m, <span class="kw">sbyte</span>*&nbsp;d)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#101">101</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#103">103</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="current_date_time" xml:space="preserve">current_date_time&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;current_date_time(<span class="kw">short</span>*&nbsp;y, <span class="kw">sbyte</span>*&nbsp;m, <span class="kw">sbyte</span>*&nbsp;d, <span class="kw">int</span>*&nbsp;secs)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#106">106</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#108">108</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="current_time_point" xml:space="preserve">current_time_point&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">long</span>&nbsp;current_time_point()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#91">91</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#93">93</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="decompress" xml:space="preserve">decompress&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;decompress(<span class="kw">byte</span>*&nbsp;buffer, <span class="kw">long</span>&nbsp;count)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#303">303</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#307">307</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="do_catch" xml:space="preserve">do_catch&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>*&nbsp;do_catch()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#129">129</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#131">131</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="do_throw" xml:space="preserve">do_throw&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;do_throw(<span class="kw">void</span>*&nbsp;exception, <span class="kw">ulong</span>&nbsp;exceptionClassId)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#124">124</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#126">126</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="dump_heap" xml:space="preserve">dump_heap&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;dump_heap(<span class="kw">ulong</span>&nbsp;free, <span class="kw">int</span>&nbsp;tag, <span class="kw">ulong</span>&nbsp;ptr, <span class="kw">ulong</span>&nbsp;size)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#81">81</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#83">83</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="exec" xml:space="preserve">exec&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;exec(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;file, <span class="kw">const</span>&nbsp;<span class="kw">char</span>**&nbsp;argv, <span class="kw">const</span>&nbsp;<span class="kw">char</span>**&nbsp;envp)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#154">154</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#156">156</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="exit" xml:space="preserve">exit&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;exit(<span class="kw">byte</span>&nbsp;exitCode)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#55">55</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#57">57</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="fork" xml:space="preserve">fork&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;fork()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#149">149</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#151">151</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="get_computer_name" xml:space="preserve">get_computer_name&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;get_computer_name(<span class="kw">char</span>*&nbsp;buffer, <span class="kw">long</span>&nbsp;bufSize)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#327">327</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="get_decompressed_data" xml:space="preserve">get_decompressed_data&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;get_decompressed_data(<span class="kw">int</span>&nbsp;dd, <span class="kw">byte</span>*&nbsp;buffer, <span class="kw">long</span>&nbsp;count)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#313">313</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#317">317</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="get_decompressed_data_size" xml:space="preserve">get_decompressed_data_size&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">long</span>&nbsp;get_decompressed_data_size(<span class="kw">int</span>&nbsp;dd)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#308">308</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#312">312</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="get_resource_size" xml:space="preserve">get_resource_size&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">long</span>&nbsp;get_resource_size(<span class="kw">int</span>&nbsp;rd)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#293">293</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#297">297</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="get_system_error" xml:space="preserve">get_system_error&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;get_system_error(<span class="kw">int</span>*&nbsp;errorCode, <span class="kw">void</span>*&nbsp;buffer, <span class="kw">long</span>&nbsp;bufferSize)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#144">144</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#146">146</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="get_user_name" xml:space="preserve">get_user_name&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;get_user_name(<span class="kw">char</span>*&nbsp;buffer, <span class="kw">long</span>&nbsp;bufSize)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#332">332</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="getcwd" xml:space="preserve">getcwd&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;getcwd(<span class="kw">char</span>*&nbsp;pathBuf, <span class="kw">long</span>&nbsp;bufSize)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#243">243</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#247">247</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="getpid" xml:space="preserve">getpid&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;getpid()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#164">164</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#166">166</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="heap_length" xml:space="preserve">heap_length&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">long</span>&nbsp;heap_length()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#71">71</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#73">73</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="heap_start" xml:space="preserve">heap_start&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">long</span>&nbsp;heap_start()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#66">66</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#68">68</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="ioctl" xml:space="preserve">ioctl&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;ioctl(<span class="kw">int</span>&nbsp;fd, <a href="doc/../../System.Base/doc/enumerated_type_IOControlItem_E6B4446ED212043875E89529FB9663CC63F814F8.html">IOControlItem</a>&nbsp;item)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#213">213</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#217">217</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="mcpy" xml:space="preserve">mcpy&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;mcpy(<span class="kw">byte</span>*&nbsp;sourceBuffer, <span class="kw">byte</span>*&nbsp;destBuffer, <span class="kw">long</span>&nbsp;count)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#263">263</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#267">267</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="memory_page_size" xml:space="preserve">memory_page_size&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">long</span>&nbsp;memory_page_size()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#61">61</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#63">63</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="mkdir" xml:space="preserve">mkdir&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;mkdir(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;path, <span class="kw">int</span>&nbsp;mode)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#253">253</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#257">257</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="open" xml:space="preserve">open&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;open(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;path, <a href="doc/../../System.Base/doc/enumerated_type_OpenFlags_9D05E67CB814B4A03C090249266BE907B55BCBE1.html">OpenFlags</a>&nbsp;flags, <span class="kw">int</span>&nbsp;mode)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#186">186</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#188">188</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="open_resource" xml:space="preserve">open_resource&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;open_resource(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;resource_name)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#283">283</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#287">287</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="opendir" xml:space="preserve">opendir&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;opendir(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;path)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#268">268</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#272">272</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="pow" xml:space="preserve">pow&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">double</span>&nbsp;pow(<span class="kw">double</span>&nbsp;x, <span class="kw">double</span>&nbsp;y)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#116">116</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#118">118</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="random_seed" xml:space="preserve">random_seed&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">uint</span>&nbsp;random_seed()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#86">86</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#88">88</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="read" xml:space="preserve">read&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">long</span>&nbsp;read(<span class="kw">int</span>&nbsp;fd, <span class="kw">void</span>*&nbsp;buffer, <span class="kw">long</span>&nbsp;count)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#196">196</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#198">198</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="read_resource" xml:space="preserve">read_resource&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;read_resource(<span class="kw">int</span>&nbsp;rd, <span class="kw">long</span>&nbsp;offset, <span class="kw">long</span>&nbsp;length, <span class="kw">byte</span>*&nbsp;buffer)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#298">298</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#302">302</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="readdir" xml:space="preserve">readdir&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;readdir(<span class="kw">int</span>&nbsp;dd, <span class="kw">byte</span>*&nbsp;dirEntryBuf, <span class="kw">long</span>&nbsp;dirEntryBufSize)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#278">278</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#282">282</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="resume" xml:space="preserve">resume&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;resume()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#134">134</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#136">136</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -951,70 +981,70 @@
   <h3 id="seek" xml:space="preserve">seek&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">long</span>&nbsp;seek(<span class="kw">int</span>&nbsp;fd, <span class="kw">long</span>&nbsp;offset, <a href="doc/../../System.Base/doc/enumerated_type_Origin_591F1BAE6B47F96A0C7B90DDE546DA143B032841.html">Origin</a>&nbsp;whence)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#228">228</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#232">232</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="sleep" xml:space="preserve">sleep&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;sleep(<span class="kw">long</span>&nbsp;duration)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#96">96</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#98">98</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="stack_trace" xml:space="preserve">stack_trace&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;stack_trace(<span class="kw">void</span>*&nbsp;buffer, <span class="kw">long</span>&nbsp;bufferSize)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#139">139</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#141">141</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="stat" xml:space="preserve">stat&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;stat(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;path, <span class="kw">byte</span>*&nbsp;statBuf, <span class="kw">int</span>&nbsp;statBufSize)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#238">238</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#242">242</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="tell" xml:space="preserve">tell&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">long</span>&nbsp;tell(<span class="kw">int</span>&nbsp;fd)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#233">233</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#237">237</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="times" xml:space="preserve">times&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;times(<span class="kw">long</span>*&nbsp;userTime, <span class="kw">long</span>*&nbsp;sleepTime, <span class="kw">long</span>*&nbsp;systemTime)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#111">111</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#113">113</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="unlink" xml:space="preserve">unlink&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;unlink(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;path)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#218">218</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#222">222</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="utime" xml:space="preserve">utime&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;utime(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;path, <span class="kw">byte</span>*&nbsp;timeBuf, <span class="kw">long</span>&nbsp;timeBufSize)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#258">258</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#262">262</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="wait" xml:space="preserve">wait&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;wait(<span class="kw">byte</span>*&nbsp;exitCode)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#159">159</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#161">161</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="write" xml:space="preserve">write&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">long</span>&nbsp;write(<span class="kw">int</span>&nbsp;fd, <span class="kw">void</span>*&nbsp;buffer, <span class="kw">long</span>&nbsp;count)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#201">201</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html#203">203</a>&nbsp;of&nbsp;<a href="doc/../../System.Base/file/SystemCall.cm.html">System.Base/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
