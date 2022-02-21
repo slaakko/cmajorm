@@ -144,6 +144,11 @@ int32_t Open(Process* process, int64_t pathAddr, int32_t flags, int32_t mode)
     }
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::string path = ReadString(process, pathAddr, mem);
+    return Open(process, path, flags, mode);
+}
+
+int32_t Open(Process* process, const std::string& path, int32_t flags, int32_t mode)
+{
     Filesystem* fs = GetFs(rootFSNumber);
     File* file = fs->Open(path, nullptr, flags, mode, process);
     ProcessFileTable& fileTable = process->GetFileTable();

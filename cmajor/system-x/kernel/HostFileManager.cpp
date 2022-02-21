@@ -6,6 +6,7 @@
 #include <system-x/kernel/HostFileManager.hpp>
 #include <system-x/kernel/IoManager.hpp>
 #include <system-x/kernel/OsFileApi.hpp>
+#include <system-x/kernel/DebugHelp.hpp>
 #include <map>
 #include <set>
 #include <memory>
@@ -63,7 +64,13 @@ HostFileManager::HostFileManager() : nextHostFileId(0), machine(nullptr)
 
 int32_t HostFileManager::OpenHostFile(const std::string& filePath, OpenFlags flags)
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), HOST_FILE_MANAGER, 0, NO_LOCK | OPEN_FILE);
+#endif 
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), HOST_FILE_MANAGER, 0, HAS_LOCK | OPEN_FILE);
+#endif 
     auto it = hostFilePathMap.find(filePath);
     if (it != hostFilePathMap.cend())
     {
@@ -89,7 +96,13 @@ int32_t HostFileManager::OpenHostFile(const std::string& filePath, OpenFlags fla
 
 void HostFileManager::CloseHostFile(int32_t hostFileId)
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), HOST_FILE_MANAGER, 0, NO_LOCK | CLOSE_FILE);
+#endif 
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), HOST_FILE_MANAGER, 0, HAS_LOCK | CLOSE_FILE);
+#endif 
     HostFile* hostFile = GetHostFile(hostFileId);
     if (hostFile)
     {
@@ -118,7 +131,13 @@ void HostFileManager::CloseHostFile(int32_t hostFileId)
 
 HostFile* HostFileManager::GetHostFile(int32_t hostFileId) const
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), HOST_FILE_MANAGER, 0, NO_LOCK | GET_HOST_FILE);
+#endif 
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), HOST_FILE_MANAGER, 0, HAS_LOCK | GET_HOST_FILE);
+#endif 
     auto it = hostFileMap.find(hostFileId);
     if (it != hostFileMap.cend())
     {

@@ -12,6 +12,7 @@
 #include <system-x/kernel/Fs.hpp>
 #include <system-x/kernel/IO.hpp>
 #include <system-x/kernel/Load.hpp>
+#include <system-x/kernel/DebugHelp.hpp>
 #include <system-x/machine/Config.hpp>
 #include <system-x/machine/Machine.hpp>
 #include <system-x/machine/Memory.hpp>
@@ -40,6 +41,9 @@ void Process::SetState(cmsx::machine::ProcessState state_)
 void Process::SetFilePath(const std::string& filePath_)
 {
     filePath = filePath_;
+#if (LOCK_DEBUG)
+    DebugLock create(nullptr, PROCESS_MANAGER, Id(), SET_FILE_PATH_PROCESS, filePath);
+#endif
 }
 
 void Process::SetHeapLength(int64_t heapLength_) 
@@ -129,6 +133,14 @@ void Process::SetError(const SystemError& error_)
 
 void Process::Exit(uint8_t exitCode_)
 {
+    cmsx::machine::Machine* machine = ProcessManager::Instance().GetMachine();
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), PROCESS_MANAGER, Id(), NO_LOCK | EXIT);
+#endif 
+    std::unique_lock<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), PROCESS_MANAGER, Id(), HAS_LOCK | EXIT);
+#endif 
     SetExitCode(exitCode_);
     SetState(cmsx::machine::ProcessState::zombie);
     if (debugger)
@@ -323,7 +335,13 @@ int32_t Fork(Process* parent)
 {
     cmsx::machine::Machine* machine = ProcessManager::Instance().GetMachine();
     cmsx::machine::Processor* processor = parent->GetProcessor();
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), PROCESS_MANAGER, parent->Id(), NO_LOCK | FORK);
+#endif 
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), PROCESS_MANAGER, parent->Id(), HAS_LOCK | FORK);
+#endif 
     Process* child = ProcessManager::Instance().CreateProcess();
     child->SetProcessor(processor);
     uint64_t rv = machine->Mem().AllocateTranslationMap();
@@ -350,7 +368,13 @@ int32_t Fork(Process* parent)
 int32_t Wait(Process* parent, int64_t childExitCodeAddress)
 {
     cmsx::machine::Machine* machine = ProcessManager::Instance().GetMachine();
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), PROCESS_MANAGER, parent->Id(), NO_LOCK | WAIT);
+#endif 
     std::unique_lock<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), PROCESS_MANAGER, parent->Id(), HAS_LOCK | WAIT);
+#endif 
     Process* child = parent->FirstChild();
     while (child)
     {
@@ -367,6 +391,7 @@ int32_t Wait(Process* parent, int64_t childExitCodeAddress)
     if (child)
     {
         Sleep(cmsx::machine::Event(cmsx::machine::EventKind::childExitEvent, parent->Id()), parent, lock);
+        lock.lock();
     }
     child = parent->FirstChild();
     while (child)
@@ -388,6 +413,7 @@ void Exec(Process* process, int64_t filePathAddress, int64_t argvAddress, int64_
     cmsx::machine::Machine* machine = process->GetProcessor()->GetMachine();
     cmsx::machine::Memory& mem = machine->Mem();
     std::string filePath = ReadString(process, filePathAddress, mem);
+    process->SetFilePath(filePath);
     std::vector<uint8_t> content = ReadFile(process, filePathAddress);
     std::vector<std::string> args = ReadStringPointerArray(process, argvAddress, mem);
     std::vector<std::string> env = ReadStringPointerArray(process, envpAddress, mem);

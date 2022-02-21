@@ -32,7 +32,7 @@ DecompressionFile::DecompressionFile(Process* process, uint64_t sourceBufferAddr
     }
 }
 
-void DecompressionFile::Close(cmsx::machine::Process* process)
+void DecompressionFile::Close(cmsx::kernel::Process* process)
 {
     compressedData.clear();
 }

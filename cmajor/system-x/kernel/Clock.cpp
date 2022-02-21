@@ -78,6 +78,7 @@ void Clock::Schedule(Alarm& alarm)
     alarms.push_back(alarm);
     std::sort(alarms.begin(), alarms.end(), AlarmEarlier());
     Sleep(cmsx::machine::Event(cmsx::machine::EventKind::alarmEvent, alarm.id), alarm.process, lock);
+    lock.lock();
 }
 
 void InitClock()

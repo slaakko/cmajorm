@@ -14,37 +14,13 @@ namespace cmsx::kernel {
 
 using namespace soulng::util;
 
-Resource::Resource(soulng::util::MappedInputFile* file_, int64_t start_, int64_t length_) : File(file_->FileName()), file(file_), start(start_), length(length_)
+Resource::Resource(int32_t fd_, int64_t start_, int64_t length_) : File("RESOURCE"), fd(fd_), start(start_), length(length_)
 {
 }
 
-void Resource::Close(cmsx::machine::Process* process)
+void Resource::Close(cmsx::kernel::Process* process)
 {
-    file.reset();
-}
-
-uint8_t Resource::operator[](int64_t offset) const
-{
-    if (offset >= 0 && offset < length)
-    {
-        return static_cast<uint8_t>(*(file->Begin() + start + offset));
-    }
-    else
-    {
-        throw SystemError(EMEMORYACCESS, "invalid resource offset " + std::to_string(offset) + ", should be between 0 and " + std::to_string(length));
-    }
-}
-
-const uint8_t* Resource::Address(int64_t offset) const
-{
-    if (offset >= 0 && offset < length)
-    {
-        return static_cast<const uint8_t*>(static_cast<const void*>(file->Begin() + start + offset));
-    }
-    else
-    {
-        throw SystemError(EMEMORYACCESS, "invalid resource offset " + std::to_string(offset) + ", should be between 0 and " + std::to_string(length));
-    }
+    cmsx::kernel::Close(process, fd);
 }
 
 int32_t OpenResource(Process* process, uint64_t resourceNameAddr)
@@ -61,9 +37,9 @@ int32_t OpenResource(Process* process, uint64_t resourceNameAddr)
     {
         int64_t start = symbol->Start();
         int64_t length = symbol->Length();
-        std::unique_ptr<MappedInputFile> file(new MappedInputFile(process->FilePath()));
-        std::unique_ptr<Resource> resource(new Resource(file.release(), start, length));
+        std::unique_ptr<Resource> resource(new Resource(cmsx::kernel::Open(process, process->FilePath(), static_cast<int32_t>(OpenFlags::read), 0), start, length));
         ProcessFileTable& fileTable = process->GetFileTable();
+        cmsx::kernel::Seek(process, resource->Fd(), resource->Start(), static_cast<int32_t>(Origin::seekSet));
         return fileTable.AddFile(resource.release());
     }
     else
@@ -109,7 +85,19 @@ void ReadResource(Process* process, int32_t rd, int64_t offset, int64_t length, 
         throw SystemError(EBADF, std::to_string(rd) + " is not a resource descriptor");
     }
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
-    mem.NCopy(resource->Address(offset), process->RV(), bufferAddr, length);
+    if (offset != 0)
+    {
+        cmsx::kernel::Seek(process, resource->Fd(), resource->Start() + offset, static_cast<int32_t>(Origin::seekSet));
+    }
+    int64_t bytesRead = cmsx::kernel::Read(process, resource->Fd(), bufferAddr, length);
+    length -= bytesRead;
+    bufferAddr += bytesRead;
+    while (length > 0)
+    {
+        bytesRead = cmsx::kernel::Read(process, resource->Fd(), bufferAddr, length);
+        length -= bytesRead;
+        bufferAddr += bytesRead;
+    }
 }
 
 } // namespace cmsx::kernel

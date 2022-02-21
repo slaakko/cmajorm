@@ -30,14 +30,20 @@ public:
     Filesystem* GetMountedFilesystem(INodeKey mountPoint) const;
     int32_t NextFileSystemId() { return nextFileSystemId++; }
     void ClearProcessData(cmsx::machine::Process* process);
+    void MapDrive(const std::string& drive, const std::string& mountedPath);
+    std::string GetMappedDrivePrefix(std::string& driveStr) const;
+    std::string MapPath(const std::string& windowsFilePath) const;
 private:
     int32_t nextFileSystemId;
     cmsx::machine::Machine* machine;
     std::vector<std::unique_ptr<Filesystem>> filesystems;
     std::map<int32_t, Filesystem*> filesystemMap;
+    std::map<std::string, std::string> driveMap;
 };
 
 void Mount(const std::string& hostPath, const std::string& dirPath, cmsx::machine::Process* process);
+void MapDrive(const std::string& drive, const std::string& mountedPath);
+std::string MapPath(const std::string& windowsFilePath);
 
 } // namespace cmsx::kernel
 

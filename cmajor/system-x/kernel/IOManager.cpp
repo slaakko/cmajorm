@@ -8,6 +8,7 @@
 #include <system-x/kernel/OsFileApi.hpp>
 #include <system-x/kernel/EventManager.hpp>
 #include <system-x/kernel/BlockManager.hpp>
+#include <system-x/kernel/DebugHelp.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <map>
 #include <memory>
@@ -103,12 +104,18 @@ void IOManager::RunRequestHandler()
     {
         while (!exiting)
         {
+#if (LOCK_DEBUG)
+            DebugLock startDebugLock(&machine->Lock(), IO_MANAGER, 0, NO_LOCK | HANDLE_REQUEST);
+#endif 
             std::unique_lock<std::recursive_mutex> lock(machine->Lock());
             requestQueueNotEmptyOrExitingVar.wait(lock, [this]{ return !requestQueue.empty() || exiting; });
             if (exiting)
             {
                 return;
             }
+#if (LOCK_DEBUG)
+            DebugLock hasDebugLock(&machine->Lock(), IO_MANAGER, 0, HAS_LOCK | HANDLE_REQUEST);
+#endif 
             int32_t requestId = requestQueue.front();
             requestQueue.pop_front();
             IORequest* request = GetRequest(requestId);
@@ -179,7 +186,13 @@ void IOManager::RunCompletionHandler()
             {
                 break;
             }
+#if (LOCK_DEBUG)
+            DebugLock startDebugLock(&machine->Lock(), IO_MANAGER, 0, NO_LOCK | HANDLE_COMPLETION);
+#endif 
             std::unique_lock<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+            DebugLock hasDebugLock(&machine->Lock(), IO_MANAGER, 0, HAS_LOCK | HANDLE_COMPLETION);
+#endif 
             int32_t hostFileId = static_cast<int32_t>(completionKey);
             HostFile* hostFile = GetHostFile(hostFileId);
             if (hostFile)
@@ -264,7 +277,13 @@ void IOManager::Exit()
 
 int32_t IOManager::Read(int32_t hostFileId, Block* block)
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), IO_MANAGER, 0, NO_LOCK | READ);
+#endif 
     std::unique_lock<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), IO_MANAGER, 0, HAS_LOCK | READ);
+#endif 
     IORequest* request = new IORequest(RequestKind::read, nextRequestId++, hostFileId, block);
     requestMap[request->Id()] = request;
     requestQueue.push_back(request->Id());
@@ -274,7 +293,13 @@ int32_t IOManager::Read(int32_t hostFileId, Block* block)
 
 int32_t IOManager::Write(int32_t hostFileId, Block* block)
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), IO_MANAGER, 0, NO_LOCK | WRITE);
+#endif 
     std::unique_lock<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), IO_MANAGER, 0, HAS_LOCK | WRITE);
+#endif 
     IORequest* request = new IORequest(RequestKind::write, nextRequestId++, hostFileId, block);
     requestMap[request->Id()] = request;
     requestQueue.push_back(request->Id());
@@ -284,7 +309,13 @@ int32_t IOManager::Write(int32_t hostFileId, Block* block)
 
 IORequest* IOManager::GetRequest(int32_t requestId) 
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), IO_MANAGER, 0, NO_LOCK | GET_REQUEST);
+#endif 
     std::unique_lock<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), IO_MANAGER, 0, HAS_LOCK | GET_REQUEST);
+#endif 
     auto it = requestMap.find(requestId);
     if (it != requestMap.cend())
     {
@@ -298,7 +329,13 @@ IORequest* IOManager::GetRequest(int32_t requestId)
 
 void IOManager::DeleteRequest(int32_t requestId)
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), IO_MANAGER, 0, NO_LOCK | DELETE_REQUEST);
+#endif 
     std::unique_lock<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), IO_MANAGER, 0, HAS_LOCK | DELETE_REQUEST);
+#endif 
     IORequest* request = GetRequest(requestId);
     if (request)
     {

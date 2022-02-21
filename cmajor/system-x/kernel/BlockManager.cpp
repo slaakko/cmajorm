@@ -7,6 +7,7 @@
 #include <system-x/kernel/EventManager.hpp>
 #include <system-x/kernel/Process.hpp>
 #include <system-x/kernel/File.hpp>
+#include <system-x/kernel/DebugHelp.hpp>
 #include <system-x/machine/Config.hpp>
 #include <system-x/machine/Event.hpp>
 #include <condition_variable>
@@ -254,14 +255,29 @@ BlockPtr GetBlock(BlockKey blockKey, cmsx::machine::Process* process)
     while (true)
     {
         BlockManager& blockManager = BlockManager::Instance();
+#if (LOCK_DEBUG)
+        DebugLock startDebugLock(&blockManager.GetMachine()->Lock(), BLOCK_MANAGER, process->Id(), NO_LOCK | GET_BLOCK);
+#endif 
         std::unique_lock<std::recursive_mutex> lock(blockManager.GetMachine()->Lock());
+#if (LOCK_DEBUG)
+        DebugLock hasDebugLock(&blockManager.GetMachine()->Lock(), BLOCK_MANAGER, process->Id(), HAS_LOCK | GET_BLOCK);
+#endif 
         BlockHashQueueEntry* entry = blockManager.GetBlockFromHashQueue(blockKey);
         if (entry)
         {
             if (entry->block->IsLocked())
             {
-                cmsx::machine::Event blockBecomesFreeEvent = blockManager.MakeBlockKeyEvent(blockKey);
-                Sleep(blockBecomesFreeEvent, process, lock);
+                const cmsx::machine::Event* blockBecomesFreeEvent = blockManager.GetBlockKeyEvent(blockKey);
+                if (blockBecomesFreeEvent)
+                {
+                    Sleep(*blockBecomesFreeEvent, process, lock);
+                }
+                else
+                {
+                    cmsx::machine::Event blockBecomesFreeEvent = blockManager.MakeBlockKeyEvent(blockKey);
+                    Sleep(blockBecomesFreeEvent, process, lock);
+                }
+                lock.lock();
                 continue;
             }
             else
@@ -277,6 +293,7 @@ BlockPtr GetBlock(BlockKey blockKey, cmsx::machine::Process* process)
             {
                 cmsx::machine::Event anyBlockBecomesFreeEvent = blockManager.GetAnyBlockBecomesFreeEvent();
                 Sleep(anyBlockBecomesFreeEvent, process, lock);
+                lock.lock();
                 continue;
             }
             else
@@ -297,14 +314,20 @@ BlockPtr GetBlock(BlockKey blockKey, cmsx::machine::Process* process)
 void PutBlock(Block* block)
 {
     BlockManager& blockManager = BlockManager::Instance();
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&blockManager.GetMachine()->Lock(), BLOCK_MANAGER, 0, NO_LOCK | PUT_BLOCK);
+#endif 
     std::unique_lock<std::recursive_mutex> lock(blockManager.GetMachine()->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&blockManager.GetMachine()->Lock(), BLOCK_MANAGER, 0, HAS_LOCK | PUT_BLOCK);
+#endif 
     Wakeup(blockManager.GetAnyBlockBecomesFreeEvent());
     const cmsx::machine::Event* blockFreeEvent = blockManager.GetBlockKeyEvent(block->Key());
     if (blockFreeEvent)
     {
         Wakeup(*blockFreeEvent);
+        blockManager.RemoveBlockKeyEvent(block->Key());
     }
-    blockManager.RemoveBlockKeyEvent(block->Key());
     blockManager.PutBlockToFreeList(block);
     block->ResetLocked();
 }

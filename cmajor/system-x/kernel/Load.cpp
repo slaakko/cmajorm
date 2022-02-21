@@ -9,6 +9,8 @@
 #include <system-x/kernel/IO.hpp>
 #include <system-x/kernel/Trap.hpp>
 #include <system-x/kernel/Scheduler.hpp>
+#include <system-x/kernel/Fs.hpp>
+#include <system-x/kernel/Mount.hpp>
 #include <system-x/machine/Registers.hpp>
 #include <soulng/util/Util.hpp>
 
@@ -112,6 +114,7 @@ void Load(Process* process, const std::vector<std::string>& args, const std::vec
 {
     uint64_t rv = machine.Mem().AllocateTranslationMap();
     std::unique_ptr<cmsx::object::BinaryFile> binaryFile(cmsx::object::ReadBinaryFile(process->FilePath()));
+    process->SetFilePath(MapPath(process->FilePath()));
     Load(process, binaryFile.get(), args, env, machine, rv, true);
 }
 

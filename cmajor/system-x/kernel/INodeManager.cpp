@@ -409,7 +409,13 @@ INodePtr GetINode(INodeKey inodeKey, cmsx::machine::Process* process)
     while (true)
     {
         INodeManager& inodeManager = INodeManager::Instance();
+#if (LOCK_DEBUG)
+        DebugLock startDebugLock(&inodeManager.GetMachine()->Lock(), INODE_MANAGER, process->Id(), NO_LOCK | GET_INODE);
+#endif 
         std::unique_lock<std::recursive_mutex> lock(inodeManager.GetMachine()->Lock());
+#if (LOCK_DEBUG)
+        DebugLock hasDebugLock(&inodeManager.GetMachine()->Lock(), INODE_MANAGER, process->Id(), HAS_LOCK | GET_INODE);
+#endif 
         INodeHashQueueEntry* entry = inodeManager.GetINodeFromHashQueue(inodeKey);
         if (entry)
         {
@@ -422,6 +428,7 @@ INodePtr GetINode(INodeKey inodeKey, cmsx::machine::Process* process)
                 }
                 cmsx::machine::Event inodeBecomesFreeEvent = inodeManager.GetINodeKeyEvent(inodeKey);
                 Sleep(inodeBecomesFreeEvent, process, lock);
+                lock.lock();
                 continue;
             }
             else
@@ -455,7 +462,13 @@ INodePtr GetINode(INodeKey inodeKey, cmsx::machine::Process* process)
 void PutINode(INode* inode)
 {
     INodeManager& inodeManager = INodeManager::Instance();
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&inodeManager.GetMachine()->Lock(), INODE_MANAGER, 0, NO_LOCK | PUT_INODE);
+#endif 
     std::unique_lock<std::recursive_mutex> lock(inodeManager.GetMachine()->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&inodeManager.GetMachine()->Lock(), INODE_MANAGER, 0, HAS_LOCK | PUT_INODE);
+#endif 
     inode->Unlock();
     if (inode->LockCount() == 0)
     {

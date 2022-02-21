@@ -1,0 +1,51 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Os;
+
+void CopyCpAndCopyChild()
+{
+	CreateDirectories("/bin");
+	File.Copy("/mnt/sx/bin/cp.x", "/bin/cp.x", FileCopyOptions.update);
+	CreateDirectories("/copy_test");
+	File.Copy("/mnt/sx/test/copy_test/copy_child/bin/debug/copy_child.x", "/copy_test/copy_child.x");
+}
+
+void RunCopyChild(const string& dir)
+{
+	int pid = Fork();
+	if (pid == 0)
+	{
+		List<string> args;
+		args.Add(dir);
+		Exec("/copy_test/copy_child", args);
+	}
+}
+
+void WaitChildren()
+{
+	byte exitCode = 0u;
+	int pid = Wait(&exitCode);
+	while (pid != -1)
+	{
+		pid = Wait(&exitCode);
+	}
+}
+
+int main()
+{
+	try
+	{
+		CopyCpAndCopyChild();
+		RunCopyChild("System.Base");
+		RunCopyChild("System.Lex");
+		RunCopyChild("System.RegularExpressions");
+		WaitChildren();
+	}
+	catch (const Exception& ex)
+	{
+		Console.Error() << ex.ToString() << endl();
+		return 1;
+	}
+	return 0;
+}

@@ -32,6 +32,7 @@ CMSX_KERNEL_API int64_t WriteString(Process* process, const std::string& s, int6
 CMSX_KERNEL_API std::vector<std::string> ReadStringPointerArray(Process* process, int64_t arrayAddress, cmsx::machine::Memory& mem);
 CMSX_KERNEL_API int32_t Create(Process* process, int64_t pathAddr, int32_t mode);
 CMSX_KERNEL_API int32_t Open(Process* process, int64_t pathAddr, int32_t flags, int32_t mode);
+CMSX_KERNEL_API int32_t Open(Process* process, const std::string& path, int32_t flags, int32_t mode);
 CMSX_KERNEL_API void Close(Process* process, int32_t fd);
 CMSX_KERNEL_API int64_t Write(Process* process, int32_t fd, int64_t bufferAddr, int64_t count);
 CMSX_KERNEL_API int64_t Read(Process* process, int32_t fd, int64_t bufferAddr, int64_t count);

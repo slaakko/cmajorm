@@ -12,6 +12,7 @@
 #include <system-x/kernel/DirFile.hpp>
 #include <system-x/kernel/OsFileApi.hpp>
 #include <system-x/kernel/DebugHelp.hpp>
+#include <system-x/kernel/Process.hpp>
 #include <system-x/machine/Config.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/TextUtils.hpp>
@@ -26,7 +27,7 @@ class RootFilesystemFile : public BlockFile
 {
 public:
     RootFilesystemFile(RootFilesystem* fs_, const std::string& name_, OpenFlags flags_, INodeKey inodeKey_, int32_t id_);
-    void Close(cmsx::machine::Process* process) override;
+    void Close(cmsx::kernel::Process* process) override;
     bool IsReadable() const override { return (flags & OpenFlags::read) != OpenFlags::none; }
     bool IsWritable() const override { return (flags & OpenFlags::write) != OpenFlags::none; }
     bool IsConsole() const override { return false; }
@@ -52,7 +53,7 @@ RootFilesystemFile::RootFilesystemFile(RootFilesystem* fs_, const std::string& n
 {
 }
 
-void RootFilesystemFile::Close(cmsx::machine::Process* process)
+void RootFilesystemFile::Close(cmsx::kernel::Process* process)
 {
     INodePtr inodePtr = GetINode(process);
     INode* inode = inodePtr.Get();
@@ -102,7 +103,7 @@ class RootFilesystemDirFile : public DirFile
 {
 public:
     RootFilesystemDirFile(RootFilesystem* fs_, const std::string& name_, int32_t id_, const INodeKey& dirINodeKey_);
-    void Close(cmsx::machine::Process* process) override;
+    void Close(cmsx::kernel::Process* process) override;
     int32_t Read(DirectoryEntry& dirEntry, cmsx::machine::Process* process) override;
     int32_t Id() const { return id; }
 private:
@@ -118,7 +119,7 @@ RootFilesystemDirFile::RootFilesystemDirFile(RootFilesystem* fs_, const std::str
 {
 }
 
-void RootFilesystemDirFile::Close(cmsx::machine::Process* process)
+void RootFilesystemDirFile::Close(cmsx::kernel::Process* process)
 {
     fs->CloseFile(id);
 }
@@ -233,7 +234,13 @@ BlockFile* RootFilesystem::Open(const std::string& path, INode* dirINode, int32_
         throw SystemError(ENOTFOUND, "could not open: path '" + path + "' not found");
     }
     fileINode.Get()->IncrementReferenceCount();
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), ROOT_FILE_SYSTEM, process->Id(), NO_LOCK | OPEN);
+#endif 
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), ROOT_FILE_SYSTEM, process->Id(), HAS_LOCK | OPEN);
+#endif 
     RootFilesystemFile* file = new RootFilesystemFile(this, path, openFlags, fileINode.Get()->Key(), nextFileId++);
     fileMap[file->Id()] = file;
     return file;
@@ -251,7 +258,13 @@ void RootFilesystem::Stat(INode* inode, cmsx::machine::Process* process)
 
 DirFile* RootFilesystem::OpenDir(const std::string& path, INode* dirINode, cmsx::machine::Process* process)
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), ROOT_FILE_SYSTEM, process->Id(), NO_LOCK | OPEN_DIR);
+#endif 
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), ROOT_FILE_SYSTEM, process->Id(), HAS_LOCK | OPEN_DIR);
+#endif 
     RootFilesystemDirFile* dirFile = new RootFilesystemDirFile(this, path, nextFileId++, dirINode->Key());
     fileMap[dirFile->Id()] = dirFile;
     return dirFile;
@@ -286,7 +299,13 @@ void RootFilesystem::MkDir(INode* parentDirINode, const std::string& dirName, cm
 
 void RootFilesystem::CloseFile(int32_t id)
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), ROOT_FILE_SYSTEM, 0, NO_LOCK | CLOSE_FILE);
+#endif 
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), ROOT_FILE_SYSTEM, 0, HAS_LOCK | CLOSE_FILE);
+#endif 
     auto it = fileMap.find(id);
     if (it != fileMap.cend())
     {
@@ -430,6 +449,9 @@ void MountHostDirectories(Filesystem* fs, cmsx::machine::Process* kernelProcess)
             std::string hostPath = GetFullPath(drive);
             std::string driveMountDirPath = "/mnt/" + std::string(1, std::tolower(hostPath[0]));
             cmsx::kernel::Mount(hostPath, driveMountDirPath, kernelProcess);
+            std::string driveStr(1, hostPath[0]);
+            driveStr.append(1, ':');
+            cmsx::kernel::MapDrive(driveStr, driveMountDirPath);
         }
     }
     std::string cmajorRootPath = GetFullPath(CmajorRoot());

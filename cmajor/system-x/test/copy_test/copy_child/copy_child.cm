@@ -1,0 +1,36 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Os;
+
+int main(int argc, const char** argv)
+{
+	try
+	{
+		if (argc == 2)
+		{
+			string arg = argv[1];
+			CreateDirectories(arg);
+			List<string> args;
+			args.Add("-v");
+			args.Add(Path.Combine(Path.Combine("/mnt/sx/system", arg), "*.cm"));
+			args.Add(arg);
+			int pid = Fork();
+			if (pid == 0)
+			{
+				Exec("/bin/cp", args);
+			}
+			else
+			{
+				byte exitCode = 0u;
+				Wait(&exitCode);
+			}
+		}
+	}
+	catch (const Exception& ex)
+	{
+		Console.Error() << ex.ToString() << endl();
+		return 1;
+	}
+	return 0;
+}

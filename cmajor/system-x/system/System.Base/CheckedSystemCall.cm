@@ -25,7 +25,13 @@ namespace System.Os
     
     public void Exec(const string& program, const List<string>& args)
     {
-        long size = program.Length() + 1 + 16;
+		string prog = program;
+		bool hasExtension = Path.HasExtension(prog);
+		if (!hasExtension)
+		{
+			prog.Append(".x");
+		}
+        long size = prog.Length() + 1 + 16;
         for (const string& arg : args)
         {
             size = size + arg.Length() + 1 + 16;
@@ -51,7 +57,7 @@ namespace System.Os
         writer.Write(cast<long>(0));
         List<byte*> addresses;
         addresses.Add(block.Get() + writer.Offset());
-        writer.Write(program);
+        writer.Write(prog);
         for (const string& arg : args)
         {
             addresses.Add(block.Get() + writer.Offset());
@@ -71,7 +77,7 @@ namespace System.Os
         {
             headerWriter.Write(cast<ulong>(cast<void*>(address)));
         }
-        int result = exec(program.Chars(), argv, envp);
+        int result = exec(prog.Chars(), argv, envp);
         if (result == -1)
         {
             ThrowSystemError();

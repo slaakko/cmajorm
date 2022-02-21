@@ -46,7 +46,7 @@ public:
     File(const std::string& name_);
     const std::string& Name() const { return name; }
     virtual ~File();
-    virtual void Close(cmsx::machine::Process* process) = 0;
+    virtual void Close(cmsx::kernel::Process* process) = 0;
     virtual bool IsReadable() const = 0;
     virtual bool IsWritable() const = 0;
     virtual bool IsConsole() const = 0;
@@ -70,10 +70,10 @@ class CMSX_KERNEL_API ProcessFileTable
 public:
     ProcessFileTable();
     int32_t AddFile(File* file);
-    void CloseFile(int32_t fd, cmsx::machine::Process* process);
+    void CloseFile(int32_t fd, cmsx::kernel::Process* process);
     File* GetFile(int32_t fd) const;
     void CopyFrom(const ProcessFileTable& that);
-    void CloseFiles(cmsx::machine::Process* process);
+    void CloseFiles(cmsx::kernel::Process* process);
 private:
     std::vector<File*> files;
 };

@@ -62,16 +62,18 @@ std::string SearchBin(const std::string& fileName)
     {
         return fileName;
     }
-    std::string binDirectory = GetFullPath(Path::Combine(Path::Combine(CmajorRoot(), "system-x"), "bin"));
-    std::string fullPath;
+    std::string executableFileName = fileName;
     if (!Path::HasExtension(fileName))
     {
-        fullPath = Path::Combine(binDirectory, fileName + ".x");
+        executableFileName.append(".x");
     }
-    else
+    std::string fullPath = GetFullPath(executableFileName);
+    if (boost::filesystem::exists(fullPath))
     {
-        fullPath = Path::Combine(binDirectory, fileName);
+        return fullPath;
     }
+    std::string binDirectory = GetFullPath(Path::Combine(Path::Combine(CmajorRoot(), "system-x"), "bin"));
+    fullPath = GetFullPath(Path::Combine(binDirectory, executableFileName));
     if (boost::filesystem::exists(fullPath))
     {
         return fullPath;

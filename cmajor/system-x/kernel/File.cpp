@@ -56,7 +56,7 @@ ProcessFileTable::ProcessFileTable()
     files[2] = consoleOutputFile;
 }
 
-void ProcessFileTable::CloseFiles(cmsx::machine::Process* process)
+void ProcessFileTable::CloseFiles(cmsx::kernel::Process* process)
 {
     for (File* file : files)
     {
@@ -86,7 +86,7 @@ int32_t ProcessFileTable::AddFile(File* file)
     return -1;
 }
 
-void ProcessFileTable::CloseFile(int32_t fd, cmsx::machine::Process* process)
+void ProcessFileTable::CloseFile(int32_t fd, cmsx::kernel::Process* process)
 {
     File* file = GetFile(fd);
     file->Close(process);

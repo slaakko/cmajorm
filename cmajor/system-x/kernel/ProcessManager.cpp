@@ -4,6 +4,7 @@
 // =================================
 
 #include <system-x/kernel/ProcessManager.hpp>
+#include <system-x/kernel/DebugHelp.hpp>
 #include <system-x/machine/Config.hpp>
 #include <system-x/machine/Processor.hpp>
 
@@ -62,7 +63,13 @@ Process* ProcessManager::CreateProcess()
     {
         throw SystemError(EFAIL, "machine not set in process manager");
     }
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), PROCESS_MANAGER, 0, NO_LOCK | CREATE_PROCESS); 
+#endif 
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), PROCESS_MANAGER, 0, HAS_LOCK | CREATE_PROCESS);
+#endif 
     if (nextProcessId > maxProcs)
     {
         nextProcessId = 1;
@@ -98,7 +105,13 @@ void ProcessManager::DeleteProcess(int32_t pid)
     {
         throw SystemError(EFAIL, "machine not set in process manager");
     }
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), PROCESS_MANAGER, pid, NO_LOCK | DELETE_PROCESS);
+#endif 
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), PROCESS_MANAGER, pid, HAS_LOCK | DELETE_PROCESS);
+#endif 
     Process* process = GetProcess(pid);
     if (process)
     {
@@ -132,8 +145,14 @@ void ProcessManager::DecrementRunnableProcesses()
 
 void ProcessManager::WaitForProcessesExit()
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), PROCESS_MANAGER, 0, NO_LOCK | WAIT_FOR_EXIT);
+#endif 
     std::unique_lock<std::recursive_mutex> lock(machine->Lock());
     processesExitOrMachineStateChanged.wait(lock, [this]{ return numRunnableProcesses == 0 || machine->Exiting() || machine->HasException(); });
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), PROCESS_MANAGER, 0, HAS_LOCK | WAIT_FOR_EXIT);
+#endif 
 }
 
 void ProcessManager::MachineStateChanged()

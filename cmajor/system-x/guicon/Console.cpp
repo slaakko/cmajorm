@@ -15,7 +15,7 @@ ConsoleFile::ConsoleFile() :
 {
 }
 
-void ConsoleFile::Close(cmsx::machine::Process* process)
+void ConsoleFile::Close(cmsx::kernel::Process* process)
 {
 }
 

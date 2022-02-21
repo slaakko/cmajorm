@@ -5,6 +5,7 @@
 
 #include <system-x/kernel/Scheduler.hpp>
 #include <system-x/kernel/Process.hpp>
+#include <system-x/kernel/DebugHelp.hpp>
 #include <system-x/machine/Interrupt.hpp>
 #include <system-x/machine/Processor.hpp>
 #include <condition_variable>
@@ -34,8 +35,14 @@ void Scheduler::SetMachine(cmsx::machine::Machine* machine_)
 
 cmsx::machine::UserProcess* Scheduler::GetRunnableProcess()
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), SCHEDULER, 0, NO_LOCK | GET_RUNNABLE_PROCESS);
+#endif 
     std::unique_lock<std::recursive_mutex> lock(machine->Lock());
     queueNotEmptyOrExiting.wait(lock, [this]{ return machine->Exiting() || !runnableProcesses.empty(); });
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), SCHEDULER, 0, HAS_LOCK | GET_RUNNABLE_PROCESS);
+#endif 
     if (!machine->Exiting() && !runnableProcesses.empty())
     {
         cmsx::machine::UserProcess* runnableProcess = runnableProcesses.front();
@@ -47,7 +54,13 @@ cmsx::machine::UserProcess* Scheduler::GetRunnableProcess()
 
 void Scheduler::AddRunnableProcess(cmsx::machine::UserProcess* runnableProcess, cmsx::machine::ProcessState processState)
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), SCHEDULER, runnableProcess->Id(), NO_LOCK | ADD_RUNNABLE_PROCESS);
+#endif 
     std::unique_lock<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), SCHEDULER, runnableProcess->Id(), HAS_LOCK | ADD_RUNNABLE_PROCESS);
+#endif 
     if (runnableProcess->State() != cmsx::machine::ProcessState::zombie)
     {
         runnableProcess->SetState(processState);
@@ -58,7 +71,13 @@ void Scheduler::AddRunnableProcess(cmsx::machine::UserProcess* runnableProcess, 
 
 void Scheduler::CheckRunnable()
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), SCHEDULER, 0, NO_LOCK | CHECK_RUNNABLE);
+#endif 
     std::unique_lock<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), SCHEDULER, 0, HAS_LOCK | CHECK_RUNNABLE);
+#endif 
     if (!runnableProcesses.empty())
     {
         queueNotEmptyOrExiting.notify_all();

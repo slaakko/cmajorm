@@ -13,6 +13,8 @@
 #include <system-x/kernel/DirFile.hpp>
 #include <system-x/kernel/Kernel.hpp>
 #include <system-x/kernel/OsFileApi.hpp>
+#include <system-x/kernel/Process.hpp>
+#include <system-x/kernel/DebugHelp.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <boost/filesystem.hpp>
@@ -25,7 +27,7 @@ class HostFilesystemFile : public BlockFile
 {
 public:
     HostFilesystemFile(HostFilesystem* fs_, int32_t fileId_, const std::string& filePath, OpenFlags flags_, INodeKey inodeKey_);
-    void Close(cmsx::machine::Process* process) override;
+    void Close(cmsx::kernel::Process* process) override;
     bool IsReadable() const override { return (flags & OpenFlags::read) != OpenFlags::none; }
     bool IsWritable() const override { return (flags & OpenFlags::write) != OpenFlags::none; }
     bool IsConsole() const override { return false; }
@@ -51,7 +53,7 @@ HostFilesystemFile::HostFilesystemFile(HostFilesystem* fs_, int32_t fileId_, con
 {
 }
 
-void HostFilesystemFile::Close(cmsx::machine::Process* process)
+void HostFilesystemFile::Close(cmsx::kernel::Process* process)
 {
     INodePtr inode = GetINode(process);
     CloseHostFile(hostFileId);
@@ -80,10 +82,17 @@ INodePtr HostFilesystemFile::GetINode(cmsx::machine::Process* process)
 
 int64_t HostFilesystemFile::Read(Block* block, cmsx::machine::Process* process)
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&fs->GetMachine()->Lock(), HOST_FILE_SYSTEM, process->Id(), NO_LOCK | READ);
+#endif 
     std::unique_lock<std::recursive_mutex> lock(fs->GetMachine()->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&fs->GetMachine()->Lock(), HOST_FILE_SYSTEM, process->Id(), HAS_LOCK | READ);
+#endif 
     int32_t requestId = cmsx::kernel::Read(hostFileId, block);
     cmsx::machine::Event evnt(cmsx::machine::EventKind::ioEvent, requestId);
     Sleep(evnt, process, lock);
+    lock.lock();
     IORequest* request = GetRequest(requestId);
     if (request->Failed())
     {
@@ -102,10 +111,17 @@ int64_t HostFilesystemFile::Read(Block* block, cmsx::machine::Process* process)
 
 int64_t HostFilesystemFile::Write(Block* block, cmsx::machine::Process* process)
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&fs->GetMachine()->Lock(), HOST_FILE_SYSTEM, process->Id(), NO_LOCK | WRITE);
+#endif 
     std::unique_lock<std::recursive_mutex> lock(fs->GetMachine()->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&fs->GetMachine()->Lock(), HOST_FILE_SYSTEM, process->Id(), HAS_LOCK | WRITE);
+#endif 
     int32_t requestId = cmsx::kernel::Write(hostFileId, block);
     cmsx::machine::Event evnt(cmsx::machine::EventKind::ioEvent, requestId);
     Sleep(evnt, process, lock);
+    lock.lock();
     IORequest* request = GetRequest(requestId);
     if (request->Failed())
     {
@@ -126,7 +142,7 @@ class HostFilesystemDirFile : public DirFile
 {
 public:
     HostFilesystemDirFile(HostFilesystem* fs_, const std::string& name_, int32_t id_);
-    void Close(cmsx::machine::Process* process) override;
+    void Close(cmsx::kernel::Process* process) override;
     int32_t Read(DirectoryEntry& dirEntry, cmsx::machine::Process* process) override;
     int32_t Id() const { return id; }
 private:
@@ -140,7 +156,7 @@ HostFilesystemDirFile::HostFilesystemDirFile(HostFilesystem* fs_, const std::str
 {
 }
 
-void HostFilesystemDirFile::Close(cmsx::machine::Process* process)
+void HostFilesystemDirFile::Close(cmsx::kernel::Process* process)
 {
     fs->CloseDir(id);
 }
@@ -192,7 +208,13 @@ BlockFile* HostFilesystem::Create(const std::string& path, INode* dirINode, int3
 
 BlockFile* HostFilesystem::Open(const std::string& path, INode* dirINode, int32_t flags, int32_t mode, cmsx::machine::Process* process)
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, process->Id(), NO_LOCK | OPEN);
+#endif 
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, process->Id(), HAS_LOCK | OPEN);
+#endif 
     ProcessHostFilesystemData* data = nullptr;
     auto it = processDataMap.find(process->Id());
     if (it != processDataMap.cend())
@@ -248,7 +270,13 @@ BlockFile* HostFilesystem::Open(const std::string& path, INode* dirINode, int32_
 
 INodePtr HostFilesystem::SearchDirectory(const std::string& name, INode* dirINode, cmsx::machine::Process* process)
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, process->Id(), NO_LOCK | SEARCH_DIRECTORY);
+#endif 
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, process->Id(), HAS_LOCK | SEARCH_DIRECTORY);
+#endif 
     ProcessHostFilesystemData* data = nullptr;
     auto it = processDataMap.find(process->Id());
     if (it != processDataMap.cend())
@@ -329,7 +357,13 @@ void HostFilesystem::Stat(INode* inode, cmsx::machine::Process* process)
 
 void HostFilesystem::Close(int32_t fileId, INode* inode)
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, 0, NO_LOCK | CLOSE);
+#endif 
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, 0, HAS_LOCK | CLOSE);
+#endif 
     auto it = fileMap.find(fileId);
     if (it != fileMap.cend())
     {
@@ -350,7 +384,13 @@ BlockFile* HostFilesystem::HostFile() const
 
 DirFile* HostFilesystem::OpenDir(const std::string& path, INode* dirINode, cmsx::machine::Process* process)
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, 0, NO_LOCK | OPEN_DIR);
+#endif 
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, 0, HAS_LOCK | OPEN_DIR);
+#endif 
     auto it = processDataMap.find(process->Id());
     if (it != processDataMap.cend())
     {
@@ -376,7 +416,13 @@ DirFile* HostFilesystem::OpenDir(const std::string& path, INode* dirINode, cmsx:
 
 void HostFilesystem::MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process)
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, 0, NO_LOCK | MK_DIR);
+#endif 
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, 0, HAS_LOCK | MK_DIR);
+#endif 
     auto it = processDataMap.find(process->Id());
     if (it != processDataMap.cend())
     {
@@ -405,7 +451,13 @@ void HostFilesystem::MkDir(INode* parentDirINode, const std::string& dirName, cm
 
 void HostFilesystem::CloseDir(int32_t dirId)
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, 0, NO_LOCK | CLOSE_DIR);
+#endif 
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, 0, HAS_LOCK | CLOSE_DIR);
+#endif 
     auto it = dirFileMap.find(dirId);
     if (it != dirFileMap.cend())
     {
@@ -417,7 +469,13 @@ void HostFilesystem::CloseDir(int32_t dirId)
 
 std::string HostFilesystem::GetHostFilePath(int32_t inodeNumber, cmsx::machine::Process* process) 
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, process->Id(), NO_LOCK | GET_HOST_FILE_PATH);
+#endif 
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, process->Id(), HAS_LOCK | GET_HOST_FILE_PATH);
+#endif 
     ProcessHostFilesystemData* data = nullptr;
     auto it = processDataMap.find(process->Id());
     if (it != processDataMap.end())
@@ -443,7 +501,13 @@ std::string HostFilesystem::GetHostFilePath(int32_t inodeNumber, cmsx::machine::
 
 INodePtr HostFilesystem::ReadINode(INodeKey inodeKey, cmsx::machine::Process* process)
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, process->Id(), NO_LOCK | READ_INODE);
+#endif 
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, process->Id(), HAS_LOCK | READ_INODE);
+#endif 
     auto it = processDataMap.find(process->Id());
     if (it != processDataMap.cend())
     {
@@ -468,7 +532,13 @@ INodePtr HostFilesystem::ReadINode(INodeKey inodeKey, cmsx::machine::Process* pr
 
 void HostFilesystem::ClearProcessData(cmsx::machine::Process* process)
 {
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, process->Id(), NO_LOCK | CLEAR_PROCESS_DATA);
+#endif 
     std::lock_guard<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, process->Id(), HAS_LOCK | CLEAR_PROCESS_DATA);
+#endif 
     auto it = processDataMap.find(process->Id());
     if (it != processDataMap.cend())
     {

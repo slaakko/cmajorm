@@ -201,6 +201,8 @@ void InitProcessManagementTraps()
 
 void DoneProcessManagementTraps()
 {
+    SetTrapHandler(trap_get_user_name, nullptr);
+    SetTrapHandler(trap_get_computer_name, nullptr);
     SetTrapHandler(trap_getpid, nullptr);
     SetTrapHandler(trap_wait, nullptr);
     SetTrapHandler(trap_exec, nullptr);

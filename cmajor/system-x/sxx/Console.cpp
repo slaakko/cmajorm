@@ -61,7 +61,7 @@ int Console::Rows() const
     return cmsx::kernel::OsGetConsoleNumberOfRows();
 }
 
-void Console::Close(cmsx::machine::Process* process)
+void Console::Close(cmsx::kernel::Process* process)
 {
 }
 

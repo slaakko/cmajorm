@@ -15,8 +15,8 @@ class Process;
 class CMSX_KERNEL_API Resource : public File
 {
 public:
-    Resource(soulng::util::MappedInputFile* file_, int64_t start_, int64_t length_);
-    void Close(cmsx::machine::Process* process) override;
+    Resource(int32_t fd_, int64_t start_, int64_t length_);
+    void Close(cmsx::kernel::Process* process) override;
     bool IsReadable() const override { return false; }
     bool IsWritable() const override { return false; }
     bool IsConsole() const override { return false; }
@@ -28,10 +28,9 @@ public:
     int Rows() const override { return 0; }
     int64_t Start() const { return start; }
     int64_t Length() const { return length; }
-    uint8_t operator[](int64_t offset) const;
-    const uint8_t* Address(int64_t offset) const;
+    int32_t Fd() const { return fd; }
 private:
-    std::unique_ptr<soulng::util::MappedInputFile> file;
+    int32_t fd;
     int64_t start;
     int64_t length;
 };
