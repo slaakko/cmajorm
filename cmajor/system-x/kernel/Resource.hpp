@@ -16,6 +16,7 @@ class CMSX_KERNEL_API Resource : public File
 {
 public:
     Resource(int32_t fd_, int64_t start_, int64_t length_);
+    bool IsShareable() const override { return false; }
     void Close(cmsx::kernel::Process* process) override;
     bool IsReadable() const override { return false; }
     bool IsWritable() const override { return false; }

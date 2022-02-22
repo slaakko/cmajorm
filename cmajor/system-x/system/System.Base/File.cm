@@ -4,6 +4,7 @@
 // =================================
 
 using System;
+using System.Collections;
 using System.Os;
 
 namespace System.IO
@@ -158,6 +159,44 @@ namespace System.IO
                 flags = cast<OpenFlags>(flags | OpenFlags.random_access);
             }
             return BinaryReader(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(new FileStream(filePath, flags)))));
+        }
+        public static string ReadAllText(const string& filePath)
+        {
+            StreamReader reader = OpenRead(filePath);
+            string content = reader.ReadToEnd();
+            if (content.Length() >= 3 && cast<byte>(content[0]) == 0xEFu && cast<byte>(content[1]) == 0xBBu && cast<byte>(content[2]) == 0xBFu)
+            {
+                return content.Substring(3);
+            }
+            else
+            {
+                return content;
+            }
+        }
+        public static List<string> ReadAllLines(const string& filePath)
+        {
+            List<string> lines;
+            bool start = true;
+            StreamReader reader = OpenRead(filePath);
+            string line = reader.ReadLine();
+            while (!reader.Eof())
+            {
+                if (start)
+                {
+                    if (line.Length() >= 3 && cast<byte>(line[0]) == 0xEFu && cast<byte>(line[1]) == 0xBBu && cast<byte>(line[2]) == 0xBFu)
+                    {
+                        line = line.Substring(3);
+                    }
+                    start = false;
+                }
+                lines.Add(line);
+                line = reader.ReadLine();
+            }
+            if (!line.IsEmpty())
+            {
+                lines.Add(line);
+            }
+            return lines;
         }
     }
     
@@ -321,7 +360,7 @@ namespace System.IO
             if ((options & FileCopyOptions.verbose) != FileCopyOptions.none)
             {
                 // DEBUG PID: Console.WriteLine(ToString(GetPid()) + " : " + GetFullPath(sourceFilePath) + " -> " + GetFullPath(destFilePath));
-				Console.WriteLine(GetFullPath(sourceFilePath) + " -> " + GetFullPath(destFilePath));
+                Console.WriteLine(GetFullPath(sourceFilePath) + " -> " + GetFullPath(destFilePath));
             }
         }
     }

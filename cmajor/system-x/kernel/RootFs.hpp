@@ -23,7 +23,7 @@ public:
     BlockFile* HostFile() const override { return hostFile; }
     DirFile* OpenDir(const std::string& path, INode* dirINode, cmsx::machine::Process* process) override;
     void MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process) override;
-    void CloseFile(int32_t id);
+    void CloseFile(int32_t id, cmsx::kernel::Process* process);
     std::string GetHostFilePath(int32_t inodeNumber, cmsx::machine::Process* process) override { return std::string(); }
     INodePtr ReadINode(INodeKey inodeKey, cmsx::machine::Process* process) override;
     void ClearProcessData(cmsx::machine::Process* process) override;

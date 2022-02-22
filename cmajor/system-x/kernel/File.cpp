@@ -70,7 +70,14 @@ void ProcessFileTable::CloseFiles(cmsx::kernel::Process* process)
 
 void ProcessFileTable::CopyFrom(const ProcessFileTable& that)
 {
-    files = that.files;
+    for (int32_t fd = 0; fd < that.files.size(); ++fd)
+    {
+        File* file = that.files[fd];
+        if (file && file->IsShareable())
+        {
+            files[fd] = file->Share();
+        }
+    }
 }
 
 int32_t ProcessFileTable::AddFile(File* file)

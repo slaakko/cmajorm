@@ -10,8 +10,23 @@
 
 namespace cmsx::kernel {
 
-BlockFile::BlockFile(const std::string& name_, INodeKey inodeKey_) : File(name_), inodeKey(inodeKey_), filePos(0)
+BlockFile::BlockFile(const std::string& name_, INodeKey inodeKey_) : File(name_), inodeKey(inodeKey_), filePos(0), referenceCount(1)
 {
+}
+
+File* BlockFile::Share()
+{
+    ++referenceCount;
+    return this;
+}
+
+void BlockFile::Release(cmsx::kernel::Process* process)
+{
+    --referenceCount;
+    if (referenceCount == 0)
+    {
+        delete this;
+    }
 }
 
 std::vector<uint8_t> BlockFile::Read(int64_t count, cmsx::machine::Process* process)

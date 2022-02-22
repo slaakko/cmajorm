@@ -7,6 +7,7 @@
 #include <system-x/kernel/IO.hpp>
 #include <system-x/kernel/Trap.hpp>
 #include <system-x/kernel/Process.hpp>
+#include <system-x/kernel/Pipe.hpp>
 #include <system-x/machine/Processor.hpp>
 
 namespace cmsx::kernel {
@@ -412,6 +413,30 @@ uint64_t TrapUTimeHandler::HandleTrap(cmsx::machine::Processor& processor)
     }
 }
 
+class TrapPipeHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_pipe"; }
+};
+
+uint64_t TrapPipeHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int64_t readerFdAddr = static_cast<int64_t>(processor.Regs().Get(cmsx::machine::regAX));
+        int64_t writerFdAddr = static_cast<int64_t>(processor.Regs().Get(cmsx::machine::regBX));
+        MakePipe(process, readerFdAddr, writerFdAddr);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
 void InitIOTraps()
 {
     SetTrapHandler(trap_create, new TrapCreateHandler());
@@ -431,10 +456,12 @@ void InitIOTraps()
     SetTrapHandler(trap_closedir, new TrapCloseDirHandler());
     SetTrapHandler(trap_readdir, new TrapReadDirHandler());
     SetTrapHandler(trap_utime, new TrapUTimeHandler());
+    SetTrapHandler(trap_pipe, new TrapPipeHandler());
 }
 
 void DoneIOTraps()
 {
+    SetTrapHandler(trap_pipe, nullptr);
     SetTrapHandler(trap_utime, nullptr);
     SetTrapHandler(trap_readdir, nullptr);
     SetTrapHandler(trap_closedir, nullptr);

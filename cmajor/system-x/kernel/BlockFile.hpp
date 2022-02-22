@@ -16,6 +16,8 @@ class CMSX_KERNEL_API BlockFile : public File
 {
 public:
     BlockFile(const std::string& name_, INodeKey inodeKey_);
+    File* Share() override;
+    void Release(cmsx::kernel::Process* process) override;
     std::vector<uint8_t> Read(int64_t count, cmsx::machine::Process* process) override;
     int64_t Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process) override;
     int64_t Seek(int64_t offset, Origin whence, cmsx::machine::Process* process) override;
@@ -30,6 +32,7 @@ public:
 private:
     INodeKey inodeKey;
     int64_t filePos;
+    int referenceCount;
 };
 
 } // namespace cmsx::kernel

@@ -35,6 +35,7 @@ DecompressionFile::DecompressionFile(Process* process, uint64_t sourceBufferAddr
 void DecompressionFile::Close(cmsx::kernel::Process* process)
 {
     compressedData.clear();
+    delete this;
 }
 
 void DecompressionFile::GetData(Process* process, uint64_t targetBufferAddr, uint64_t count)
@@ -86,7 +87,6 @@ void CloseDecompression(Process* process, int32_t dd)
     if (file->IsDecompressionFile())
     {
         fileTable.CloseFile(dd, process);
-        delete file;
     }
     else
     {

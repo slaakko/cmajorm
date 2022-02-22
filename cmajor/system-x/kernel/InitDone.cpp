@@ -24,6 +24,7 @@
 #include <system-x/kernel/HostFileManager.hpp>
 #include <system-x/kernel/IOManager.hpp>
 #include <system-x/kernel/INodeManager.hpp>
+#include <system-x/kernel/Pipe.hpp>
 
 namespace cmsx::kernel {
 
@@ -46,12 +47,14 @@ void Init()
     InitIOManager();
     InitHostFileManager();
     InitClock();
+    InitPipe();
     InitKernel();
 }
 
 void Done()
 {
     DoneKernel();
+    DonePipe();
     DoneClock();
     DoneIOManager();
     DoneHostFileManager();

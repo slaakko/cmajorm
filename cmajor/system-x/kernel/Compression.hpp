@@ -14,6 +14,7 @@ class CMSX_KERNEL_API DecompressionFile : public File
 {
 public:
     DecompressionFile(Process* process, uint64_t sourceBufferAddr, uint64_t count);
+    bool IsShareable() const override { return false; }
     void Close(cmsx::kernel::Process* process) override;
     bool IsReadable() const override { return false; }
     bool IsWritable() const override { return false; }

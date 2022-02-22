@@ -53,6 +53,7 @@ public const byte trap_get_decompressed_data = 46u;
 public const byte trap_close_decompression = 47u;
 public const byte trap_get_computer_name = 48u;
 public const byte trap_get_user_name = 49u;
+public const byte trap_pipe = 50u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -332,4 +333,9 @@ public cdecl nothrow int get_computer_name(char* buffer, long bufSize)
 public cdecl nothrow int get_user_name(char* buffer, long bufSize)
 {
     return cast<int>(trap(0u, trap_get_user_name, 0u, buffer, bufSize));
+}
+
+public cdecl nothrow int pipe(int* readerFd, int* writerFd)
+{
+    return cast<int>(trap(0u, trap_pipe, 0u, readerFd, writerFd));
 }

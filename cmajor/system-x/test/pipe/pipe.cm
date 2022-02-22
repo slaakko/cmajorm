@@ -1,0 +1,45 @@
+using System;
+using System.IO;
+using System.Os;
+
+void main()
+{
+	int readFd = 0;
+	int writeFd = 0;
+	Pipe(&readFd, &writeFd);
+	int pid = Fork();
+	if (pid == 0)
+	{
+		Close(readFd);
+		string s = File.ReadAllText("/System.Base/Algorithm.cm");
+		long n = s.Length();
+		long pos = 0;
+		long bytesWritten = Write(writeFd, s.Chars() + pos, n);
+		n = n - bytesWritten;
+		pos = pos + bytesWritten;
+		while (n > 0)
+		{
+			bytesWritten = Write(writeFd, s.Chars() + pos, n);
+			n = n - bytesWritten;
+			pos = pos + bytesWritten;
+		}
+	}
+	else
+	{
+		Close(writeFd);
+		byte[4096] buffer;
+		long bytesRead = Read(readFd, &buffer[0], 4096);
+		while (bytesRead > 0)
+		{
+			string s;
+			for (long i = 0; i < bytesRead; ++i)
+			{
+				s.Append(cast<char>(buffer[i]));
+			}
+			Console.Out() << s;
+			bytesRead = Read(readFd, &buffer[0], 4096);
+		}
+		byte childExitCode = 0u;
+		Wait(&childExitCode);
+	}
+}

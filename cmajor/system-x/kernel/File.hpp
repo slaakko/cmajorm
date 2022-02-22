@@ -46,6 +46,9 @@ public:
     File(const std::string& name_);
     const std::string& Name() const { return name; }
     virtual ~File();
+    virtual bool IsShareable() const { return true; }
+    virtual File* Share() { return this; }
+    virtual void Release(cmsx::kernel::Process* process) { }
     virtual void Close(cmsx::kernel::Process* process) = 0;
     virtual bool IsReadable() const = 0;
     virtual bool IsWritable() const = 0;

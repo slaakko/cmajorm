@@ -14,6 +14,7 @@ class CMSX_KERNEL_API DirFile : public File
 {
 public:
     DirFile(const std::string& name_);
+    bool IsShareable() const override { return false; }
     bool IsDirFile() const override { return true; }
     bool IsReadable() const override { return false; }
     bool IsWritable() const override { return false; }

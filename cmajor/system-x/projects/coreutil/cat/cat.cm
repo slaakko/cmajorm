@@ -1,0 +1,17 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+
+void Catenate(const List<string>& files)
+{
+    for (const string& file : files)
+    {
+        string content = File.ReadAllText(file);
+        Console.Out() << content;
+    }
+}

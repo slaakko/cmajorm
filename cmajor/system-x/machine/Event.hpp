@@ -13,7 +13,7 @@ namespace cmsx::machine {
 
 enum class EventKind
 {
-    none, childExitEvent, alarmEvent, blockFreeEvent, inodeFreeEvent, ioEvent
+    none, childExitEvent, alarmEvent, blockFreeEvent, inodeFreeEvent, ioEvent, pipeNotEmptyEvent, pipeNotFullEvent
 };
 
 CMSX_MACHINE_API std::string EventKindStr(EventKind eventKind);

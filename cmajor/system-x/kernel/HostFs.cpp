@@ -57,7 +57,7 @@ void HostFilesystemFile::Close(cmsx::kernel::Process* process)
 {
     INodePtr inode = GetINode(process);
     CloseHostFile(hostFileId);
-    fs->Close(fileId, inode.Get());
+    fs->Close(fileId, inode.Get(), process);
 }
 
 int32_t HostFilesystemFile::GetBlockNumber(INode* inode, cmsx::machine::Process* process, bool allocate) const
@@ -355,7 +355,7 @@ void HostFilesystem::Stat(INode* inode, cmsx::machine::Process* process)
     }
 }
 
-void HostFilesystem::Close(int32_t fileId, INode* inode)
+void HostFilesystem::Close(int32_t fileId, INode* inode, cmsx::kernel::Process* process)
 {
 #if (LOCK_DEBUG)
     DebugLock startDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, 0, NO_LOCK | CLOSE);
@@ -371,8 +371,8 @@ void HostFilesystem::Close(int32_t fileId, INode* inode)
         inode->DecrementReferenceCount();
         if (inode->ReferenceCount() == 0)
         {
-            delete file;
             fileMap.erase(fileId);
+            file->Release(process);
         }
     }
 }

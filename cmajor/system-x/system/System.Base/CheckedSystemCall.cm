@@ -25,12 +25,12 @@ namespace System.Os
     
     public void Exec(const string& program, const List<string>& args)
     {
-		string prog = program;
-		bool hasExtension = Path.HasExtension(prog);
-		if (!hasExtension)
-		{
-			prog.Append(".x");
-		}
+        string prog = program;
+        bool hasExtension = Path.HasExtension(prog);
+        if (!hasExtension)
+        {
+            prog.Append(".x");
+        }
         long size = prog.Length() + 1 + 16;
         for (const string& arg : args)
         {
@@ -367,4 +367,13 @@ namespace System.Os
         }
         return string(&buffer[0]);
     }    
+    
+    public void Pipe(int* readerFd, int* writerFd)
+    {
+        int result = pipe(readerFd, writerFd);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
 }

@@ -66,7 +66,7 @@ void RootFilesystemFile::Close(cmsx::kernel::Process* process)
             FreeINode(inode, process);
         }
     }
-    fs->CloseFile(id);
+    fs->CloseFile(id, process);
 }
 
 int32_t RootFilesystemFile::GetBlockNumber(INode* inode, cmsx::machine::Process* process, bool allocate) const
@@ -121,7 +121,7 @@ RootFilesystemDirFile::RootFilesystemDirFile(RootFilesystem* fs_, const std::str
 
 void RootFilesystemDirFile::Close(cmsx::kernel::Process* process)
 {
-    fs->CloseFile(id);
+    fs->CloseFile(id, process);
 }
 
 int32_t RootFilesystemDirFile::Read(DirectoryEntry& dirEntry, cmsx::machine::Process* process)
@@ -297,7 +297,7 @@ void RootFilesystem::MkDir(INode* parentDirINode, const std::string& dirName, cm
     AddDirectoryEntry(entry, parentDirINode, this, process);
 }
 
-void RootFilesystem::CloseFile(int32_t id)
+void RootFilesystem::CloseFile(int32_t id, cmsx::kernel::Process* process)
 {
 #if (LOCK_DEBUG)
     DebugLock startDebugLock(&machine->Lock(), ROOT_FILE_SYSTEM, 0, NO_LOCK | CLOSE_FILE);
@@ -311,7 +311,7 @@ void RootFilesystem::CloseFile(int32_t id)
     {
         File* file = it->second;
         fileMap.erase(id);
-        delete file;
+        file->Release(process);
     }
 }
 

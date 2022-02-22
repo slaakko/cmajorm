@@ -25,7 +25,7 @@ public:
     BlockFile* Open(const std::string& path, INode* dirINode, int32_t flags, int32_t mode, cmsx::machine::Process* process) override;
     INodePtr SearchDirectory(const std::string& name, INode* dirINode, cmsx::machine::Process* process) override;
     void Stat(INode* inode, cmsx::machine::Process* process) override;
-    void Close(int32_t fileId, INode* inode);
+    void Close(int32_t fileId, INode* inode, cmsx::kernel::Process* process);
     BlockFile* HostFile() const override;
     INodeKey MountPoint() const override { return mountPoint; }
     void SetMountPoint(INodeKey mountPoint_) { mountPoint = mountPoint_; }

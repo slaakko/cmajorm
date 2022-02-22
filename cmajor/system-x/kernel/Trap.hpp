@@ -61,6 +61,7 @@ const uint8_t trap_get_decompressed_data = 46;
 const uint8_t trap_close_decompression = 47;
 const uint8_t trap_get_computer_name = 48;
 const uint8_t trap_get_user_name = 49;
+const uint8_t trap_pipe = 50;
 
 class CMSX_KERNEL_API TrapHandler
 {
