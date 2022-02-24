@@ -198,6 +198,10 @@ int main(int argc, const char** argv)
             std::chrono::steady_clock::duration sleepTime = process->SleepTime();
             std::chrono::steady_clock::duration systemTime = process->SystemTime();
             std::chrono::steady_clock::duration totalTime = userTime + sleepTime + systemTime;
+            std::chrono::steady_clock::duration childUserTime = process->ChildUserTime();
+            std::chrono::steady_clock::duration childSleepTime = process->ChildSleepTime();
+            std::chrono::steady_clock::duration childSystemTime = process->ChildSystemTime();
+            std::chrono::steady_clock::duration childTotalTime = childUserTime + childSleepTime + childSystemTime;
             double userTimePercent = 0.0; 
             double sleepTimePercent = 0.0;
             double systemTimePercent = 0.0;
@@ -207,10 +211,23 @@ int main(int argc, const char** argv)
                 sleepTimePercent = (100.0 * sleepTime) / totalTime;
                 systemTimePercent = (100.0 * systemTime) / totalTime;
             }
-            std::cout << "user time:   " << DurationStr(userTime) << " (" << userTimePercent << "%)" << std::endl;
-            std::cout << "sleep time:  " << DurationStr(sleepTime) << " (" << sleepTimePercent << "%)" << std::endl;
-            std::cout << "system time: " << DurationStr(systemTime) << " (" << systemTimePercent << "%)" << std::endl;
-            std::cout << "total time:  " << DurationStr(totalTime) << std::endl;
+            double childUserTimePercent = 0.0;
+            double childSleepTimePercent = 0.0;
+            double childSystemTimePercent = 0.0;
+            if (childTotalTime.count() > 0)
+            {
+                childUserTimePercent = (100.0 * childUserTime) / childTotalTime;
+                childSleepTimePercent = (100.0 * childSleepTime) / childTotalTime;
+                childSystemTimePercent = (100.0 * childSystemTime) / childTotalTime;
+            }
+            std::cout << "user time:         " << DurationStr(userTime) << " (" << userTimePercent << "%)" << std::endl;
+            std::cout << "sleep time:        " << DurationStr(sleepTime) << " (" << sleepTimePercent << "%)" << std::endl;
+            std::cout << "system time:       " << DurationStr(systemTime) << " (" << systemTimePercent << "%)" << std::endl;
+            std::cout << "total time:        " << DurationStr(totalTime) << std::endl;
+            std::cout << "child user time:   " << DurationStr(childUserTime) << " (" << childUserTimePercent << "%)" << std::endl;
+            std::cout << "child sleep time:  " << DurationStr(childSleepTime) << " (" << childSleepTimePercent << "%)" << std::endl;
+            std::cout << "child system time: " << DurationStr(childSystemTime) << " (" << childSystemTimePercent << "%)" << std::endl;;
+            std::cout << "child total time:  " << DurationStr(childTotalTime) << std::endl;
         }
         cmsx::kernel::ProcessManager::Instance().DeleteProcess(process->Id());
         cmsx::kernel::Kernel::Instance().Stop();

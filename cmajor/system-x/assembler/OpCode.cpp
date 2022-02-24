@@ -121,6 +121,10 @@ int OpCodeMap::GetOpCode(const std::string& opCodeName) const
 
 OpCode::OpCode(const SourcePos& sourcePos_, const std::string& name_) : Node(NodeKind::opCodeNode, sourcePos_), name(name_), value(-1)
 {
+    if (name == "8ADDU" || name == "8ADDUI")
+    {
+        int x = 0;
+    }
 }
 
 OpCode::OpCode(int value_) : Node(NodeKind::opCodeNode, SourcePos()), value(value_)

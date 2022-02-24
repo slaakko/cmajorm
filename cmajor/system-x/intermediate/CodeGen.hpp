@@ -88,9 +88,13 @@ public:
     virtual void Catch(uint32_t catchBlockId, uint32_t tryBlockId, const std::string& caughtTypeIdStr) = 0;
     virtual void BeginCleanup(uint32_t cleanupBlockId, uint32_t tryBlockId) = 0;
     virtual void EndCleanup(uint32_t cleanupBlockId) = 0;
+    virtual Function* CurrentFunction() const = 0;
+    virtual int CurrentLineNumber() const = 0;
+    virtual cmsx::assembler::AssemblyFile* AssemblyFile() const = 0;
 };
 
 CMSX_INTERMEDIATE_API cmsx::assembler::Node* MakeRegOperand(const Register& reg);
+CMSX_INTERMEDIATE_API
 CMSX_INTERMEDIATE_API int64_t GetIndex(Value* index, CodeGenerator& codeGen);
 CMSX_INTERMEDIATE_API int64_t GetOffset(Type* type, int64_t index, CodeGenerator& codeGen);
 CMSX_INTERMEDIATE_API int64_t GetElementSize(Type* type, CodeGenerator& codeGen);

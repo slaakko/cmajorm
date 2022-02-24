@@ -4,10 +4,12 @@
 // =================================
 
 #include <system-x/intermediate/SimpleAssemblyCodeGenerator.hpp>
+#include <system-x/intermediate/OptCodeGen.hpp>
 #include <system-x/intermediate/LinearScanRegisterAllocator.hpp>
 #include <system-x/intermediate/Context.hpp>
 #include <system-x/intermediate/Error.hpp>
 #include <system-x/assembler/Constant.hpp>
+#include <symbols/GlobalFlags.hpp>
 #include <soulng/util/Uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
@@ -18,8 +20,8 @@ using namespace soulng::util;
 
 SimpleAssemblyCodeGenerator::SimpleAssemblyCodeGenerator(Context* context_, cmsx::assembler::AssemblyFile* assemblyFile_) : 
     Visitor(context_), assemblyFile(assemblyFile_), emitSection(cmsx::assembler::AssemblySectionKind::code), 
-    assemblyFunction(nullptr), assemblyStructure(nullptr), assemblyInst(nullptr), currentInst(nullptr), registerAllocator(nullptr), leader(false), debugInfo(nullptr),
-    lineNumber(0)
+    assemblyFunction(nullptr), assemblyStructure(nullptr), assemblyInst(nullptr), currentInst(nullptr), currentFunction(nullptr),
+    registerAllocator(nullptr), leader(false), debugInfo(nullptr), lineNumber(0)
 {
 }
 
@@ -258,6 +260,7 @@ const SourcePos& SimpleAssemblyCodeGenerator::GetSourcePos() const
 void SimpleAssemblyCodeGenerator::Visit(Function& function)
 {
     if (!function.IsDefined()) return;
+    currentFunction = &function;
     lineNumber = 0;
     if (function.GetFlag(FunctionFlags::once))
     {
@@ -341,7 +344,14 @@ void SimpleAssemblyCodeGenerator::Visit(RetInstruction& inst)
 
 void SimpleAssemblyCodeGenerator::Visit(SwitchInstruction& inst)
 {
-    EmitSwitch(inst, *this);
+    if (cmajor::symbols::GetOptimizationLevel() > 0)
+    {
+        EmitOptSwitch(inst, *this);
+    }
+    else
+    {
+        EmitSwitch(inst, *this);
+    }
 }
 
 void SimpleAssemblyCodeGenerator::Visit(NotInstruction& inst)

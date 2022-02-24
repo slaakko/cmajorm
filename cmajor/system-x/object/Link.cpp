@@ -579,10 +579,6 @@ void ProcessInternalSymbol(Symbol* symbol, Symbol* parentSymbolClone, SymbolTabl
 
 void ProcessExternalSymbol(LinkTable& linkTable, Symbol* symbol, Symbol*& parentSymbolClone, SymbolTable& executableSymbolTable, std::vector<Symbol*>& linkSymbols)
 {
-    if (symbol->GetSection()->IsDataSection())
-    {
-        int x = 0;
-    }
     symbol->SetStart(symbol->GetSection()->BaseAddress() + symbol->GetValue().Val() - symbol->GetSection()->RemoveOffset());
     uint64_t value = symbol->Start();
     uint64_t alignedValue = Align(value, symbol->Alignment());
@@ -781,6 +777,10 @@ void ProcessSymbols(LinkTable& linkTable, ObjectFile* objectFile, ExecutableFile
 
 void LinkObjectFile(LinkTable& linkTable, ObjectFile* objectFile, Section*& prevCodeSection, Section*& prevDataSection, ExecutableFile* executable)
 {
+    if (objectFile->FileName() == "opt_switch.o")
+    {
+        int x = 0;
+    }
     Section* codeSection = objectFile->GetCodeSection();
     if (!prevCodeSection)
     {

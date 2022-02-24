@@ -376,4 +376,14 @@ namespace System.Os
             ThrowSystemError();
         }
     }
+	
+	public int Dup(int fd)
+	{
+		int result = dup(fd);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+		return result;
+	}
 }

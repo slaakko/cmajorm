@@ -319,16 +319,38 @@ soulng::parser::Match AssemblyParser::Comment(AssemblyLexer& lexer)
                                                 {
                                                     int64_t save = lexer.GetPos();
                                                     soulng::parser::Match match(false);
-                                                    if (*lexer == NEWLINE)
+                                                    soulng::parser::Match* parentMatch13 = &match;
                                                     {
-                                                        ++lexer;
-                                                        match.hit = true;
+                                                        int64_t save = lexer.GetPos();
+                                                        soulng::parser::Match match(false);
+                                                        if (*lexer == NEWLINE)
+                                                        {
+                                                            ++lexer;
+                                                            match.hit = true;
+                                                        }
+                                                        *parentMatch13 = match;
+                                                        if (!match.hit)
+                                                        {
+                                                            soulng::parser::Match match(false);
+                                                            soulng::parser::Match* parentMatch14 = &match;
+                                                            lexer.SetPos(save);
+                                                            {
+                                                                soulng::parser::Match match(false);
+                                                                if (*lexer == DECIMAL_CONSTANT)
+                                                                {
+                                                                    ++lexer;
+                                                                    match.hit = true;
+                                                                }
+                                                                *parentMatch14 = match;
+                                                            }
+                                                            *parentMatch13 = match;
+                                                        }
                                                     }
                                                     *parentMatch12 = match;
                                                     if (!match.hit)
                                                     {
                                                         soulng::parser::Match match(false);
-                                                        soulng::parser::Match* parentMatch13 = &match;
+                                                        soulng::parser::Match* parentMatch15 = &match;
                                                         lexer.SetPos(save);
                                                         {
                                                             soulng::parser::Match match(false);
@@ -337,7 +359,7 @@ soulng::parser::Match AssemblyParser::Comment(AssemblyLexer& lexer)
                                                                 ++lexer;
                                                                 match.hit = true;
                                                             }
-                                                            *parentMatch13 = match;
+                                                            *parentMatch15 = match;
                                                         }
                                                         *parentMatch12 = match;
                                                     }
@@ -346,7 +368,7 @@ soulng::parser::Match AssemblyParser::Comment(AssemblyLexer& lexer)
                                                 if (!match.hit)
                                                 {
                                                     soulng::parser::Match match(false);
-                                                    soulng::parser::Match* parentMatch14 = &match;
+                                                    soulng::parser::Match* parentMatch16 = &match;
                                                     lexer.SetPos(save);
                                                     {
                                                         soulng::parser::Match match(false);
@@ -355,7 +377,7 @@ soulng::parser::Match AssemblyParser::Comment(AssemblyLexer& lexer)
                                                             ++lexer;
                                                             match.hit = true;
                                                         }
-                                                        *parentMatch14 = match;
+                                                        *parentMatch16 = match;
                                                     }
                                                     *parentMatch11 = match;
                                                 }
@@ -364,7 +386,7 @@ soulng::parser::Match AssemblyParser::Comment(AssemblyLexer& lexer)
                                             if (!match.hit)
                                             {
                                                 soulng::parser::Match match(false);
-                                                soulng::parser::Match* parentMatch15 = &match;
+                                                soulng::parser::Match* parentMatch17 = &match;
                                                 lexer.SetPos(save);
                                                 {
                                                     soulng::parser::Match match(false);
@@ -373,7 +395,7 @@ soulng::parser::Match AssemblyParser::Comment(AssemblyLexer& lexer)
                                                         ++lexer;
                                                         match.hit = true;
                                                     }
-                                                    *parentMatch15 = match;
+                                                    *parentMatch17 = match;
                                                 }
                                                 *parentMatch10 = match;
                                             }
@@ -382,7 +404,7 @@ soulng::parser::Match AssemblyParser::Comment(AssemblyLexer& lexer)
                                         if (!match.hit)
                                         {
                                             soulng::parser::Match match(false);
-                                            soulng::parser::Match* parentMatch16 = &match;
+                                            soulng::parser::Match* parentMatch18 = &match;
                                             lexer.SetPos(save);
                                             {
                                                 soulng::parser::Match match(false);
@@ -391,7 +413,7 @@ soulng::parser::Match AssemblyParser::Comment(AssemblyLexer& lexer)
                                                     ++lexer;
                                                     match.hit = true;
                                                 }
-                                                *parentMatch16 = match;
+                                                *parentMatch18 = match;
                                             }
                                             *parentMatch9 = match;
                                         }
@@ -400,7 +422,7 @@ soulng::parser::Match AssemblyParser::Comment(AssemblyLexer& lexer)
                                     if (!match.hit)
                                     {
                                         soulng::parser::Match match(false);
-                                        soulng::parser::Match* parentMatch17 = &match;
+                                        soulng::parser::Match* parentMatch19 = &match;
                                         lexer.SetPos(save);
                                         {
                                             soulng::parser::Match match(false);
@@ -409,7 +431,7 @@ soulng::parser::Match AssemblyParser::Comment(AssemblyLexer& lexer)
                                                 ++lexer;
                                                 match.hit = true;
                                             }
-                                            *parentMatch17 = match;
+                                            *parentMatch19 = match;
                                         }
                                         *parentMatch8 = match;
                                     }
@@ -435,20 +457,20 @@ soulng::parser::Match AssemblyParser::Comment(AssemblyLexer& lexer)
     if (match.hit)
     {
         soulng::parser::Match match(false);
-        soulng::parser::Match* parentMatch18 = &match;
+        soulng::parser::Match* parentMatch20 = &match;
         {
             soulng::parser::Match match(true);
-            soulng::parser::Match* parentMatch19 = &match;
+            soulng::parser::Match* parentMatch21 = &match;
             {
                 while (true)
                 {
                     int64_t save = lexer.GetPos();
                     {
                         soulng::parser::Match match(false);
-                        soulng::parser::Match* parentMatch20 = &match;
+                        soulng::parser::Match* parentMatch22 = &match;
                         {
                             soulng::parser::Match match(false);
-                            soulng::parser::Match* parentMatch21 = &match;
+                            soulng::parser::Match* parentMatch23 = &match;
                             int64_t save = lexer.GetPos();
                             {
                                 soulng::parser::Match match(false);
@@ -457,12 +479,12 @@ soulng::parser::Match AssemblyParser::Comment(AssemblyLexer& lexer)
                                     ++lexer;
                                     match.hit = true;
                                 }
-                                *parentMatch21 = match;
+                                *parentMatch23 = match;
                             }
                             if (match.hit)
                             {
                                 soulng::parser::Match match(false);
-                                soulng::parser::Match* parentMatch22 = &match;
+                                soulng::parser::Match* parentMatch24 = &match;
                                 {
                                     int64_t tmp = lexer.GetPos();
                                     lexer.SetPos(save);
@@ -473,19 +495,19 @@ soulng::parser::Match AssemblyParser::Comment(AssemblyLexer& lexer)
                                         ++lexer;
                                         match.hit = true;
                                     }
-                                    *parentMatch22 = match;
+                                    *parentMatch24 = match;
                                 }
                                 if (!match.hit)
                                 {
                                     lexer.SetPos(save);
                                 }
-                                *parentMatch21 = soulng::parser::Match(!match.hit, match.value);
+                                *parentMatch23 = soulng::parser::Match(!match.hit, match.value);
                             }
-                            *parentMatch20 = match;
+                            *parentMatch22 = match;
                         }
                         if (match.hit)
                         {
-                            *parentMatch19 = match;
+                            *parentMatch21 = match;
                         }
                         else
                         {
@@ -495,7 +517,7 @@ soulng::parser::Match AssemblyParser::Comment(AssemblyLexer& lexer)
                     }
                 }
             }
-            *parentMatch18 = match;
+            *parentMatch20 = match;
         }
         *parentMatch0 = match;
     }

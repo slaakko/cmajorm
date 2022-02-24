@@ -126,6 +126,21 @@ void Process::AddSystemTime()
     systemTime = systemTime + (endSystemTime - startSystemTime);
 }
 
+void Process::AddChildUserTime(const std::chrono::steady_clock::duration& childUserTime_)
+{
+    childUserTime = childUserTime + childUserTime_;
+}
+
+void Process::AddChildSleepTime(const std::chrono::steady_clock::duration & childSleepTime_)
+{
+    childSleepTime = childSleepTime + childSleepTime_;
+}
+
+void Process::AddChildSystemTime(const std::chrono::steady_clock::duration& childSystemTime_)
+{
+    childSystemTime = childSystemTime + childSystemTime_;
+}
+
 void Process::SetError(const SystemError& error_)
 {
     error = error_;
@@ -383,6 +398,9 @@ int32_t Wait(Process* parent, int64_t childExitCodeAddress)
             child->RemoveFromParent();
             uint8_t exitCode = child->ExitCode();
             parent->GetProcessor()->GetMachine()->Mem().WriteByte(parent->RV(), childExitCodeAddress, exitCode, cmsx::machine::Protection::write);
+            parent->AddChildUserTime(child->UserTime());
+            parent->AddChildSleepTime(child->SleepTime());
+            parent->AddChildSystemTime(child->SystemTime());
             return child->Id();
         }
         child = child->NextSibling();
@@ -401,6 +419,9 @@ int32_t Wait(Process* parent, int64_t childExitCodeAddress)
             child->RemoveFromParent();
             uint8_t exitCode = child->ExitCode();
             machine->Mem().WriteByte(parent->RV(), childExitCodeAddress, exitCode, cmsx::machine::Protection::write);
+            parent->AddChildUserTime(child->UserTime());
+            parent->AddChildSleepTime(child->SleepTime());
+            parent->AddChildSystemTime(child->SystemTime());
             return child->Id();
         }
         child = child->NextSibling();

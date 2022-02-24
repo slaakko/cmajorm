@@ -68,6 +68,12 @@ void ProcessFileTable::CloseFiles(cmsx::kernel::Process* process)
     files.clear();
 }
 
+int32_t ProcessFileTable::Dup(int32_t fd)
+{
+    File* file = GetFile(fd);
+    return AddFile(file);
+}
+
 void ProcessFileTable::CopyFrom(const ProcessFileTable& that)
 {
     for (int32_t fd = 0; fd < that.files.size(); ++fd)

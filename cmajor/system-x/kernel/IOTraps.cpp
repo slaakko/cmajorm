@@ -437,6 +437,28 @@ uint64_t TrapPipeHandler::HandleTrap(cmsx::machine::Processor& processor)
     }
 }
 
+class TrapDupHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_dup"; }
+};
+
+uint64_t TrapDupHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t fd = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
+        return Dup(process, fd);
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
 void InitIOTraps()
 {
     SetTrapHandler(trap_create, new TrapCreateHandler());
@@ -457,10 +479,12 @@ void InitIOTraps()
     SetTrapHandler(trap_readdir, new TrapReadDirHandler());
     SetTrapHandler(trap_utime, new TrapUTimeHandler());
     SetTrapHandler(trap_pipe, new TrapPipeHandler());
+    SetTrapHandler(trap_dup, new TrapDupHandler());
 }
 
 void DoneIOTraps()
 {
+    SetTrapHandler(trap_dup, nullptr);
     SetTrapHandler(trap_pipe, nullptr);
     SetTrapHandler(trap_utime, nullptr);
     SetTrapHandler(trap_readdir, nullptr);

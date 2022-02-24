@@ -72,9 +72,15 @@ public:
     void AddUserTime() override;
     void AddSleepTime() override;
     void AddSystemTime() override;
+    void AddChildUserTime(const std::chrono::steady_clock::duration& childUserTime_);
+    void AddChildSleepTime(const std::chrono::steady_clock::duration& childSleepTime_);
+    void AddChildSystemTime(const std::chrono::steady_clock::duration& childSystemTime_);
     const std::chrono::steady_clock::duration& UserTime() const { return userTime; }
     const std::chrono::steady_clock::duration& SleepTime() const { return sleepTime; }
     const std::chrono::steady_clock::duration& SystemTime() const { return systemTime; }
+    const std::chrono::steady_clock::duration& ChildUserTime() const { return childUserTime; }
+    const std::chrono::steady_clock::duration& ChildSleepTime() const { return childSleepTime; }
+    const std::chrono::steady_clock::duration& ChildSystemTime() const { return childSystemTime; }
     RegionTable& GetRegionTable() { return regionTable; }
     ProcessFileTable& GetFileTable() { return fileTable; }
     void SetError(const SystemError& error_);
@@ -114,6 +120,9 @@ private:
     std::chrono::steady_clock::duration userTime;
     std::chrono::steady_clock::duration sleepTime;
     std::chrono::steady_clock::duration systemTime;
+    std::chrono::steady_clock::duration childUserTime;
+    std::chrono::steady_clock::duration childSleepTime;
+    std::chrono::steady_clock::duration childSystemTime;
     std::shared_ptr<cmsx::object::SymbolTable> symbolTable;
     cmsx::machine::Debugger* debugger;
     cmsx::machine::Processor* processor;

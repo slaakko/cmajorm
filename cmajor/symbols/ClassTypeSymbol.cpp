@@ -353,10 +353,6 @@ const int maxStaticLayoutSize = maxObjectLayoutSize;
 
 void ClassTypeSymbol::Read(SymbolReader& reader)
 {
-    if (FullName().find(U"FileSystemException") != std::u32string::npos)
-    {
-        int x = 0;
-    }
     TypeSymbol::Read(reader);
     groupName = reader.GetBinaryReader().ReadUtf32String();
     flags = static_cast<ClassTypeSymbolFlags>(reader.GetBinaryReader().ReadUShort());

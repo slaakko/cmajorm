@@ -100,6 +100,9 @@ public:
     void Visit(ConversionValue& value) override;
     void Visit(ClsIdValue& value) override;
     void Visit(SymbolValue& value) override;
+    Function* CurrentFunction() const override { return currentFunction; };
+    cmsx::assembler::AssemblyFile* AssemblyFile() const override { return assemblyFile; }
+    int CurrentLineNumber() const override { return lineNumber; }
 private:
     cmsx::assembler::AssemblySectionKind emitSection;
     cmsx::assembler::AssemblyFile* assemblyFile;
@@ -109,6 +112,7 @@ private:
     cmsx::assembler::Instruction* assemblyInst;
     RegisterAllocator* registerAllocator;
     Instruction* currentInst;
+    Function* currentFunction;
     bool leader;
     std::string symbolName;
     std::vector<Function*> debugInfoFunctions;

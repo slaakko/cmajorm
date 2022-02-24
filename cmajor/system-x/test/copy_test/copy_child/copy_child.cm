@@ -18,7 +18,11 @@ int main(int argc, const char** argv)
 			int pid = Fork();
 			if (pid == 0)
 			{
+			#if (RELEASE)
 				Exec("/bin/cp", args);
+			#else
+				Exec("/bin/cpd", args);
+			#endif
 			}
 			else
 			{

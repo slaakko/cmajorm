@@ -541,4 +541,10 @@ std::vector<uint8_t> ReadFile(Process* process, int64_t pathAddr)
     return content;
 }
 
+int32_t Dup(Process* process, int32_t fd)
+{
+    ProcessFileTable& fileTable = process->GetFileTable();
+    return fileTable.Dup(fd);
+}
+
 } // namespace cmsx::kernel

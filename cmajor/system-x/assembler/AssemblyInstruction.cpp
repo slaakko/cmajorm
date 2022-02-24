@@ -1573,6 +1573,7 @@ AssemblyInstructionMap::AssemblyInstructionMap()
     MapInstruction(cmsx::machine::WDIF, registerInstruction);
     MapInstruction(cmsx::machine::TDIF, registerInstruction);
     MapInstruction(cmsx::machine::ODIF, registerInstruction);
+    MapInstruction(cmsx::machine::GO, registerInstruction);
     AssemblyInstruction* negateInstruction = AddInstruction(new NegateInstruction());
     MapInstruction(cmsx::machine::NEG, negateInstruction);
     MapInstruction(cmsx::machine::NEGU, negateInstruction);

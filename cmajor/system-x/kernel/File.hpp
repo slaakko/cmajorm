@@ -77,6 +77,7 @@ public:
     File* GetFile(int32_t fd) const;
     void CopyFrom(const ProcessFileTable& that);
     void CloseFiles(cmsx::kernel::Process* process);
+    int32_t Dup(int32_t fd);
 private:
     std::vector<File*> files;
 };
