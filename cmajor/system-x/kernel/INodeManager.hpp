@@ -141,10 +141,10 @@ public:
     void SetOtherAccess(Access otherAccess_) { otherAccess = otherAccess_; }
     int32_t NLinks() const { return nlinks; }
     void SetNLinks(int32_t nlinks_) { nlinks = nlinks_; }
-    int32_t Uid() const { return uid; }
-    void SetUid(int32_t uid_) { uid = uid_; }
-    int32_t Gid() const { return gid; }
-    void SetGid(int32_t gid_) { gid = gid_; }
+    int32_t UID() const { return uid; }
+    void SetUID(int32_t uid_) { uid = uid_; }
+    int32_t GID() const { return gid; }
+    void SetGID(int32_t gid_) { gid = gid_; }
     int64_t FileSize() const { return fileSize; }
     void SetFileSize(int64_t fileSize_) { fileSize = fileSize_; }
     const DateTime& CTime() const { return ctime; }

@@ -21,7 +21,15 @@ enum class IOControlItem : int32_t
 	isHostTextFile = 1,
 	hasColors = 2,
     columns = 3,
-    rows = 4
+    rows = 4,
+    cursorX = 5,
+    cursorY = 6,
+    set_cursor_pos = 7,
+    set_cooked = 8,
+    set_raw = 9,
+    set_echo = 10,
+    push_lines = 11,
+    pop_lines = 12
 };
 
 CMSX_KERNEL_API std::vector<std::uint8_t> MakeStringBuffer(const std::string& str, int64_t maxLength);
@@ -36,7 +44,7 @@ CMSX_KERNEL_API int32_t Open(Process* process, const std::string& path, int32_t 
 CMSX_KERNEL_API void Close(Process* process, int32_t fd);
 CMSX_KERNEL_API int64_t Write(Process* process, int32_t fd, int64_t bufferAddr, int64_t count);
 CMSX_KERNEL_API int64_t Read(Process* process, int32_t fd, int64_t bufferAddr, int64_t count);
-CMSX_KERNEL_API int32_t IOCtl(Process* process, int32_t fd, int32_t item);
+CMSX_KERNEL_API int32_t IOCtl(Process* process, int32_t fd, int32_t item, int64_t argAddr, int64_t argSize);
 CMSX_KERNEL_API void Unlink(Process* process, int64_t pathAddr);
 CMSX_KERNEL_API int64_t Seek(Process* process, int32_t fd, int64_t offset, int32_t whence);
 CMSX_KERNEL_API int64_t Tell(Process* process, int32_t fd);

@@ -27,7 +27,7 @@ void InitApplication(HINSTANCE instance)
     sngxml::xpath::Init();
     cmajor::wing::Init(instance);
     cmsx::machine::Init();
-    cmsx::kernel::Init();
+    cmsx::kernel::Init(false);
     cmsx::db::InitThemes();
 }
 

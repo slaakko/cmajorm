@@ -25,10 +25,11 @@
 #include <system-x/kernel/IOManager.hpp>
 #include <system-x/kernel/INodeManager.hpp>
 #include <system-x/kernel/Pipe.hpp>
+#include <system-x/kernel/Terminal.hpp>
 
 namespace cmsx::kernel {
 
-void Init()
+void Init(bool initTerminal)
 {
     InitTrap();
     InitTrapExit();
@@ -48,12 +49,17 @@ void Init()
     InitHostFileManager();
     InitClock();
     InitPipe();
+    if (initTerminal)
+    {
+        InitTerminal();
+    }
     InitKernel();
 }
 
 void Done()
 {
     DoneKernel();
+    DoneTerminal();
     DonePipe();
     DoneClock();
     DoneIOManager();

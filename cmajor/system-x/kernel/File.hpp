@@ -59,6 +59,14 @@ public:
     virtual bool HasColors() const = 0;
     virtual int Columns() const = 0;
     virtual int Rows() const = 0;
+    virtual int CursorX() const = 0;
+    virtual int CursorY() const = 0;
+    virtual void SetCursorPos(int32_t cursorX, int32_t cursorY);
+    virtual void SetCooked();
+    virtual void SetRaw();
+    virtual void SetEcho(bool echo);
+    virtual void PushLines();
+    virtual void PopLines();
     virtual bool IsDirFile() const { return false; }
     virtual std::vector<uint8_t> Read(int64_t count, cmsx::machine::Process* process);
     virtual int64_t Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process);
@@ -82,8 +90,8 @@ private:
     std::vector<File*> files;
 };
 
-CMSX_KERNEL_API void SetConsoleFiles(File* consoleOutputFile, File* consoleInputFile);
-CMSX_KERNEL_API void WriteToConsole(const std::string& text, cmsx::machine::Process* process);
+CMSX_KERNEL_API void SetTerminalFiles(File* terminalOutputFile, File* terminalInputFile);
+CMSX_KERNEL_API void WriteToTerminal(const std::string& text, cmsx::machine::Process* process);
 
 } // namespace cmsx::kernel
 

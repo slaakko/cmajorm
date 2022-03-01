@@ -25,6 +25,8 @@ public:
     bool HasColors() const override { return false; }
     int Columns() const override { return 0; }
     int Rows() const override { return 0; }
+    int CursorX() const override { return 0; }
+    int CursorY() const override { return 0; }
     int64_t Size() const { return decompressedMemoryStream.Content().size(); }
     void GetData(Process* process, uint64_t targetBufferAddr, uint64_t count);
 private:

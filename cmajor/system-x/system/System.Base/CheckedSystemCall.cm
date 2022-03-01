@@ -161,9 +161,9 @@ namespace System.Os
         return result;
     }
     
-    public int IOCtl(int fd, IOControlItem item)
+    public int IOCtl(int fd, IOControlItem item, byte* arg, long argSize)
     {
-        int result = ioctl(fd, item);
+        int result = ioctl(fd, item, arg, argSize);
         if (result == -1)
         {
             ThrowSystemError();
@@ -380,6 +380,44 @@ namespace System.Os
 	public int Dup(int fd)
 	{
 		int result = dup(fd);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+		return result;
+	}
+	
+	public void SetUID(int uid)
+	{
+		int result = setuid(uid);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+	}
+
+	public void SetGID(int gid)
+	{
+		int result = setgid(gid);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+	}
+	
+	public int GetUID()
+	{
+		int result = getuid();
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+		return result;
+	}
+
+	public int GetGID()
+	{
+		int result = getgid();
 		if (result == -1)
 		{
 			ThrowSystemError();

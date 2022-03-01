@@ -12,8 +12,8 @@ int main(int argc, const char** argv)
 {
     try
     {
-        bool hasColors = IOCtl(1, IOControlItem.hasColors) == 1;
-        int screenWidth = IOCtl(1, IOControlItem.columns);
+        bool hasColors = IOCtl(1, IOControlItem.hasColors, null, 0) == 1;
+        int screenWidth = IOCtl(1, IOControlItem.columns, null, 0);
         Fields additionalFields;
         SortField sortField = SortField.name;
         Flags flags = Flags.none;

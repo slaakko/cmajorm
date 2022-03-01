@@ -1,0 +1,109 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Os;
+using System.Security;
+
+class ShellEnvironment
+{
+	public ShellEnvironment()
+	{
+	}
+	public Users& GetUsers() 
+	{
+		return users;
+	}
+	public void SetUsers(const Users& users_)
+	{
+		users = users_;
+	}
+	public const string& UserName() const
+	{
+		return userName;
+	}
+	public void SetUserName(const string& userName_)
+	{
+		userName = userName_;
+	}
+	public const string& HostName() const
+	{
+		return hostName;
+	}
+	public void SetHostName(const string& hostName_)
+	{
+		hostName = hostName_;
+	}
+	public int UID() const
+	{
+		return uid;
+	}
+	public void SetUID(int uid_)
+	{
+		uid = uid_;
+	}
+	public const string& Shell() const
+	{
+		return shell;
+	}
+	public void SetShell(const string& shell_)
+	{
+		shell = shell_;
+	}
+	private Users users;
+	private string userName;
+	private string hostName;
+	private int uid;
+	private string shell;
+}
+
+void SetupShellEnvironment(ShellEnvironment& environment)
+{
+	environment.SetUsers(GetUsers());
+	if (HasEnv("USER"))
+	{
+		environment.SetUserName(GetEnv("USER"));
+	}
+	else
+	{
+		environment.SetUserName(GetUserName());
+	}
+	if (HasEnv("HOSTNAME"))
+	{
+		environment.SetHostName(GetEnv("HOSTNAME"));
+	}
+	else
+	{
+		environment.SetHostName(GetComputerName());
+	}
+	int uid = -1;
+	string shell;
+	User* user = environment.GetUsers().GetUser(environment.UserName());
+	if (user == null)
+	{
+		InstallUser(environment.UserName(), uid, shell);
+	}
+	else
+	{
+		uid = user->UID();
+		shell = user->Shell();
+	}
+	if (HasEnv("UID"))
+	{
+		environment.SetUID(ParseInt(GetEnv("UID")));
+	}
+	else
+	{
+		environment.SetUID(uid);
+	}
+	if (HasEnv("SHELL"))
+	{
+		environment.SetShell(GetEnv("SHELL"));
+	}
+	else
+	{
+		environment.SetShell(shell);
+	}
+}

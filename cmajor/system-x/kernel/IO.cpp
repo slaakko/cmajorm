@@ -199,7 +199,7 @@ int64_t Read(Process* process, int32_t fd, int64_t bufferAddr, int64_t count)
     return buffer.size();
 }
 
-int32_t IOCtl(Process* process, int32_t fd, int32_t item)
+int32_t IOCtl(Process* process, int32_t fd, int32_t item, int64_t argAddr, int64_t argSize)
 {
     ProcessFileTable& fileTable = process->GetFileTable();
     File* file = fileTable.GetFile(fd);
@@ -225,11 +225,63 @@ int32_t IOCtl(Process* process, int32_t fd, int32_t item)
         {
             return static_cast<int32_t>(file->Rows());
         }
+        case IOControlItem::cursorX:
+        {
+            return static_cast<int32_t>(file->CursorX());
+        }
+        case IOControlItem::cursorY:
+        {
+            return static_cast<int32_t>(file->CursorY());
+        }
+        case IOControlItem::set_cursor_pos:
+        {
+            std::vector<uint8_t> arg = ReadProcessMemory(process, argAddr, 8);
+            MemoryReader reader(arg.data(), 8);
+            int32_t cursorX = reader.ReadInt();
+            int32_t cursorY = reader.ReadInt();
+            file->SetCursorPos(cursorX, cursorY);
+            break;
+        }
+        case IOControlItem::set_cooked:
+        {
+            file->SetCooked();
+            break;
+        }
+        case IOControlItem::set_raw:
+        {
+            file->SetRaw();
+            break;
+        }
+        case IOControlItem::set_echo:
+        {
+            std::vector<uint8_t> arg = ReadProcessMemory(process, argAddr, 1);
+            MemoryReader reader(arg.data(), 1);
+            uint8_t echo = reader.ReadByte();
+            if (echo == 1)
+            {
+                file->SetEcho(true);
+            }
+            else
+            {
+                file->SetEcho(false);
+            }
+        }
+        case IOControlItem::push_lines:
+        {
+            file->PushLines();
+            break;
+        }
+        case IOControlItem::pop_lines:
+        {
+            file->PopLines();
+            break;
+        }
         default:
         {
             throw SystemError(EPARAM, "unknown ioctl item");
         }
     }
+    return 0;
 }
 
 void Unlink(Process* process, int64_t pathAddr)

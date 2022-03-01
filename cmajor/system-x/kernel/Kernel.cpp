@@ -15,6 +15,7 @@
 #include <system-x/kernel/Mount.hpp>
 #include <system-x/kernel/RootFs.hpp>
 #include <system-x/kernel/HostFs.hpp>
+#include <system-x/kernel/Terminal.hpp>
 
 namespace cmsx::kernel {
 
@@ -46,6 +47,16 @@ uint64_t KernelProcess::GetINodeKeyOfWorkingDir() const
 void KernelProcess::SetINodeKeyOfWorkingDir(uint64_t inodeKeyAsULong)
 {
     Kernel::Instance().SetINodeKeyOfRootDir(inodeKeyAsULong);
+}
+
+void KernelProcess::SetUID(int32_t uid)
+{
+    throw SystemError(EPERMISSION, "cannot set UID of kernel process");
+}
+
+void KernelProcess::SetGID(int32_t gid)
+{
+    throw SystemError(EPERMISSION, "cannot set GID of kernel process");
 }
 
 std::unique_ptr<Kernel> Kernel::instance;
@@ -86,6 +97,7 @@ void Kernel::SetMachine(cmsx::machine::Machine* machine_)
     SetINodeManagerMachine(machine);
     SetHostFileManagerMachine(machine);
     SetIOManagerMachine(machine);
+    SetTerminalMachine(machine);
 }
 
 void Kernel::Start()
@@ -105,10 +117,12 @@ void Kernel::Start()
     StartIOManager();
     hostFs->Initialize();
     rootFs->Initialize();
+    StartTerminal();
 }
 
 void Kernel::Stop()
 {
+    StopTerminal();
     StopIOManager();
     StopHostFileManager();
     StopBlockManager();

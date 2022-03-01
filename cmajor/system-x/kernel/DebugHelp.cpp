@@ -289,7 +289,7 @@ DebugLock::DebugLock(std::recursive_mutex* machineLock_, int site_, int processI
         std::string logEntry = MakeLogEntry(true, site, processId, flags);
         logEntry.append(":").append(evnt.ToString());
         logEntry.append("\n");
-        WriteToConsole(logEntry, cmsx::kernel::Kernel::Instance().GetKernelProcess());
+        WriteToTerminal(logEntry, cmsx::kernel::Kernel::Instance().GetKernelProcess());
         logged = true;
     }
 }
@@ -303,7 +303,7 @@ DebugLock::DebugLock(std::recursive_mutex* machineLock_, int site_, int processI
         std::string logEntry = MakeLogEntry(true, site, processId, flags);
         logEntry.append(":").append(str);
         logEntry.append("\n");
-        WriteToConsole(logEntry, cmsx::kernel::Kernel::Instance().GetKernelProcess());
+        WriteToTerminal(logEntry, cmsx::kernel::Kernel::Instance().GetKernelProcess());
         logged = true;
     }
 }
@@ -317,7 +317,7 @@ DebugLock::DebugLock(std::recursive_mutex* machineLock_, int site_, int processI
     {
         std::string logEntry = MakeLogEntry(true, site, processId, flags);
         logEntry.append("\n");
-        WriteToConsole(logEntry, cmsx::kernel::Kernel::Instance().GetKernelProcess());
+        WriteToTerminal(logEntry, cmsx::kernel::Kernel::Instance().GetKernelProcess());
         logged = true;
     }
 }
@@ -334,7 +334,7 @@ DebugLock::~DebugLock()
         logEntry.append(":").append(evnt.ToString());
     }
     logEntry.append("\n");
-    WriteToConsole(logEntry, cmsx::kernel::Kernel::Instance().GetKernelProcess());
+    WriteToTerminal(logEntry, cmsx::kernel::Kernel::Instance().GetKernelProcess());
 }
 
 } // namespace cmsx::kernel

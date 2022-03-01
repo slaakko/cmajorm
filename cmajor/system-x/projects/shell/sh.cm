@@ -1,0 +1,42 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+using System.Os;
+
+string CWD(ShellEnvironment& environment)
+{
+	string cwd = GetCurrentWorkingDirectory();
+	
+	return SetColors(ConsoleColor.blue, DefaultConsoleBackColor()).Append(cwd).Append(ResetColors());
+}
+
+void PrintPrompt(ShellEnvironment& environment)
+{
+	string prompt = "$ ";
+	if (environment.UID() == 0)
+	{
+		prompt = "# ";
+	}
+	Console.Out() << SetColors(ConsoleColor.green, DefaultConsoleBackColor()).Append(environment.UserName()).Append("@").Append(environment.HostName()).Append(ResetColors()).
+		Append(":").Append(CWD(environment)).Append(prompt);
+}
+
+string GetLine(ShellEnvironment& environment)
+{
+	PrintPrompt(environment);
+	string line = Console.ReadLine();
+	return line;
+}
+
+void Run(ShellEnvironment& environment)
+{
+	string line = GetLine(environment);
+	while (line != "exit")
+	{
+		line = GetLine(environment);
+	}
+}

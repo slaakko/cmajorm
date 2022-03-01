@@ -147,12 +147,12 @@ namespace System.IO
         }
         public override bool IsHostTextFile() const
         {
-            int result = System.Os.IOCtl(fd, IOControlItem.isHostTextFile);
+            int result = System.Os.IOCtl(fd, IOControlItem.isHostTextFile, null, 0);
             return result == 1;
         }
         public override bool IsConsole() const
         {
-            int result = System.Os.IOCtl(fd, IOControlItem.isConsole);
+            int result = System.Os.IOCtl(fd, IOControlItem.isConsole, null, 0);
             return result == 1;
         }
         private int fd;

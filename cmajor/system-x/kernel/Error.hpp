@@ -21,6 +21,7 @@ const int EALREADYEXISTS = 6;
 const int ELIMITEXCEEDED = 7;
 const int ENOCHILD = 8;
 const int EHOST = 9;
+const int EPERMISSION = 10;
 
 CMSX_KERNEL_API std::string ErrorCodeStr(int errorCode);
 CMSX_KERNEL_API std::string ErrorMsg(int errorCode);

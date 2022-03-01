@@ -28,7 +28,7 @@ Process::Process(int32_t id_) :
     state(cmsx::machine::ProcessState::created), entryPoint(-1), argumentsStartAddress(-1), argumentsLength(0), environmentStartAddress(-1), environmentLength(0), 
     heapStartAddress(-1), heapLength(0), stackStartAddress(-1), startUserTime(), startSleepTime(), startSystemTime(), userTime(0), sleepTime(0), systemTime(0),
     exitCode(0), debugger(nullptr), processor(nullptr), currentExceptionAddress(0), currentExceptionClassId(0), currentTryRecord(nullptr), kernelFiber(nullptr),
-    inodeKeyOfWorkingDirAsULong(-1)
+    inodeKeyOfWorkingDirAsULong(-1), uid(0), gid(0)
 {
     SetINodeKeyOfWorkingDir(Kernel::Instance().GetINodeKeyOfRootDir());
 }
@@ -144,6 +144,30 @@ void Process::AddChildSystemTime(const std::chrono::steady_clock::duration& chil
 void Process::SetError(const SystemError& error_)
 {
     error = error_;
+}
+
+void Process::SetUID(int32_t uid_)
+{
+    if (uid == 0)
+    {
+        uid = uid_;
+    }
+    else
+    {
+        throw SystemError(EPERMISSION, "unauthorized");
+    }
+}
+
+void Process::SetGID(int32_t gid_)
+{
+    if (gid == 0)
+    {
+        gid = gid_;
+    }
+    else
+    {
+        throw SystemError(EPERMISSION, "unauthorized");
+    }
 }
 
 void Process::Exit(uint8_t exitCode_)
@@ -361,6 +385,8 @@ int32_t Fork(Process* parent)
     child->SetProcessor(processor);
     uint64_t rv = machine->Mem().AllocateTranslationMap();
     child->SetRV(rv);
+    child->SetUID(parent->UID());
+    child->SetGID(parent->GID());
     TextSegmentWriteProtectionGuard guard(rv, machine->Mem());
     SetupRegions(parent, child);
     child->GetFileTable().CopyFrom(parent->GetFileTable());

@@ -82,7 +82,7 @@ namespace System.Security
         }
         public User* GetUser(int uid) const
         {
-            HashMap<int, User*>.ConstIterator it = uidUserMap.CFind(uid);
+            Map<int, User*>.ConstIterator it = uidUserMap.CFind(uid);
             if (it != uidUserMap.CEnd())
             {
                 return it->second;
@@ -94,7 +94,7 @@ namespace System.Security
         }
         public User* GetUser(const string& userName) const
         {
-            HashMap<string, User*>.ConstIterator it = userNameUserMap.CFind(userName);
+            Map<string, User*>.ConstIterator it = userNameUserMap.CFind(userName);
             if (it != userNameUserMap.CEnd())
             {
                 return it->second;
@@ -124,8 +124,8 @@ namespace System.Security
             return lastUserId + 1;
         }
         private List<User> users;
-        private HashMap<int, User*> uidUserMap;
-        private HashMap<string, User*> userNameUserMap;
+        private Map<int, User*> uidUserMap;
+        private Map<string, User*> userNameUserMap;
         private int lastUserId;
     }
     
@@ -151,6 +151,10 @@ namespace System.Security
         {
             return users;
         }
+		public void AddUser(const string& userName)
+		{
+			users.Add(userName);
+		}
         private string groupname;
         private int gid;
         private List<string> users;
@@ -171,7 +175,7 @@ namespace System.Security
         }
         public Group* GetGroup(int gid) const
         {
-            HashMap<int, Group*>.ConstIterator it = gidGroupMap.CFind(gid);
+            Map<int, Group*>.ConstIterator it = gidGroupMap.CFind(gid);
             if (it != gidGroupMap.CEnd())
             {
                 return it->second;
@@ -200,7 +204,7 @@ namespace System.Security
             return lastGroupId + 1;
         }
         private List<Group> groups;
-        private HashMap<int, Group*> gidGroupMap;
+        private Map<int, Group*> gidGroupMap;
         private int lastGroupId;
     }
     

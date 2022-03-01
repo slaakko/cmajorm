@@ -9,7 +9,7 @@
 
 namespace cmsx::kernel {
 
-CMSX_KERNEL_API void Init();
+CMSX_KERNEL_API void Init(bool initTerminal);
 CMSX_KERNEL_API void Done();
 
 } // namespace cmsx::kernel

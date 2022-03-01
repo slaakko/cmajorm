@@ -5,7 +5,7 @@
 
 #include <system-x/sxx/Console.hpp>
 #include <system-x/sxx/Color.hpp>
-#include <system-x/kernel/OsFileApi.hpp>
+#include <system-x/kernel/OsApi.hpp>
 #include <io.h>
 #include <fcntl.h>
 

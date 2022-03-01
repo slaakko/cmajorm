@@ -12,7 +12,7 @@
 #include <sngxml/xpath/InitDone.hpp>
 #include <system-x/machine/InitDone.hpp>
 #include <system-x/kernel/InitDone.hpp>
-#include <system-x/kernel/OsFileApi.hpp>
+#include <system-x/kernel/OsApi.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Time.hpp>
 #include <soulng/util/Unicode.hpp>
@@ -28,7 +28,7 @@ void InitApplication()
     soulng::util::Init();
     sngxml::xpath::Init();
     cmsx::machine::Init();
-    cmsx::kernel::Init();
+    cmsx::kernel::Init(true);
 }
 
 void DoneApplication()
@@ -86,14 +86,11 @@ std::string SearchBin(const std::string& fileName)
 
 int main(int argc, const char** argv)
 {
-    std::string computerName = cmsx::kernel::OsGetComputerName();
-    std::string userName = cmsx::kernel::OsGetUserName();
     uint8_t exitCode = 0;
     sxx::Console console;
     try
     {
         InitApplication();
-        cmsx::kernel::SetConsoleFiles(&console, &console);
         std::vector<std::string> args;
         std::vector<std::string> env;
         bool programFileSeen = false;
@@ -154,7 +151,9 @@ int main(int argc, const char** argv)
         }
         if (!programFileSeen)
         {
-            throw std::runtime_error("no program set");
+            std::string filePath = SearchBin("sh");
+            args.push_back(filePath);
+            args.push_back("-v");
         }
         cmsx::machine::Machine machine;
         cmsx::kernel::Kernel::Instance().SetMachine(&machine);
@@ -166,7 +165,6 @@ int main(int argc, const char** argv)
         {
             std::cout << "running '" << args[0] << "'..." << std::endl;;
         }
-        console.SetToUtf16Mode();
         machine.Start();
         cmsx::kernel::ProcessManager::Instance().WaitForProcessesExit();
         if (machine.HasException())
@@ -178,7 +176,6 @@ int main(int argc, const char** argv)
             catch (const std::exception& ex)
             {
                 exitCode = 255;
-                console.SetToTextMode();
                 std::cout << ex.what() << std::endl;
             }
         }
@@ -191,7 +188,6 @@ int main(int argc, const char** argv)
                     exitCode = process->ExitCode();
                 }
             }
-            console.SetToTextMode();
             std::cout << "'" << args[0] << "' exited with code " << static_cast<int>(exitCode) << std::endl;
             std::cout << std::endl;
             std::chrono::steady_clock::duration userTime = process->UserTime();
@@ -235,7 +231,6 @@ int main(int argc, const char** argv)
     }
     catch (const std::exception& ex)
     {
-        console.SetToTextMode();
         std::cerr << ex.what() << std::endl;
         return 1;
     }

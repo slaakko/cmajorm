@@ -55,6 +55,10 @@ public const byte trap_get_computer_name = 48u;
 public const byte trap_get_user_name = 49u;
 public const byte trap_pipe = 50u;
 public const byte trap_dup = 51u;
+public const byte trap_setuid = 52u;
+public const byte trap_setgid = 53u;
+public const byte trap_getuid = 54u;
+public const byte trap_getgid = 55u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -213,12 +217,20 @@ public enum IOControlItem : int
     isHostTextFile = 1,
     hasColors = 2,
     columns = 3,
-    rows = 4
+    rows = 4,
+	cursor_x = 5,
+	cursor_y = 6,
+	set_cursor_pos = 7,
+	set_cooked = 8,
+	set_raw = 9,
+	set_echo = 10,
+	push_lines = 11,
+	pop_lines = 12
 }
 
-public cdecl nothrow int ioctl(int fd, IOControlItem item)
+public cdecl nothrow int ioctl(int fd, IOControlItem item, byte* arg, long argSize)
 {
-    return cast<int>(trap(0u, trap_ioctl, 0u, fd, item));
+    return cast<int>(trap(0u, trap_ioctl, 0u, fd, item, arg, argSize));
 }
 
 public cdecl nothrow int unlink(const char* path)
@@ -344,4 +356,24 @@ public cdecl nothrow int pipe(int* readerFd, int* writerFd)
 public cdecl nothrow int dup(int fd)
 {
 	return cast<int>(trap(0u, trap_dup, 0u, fd));
+}
+
+public cdecl nothrow int setuid(int uid)
+{
+	return cast<int>(trap(0u, trap_setuid, 0u, uid));
+}
+
+public cdecl nothrow int setgid(int gid)
+{
+	return cast<int>(trap(0u, trap_setgid, 0u, gid));
+}
+
+public cdecl nothrow int getuid()
+{
+	return cast<int>(trap(0u, trap_getuid, 0u));
+}
+
+public cdecl nothrow int getgid()
+{
+	return cast<int>(trap(0u, trap_getgid, 0u));
 }

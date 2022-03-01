@@ -263,7 +263,7 @@ MainWindow::MainWindow(const std::string& filePath_) :
     SetState(DebuggingState::debuggerIdle);
 
     consoleFile.reset(new cmsx::guicon::ConsoleFile());
-    cmsx::kernel::SetConsoleFiles(consoleFile.get(), consoleFile.get());
+    cmsx::kernel::SetTerminalFiles(consoleFile.get(), consoleFile.get());
 
     if (!filePath.empty())
     {

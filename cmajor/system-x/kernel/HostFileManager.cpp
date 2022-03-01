@@ -5,7 +5,7 @@
 
 #include <system-x/kernel/HostFileManager.hpp>
 #include <system-x/kernel/IoManager.hpp>
-#include <system-x/kernel/OsFileApi.hpp>
+#include <system-x/kernel/OsApi.hpp>
 #include <system-x/kernel/DebugHelp.hpp>
 #include <map>
 #include <set>

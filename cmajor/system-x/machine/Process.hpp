@@ -35,6 +35,10 @@ public:
     virtual void ReleaseProcessor(Processor* processor) = 0;
     virtual uint64_t GetINodeKeyOfWorkingDir() const = 0;
     virtual void SetINodeKeyOfWorkingDir(uint64_t inodeKeyAsULong) = 0;
+    virtual int32_t UID() const = 0;
+    virtual int32_t GID() const = 0;
+    virtual void SetUID(int32_t uid) = 0;
+    virtual void SetGID(int32_t gid) = 0;
 };
 
 using ProcessList = std::list<Process*, boost::fast_pool_allocator<Process*>>;

@@ -1,0 +1,91 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Os;
+using System.Security;
+
+void InstallUser(const string& userName, int& uid, string& shell)
+{
+	Users users = GetUsers();
+	uid = users.GetFreeUserId();
+	shell = "/bin/sh";
+	int gid = 0;
+	string homeDirectory = Path.Combine("/home", userName);
+	User newUser(userName, string(), uid, gid, userName, homeDirectory, shell);
+	users.AddUser(newUser);
+	WriteUsers(users);
+	Groups groups = GetGroups();
+	Group* adminGroup = groups.GetGroup(0);
+	if (adminGroup == null)
+	{
+		List<string> users;
+		users.Add("root");
+		users.Add(userName);
+		Group rootGroup("root", 0, users);
+		groups.AddGroup(rootGroup);
+	}
+	else
+	{
+		adminGroup->AddUser(userName);
+	}
+	WriteGroups(groups);
+}
+
+void Install()
+{
+	Console.Out() << "initializing..." << endl();
+	int pid = Fork();
+	if (pid == 0)
+	{
+		CreateDirectories("/bin");
+		List<string> args;
+		args.Add("-vu");
+		args.Add("/mnt/sx/bin/*.x");
+		args.Add("/bin");
+		Exec("/mnt/sx/bin/cp", args);
+	}
+	else
+	{
+		byte exitCode = 0u;
+		Wait(&exitCode);
+		if (exitCode != 0u)
+		{
+			throw Exception("shell installation failed: child returned exit code " + ToString(exitCode));
+		}
+		string userName = GetUserName();
+		if (!Directory.Exists("/etc")) 
+		{
+			CreateDirectories("/etc");
+		}
+		if (!File.Exists("/etc/passwd"))
+		{
+			StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/passwd", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), cast<int>(ParseOctal("644")))));
+			// username:hash:uid:gid:info:home:shell
+			writer.WriteLine("root::0:0:root:/:/bin/sh");
+			writer.WriteLine(userName + "::1:1:" + userName + ":/home/" + userName + ":/bin/sh");
+		}
+		if (!File.Exists("/etc/group"))
+		{
+			StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/group", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), cast<int>(ParseOctal("644")))));
+			// groupname:gid:usercsv
+			writer.WriteLine("root:0:root," + userName);
+		}
+		if (!File.Exists("/etc/environment"))
+		{
+			StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/environment", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), cast<int>(ParseOctal("644")))));
+			writer.WriteLine("PATH=\"/bin\"");
+		}
+		if (!Directory.Exists("/home"))
+		{
+			CreateDirectories("/home");
+		}
+		if (!Directory.Exists("/home/" + userName))
+		{
+			CreateDirectories("/home/" + userName);
+		}
+	}
+}

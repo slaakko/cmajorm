@@ -63,6 +63,10 @@ const uint8_t trap_get_computer_name = 48;
 const uint8_t trap_get_user_name = 49;
 const uint8_t trap_pipe = 50;
 const uint8_t trap_dup = 51;
+const uint8_t trap_setuid = 52;
+const uint8_t trap_setgid = 53;
+const uint8_t trap_getuid = 54;
+const uint8_t trap_getgid = 55;
 
 class CMSX_KERNEL_API TrapHandler
 {

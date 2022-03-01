@@ -23,7 +23,7 @@ void InitApplication()
     sngxml::xpath::Init();
     cmsx::machine::Init();
     cmsx::assembler::Init();
-    cmsx::kernel::Init();
+    cmsx::kernel::Init(true);
 }
 
 void DoneApplication()

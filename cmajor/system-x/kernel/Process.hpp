@@ -81,6 +81,10 @@ public:
     const std::chrono::steady_clock::duration& ChildUserTime() const { return childUserTime; }
     const std::chrono::steady_clock::duration& ChildSleepTime() const { return childSleepTime; }
     const std::chrono::steady_clock::duration& ChildSystemTime() const { return childSystemTime; }
+    int32_t UID() const override { return uid; }
+    void SetUID(int32_t uid_) override;
+    int32_t GID() const override { return gid; }
+    void SetGID(int32_t gid_) override;
     RegionTable& GetRegionTable() { return regionTable; }
     ProcessFileTable& GetFileTable() { return fileTable; }
     void SetError(const SystemError& error_);
@@ -114,6 +118,8 @@ private:
     int64_t heapLength;
     int64_t stackStartAddress;
     uint8_t exitCode;
+    int32_t uid;
+    int32_t gid;
     std::chrono::steady_clock::time_point startUserTime;
     std::chrono::steady_clock::time_point startSleepTime;
     std::chrono::steady_clock::time_point startSystemTime;

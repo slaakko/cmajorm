@@ -137,7 +137,6 @@ public:
     std::string TrapName() const { return "trap_ioctl"; }
 };
 
-
 uint64_t TrapIOCtlHandler::HandleTrap(cmsx::machine::Processor& processor)
 {
     Process* process = static_cast<Process*>(processor.CurrentProcess());
@@ -145,7 +144,9 @@ uint64_t TrapIOCtlHandler::HandleTrap(cmsx::machine::Processor& processor)
     {
         int32_t fd = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
         int32_t item = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regBX));
-        return IOCtl(process, fd, item);
+        int64_t argAddr = static_cast<int64_t>(processor.Regs().Get(cmsx::machine::regCX));
+        int64_t argSize = static_cast<int64_t>(processor.Regs().Get(cmsx::machine::regDX));
+        return IOCtl(process, fd, item, argAddr, argSize);
     }
     catch (const SystemError& error)
     {

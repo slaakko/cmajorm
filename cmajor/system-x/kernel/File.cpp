@@ -9,8 +9,8 @@
 
 namespace cmsx::kernel {
 
-File* consoleOutputFile = nullptr;
-File* consoleInputFile = nullptr;
+File* terminalOutputFile = nullptr;
+File* terminalInputFile = nullptr;
 
 File::File(const std::string& name_) : name(name_)
 {
@@ -38,6 +38,36 @@ int64_t File::Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* 
     return 0;
 }
 
+void File::SetCursorPos(int32_t cursorX, int32_t cursorY)
+{
+    throw SystemError(EBADF, name + ": cannot set cursor position");
+}
+
+void File::SetCooked()
+{
+    throw SystemError(EBADF, name + " cannot be set to cooked mode");
+
+}
+void File::SetRaw()
+{
+    throw SystemError(EBADF, name + " cannot be set to raw mode");
+}
+
+void File::SetEcho(bool echo)
+{
+    throw SystemError(EBADF, name + ": cannot set echo");
+}
+
+void File::PushLines()
+{
+    throw SystemError(EBADF, name + ": cannot push lines");
+}
+
+void File::PopLines()
+{
+    throw SystemError(EBADF, name + ": cannot pop lines");
+}
+
 int64_t File::Seek(int64_t offset, Origin whence, cmsx::machine::Process* process)
 {
     throw SystemError(EBADF, name + " not seekable");
@@ -51,9 +81,9 @@ int64_t File::Tell(cmsx::machine::Process* process)
 ProcessFileTable::ProcessFileTable()
 {
     files.resize(cmsx::machine::MaxOpenFiles());
-    files[0] = consoleInputFile;
-    files[1] = consoleOutputFile;
-    files[2] = consoleOutputFile;
+    files[0] = terminalInputFile;
+    files[1] = terminalOutputFile;
+    files[2] = terminalOutputFile;
 }
 
 void ProcessFileTable::CloseFiles(cmsx::kernel::Process* process)
@@ -120,24 +150,23 @@ File* ProcessFileTable::GetFile(int32_t fd) const
     return file;
 }
 
-void SetConsoleFiles(File* consoleOutputFile, File* consoleInputFile)
+void SetTerminalFiles(File* terminalOutputFile, File* terminalInputFile)
 {
-    cmsx::kernel::consoleOutputFile = consoleOutputFile;
-    cmsx::kernel::consoleInputFile = consoleInputFile;
+    cmsx::kernel::terminalOutputFile = terminalOutputFile;
+    cmsx::kernel::terminalInputFile = terminalInputFile;
 }
 
-void WriteToConsole(const std::string& text, cmsx::machine::Process* process)
+void WriteToTerminal(const std::string& text, cmsx::machine::Process* process)
 {
-    if (cmsx::kernel::consoleOutputFile)
+    if (cmsx::kernel::terminalOutputFile)
     {
         std::vector<std::uint8_t> buffer;
         for (char c : text)
         {
             buffer.push_back(static_cast<uint8_t>(c));
         }
-        cmsx::kernel::consoleOutputFile->Write(buffer, process);
+        cmsx::kernel::terminalOutputFile->Write(buffer, process);
     }
 }
-
 
 } // namespace cmsx::kernel

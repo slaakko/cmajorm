@@ -5,7 +5,7 @@
 
 #include <system-x/kernel/IOManager.hpp>
 #include <system-x/kernel/HostFileManager.hpp>
-#include <system-x/kernel/OsFileApi.hpp>
+#include <system-x/kernel/OsApi.hpp>
 #include <system-x/kernel/EventManager.hpp>
 #include <system-x/kernel/BlockManager.hpp>
 #include <system-x/kernel/DebugHelp.hpp>

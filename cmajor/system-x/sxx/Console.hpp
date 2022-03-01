@@ -27,6 +27,8 @@ public:
     bool HasColors() const override { return true; }
     int Columns() const override;
     int Rows() const override;
+    int CursorX() const override { return 0; }
+    int CursorY() const override { return 0; }
     void Close(cmsx::kernel::Process* process) override;
     std::vector<uint8_t> Read(int64_t count, cmsx::machine::Process* process) override;
     int64_t Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process) override;

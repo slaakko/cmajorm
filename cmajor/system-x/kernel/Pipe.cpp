@@ -214,6 +214,8 @@ public:
     bool HasColors() const override { return false; }
     int Columns() const override { return 0; }
     int Rows() const override { return 0; }
+    int CursorX() const override { return 0; }
+    int CursorY() const override { return 0; }
     bool IsDirFile() const override { return false; }
     std::vector<uint8_t> Read(int64_t count, cmsx::machine::Process* process) override;
 private:
@@ -306,6 +308,8 @@ public:
     bool HasColors() const override { return false; }
     int Columns() const override { return 0; }
     int Rows() const override { return 0; }
+    int CursorX() const override { return 0; }
+    int CursorY() const override { return 0; }
     bool IsDirFile() const override { return false; }
     int64_t Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process) override;
 private:
