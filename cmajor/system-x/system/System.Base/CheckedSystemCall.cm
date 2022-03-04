@@ -346,10 +346,10 @@ namespace System.Os
         }
     }
     
-    public string GetComputerName()
+    public string GetHostName()
     {
         char[256] buffer;
-        int result = get_computer_name(&buffer[0], 256);
+        int result = get_host_name(&buffer[0], 256);
         if (result == -1)
         {
             ThrowSystemError();
@@ -423,5 +423,42 @@ namespace System.Os
 			ThrowSystemError();
 		}
 		return result;
+	}
+	
+	public int UMask(int mask)
+	{
+		int result = umask(mask);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+		return result;
+	}
+	
+	public void ChMod(const char* path, int mode)
+	{
+		int result = chmod(path, mode);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+	}
+	
+	public void ChOwn(const char* path, int uid, int gid)
+	{
+		int result = chown(path, uid, gid);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+	}
+	
+	public void Rename(const char* source, const char* target)
+	{
+		int result = rename(source, target);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
 	}
 }

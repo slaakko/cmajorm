@@ -7,6 +7,44 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Text;
+using System.Security;
+
+class Credentials
+{
+	static Credentials() : instance(new Credentials())
+	{
+	}
+	public static Credentials& Instance() 
+	{
+		return *instance;
+	}
+	private Credentials()
+	{
+		users = GetUsers();
+		groups = GetGroups();
+	}
+	public string GetUserName(int uid) const
+	{
+		User* user = users.GetUser(uid);
+		if (user != null)
+		{
+			return user->Name();
+		}
+		return string();
+	}
+	public string GetGroupName(int gid) const
+	{
+		Group* group = groups.GetGroup(gid);
+		if (group != null)
+		{
+			return group->Name();
+		}
+		return string();
+	}
+	private static UniquePtr<Credentials> instance;
+	private Users users;
+	private Groups groups;
+}
 
 enum Fields
 {
@@ -42,6 +80,11 @@ FieldValue MakeIntFieldValue(int n, Fields field)
 FieldValue MakeStringFieldValue(const string& s, Fields field)
 {
     return FieldValue(ToUtf32(s), field);
+}
+
+FieldValue MakeUStringFieldValue(const ustring& s, Fields field)
+{
+	return FieldValue(s, field);
 }
 
 FieldValue MakeTimeFieldValue(const DateTime& dateTime, Fields field)
@@ -196,6 +239,8 @@ class FileInfo
     public DirectoryEntry entry;
     public List<FieldValue> fieldValues;
     public long nameFieldIndex;
+	public ustring userName;
+	public ustring groupName;
 }
 
 enum SortField
@@ -226,7 +271,8 @@ class SortBy : Rel<FileInfo>
             }
             case SortField.user:
             {
-                // todo
+                if (left.userName < right.userName) return true;
+				if (left.userName > right.userName) return false;
                 break;
             }
             case SortField.size:
@@ -309,19 +355,21 @@ void MakeFileInfo(FileInfo& fileInfo, Fields fields, bool humanReadableSize)
     }
     if ((fields & Fields.user) != Fields.none)
     {
-        // todo
+		fileInfo.userName = ToUtf32(Credentials.Instance().GetUserName(fileInfo.fileStatus.uid));
+        fileInfo.fieldValues.Add(MakeUStringFieldValue(fileInfo.userName, Fields.user));
     }
     if ((fields & Fields.uid) != Fields.none)
     {
-        // todo
+        fileInfo.fieldValues.Add(MakeIntFieldValue(fileInfo.fileStatus.uid, Fields.uid));
     }
     if ((fields & Fields.group) != Fields.none)
     {
-        // todo
+		fileInfo.groupName = ToUtf32(Credentials.Instance().GetGroupName(fileInfo.fileStatus.gid));
+        fileInfo.fieldValues.Add(MakeUStringFieldValue(fileInfo.groupName, Fields.group));
     }
     if ((fields & Fields.gid) != Fields.none)
     {
-        // todo
+        fileInfo.fieldValues.Add(MakeIntFieldValue(fileInfo.fileStatus.gid, Fields.gid));
     }
     if ((fields & Fields.size) != Fields.none)
     {
@@ -387,19 +435,19 @@ int NumberOfFields(Fields fields)
     }
     if ((fields & Fields.user) != Fields.none)
     {
-        // todo
+        ++nfields;
     }
     if ((fields & Fields.uid) != Fields.none)
     {
-        // todo
+        ++nfields;
     }
     if ((fields & Fields.group) != Fields.none)
     {
-        // todo
+        ++nfields;
     }
     if ((fields & Fields.gid) != Fields.none)
     {
-        // todo
+        ++nfields;
     }
     if ((fields & Fields.size) != Fields.none)
     {

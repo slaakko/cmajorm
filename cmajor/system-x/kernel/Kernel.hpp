@@ -28,6 +28,7 @@ public:
     int32_t GID() const override { return 0; }
     void SetUID(int32_t uid) override;
     void SetGID(int32_t gid) override;
+    int32_t UMask() const override { return 0; }
 };
 
 class CMSX_KERNEL_API Kernel

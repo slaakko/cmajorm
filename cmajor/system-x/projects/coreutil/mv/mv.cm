@@ -1,0 +1,54 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+using System.Collections;
+using System.Os;
+
+bool TargetIsDirectory(const string& target) 
+{
+    byte[statBufSize] statBuf;
+    int result = stat(target.Chars(), &statBuf[0], statBufSize);
+    if (result == -1)
+    {
+        return false;
+    }
+    FileStatus status;
+    GetFileStatus(&statBuf[0], status);
+    return status.fileType == FileType.directory;
+}
+
+void Move(const List<string>& files, const string& target, bool verbose)
+{
+	if (!TargetIsDirectory(target))
+	{
+		if (files.Count() == 1)
+		{
+			Rename(files.Front().Chars(), target.Chars());
+			if (verbose)
+			{
+				Console.Out() << files.Front() << " -> " << target << endl();
+			}
+		}
+		else if (files.Count() > 1)
+		{
+			throw Exception("'" + target + "': not directory");
+		}
+	}
+	else
+	{
+		for (const string& file : files)
+		{
+			string name = Path.GetFileName(file);
+			string targetPath = Path.Combine(target, name);
+			Rename(file.Chars(), targetPath.Chars());
+			if (verbose)
+			{
+				Console.Out() << file << " -> " << targetPath << endl();
+			}
+		}
+	}
+}

@@ -4,10 +4,13 @@
 // =================================
 
 using System;
+using System.Collections;
 using System.Os;
-using System.Security;
 
-void Login()
+void ChangeMode(int mode, const List<string>& files)
 {
-    
+	for (const string& file : files)
+	{
+		ChMod(file.Chars(), mode << modeShift);
+	}
 }

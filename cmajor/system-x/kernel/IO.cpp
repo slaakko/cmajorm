@@ -298,8 +298,9 @@ void Unlink(Process* process, int64_t pathAddr)
     {
         throw SystemError(EFAIL, "could not unlink: directory '" + dirName + "' not found");
     }
+    CheckAccess(Access::write, process->UID(), process->GID(), dirINode.Get(), "could not open directory '" + dirName + "' for writing");
     std::string fileName = Path::GetFileName(path);
-    RemoveDirectoryEntry(fileName, dirINode.Get(), GetFs(rootFSNumber), process);
+    RemoveDirectoryEntry(fileName, path, dirINode.Get(), GetFs(rootFSNumber), process, true);
 }
 
 int64_t Seek(Process* process, int32_t fd, int64_t offset, int32_t whence)
@@ -370,7 +371,7 @@ void GetCWD(Process* process, int64_t bufAddr, int64_t bufSize)
     INodePtr dirINodePtr = ReadINode(cwdINodeKey, process);
     if (dirINodePtr.Get())
     {
-        INodePtr parentDirINodePtr = SearchDirectory("..", dirINodePtr.Get(), fs, process);
+        INodePtr parentDirINodePtr = SearchDirectory("..", dirINodePtr.Get(), "..", fs, process);
         if (parentDirINodePtr.Get())
         {
             std::string cwd;
@@ -385,7 +386,7 @@ void GetCWD(Process* process, int64_t bufAddr, int64_t bufSize)
                 {
                     throw SystemError(EFAIL, "parent directory entry not found");
                 }
-                INodePtr grandParentDirINodePtr = SearchDirectory("..", parentDirINodePtr.Get(), fs, process);
+                INodePtr grandParentDirINodePtr = SearchDirectory("..", parentDirINodePtr.Get(), "..", fs, process);
                 if (!grandParentDirINodePtr.Get())
                 {
                     throw SystemError(EFAIL, "grand parent directory not found");
@@ -454,10 +455,12 @@ void MkDir(Process* process, int64_t pathAddr, int32_t mode)
     std::string parentPath = Path::GetDirectoryName(path);
     std::string dirName = Path::GetFileName(path);
     INodePtr inodePtr = PathToINode(parentPath, fs, process);
-    if (inodePtr.Get())
+    INode* parentINode = inodePtr.Get();
+    if (parentINode)
     {
-        Filesystem* ds = GetFs(inodePtr.Get()->Key().fsNumber);
-        ds->MkDir(inodePtr.Get(), dirName, process);
+        Filesystem* ds = GetFs(parentINode->Key().fsNumber);
+        CheckAccess(Access::write, process->UID(), process->GID(), parentINode, "could not create directory '" + path + "'");
+        ds->MkDir(parentINode, dirName, process, mode);
     }
     else
     {
@@ -475,10 +478,12 @@ int32_t OpenDir(Process* process, int64_t pathAddr)
     std::string path = ReadString(process, pathAddr, mem);
     Filesystem* fs = GetFs(rootFSNumber);
     INodePtr inodePtr = PathToINode(path, fs, process);
-    if (inodePtr.Get())
+    INode* inode = inodePtr.Get();
+    if (inode)
     {
-        Filesystem* ds = GetFs(inodePtr.Get()->Key().fsNumber);
-        DirFile* dirFile = ds->OpenDir(path, inodePtr.Get(), process);
+        CheckAccess(Access::read, process->UID(), process->GID(), inode, "could not open directory '" + path + "' for reading");
+        Filesystem* ds = GetFs(inode->Key().fsNumber);
+        DirFile* dirFile = ds->OpenDir(path, inode, process);
         ProcessFileTable& fileTable = process->GetFileTable();
         int32_t dd = fileTable.AddFile(dirFile);
         if (dd == -1)
@@ -597,6 +602,152 @@ int32_t Dup(Process* process, int32_t fd)
 {
     ProcessFileTable& fileTable = process->GetFileTable();
     return fileTable.Dup(fd);
+}
+
+void ChMod(Process* process, int64_t pathAddr, int32_t mode)
+{
+    if (pathAddr == 0)
+    {
+        throw SystemError(EPARAM, "path is null");
+    }
+    cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
+    std::string path = ReadString(process, pathAddr, mem);
+    Filesystem* fs = GetFs(rootFSNumber);
+    INodePtr inodePtr = PathToINode(path, fs, process);
+    INode* inode = inodePtr.Get();
+    if (inode)
+    {
+        if (process->UID() == 0 || process->UID() == inode->UID())
+        {
+            inode->SetMode(mode);
+            inode->SetCTime(GetCurrentDateTime());
+            WriteINode(inode, process);
+        }
+        else
+        {
+            throw SystemError(EPERMISSION, "unauthorized");
+        }
+    }
+    else
+    {
+        throw SystemError(ENOTFOUND, "path '" + path + "' not found");
+    }
+}
+
+void ChOwn(Process* process, int64_t pathAddr, int32_t uid, int32_t gid)
+{
+    if (process->UID() != 0)
+    {
+        throw SystemError(EPERMISSION, "unauthorized");
+    }
+    if (pathAddr == 0)
+    {
+        throw SystemError(EPARAM, "path is null");
+    }
+    cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
+    std::string path = ReadString(process, pathAddr, mem);
+    Filesystem* fs = GetFs(rootFSNumber);
+    INodePtr inodePtr = PathToINode(path, fs, process);
+    INode* inode = inodePtr.Get();
+    if (inode)
+    {
+        inode->SetUID(uid);
+        inode->SetGID(gid);
+        inode->SetCTime(GetCurrentDateTime());
+        WriteINode(inode, process);
+    }
+    else
+    {
+        throw SystemError(ENOTFOUND, "path '" + path + "' not found");
+    }
+}
+
+void Rename(Process* process, int64_t sourcePathAddr, int64_t targetPathAddr)
+{
+    if (sourcePathAddr == 0)
+    {
+        throw SystemError(EPARAM, "source path is null");
+    }
+    if (targetPathAddr == 0)
+    {
+        throw SystemError(EPARAM, "target path is null");
+    }
+    cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
+    std::string sourcePath = ReadString(process, sourcePathAddr, mem);
+    std::string targetPath = ReadString(process, targetPathAddr, mem);
+    std::string sourceDirPath = Path::GetDirectoryName(sourcePath);
+    if (sourceDirPath.empty())
+    {
+        if (sourcePath.starts_with("/"))
+        {
+            sourceDirPath = "/";
+        }
+        else
+        {
+            sourceDirPath = ".";
+        }
+    }
+    std::string targetDirPath = Path::GetDirectoryName(targetPath);
+    if (targetDirPath.empty())
+    {
+        if (targetPath.starts_with("/"))
+        {
+            targetDirPath = "/";
+        }
+        else
+        {
+            targetDirPath = ".";
+        }
+    }
+    Filesystem* fs = GetFs(rootFSNumber);
+    INodePtr sourceDirINodePtr = PathToINode(sourceDirPath, fs, process);
+    INode* sourceDirINode = sourceDirINodePtr.Get();
+    if (sourceDirINode)
+    {
+        CheckAccess(Access::read, process->UID(), process->GID(), sourceDirINode, "could not open directory '" + sourceDirPath + "' for reading");
+        INodePtr targetDirINodePtr = PathToINode(targetDirPath, fs, process);
+        INode* targetDirINode = targetDirINodePtr.Get();
+        if (targetDirINode)
+        {
+            CheckAccess(Access::write, process->UID(), process->GID(), sourceDirINode, "could not open directory '" + targetDirPath + "' for writing");
+            if (sourceDirINode == targetDirINode)
+            {
+                RenameDirectoryEntry(sourceDirINode, Path::GetFileName(sourcePath), Path::GetFileName(targetPath), fs, process);
+            }
+            else
+            {
+                if (sourceDirINode->Key().fsNumber == targetDirINode->Key().fsNumber)
+                {
+                    INodePtr inodePtr = SearchDirectory(Path::GetFileName(sourcePath), sourceDirINode, sourceDirPath, fs, process);
+                    INode* inode = inodePtr.Get();
+                    if (inode)
+                    {
+                        DirectoryEntry entry;
+                        entry.SetINodeNumber(inode->Key().inodeNumber);
+                        entry.SetName(Path::GetFileName(targetPath));
+                        AddDirectoryEntry(entry, targetDirINode, fs, process);
+                        RemoveDirectoryEntry(Path::GetFileName(sourcePath), sourcePath, sourceDirINode, fs, process);
+                    }
+                    else
+                    {
+                        throw SystemError(ENOTFOUND, "file name '" + Path::GetFileName(sourcePath) + "' not found from directory '" + sourceDirPath + "'");
+                    }
+                }
+                else
+                {
+                    throw SystemError(EFAIL, "cannot rename across filesystems");
+                }
+            }
+        }
+        else
+        {
+            throw SystemError(ENOTFOUND, "target directory '" + targetDirPath + "' not found");
+        }
+    }
+    else
+    {
+        throw SystemError(ENOTFOUND, "source directory '" + sourceDirPath + "' not found");
+    }
 }
 
 } // namespace cmsx::kernel

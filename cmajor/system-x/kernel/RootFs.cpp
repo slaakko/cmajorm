@@ -152,7 +152,7 @@ int32_t RootFilesystemDirFile::Read(DirectoryEntry& dirEntry, cmsx::machine::Pro
     return 0;
 }
 
-void MountHostDirectories(Filesystem* fs, cmsx::machine::Process* kernelProcess);
+void MountHostDirectories(Filesystem* fs, cmsx::machine::Process* kernelProcess, int32_t mode);
 
 RootFilesystem::RootFilesystem() : Filesystem(rootFSNumber), machine(nullptr), hostFs(nullptr), hostFile(nullptr), nextFileId(0)
 {
@@ -172,7 +172,7 @@ void RootFilesystem::Initialize()
         OpenFlags flags = OpenFlags::read | OpenFlags::write | OpenFlags::random_access;
         int32_t mode = 0;
         hostFile = hostFs->Open(RootFsHostFilePath(), nullptr, static_cast<int32_t>(flags), mode, Kernel::Instance().GetKernelProcess());
-        MountHostDirectories(this, Kernel::Instance().GetKernelProcess());
+        MountHostDirectories(this, Kernel::Instance().GetKernelProcess(), mode);
     }
 }
 
@@ -200,8 +200,12 @@ BlockFile* RootFilesystem::Open(const std::string& path, INode* dirINode, int32_
     {
         return fs->Open(fileName, dirINodePtr.Get(), flags, mode, process);
     }
-    INodePtr fileINode = cmsx::kernel::SearchDirectory(fileName, dirINodePtr.Get(), this, process);
+    INodePtr fileINode = cmsx::kernel::SearchDirectory(fileName, dirINodePtr.Get(), dirPath, this, process);
     OpenFlags openFlags = static_cast<OpenFlags>(flags);
+    if ((openFlags & OpenFlags::create) != OpenFlags::none)
+    {
+        CheckAccess(Access::write, process->UID(), process->GID(), dirINodePtr.Get(), "could not open directory '" + dirPath + "' for writing");
+    }
     bool truncated = false;
     if ((openFlags & OpenFlags::truncate) != OpenFlags::none)
     {
@@ -223,9 +227,19 @@ BlockFile* RootFilesystem::Open(const std::string& path, INode* dirINode, int32_
         else
         {
             fileINode = AllocateINode(Id(), process);
-            fileINode.Get()->SetFileType(FileType::regular);
-            fileINode.Get()->SetUID(process->UID());
-            fileINode.Get()->SetGID(process->GID());
+            INode* inode = fileINode.Get();
+            inode->SetFileType(FileType::regular);
+            inode->SetUID(process->UID());
+            inode->SetGID(process->GID());
+            inode->SetMode(AlterMode(mode, process->UMask(), false));
+            if ((openFlags & OpenFlags::read) != OpenFlags::none)
+            {
+                CheckAccess(Access::read, process->UID(), process->GID(), inode, "could not open file '" + path + "' for reading");
+            }
+            if ((openFlags & OpenFlags::write) != OpenFlags::none)
+            {
+                CheckAccess(Access::write, process->UID(), process->GID(), inode, "could not open file '" + path + "' for writing");
+            }
             WriteINode(fileINode.Get(), process);
             DirectoryEntry entry;
             entry.SetName(fileName);
@@ -236,6 +250,14 @@ BlockFile* RootFilesystem::Open(const std::string& path, INode* dirINode, int32_
     if (!fileINode.Get())
     {
         throw SystemError(ENOTFOUND, "could not open: path '" + path + "' not found");
+    }
+    if ((openFlags & OpenFlags::read) != OpenFlags::none)
+    {
+        CheckAccess(Access::read, process->UID(), process->GID(), fileINode.Get(), "could not open file '" + path + "' for reading");
+    }
+    if ((openFlags & OpenFlags::write) != OpenFlags::none)
+    {
+        CheckAccess(Access::write, process->UID(), process->GID(), fileINode.Get(), "could not open file '" + path + "' for writing");
     }
     fileINode.Get()->IncrementReferenceCount();
 #if (LOCK_DEBUG)
@@ -250,9 +272,10 @@ BlockFile* RootFilesystem::Open(const std::string& path, INode* dirINode, int32_
     return file;
 }
 
-INodePtr RootFilesystem::SearchDirectory(const std::string& name, INode* dirINode, cmsx::machine::Process* process)
+INodePtr RootFilesystem::SearchDirectory(const std::string& name, INode* dirINode, const std::string& dirPath, cmsx::machine::Process* process)
 {
-    return cmsx::kernel::SearchDirectory(name, dirINode, this, process);
+    CheckAccess(Access::execute, process->UID(), process->GID(), dirINode, "could not search directory '" + dirPath + "'");
+    return cmsx::kernel::SearchDirectory(name, dirINode, dirPath, this, process);
 }
 
 void RootFilesystem::Stat(INode* inode, cmsx::machine::Process* process)
@@ -274,11 +297,14 @@ DirFile* RootFilesystem::OpenDir(const std::string& path, INode* dirINode, cmsx:
     return dirFile;
 }
 
-void RootFilesystem::MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process)
+void RootFilesystem::MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process, int32_t mode)
 {
     INodePtr dirINodePtr = AllocateINode(Id(), process);
     INode* dirINode = dirINodePtr.Get();
     dirINode->SetFileType(FileType::directory);
+    dirINode->SetUID(process->UID());
+    dirINode->SetGID(process->GID());
+    dirINode->SetMode(AlterMode(mode, process->UMask(), true));
     BlockPtr dirBlockPtr = AllocateBlock(Id(), process);
     dirINode->SetDirectBlockNumber(dirBlockPtr.Get()->Key().blockNumber, 0);
     DirectoryBlock dirBlock;
@@ -405,7 +431,7 @@ void MakeINodeBlocks(const SuperBlock& superBlock, BlockFile* rootHostFile, cmsx
     }
 }
 
-void MakeRootDirectory(cmsx::machine::Process* process)
+void MakeRootDirectory(cmsx::machine::Process* process, int32_t mode)
 {
     Filesystem* rootFs = GetFs(rootFSNumber);
     SuperBlock superBlock;
@@ -417,6 +443,7 @@ void MakeRootDirectory(cmsx::machine::Process* process)
     INodePtr rootDirINodePtr = AllocateINode(rootFSNumber, process);
     INode* rootDirINode = rootDirINodePtr.Get();
     rootDirINode->SetFileType(FileType::directory);
+    rootDirINode->SetMode(AlterMode(mode, process->UMask(), true));
     superBlock.SetINodeNumberOfRootDirectory(rootDirINode->Key().inodeNumber);
     process->SetINodeKeyOfWorkingDir(ToULong(rootDirINode->Key()));
     BlockPtr rootDirBlockPtr = AllocateBlock(rootFSNumber, process);
@@ -436,12 +463,12 @@ void MakeRootDirectory(cmsx::machine::Process* process)
     WriteINode(rootDirINode, process);
 }
 
-void MountHostDirectories(Filesystem* fs, cmsx::machine::Process* kernelProcess)
+void MountHostDirectories(Filesystem* fs, cmsx::machine::Process* kernelProcess, int32_t mode)
 {
     std::string mountDirPath = "/mnt";
     if (!DirectoryExists(mountDirPath, fs, kernelProcess))
     {
-        MakeDirectory(mountDirPath, fs, kernelProcess);
+        MakeDirectory(mountDirPath, fs, kernelProcess, mode);
     }
     std::string driveStr = OsGetLogicalDrives();
     std::vector<std::string> drives = Split(driveStr, ';');
@@ -452,7 +479,7 @@ void MountHostDirectories(Filesystem* fs, cmsx::machine::Process* kernelProcess)
         {
             std::string hostPath = GetFullPath(drive);
             std::string driveMountDirPath = "/mnt/" + std::string(1, std::tolower(hostPath[0]));
-            cmsx::kernel::Mount(hostPath, driveMountDirPath, kernelProcess);
+            cmsx::kernel::Mount(hostPath, driveMountDirPath, kernelProcess, mode);
             std::string driveStr(1, hostPath[0]);
             driveStr.append(1, ':');
             cmsx::kernel::MapDrive(driveStr, driveMountDirPath);
@@ -460,10 +487,10 @@ void MountHostDirectories(Filesystem* fs, cmsx::machine::Process* kernelProcess)
     }
     std::string cmajorRootPath = GetFullPath(CmajorRoot());
     std::string cmajorMountDirPath = "/mnt/cmajor";
-    cmsx::kernel::Mount(cmajorRootPath, cmajorMountDirPath, kernelProcess);
+    cmsx::kernel::Mount(cmajorRootPath, cmajorMountDirPath, kernelProcess, mode);
     std::string sxRootPath = GetFullPath(Path::Combine(CmajorRoot(), "system-x"));
     std::string sxMountDirPath = "/mnt/sx";
-    cmsx::kernel::Mount(sxRootPath, sxMountDirPath, kernelProcess);
+    cmsx::kernel::Mount(sxRootPath, sxMountDirPath, kernelProcess, mode);
 }
 
 void MakeRootFs(RootFilesystem& rootFs)
@@ -482,8 +509,9 @@ void MakeRootFs(RootFilesystem& rootFs)
     MakeSuperBlock(superBlock, rootHostFile, kernelProcess);
     MakeBlockNumberBlocks(superBlock, rootHostFile, kernelProcess);
     MakeINodeBlocks(superBlock, rootHostFile, kernelProcess);
-    MakeRootDirectory(kernelProcess);
-    MountHostDirectories(&rootFs, kernelProcess);
+    int32_t mode = 0;
+    MakeRootDirectory(kernelProcess, mode);
+    MountHostDirectories(&rootFs, kernelProcess, mode);
 }
 
 } // namespace cmsx::kernel

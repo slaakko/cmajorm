@@ -19,6 +19,13 @@ namespace System.IO
         none = 0, read = 1 << 0, write = 1 << 1, execute = 1 << 2
     }
 
+	public int MakeMode(Access ownerAccess, Access groupAccess, Access otherAccess)
+	{
+		return (int(ownerAccess & 7) << 4) | ((int(groupAccess) & 7) << 7) | ((int(otherAccess) & 7) << 10);
+	}
+	
+	public const int modeShift = 4;
+
     public const int rootFileSystemNumber = 0;
 
     public class FileStatus
@@ -78,7 +85,7 @@ namespace System.IO
     
     public enum FileCopyOptions : int
     {
-        none = 0, update = 1 << 0, verbose = 1 << 1, dontPreserveTimestamps = 1 << 2, removeCrs = 1 << 3, addCrs = 1 << 4, noBufferedCopy = 1 << 5
+        none = 0, update = 1 << 0, verbose = 1 << 1, dontPreserveTimestamps = 1 << 2, dontPreserveMode = 1 << 3, removeCrs = 1 << 4, addCrs = 1 << 5, noBufferedCopy = 1 << 6
     }
 
     public static class File
@@ -357,6 +364,12 @@ namespace System.IO
             {
                 File.SetTimes(destFilePath, sourceAccessTime, sourceModificationTime);
             }
+			if ((options & FileCopyOptions.dontPreserveMode) == FileCopyOptions.none)
+			{
+				FileStatus status;
+				Stat(sourceFilePath.Chars(), status);
+				ChMod(destFilePath.Chars(), MakeMode(status.ownerAccess, status.groupAccess, status.otherAccess));
+			}
             if ((options & FileCopyOptions.verbose) != FileCopyOptions.none)
             {
                 // DEBUG PID: Console.WriteLine(ToString(GetPid()) + " : " + GetFullPath(sourceFilePath) + " -> " + GetFullPath(destFilePath));

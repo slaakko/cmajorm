@@ -13,6 +13,7 @@
 #include <system-x/machine/InitDone.hpp>
 #include <system-x/kernel/InitDone.hpp>
 #include <system-x/kernel/OsApi.hpp>
+#include <system-x/machine/Config.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Time.hpp>
 #include <soulng/util/Unicode.hpp>
@@ -160,6 +161,12 @@ int main(int argc, const char** argv)
         cmsx::kernel::Kernel::Instance().Start();
         cmsx::kernel::Process* process = cmsx::kernel::ProcessManager::Instance().CreateProcess();
         process->SetFilePath(args[0]);
+        process->SetUMask(cmsx::machine::UMask());
+        if (process->FilePath() != "/mnt/sx/bin/sh.x")
+        {
+            process->SetUID(cmsx::machine::UID());
+            process->SetGID(cmsx::machine::GID());
+        }
         cmsx::kernel::Load(process, args, env, machine);
         if (verbose)
         {
@@ -181,12 +188,9 @@ int main(int argc, const char** argv)
         }
         if (verbose)
         {
-            if (process)
+            if (exitCode == 0)
             {
-                if (exitCode == 0)
-                {
-                    exitCode = process->ExitCode();
-                }
+                exitCode = process->ExitCode();
             }
             std::cout << "'" << args[0] << "' exited with code " << static_cast<int>(exitCode) << std::endl;
             std::cout << std::endl;

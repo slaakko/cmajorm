@@ -9,101 +9,137 @@ using System.Security;
 
 class ShellEnvironment
 {
-	public ShellEnvironment()
-	{
-	}
-	public Users& GetUsers() 
-	{
-		return users;
-	}
-	public void SetUsers(const Users& users_)
-	{
-		users = users_;
-	}
-	public const string& UserName() const
-	{
-		return userName;
-	}
-	public void SetUserName(const string& userName_)
-	{
-		userName = userName_;
-	}
-	public const string& HostName() const
-	{
-		return hostName;
-	}
-	public void SetHostName(const string& hostName_)
-	{
-		hostName = hostName_;
-	}
-	public int UID() const
-	{
-		return uid;
-	}
-	public void SetUID(int uid_)
-	{
-		uid = uid_;
-	}
-	public const string& Shell() const
-	{
-		return shell;
-	}
-	public void SetShell(const string& shell_)
-	{
-		shell = shell_;
-	}
-	private Users users;
-	private string userName;
-	private string hostName;
-	private int uid;
-	private string shell;
+    public ShellEnvironment()
+    {
+    }
+    public Users& GetUsers() 
+    {
+        return users;
+    }
+    public void SetUsers(const Users& users_)
+    {
+        users = users_;
+        users.Finalize();
+    }
+    public const string& UserName() const
+    {
+        return userName;
+    }
+    public void SetUserName(const string& userName_)
+    {
+        userName = userName_;
+    }
+    public const string& HostName() const
+    {
+        return hostName;
+    }
+    public void SetHostName(const string& hostName_)
+    {
+        hostName = hostName_;
+    }
+    public int UID() const
+    {
+        return uid;
+    }
+    public void SetUID(int uid_)
+    {
+        uid = uid_;
+    }
+    public const string& Home() const
+    {
+        return home;
+    }
+    public void SetHome(const string& home_)
+    {
+        home = home_;
+    }
+    public const string& Shell() const
+    {
+        return shell;
+    }
+    public void SetShell(const string& shell_)
+    {
+        shell = shell_;
+    }
+    public const string& PWD() const
+    {
+        return pwd;
+    }
+    public void SetPWD(const string& pwd_)
+    {
+        pwd = pwd_;
+    }
+    private Users users;
+    private string userName;
+    private string hostName;
+    private int uid;
+    private string home;
+    private string shell;
+    private string pwd;
+}
+
+void SetPWD(ShellEnvironment& shellEnvironment)
+{
+    shellEnvironment.SetPWD(GetCurrentWorkingDirectory());
+    SetEnv("PWD", shellEnvironment.PWD());
 }
 
 void SetupShellEnvironment(ShellEnvironment& environment)
 {
-	environment.SetUsers(GetUsers());
-	if (HasEnv("USER"))
-	{
-		environment.SetUserName(GetEnv("USER"));
-	}
-	else
-	{
-		environment.SetUserName(GetUserName());
-	}
-	if (HasEnv("HOSTNAME"))
-	{
-		environment.SetHostName(GetEnv("HOSTNAME"));
-	}
-	else
-	{
-		environment.SetHostName(GetComputerName());
-	}
-	int uid = -1;
-	string shell;
-	User* user = environment.GetUsers().GetUser(environment.UserName());
-	if (user == null)
-	{
-		InstallUser(environment.UserName(), uid, shell);
-	}
-	else
-	{
-		uid = user->UID();
-		shell = user->Shell();
-	}
-	if (HasEnv("UID"))
-	{
-		environment.SetUID(ParseInt(GetEnv("UID")));
-	}
-	else
-	{
-		environment.SetUID(uid);
-	}
-	if (HasEnv("SHELL"))
-	{
-		environment.SetShell(GetEnv("SHELL"));
-	}
-	else
-	{
-		environment.SetShell(shell);
-	}
+    environment.SetUsers(System.Security.GetUsers());
+    if (HasEnv("USER"))
+    {
+        environment.SetUserName(GetEnv("USER"));
+    }
+    else
+    {
+        environment.SetUserName(GetUserName());
+    }
+    if (HasEnv("HOSTNAME"))
+    {
+        environment.SetHostName(GetEnv("HOSTNAME"));
+    }
+    else
+    {
+        environment.SetHostName(GetHostName());
+    }
+    int uid = -1;
+    string shell;
+    string home;
+    Users& users = environment.GetUsers();
+    User* user = users.GetUser(environment.UserName());
+    if (user == null)
+    {
+        InstallUser(environment.UserName(), uid, shell, home);
+    }
+    else
+    {
+        uid = user->UID();
+        shell = user->Shell();
+        home = user->Home();
+    }
+    if (HasEnv("UID"))
+    {
+        environment.SetUID(ParseInt(GetEnv("UID")));
+    }
+    else
+    {
+        environment.SetUID(uid);
+    }
+    if (HasEnv("HOME"))
+    {
+        environment.SetHome(GetEnv("HOME"));
+    }
+    else
+    {
+        environment.SetHome(home);
+    }
+    if (HasEnv("SHELL"))
+    {
+        environment.SetShell(GetEnv("SHELL"));
+    }
+    else
+    {
+        environment.SetShell(shell);
+    }
 }

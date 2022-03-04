@@ -8,6 +8,7 @@
 #include <system-x/kernel/Trap.hpp>
 #include <system-x/kernel/OsApi.hpp>
 #include <system-x/kernel/IO.hpp>
+#include <system-x/machine/Config.hpp>
 #include <system-x/machine/Processor.hpp>
 
 namespace cmsx::kernel {
@@ -105,14 +106,14 @@ uint64_t TrapGetPidHandler::HandleTrap(cmsx::machine::Processor& processor)
     }
 }
 
-class TrapGetComputerNameHandler : public TrapHandler
+class TrapGetHostNameHandler : public TrapHandler
 {
 public:
     uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
-    std::string TrapName() const { return "trap_get_computer_name"; }
+    std::string TrapName() const { return "trap_get_host_name"; }
 };
 
-uint64_t TrapGetComputerNameHandler::HandleTrap(cmsx::machine::Processor& processor)
+uint64_t TrapGetHostNameHandler::HandleTrap(cmsx::machine::Processor& processor)
 {
     Process* process = static_cast<Process*>(processor.CurrentProcess());
     try
@@ -277,28 +278,57 @@ uint64_t TrapGetGidHandler::HandleTrap(cmsx::machine::Processor& processor)
     }
 }
 
+class TrapUMaskHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_umask"; }
+};
+
+uint64_t TrapUMaskHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t umask = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
+        int32_t prevUMask = process->UMask();
+        if (umask != -1)
+        {
+            process->SetUMask(umask);
+        }
+        return prevUMask;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
 void InitProcessManagementTraps()
 {
     SetTrapHandler(trap_fork, new TrapForkHandler());
     SetTrapHandler(trap_exec, new TrapExecHandler());
     SetTrapHandler(trap_wait, new TrapWaitHandler());
     SetTrapHandler(trap_getpid, new TrapGetPidHandler());
-    SetTrapHandler(trap_get_computer_name, new TrapGetComputerNameHandler());
+    SetTrapHandler(trap_get_host_name, new TrapGetHostNameHandler());
     SetTrapHandler(trap_get_user_name, new TrapGetUserNameHandler());
     SetTrapHandler(trap_setuid, new TrapSetUidHandler());
     SetTrapHandler(trap_setgid, new TrapSetGidHandler());
     SetTrapHandler(trap_getuid, new TrapGetUidHandler());
     SetTrapHandler(trap_getgid, new TrapGetGidHandler());
+    SetTrapHandler(trap_umask, new TrapUMaskHandler());
 }
 
 void DoneProcessManagementTraps()
 {
+    SetTrapHandler(trap_umask, nullptr);
     SetTrapHandler(trap_getgid, nullptr);
     SetTrapHandler(trap_getuid, nullptr);
     SetTrapHandler(trap_setgid, nullptr);
     SetTrapHandler(trap_setuid, nullptr);
     SetTrapHandler(trap_get_user_name, nullptr);
-    SetTrapHandler(trap_get_computer_name, nullptr);
+    SetTrapHandler(trap_get_host_name, nullptr);
     SetTrapHandler(trap_getpid, nullptr);
     SetTrapHandler(trap_wait, nullptr);
     SetTrapHandler(trap_exec, nullptr);

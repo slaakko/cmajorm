@@ -1,0 +1,95 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+using paths;
+
+int main(int argc, const char** argv)
+{
+	try
+	{
+		int mode = -1;
+		List<string> files;
+		for (int i = 1; i < argc; ++i)
+		{
+			string arg = argv[i];
+			if (arg.StartsWith("--"))
+			{
+				if (arg == "--help")
+				{
+					PrintHelp();
+					return 1;
+				}
+				else
+				{
+					throw Exception("unknown option '" + arg + "'");
+				}
+			}
+			else if (arg.StartsWith("-"))
+			{
+				string options = arg.Substring(1);
+				if (options.IsEmpty())
+				{
+					throw Exception("unknown option '" + arg + "'");
+				}
+				else 
+				{
+                    bool unknown = false;
+                    string uo;
+					for (char o : options)
+					{
+						switch (o)
+						{
+							case 'h':
+							{
+								PrintHelp();
+								return 1;
+							}
+							default:
+							{
+								unknown = true; 
+								uo.Append(o);
+								break;
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				if (mode == -1)
+				{
+					if (arg.Length() != 3 || arg[0] < '0' || arg[0] > '7' || arg[1] < '0' || arg[1] > '7' || arg[2] < '0' || arg[2] > '7')
+					{
+						throw Exception("invalid mode argument: three octal digits expected");
+					}
+					Reverse(arg.Begin(), arg.End());
+					mode = cast<int>(ParseOctal(arg));
+				}
+				else
+				{
+					files.Add(GetFullPath(arg));
+				}
+			}
+		}
+        if (files.IsEmpty())
+        {
+            throw Exception("no files specified");
+        }
+        if (!HasEnv("SHELL"))
+        {
+            files = Expand(files);
+        }
+        ChangeMode(mode, files);
+	}
+	catch (const Exception& ex)
+	{
+		Console.Error() << ex.ToString() << endl();
+		return 1;
+	}
+	return 0;
+}

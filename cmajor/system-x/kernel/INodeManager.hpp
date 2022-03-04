@@ -69,8 +69,14 @@ CMSX_KERNEL_API inline bool GetFlag(INodeFlags flags, INodeFlags flag) { return 
 CMSX_KERNEL_API inline void SetFlag(INodeFlags& flags, INodeFlags flag) { flags = flags | flag; }
 CMSX_KERNEL_API inline void ResetFlag(INodeFlags& flags, INodeFlags flag) { flags = flags & ~flag; }
 
+class INode;
+
 CMSX_KERNEL_API int32_t EncodeMode(FileType fileType, INodeFlags flags, Access ownerAccess, Access groupAccess, Access otherAccess);
 CMSX_KERNEL_API void DecodeMode(int32_t mode, FileType& fileType, INodeFlags& flags, Access& ownerAccess, Access& groupAccess, Access& otherAccess);
+CMSX_KERNEL_API int32_t AlterMode(int32_t mode, int32_t umask, bool directory);
+CMSX_KERNEL_API void CheckAccess(Access access, int32_t uid, int32_t gid, INode* inode, const std::string& message);
+
+const int modeShift = 4;
 
 struct CMSX_KERNEL_API INodeKey
 {
@@ -118,6 +124,7 @@ public:
     void SetKey(const INodeKey& key_) { key = key_; }
     int32_t EncodeMode() const;
     void DecodeMode(int32_t mode);
+    void SetMode(int32_t mode);
     void Read(Block* block, int index);
     void Write(Block* block, int index);
     bool IsLocked() const { return GetFlag(flags, INodeFlags::locked); }
@@ -133,6 +140,7 @@ public:
     void SetFree() { fileType = FileType::free; }
     FileType GetFileType() const { return fileType; }
     void SetFileType(FileType fileType_) { fileType = fileType_; }
+    INodeFlags Flags() const { return flags; }
     Access OwnerAccess() const { return ownerAccess; }
     void SetOwnerAccess(Access ownerAccess_) { ownerAccess = ownerAccess_; }
     Access GroupAccess() const { return groupAccess; }

@@ -28,7 +28,7 @@ Process::Process(int32_t id_) :
     state(cmsx::machine::ProcessState::created), entryPoint(-1), argumentsStartAddress(-1), argumentsLength(0), environmentStartAddress(-1), environmentLength(0), 
     heapStartAddress(-1), heapLength(0), stackStartAddress(-1), startUserTime(), startSleepTime(), startSystemTime(), userTime(0), sleepTime(0), systemTime(0),
     exitCode(0), debugger(nullptr), processor(nullptr), currentExceptionAddress(0), currentExceptionClassId(0), currentTryRecord(nullptr), kernelFiber(nullptr),
-    inodeKeyOfWorkingDirAsULong(-1), uid(0), gid(0)
+    inodeKeyOfWorkingDirAsULong(-1), uid(0), gid(0), umask(0)
 {
     SetINodeKeyOfWorkingDir(Kernel::Instance().GetINodeKeyOfRootDir());
 }
@@ -355,6 +355,11 @@ void Process::SetDebugger(cmsx::machine::Debugger* debugger_)
     debugger = debugger_;
 }
 
+void Process::SetUMask(int32_t mask)
+{
+    umask = mask & 0777;
+}
+
 void SetupRegions(Process* parent, Process* child)
 {
     Region textRegion = parent->GetRegionTable().GetRegion(RegionId::text);
@@ -387,6 +392,7 @@ int32_t Fork(Process* parent)
     child->SetRV(rv);
     child->SetUID(parent->UID());
     child->SetGID(parent->GID());
+    child->SetUMask(parent->UMask());
     TextSegmentWriteProtectionGuard guard(rv, machine->Mem());
     SetupRegions(parent, child);
     child->GetFileTable().CopyFrom(parent->GetFileTable());
@@ -460,6 +466,17 @@ void Exec(Process* process, int64_t filePathAddress, int64_t argvAddress, int64_
     cmsx::machine::Machine* machine = process->GetProcessor()->GetMachine();
     cmsx::machine::Memory& mem = machine->Mem();
     std::string filePath = ReadString(process, filePathAddress, mem);
+    Filesystem* fs = GetFs(rootFSNumber);
+    INodePtr inodePtr = PathToINode(filePath, fs, process);
+    INode* inode = inodePtr.Get();
+    if (!inode)
+    {
+        throw SystemError(ENOTFOUND, "could not execute: path '" + filePath + "' not found");
+    }
+    if (!filePath.starts_with("/mnt/sx/bin"))
+    {
+        CheckAccess(Access::execute, process->UID(), process->GID(), inode, "could not execute '" + filePath + "'");
+    }
     process->SetFilePath(filePath);
     std::vector<uint8_t> content = ReadFile(process, filePathAddress);
     std::vector<std::string> args = ReadStringPointerArray(process, argvAddress, mem);

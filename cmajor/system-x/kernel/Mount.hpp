@@ -41,7 +41,7 @@ private:
     std::map<std::string, std::string> driveMap;
 };
 
-void Mount(const std::string& hostPath, const std::string& dirPath, cmsx::machine::Process* process);
+void Mount(const std::string& hostPath, const std::string& dirPath, cmsx::machine::Process* process, int32_t mode);
 void MapDrive(const std::string& drive, const std::string& mountedPath);
 std::string MapPath(const std::string& windowsFilePath);
 

@@ -25,10 +25,10 @@ public:
     virtual BlockFile* Open(const std::string& path, INode* dirINode, int32_t flags, int32_t mode, cmsx::machine::Process* process) = 0;
     virtual BlockFile* HostFile() const = 0;
     virtual INodeKey MountPoint() const { return INodeKey(); }
-    virtual INodePtr SearchDirectory(const std::string& name, INode* dirINode, cmsx::machine::Process* process) = 0;
+    virtual INodePtr SearchDirectory(const std::string& name, INode* dirINode, const std::string& dirPath, cmsx::machine::Process* process) = 0;
     virtual void Stat(INode* inode, cmsx::machine::Process* process) = 0;
     virtual DirFile* OpenDir(const std::string& path, INode* dirINode, cmsx::machine::Process* process) = 0;
-    virtual void MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process) = 0;
+    virtual void MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process, int32_t mode) = 0;
     virtual std::string GetHostFilePath(int32_t inodeNumber, cmsx::machine::Process* process) = 0;
     virtual INodePtr ReadINode(INodeKey inodeKey, cmsx::machine::Process* process) = 0;
     virtual void ClearProcessData(cmsx::machine::Process* process) = 0;
@@ -170,11 +170,13 @@ CMSX_KERNEL_API void FreeBlock(Block* block, cmsx::machine::Process* process);
 CMSX_KERNEL_API void FreeBlocks(INode* inode, Filesystem* fs, cmsx::machine::Process* process);
 CMSX_KERNEL_API int32_t MapBlockNumber(int32_t logicalBlockNumber, INode* inode, Filesystem* fs, cmsx::machine::Process* process);
 CMSX_KERNEL_API void SetBlockNumber(int32_t logicalBlockNumber, int32_t blockNumber, INode* inode, Filesystem* fs, cmsx::machine::Process* process);
-CMSX_KERNEL_API INodePtr SearchDirectory(const std::string& name, INode* dirINode, Filesystem* fs, cmsx::machine::Process* process);
+CMSX_KERNEL_API INodePtr SearchDirectory(const std::string& name, INode* dirINode, const std::string& dirPath, Filesystem* fs, cmsx::machine::Process* process);
 CMSX_KERNEL_API DirectoryEntry GetDirectoryEntry(INode* dirINode, int32_t inodeNumber, Filesystem* fs, cmsx::machine::Process* process);
 CMSX_KERNEL_API void AddDirectoryEntry(const DirectoryEntry& entry, INode* dirINode, Filesystem* fs, cmsx::machine::Process* process);
-CMSX_KERNEL_API void RemoveDirectoryEntry(const std::string& name, INode* dirINode, Filesystem* fs, cmsx::machine::Process* process);
-CMSX_KERNEL_API INodePtr MakeDirectory(const std::string& path, Filesystem* fs, cmsx::machine::Process* process);
+CMSX_KERNEL_API void RemoveDirectoryEntry(const std::string& name, const std::string& filePath, INode* dirINode, Filesystem* fs, cmsx::machine::Process* process);
+CMSX_KERNEL_API void RemoveDirectoryEntry(const std::string& name, const std::string& filePath, INode* dirINode, Filesystem* fs, cmsx::machine::Process* process, bool unlink);
+CMSX_KERNEL_API void RenameDirectoryEntry(INode* dirINode, const std::string& oldName, const std::string& newName, Filesystem* fs, cmsx::machine::Process* process);
+CMSX_KERNEL_API INodePtr MakeDirectory(const std::string& path, Filesystem* fs, cmsx::machine::Process* process, int32_t mode);
 CMSX_KERNEL_API bool DirectoryExists(const std::string& path, Filesystem* fs, cmsx::machine::Process* process);
 CMSX_KERNEL_API std::string GetHostFilePath(const INodeKey& key, cmsx::machine::Process* process);
 

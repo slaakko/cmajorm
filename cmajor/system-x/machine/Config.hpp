@@ -7,6 +7,7 @@
 #define CMSX_MACHINE_CONFIG_INCLUDED
 #include <system-x/machine/Api.hpp>
 #include <string>
+#include <stdint.h>
 
 namespace cmsx::machine {
 
@@ -23,6 +24,9 @@ CMSX_MACHINE_API int NumINodeHashQueues();
 CMSX_MACHINE_API int KernelStackSize(); 
 CMSX_MACHINE_API int RootFSNumBlocks();
 CMSX_MACHINE_API int RootFSMaxFiles();
+CMSX_MACHINE_API int32_t UID();
+CMSX_MACHINE_API int32_t GID();
+CMSX_MACHINE_API int32_t UMask();
 CMSX_MACHINE_API std::string ConfigFilePath();
 CMSX_MACHINE_API void InitConfig();
 CMSX_MACHINE_API void DoneConfig();

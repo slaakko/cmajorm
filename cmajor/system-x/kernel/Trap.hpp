@@ -59,7 +59,7 @@ const uint8_t trap_decompress = 44;
 const uint8_t trap_get_decompressed_data_size = 45;
 const uint8_t trap_get_decompressed_data = 46;
 const uint8_t trap_close_decompression = 47;
-const uint8_t trap_get_computer_name = 48;
+const uint8_t trap_get_host_name = 48;
 const uint8_t trap_get_user_name = 49;
 const uint8_t trap_pipe = 50;
 const uint8_t trap_dup = 51;
@@ -67,6 +67,10 @@ const uint8_t trap_setuid = 52;
 const uint8_t trap_setgid = 53;
 const uint8_t trap_getuid = 54;
 const uint8_t trap_getgid = 55;
+const uint8_t trap_umask = 56;
+const uint8_t trap_chmod = 57;
+const uint8_t trap_chown = 58;
+const uint8_t trap_rename = 59;
 
 class CMSX_KERNEL_API TrapHandler
 {

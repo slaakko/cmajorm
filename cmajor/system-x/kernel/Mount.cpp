@@ -98,7 +98,7 @@ Filesystem* MountTable::GetMountedFilesystem(INodeKey mountPoint) const
     return nullptr;
 }
 
-void Mount(const std::string& hostPath, const std::string& dirPath, cmsx::machine::Process* process)
+void Mount(const std::string& hostPath, const std::string& dirPath, cmsx::machine::Process* process, int32_t mode)
 {
     Filesystem* fs = GetFs(rootFSNumber);
     std::string absoluteHostPath = GetFullPath(hostPath);
@@ -109,7 +109,7 @@ void Mount(const std::string& hostPath, const std::string& dirPath, cmsx::machin
     INodePtr dirINode = PathToINode(dirPath, fs, process, PathToINodeFlags::ignoreMountPoint);
     if (!dirINode.Get())
     {
-        dirINode = MakeDirectory(dirPath, fs, process);
+        dirINode = MakeDirectory(dirPath, fs, process, mode);
         dirINode.Get()->SetMountPoint();
         WriteINode(dirINode.Get(), process);
     }

@@ -653,7 +653,7 @@ int64_t Terminal::Write(const std::vector<uint8_t>& buffer, cmsx::machine::Proce
             char32_t ch = utfEngine.Result();
             if (ch < static_cast<char32_t>(0x100000u))
             {
-                utf32Chars.push_back(ch);
+                utf32Chars.append(1, ch);
             }
             else if (ch < 0x10FFFD)
             {

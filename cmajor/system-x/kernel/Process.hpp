@@ -100,6 +100,8 @@ public:
     void DeleteKernelFiber();
     uint64_t GetINodeKeyOfWorkingDir() const override { return inodeKeyOfWorkingDirAsULong; }
     void SetINodeKeyOfWorkingDir(uint64_t inodeKeyOfWorkingDirAsULong_) override { inodeKeyOfWorkingDirAsULong = inodeKeyOfWorkingDirAsULong_; }
+    void SetUMask(int32_t mask);
+    int32_t UMask() const override { return umask; }
 private:
     int32_t id;
     uint64_t rv;
@@ -120,6 +122,7 @@ private:
     uint8_t exitCode;
     int32_t uid;
     int32_t gid;
+    int32_t umask;
     std::chrono::steady_clock::time_point startUserTime;
     std::chrono::steady_clock::time_point startSleepTime;
     std::chrono::steady_clock::time_point startSystemTime;

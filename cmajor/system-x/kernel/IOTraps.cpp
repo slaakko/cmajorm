@@ -460,6 +460,79 @@ uint64_t TrapDupHandler::HandleTrap(cmsx::machine::Processor& processor)
     }
 }
 
+class TrapChModHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_chmod"; }
+};
+
+uint64_t TrapChModHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int64_t pathAddr = processor.Regs().Get(cmsx::machine::regAX);
+        int32_t mode = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regBX));
+        ChMod(process, pathAddr, mode);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapChOwnHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_chown"; }
+};
+
+uint64_t TrapChOwnHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int64_t pathAddr = processor.Regs().Get(cmsx::machine::regAX);
+        int32_t uid = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regBX));
+        int32_t gid = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regCX));
+        ChOwn(process, pathAddr, uid, gid);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapRenameHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_rename"; }
+};
+
+uint64_t TrapRenameHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int64_t sourcePathAddr = processor.Regs().Get(cmsx::machine::regAX);
+        int64_t targetPathAddr = processor.Regs().Get(cmsx::machine::regBX);
+        Rename(process, sourcePathAddr, targetPathAddr);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
 void InitIOTraps()
 {
     SetTrapHandler(trap_create, new TrapCreateHandler());
@@ -481,10 +554,16 @@ void InitIOTraps()
     SetTrapHandler(trap_utime, new TrapUTimeHandler());
     SetTrapHandler(trap_pipe, new TrapPipeHandler());
     SetTrapHandler(trap_dup, new TrapDupHandler());
+    SetTrapHandler(trap_chmod, new TrapChModHandler());
+    SetTrapHandler(trap_chown, new TrapChOwnHandler());
+    SetTrapHandler(trap_rename, new TrapRenameHandler());
 }
 
 void DoneIOTraps()
 {
+    SetTrapHandler(trap_rename, nullptr);
+    SetTrapHandler(trap_chown, nullptr);
+    SetTrapHandler(trap_chmod, nullptr);
     SetTrapHandler(trap_dup, nullptr);
     SetTrapHandler(trap_pipe, nullptr);
     SetTrapHandler(trap_utime, nullptr);

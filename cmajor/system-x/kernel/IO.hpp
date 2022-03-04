@@ -58,6 +58,9 @@ CMSX_KERNEL_API int32_t ReadDir(Process* process, int32_t dfd, int64_t dirEntryB
 CMSX_KERNEL_API void UTime(Process* process, int64_t pathAddr, int64_t timeBufAddr, int64_t timeBufSize);
 CMSX_KERNEL_API std::vector<uint8_t> ReadFile(Process* process, int64_t pathAddr);
 CMSX_KERNEL_API int32_t Dup(Process* process, int32_t fd);
+CMSX_KERNEL_API void ChMod(Process* process, int64_t pathAddr, int32_t mode);
+CMSX_KERNEL_API void ChOwn(Process* process, int64_t pathAddr, int32_t uid, int32_t gid);
+CMSX_KERNEL_API void Rename(Process* process, int64_t sourcePathAddr, int64_t targetPathAddr);
 
 } // namespace cmsx::kernel
 

@@ -51,7 +51,7 @@ public const byte trap_decompress = 44u;
 public const byte trap_get_decompressed_data_size = 45u;
 public const byte trap_get_decompressed_data = 46u;
 public const byte trap_close_decompression = 47u;
-public const byte trap_get_computer_name = 48u;
+public const byte trap_get_host_name = 48u;
 public const byte trap_get_user_name = 49u;
 public const byte trap_pipe = 50u;
 public const byte trap_dup = 51u;
@@ -59,6 +59,10 @@ public const byte trap_setuid = 52u;
 public const byte trap_setgid = 53u;
 public const byte trap_getuid = 54u;
 public const byte trap_getgid = 55u;
+public const byte trap_umask = 56u;
+public const byte trap_chmod = 57u;
+public const byte trap_chown = 58u;
+public const byte trap_rename = 59u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -338,9 +342,9 @@ public cdecl nothrow int close_decompression(int dd)
     return cast<int>(trap(0u, trap_close_decompression, 0u, dd));
 }
 
-public cdecl nothrow int get_computer_name(char* buffer, long bufSize)
+public cdecl nothrow int get_host_name(char* buffer, long bufSize)
 {
-    return cast<int>(trap(0u, trap_get_computer_name, 0u, buffer, bufSize));
+    return cast<int>(trap(0u, trap_get_host_name, 0u, buffer, bufSize));
 }
 
 public cdecl nothrow int get_user_name(char* buffer, long bufSize)
@@ -376,4 +380,24 @@ public cdecl nothrow int getuid()
 public cdecl nothrow int getgid()
 {
 	return cast<int>(trap(0u, trap_getgid, 0u));
+}
+
+public cdecl nothrow int umask(int mask)
+{
+	return cast<int>(trap(0u, trap_umask, 0u, mask));
+}
+
+public cdecl nothrow int chmod(const char* path, int mode)
+{
+	return cast<int>(trap(0u, trap_chmod, 0u, path, mode));
+}
+
+public cdecl nothrow int chown(const char* path, int uid, int gid)
+{
+	return cast<int>(trap(0u, trap_chown, 0u, path, uid, gid));
+}
+
+public cdecl nothrow int rename(const char* sourcePath, const char* targetPath)
+{
+    return cast<int>(trap(0u, trap_rename, 0u, sourcePath, targetPath));
 }

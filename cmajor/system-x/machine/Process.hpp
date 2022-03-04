@@ -39,6 +39,7 @@ public:
     virtual int32_t GID() const = 0;
     virtual void SetUID(int32_t uid) = 0;
     virtual void SetGID(int32_t gid) = 0;
+    virtual int32_t UMask() const = 0;
 };
 
 using ProcessList = std::list<Process*, boost::fast_pool_allocator<Process*>>;

@@ -270,7 +270,7 @@ BlockFile* HostFilesystem::Open(const std::string& path, INode* dirINode, int32_
     return file;
 }
 
-INodePtr HostFilesystem::SearchDirectory(const std::string& name, INode* dirINode, cmsx::machine::Process* process)
+INodePtr HostFilesystem::SearchDirectory(const std::string& name, INode* dirINode, const std::string& dirPath, cmsx::machine::Process* process)
 {
 #if (LOCK_DEBUG)
     DebugLock startDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, process->Id(), NO_LOCK | SEARCH_DIRECTORY);
@@ -328,6 +328,12 @@ void HostFilesystem::Stat(INode* inode, cmsx::machine::Process* process)
         {
             std::string fullPath = it->second;
             boost::filesystem::file_status status = boost::filesystem::status(fullPath);
+            cmsx::kernel::Access access = static_cast<cmsx::kernel::Access>(cmsx::kernel::Access::read | kernel::Access::write);
+            std::string ext = Path::GetExtension(fullPath);
+            if (ext == ".exe")
+            {
+                access = static_cast<cmsx::kernel::Access>(access | cmsx::kernel::Access::execute);
+            }
             if (status.type() == boost::filesystem::file_type::regular_file)
             {
                 inode->SetFileType(FileType::regular);
@@ -336,11 +342,15 @@ void HostFilesystem::Stat(INode* inode, cmsx::machine::Process* process)
             else if (status.type() == boost::filesystem::file_type::directory_file)
             {
                 inode->SetFileType(FileType::directory);
+                access = static_cast<cmsx::kernel::Access>(access | cmsx::kernel::Access::execute);
             }
             else
             {
                 throw SystemError(EFAIL, "path '" + fullPath + "' has unknown file type");
             }
+            inode->SetOwnerAccess(access);
+            inode->SetGroupAccess(access);
+            inode->SetOtherAccess(access);
             inode->SetNLinks(1);
             std::time_t lastWriteTime = boost::filesystem::last_write_time(fullPath);
             DateTime mtime = ToDateTime(lastWriteTime);
@@ -416,7 +426,7 @@ DirFile* HostFilesystem::OpenDir(const std::string& path, INode* dirINode, cmsx:
     }
 }
 
-void HostFilesystem::MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process)
+void HostFilesystem::MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process, int32_t mode)
 {
 #if (LOCK_DEBUG)
     DebugLock startDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, 0, NO_LOCK | MK_DIR);

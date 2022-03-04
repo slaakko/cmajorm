@@ -4,20 +4,23 @@
 // =================================
 
 using System;
+using System.Os;
 
 int main(int argc, const char** argv)
 {
-	try
-	{
-		Install();
-		ShellEnvironment environment;
-		SetupShellEnvironment(environment);
-		Run(environment);
-	}
-	catch (const Exception& ex)
-	{
-		Console.Error() << ex.ToString() << endl();
-		return 1;
-	}
-	return 1;
+    try
+    {
+        Install();
+        ShellEnvironment environment;
+        SetupShellEnvironment(environment);
+        SetupCredentials(environment);
+        ChDir(environment.Home().Chars());
+        Run(environment);
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 1;
 }

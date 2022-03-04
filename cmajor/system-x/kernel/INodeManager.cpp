@@ -42,6 +42,44 @@ void DecodeMode(int32_t mode, FileType& fileType, INodeFlags& flags, Access& own
     otherAccess = Access((mode >> 10) & 7);
 }
 
+int32_t AlterMode(int32_t mode, int32_t umask, bool directory)
+{
+    if (mode == 0)
+    {
+        Access access = static_cast<Access>(Access::read | Access::write);
+        if (directory)
+        {
+            access = static_cast<Access>(access | Access::execute);
+        }
+        mode = cmsx::kernel::EncodeMode(FileType(), INodeFlags(), access, access, access);
+    }
+    mode = ((mode >> modeShift) & 0777 & ~umask) << modeShift;
+    return mode;
+}
+
+void CheckAccess(Access access, int32_t uid, int32_t gid, INode* inode, const std::string& message)
+{
+    if (uid == inode->UID())
+    {
+        if ((access & inode->OwnerAccess()) != Access::none)
+        {
+            return;
+        }
+    }
+    if (gid == inode->GID())
+    {
+        if ((access & inode->GroupAccess()) != Access::none)
+        {
+            return;
+        }
+    }
+    if ((access & inode->OtherAccess()) != Access::none)
+    {
+        return;
+    }
+    throw SystemError(EPERMISSION, message + ": permission denied");
+}
+
 INode::INode() :
     key(),
     fileType(FileType::free),
@@ -96,6 +134,13 @@ int32_t INode::EncodeMode() const
 void INode::DecodeMode(int32_t mode)
 {
     cmsx::kernel::DecodeMode(mode, fileType, flags, ownerAccess, groupAccess, otherAccess);
+}
+
+void INode::SetMode(int32_t mode)
+{
+    FileType ft;
+    INodeFlags f;
+    cmsx::kernel::DecodeMode(mode, ft, f, ownerAccess, groupAccess, otherAccess);
 }
 
 int32_t INode::GetDirectBlockNumber(int32_t index) const
@@ -169,7 +214,7 @@ int32_t INode::NumberOfBlocks() const
     {
         return 0;
     }
-    return static_cast<int32_t>(fileSize / Block::Size());
+    return static_cast<int32_t>((fileSize - 1) / Block::Size() + 1);
 }
 
 void INode::WriteStat(MemoryWriter& writer)

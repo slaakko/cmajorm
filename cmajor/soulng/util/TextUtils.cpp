@@ -523,6 +523,34 @@ uint64_t ParseHexULong(const std::string& hexByteStr)
     return value;
 }
 
+int32_t ParseOctal(const std::string& octalDigitStr)
+{
+    if (octalDigitStr.empty())
+    {
+        return -1;
+    }
+    int32_t value = 0;
+    for (char o : octalDigitStr)
+    {
+        if (o < '0' || o > '7') return -1;
+        value = (value << 3) | (o - '0');
+    }
+    return value;
+}
+
+std::string ToOctalString(int32_t value, int numDigits)
+{
+    std::string str;
+    for (int i = 0; i < numDigits; ++i)
+    {
+        int digit = value & 7;
+        str.append(1, ('0' + digit));
+        value = value >> 3;
+    }
+    std::reverse(str.begin(), str.end());
+    return str;
+}
+
 int Log10(int n)
 {
     int log10 = 1;

@@ -55,6 +55,8 @@ UTIL_API std::string ToHexString(uint32_t x);
 UTIL_API std::string ToHexString(uint64_t x);
 UTIL_API uint8_t ParseHexByte(const std::string& hexByteStr);
 UTIL_API uint64_t ParseHexULong(const std::string& hexByteStr);
+UTIL_API int32_t ParseOctal(const std::string& octalDigitStr);
+UTIL_API std::string ToOctalString(int32_t value, int numDigits);
 UTIL_API int Log10(int n);
 UTIL_API std::u32string FormatNumber(int n, int numDigits);
 UTIL_API std::string CurrentThreadIdStr();

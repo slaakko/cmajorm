@@ -723,12 +723,13 @@ void SetBlockNumber(int32_t logicalBlockNumber, int32_t blockNumber, INode* inod
     WriteINode(inode, process);
 }
 
-INodePtr SearchDirectory(const std::string& name, INode* dirINode, Filesystem* fs, cmsx::machine::Process* process)
+INodePtr SearchDirectory(const std::string& name, INode* dirINode, const std::string& dirPath, Filesystem* fs, cmsx::machine::Process* process)
 {
     if (dirINode->GetFileType() != FileType::directory)
     {
         throw SystemError(EFAIL, "not a directory inode");
     }
+    CheckAccess(Access::execute, process->UID(), process->GID(), dirINode, "could not search directory '" + dirPath + "'");
     int32_t logicalBlockNumber = 0;
     int32_t blockNumber = MapBlockNumber(logicalBlockNumber, dirINode, fs, process);
     while (blockNumber != -1)
@@ -819,7 +820,12 @@ void AddDirectoryEntry(const DirectoryEntry& entry, INode* dirINode, Filesystem*
     WriteINode(dirINode, process);
 }
 
-void RemoveDirectoryEntry(const std::string& name, INode* dirINode, Filesystem* fs, cmsx::machine::Process* process)
+void RemoveDirectoryEntry(const std::string& name, const std::string& filePath, INode* dirINode, Filesystem* fs, cmsx::machine::Process* process)
+{
+    RemoveDirectoryEntry(name, filePath, dirINode, fs, process, false);
+}
+
+void RemoveDirectoryEntry(const std::string& name, const std::string& filePath, INode* dirINode, Filesystem* fs, cmsx::machine::Process* process, bool unlink)
 {
     if (dirINode->GetFileType() != FileType::directory)
     {
@@ -841,19 +847,23 @@ void RemoveDirectoryEntry(const std::string& name, INode* dirINode, Filesystem* 
             {
                 if (directoryEntry.Name() == name)
                 {
-                    INodePtr inodePtr = ReadINode(MakeINodeKey(fs->Id(), inodeNumber), process);
-                    INode* inode = inodePtr.Get();
-                    int32_t nlinks = inode->NLinks();
-                    --nlinks;
-                    inode->SetNLinks(nlinks);
-                    dirINode->SetFileSize(dirINode->FileSize() - DirectoryEntry::Size());
-                    dirINode->SetCTime(GetCurrentDateTime());
-                    dirINode->SetMTime(GetCurrentDateTime());
-                    if (nlinks == 0 && inode->ReferenceCount() == 0)
+                    if (unlink)
                     {
-                        FreeBlocks(inode, fs, process);
+                        INodePtr inodePtr = ReadINode(MakeINodeKey(fs->Id(), inodeNumber), process);
+                        INode* inode = inodePtr.Get();
+                        CheckAccess(Access::write, process->UID(), process->GID(), inode, "could not unlink '" + filePath + "'");
+                        int32_t nlinks = inode->NLinks();
+                        --nlinks;
+                        inode->SetNLinks(nlinks);
+                        dirINode->SetFileSize(dirINode->FileSize() - DirectoryEntry::Size());
+                        dirINode->SetCTime(GetCurrentDateTime());
+                        dirINode->SetMTime(GetCurrentDateTime());
+                        if (nlinks == 0 && inode->ReferenceCount() == 0)
+                        {
+                            FreeBlocks(inode, fs, process);
+                        }
+                        WriteINode(inode, process);
                     }
-                    WriteINode(inode, process);
                     directoryBlock.RemoveEntry(i);
                     WriteDirectoryBlock(directoryBlock, blockPtr, fs, process);
                     return;
@@ -866,7 +876,45 @@ void RemoveDirectoryEntry(const std::string& name, INode* dirINode, Filesystem* 
     throw SystemError(EFAIL, "could not remove: name '" + name + "' not found");
 }
 
-INodePtr MakeDirectory(const std::string& path, Filesystem* fs, cmsx::machine::Process* process)
+void RenameDirectoryEntry(INode* dirINode, const std::string& oldName, const std::string& newName, Filesystem* fs, cmsx::machine::Process* process)
+{
+    if (dirINode->GetFileType() != FileType::directory)
+    {
+        throw SystemError(EFAIL, "not a directory");
+    }
+    int32_t logicalBlockNumber = 0;
+    int32_t blockNumber = MapBlockNumber(logicalBlockNumber, dirINode, fs, process);
+    while (blockNumber != -1)
+    {
+        DirectoryBlock directoryBlock;
+        BlockPtr blockPtr = ReadDirectoryBlock(directoryBlock, blockNumber, fs, process);
+        int32_t n = directoryBlock.Entries().size();
+        for (int32_t i = 0; i < n; ++i)
+        {
+            DirectoryEntry directoryEntry;
+            directoryEntry.Read(blockPtr.Get(), i);
+            int32_t inodeNumber = directoryEntry.INodeNumber();
+            if (inodeNumber != -1)
+            {
+                if (directoryEntry.Name() == oldName)
+                {
+                    directoryEntry.SetName(newName);
+                    directoryBlock.RemoveEntry(i);
+                    directoryBlock.AddEntry(directoryEntry);
+                    WriteDirectoryBlock(directoryBlock, blockPtr, fs, process);
+                    dirINode->SetMTime(GetCurrentDateTime());
+                    dirINode->SetCTime(GetCurrentDateTime());
+                    return;
+                }
+            }
+        }
+        ++logicalBlockNumber;
+        blockNumber = MapBlockNumber(logicalBlockNumber, dirINode, fs, process);
+    }
+    throw SystemError(EFAIL, "could not remove: name '" + oldName + "' not found");
+}
+
+INodePtr MakeDirectory(const std::string& path, Filesystem* fs, cmsx::machine::Process* process, int32_t mode)
 {
     std::string parentDirectoryPath = Path::GetDirectoryName(path);
     INodePtr parentDirINode = PathToINode(parentDirectoryPath, fs, process);
@@ -877,6 +925,7 @@ INodePtr MakeDirectory(const std::string& path, Filesystem* fs, cmsx::machine::P
     INodePtr dirINodePtr = AllocateINode(fs->Id(), process);
     INode* dirINode = dirINodePtr.Get();
     dirINode->SetFileType(FileType::directory);
+    dirINode->SetMode(AlterMode(mode, process->UMask(), true));
     BlockPtr dirBlockPtr = AllocateBlock(fs->Id(), process);
     dirINode->SetDirectBlockNumber(dirBlockPtr.Get()->Key().blockNumber, 0);
     DirectoryBlock dirBlock; 
@@ -937,12 +986,14 @@ INodePtr PathToINode(const std::string& path, Filesystem* fs, cmsx::machine::Pro
         INodePtr inode = rootFs->ReadINode(rootDirINodeKey, process);
         return inode;
     }
+    std::string dirPath;
     INodeKey inodeKey;
     int start = 0;
     if (path.starts_with('/'))
     {
         inodeKey = MakeINodeKey(rootFSNumber, superBlock.INodeNumberOfRootDirectory());
         start = 1;
+        dirPath.append(1, '/');
     }
     else
     {
@@ -955,7 +1006,7 @@ INodePtr PathToINode(const std::string& path, Filesystem* fs, cmsx::machine::Pro
     {
         const std::string& name = components[i];
         fs = GetFs(inode.Get()->Key().fsNumber);
-        inode = fs->SearchDirectory(name, inode.Get(), process);
+        inode = fs->SearchDirectory(name, inode.Get(), dirPath, process);
         if (!inode.Get())
         {
             return INodePtr(nullptr);
@@ -966,7 +1017,7 @@ INodePtr PathToINode(const std::string& path, Filesystem* fs, cmsx::machine::Pro
             fs = mountTable.GetMountedFilesystem(inode.Get()->Key());
             if (fs)
             {
-                inode = fs->SearchDirectory(".", inode.Get(), process);
+                inode = fs->SearchDirectory(".", inode.Get(), dirPath, process);
                 if (!inode.Get())
                 {
                     return INodePtr(nullptr);
@@ -977,6 +1028,7 @@ INodePtr PathToINode(const std::string& path, Filesystem* fs, cmsx::machine::Pro
                 return INodePtr(nullptr);
             }
         }
+        dirPath = Path::Combine(dirPath, name);
     }
     if (inode.Get() && (flags & PathToINodeFlags::stat) != PathToINodeFlags::none)
     {
