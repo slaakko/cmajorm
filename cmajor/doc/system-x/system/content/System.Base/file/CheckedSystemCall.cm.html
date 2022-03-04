@@ -335,11 +335,11 @@
   <br/>
   <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
   <br/>
-  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">int</span>&nbsp;<a href="../doc/ns_System.Os.html#function_IOCtl_0BA334C5C449D6E149A019F61E2B58B18280E161">IOCtl</a><span class="other">(</span><span class="keyword">int</span>&nbsp;<span class="identifier">fd</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_IOControlItem_E6B4446ED212043875E89529FB9663CC63F814F8.html">IOControlItem</a>&nbsp;<span class="identifier">item</span><span class="other">)</span></span>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">int</span>&nbsp;<a href="../doc/ns_System.Os.html#function_IOCtl_FC3B872E6A3EF86A078FE4F4CB3E3AC4607CA55C">IOCtl</a><span class="other">(</span><span class="keyword">int</span>&nbsp;<span class="identifier">fd</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_IOControlItem_E6B4446ED212043875E89529FB9663CC63F814F8.html">IOControlItem</a>&nbsp;<span class="identifier">item</span><span class="other">,&nbsp;</span><span class="keyword">byte</span><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">,&nbsp;</span><span class="keyword">long</span>&nbsp;<span class="identifier">argSize</span><span class="other">)</span></span>
   <br/>
   <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">int</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../index.html#ioctl">ioctl</a><span class="other">(</span><span class="identifier">fd</span><span class="other">,&nbsp;</span><span class="identifier">item</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">int</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../index.html#ioctl">ioctl</a><span class="other">(</span><span class="identifier">fd</span><span class="other">,&nbsp;</span><span class="identifier">item</span><span class="other">,&nbsp;</span><span class="identifier">arg</span><span class="other">,&nbsp;</span><span class="identifier">argSize</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
   <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span>&nbsp;<span class="other">(</span><span class="identifier">result</span><span class="other">&nbsp;==&nbsp;</span><span class="other">-</span><span class="number">1</span><span class="other">)</span></span>
   <br/>
@@ -705,13 +705,13 @@
   <br/>
   <span class="code" id="348" xml:space="preserve"><span class="lineNumber">348</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
   <br/>
-  <span class="code" id="349" xml:space="preserve"><span class="lineNumber">349</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>&nbsp;<a href="../doc/ns_System.Os.html#function_GetComputerName_8BBF39D3EE952578313EA418355070E07D2DD1FE">GetComputerName</a><span class="other">(</span><span class="other">)</span></span>
+  <span class="code" id="349" xml:space="preserve"><span class="lineNumber">349</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>&nbsp;<a href="../doc/ns_System.Os.html#function_GetHostName_041029B30A949182CC528A0E253072C1DFEBC68E">GetHostName</a><span class="other">(</span><span class="other">)</span></span>
   <br/>
   <span class="code" id="350" xml:space="preserve"><span class="lineNumber">350</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
   <span class="code" id="351" xml:space="preserve"><span class="lineNumber">351</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">char</span><span class="other">[</span><span class="number">256</span><span class="other">]</span>&nbsp;<span class="identifier">buffer</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="352" xml:space="preserve"><span class="lineNumber">352</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">int</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../index.html#get_computer_name">get_computer_name</a><span class="other">(</span><span class="other">&amp;</span><span class="identifier">buffer</span><span class="other">[</span><span class="number">0</span><span class="other">]</span><span class="other">,&nbsp;</span><span class="number">256</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="352" xml:space="preserve"><span class="lineNumber">352</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">int</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../index.html#get_host_name">get_host_name</a><span class="other">(</span><span class="other">&amp;</span><span class="identifier">buffer</span><span class="other">[</span><span class="number">0</span><span class="other">]</span><span class="other">,&nbsp;</span><span class="number">256</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
   <span class="code" id="353" xml:space="preserve"><span class="lineNumber">353</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span>&nbsp;<span class="other">(</span><span class="identifier">result</span><span class="other">&nbsp;==&nbsp;</span><span class="other">-</span><span class="number">1</span><span class="other">)</span></span>
   <br/>
@@ -785,7 +785,157 @@
   <br/>
   <span class="code" id="388" xml:space="preserve"><span class="lineNumber">388</span>&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="389" xml:space="preserve"><span class="lineNumber">389</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="389" xml:space="preserve"><span class="lineNumber">389</span>&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="390" xml:space="preserve"><span class="lineNumber">390</span>&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">void</span>&nbsp;<a href="../doc/ns_System.Os.html#function_SetUID_32F9B0F463E6F9E99EE61BF8423429AB6D53E74F">SetUID</a><span class="other">(</span><span class="keyword">int</span>&nbsp;<span class="identifier">uid</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="391" xml:space="preserve"><span class="lineNumber">391</span>&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="392" xml:space="preserve"><span class="lineNumber">392</span>&nbsp;&nbsp;&nbsp;<span class="keyword">int</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../index.html#setuid">setuid</a><span class="other">(</span><span class="identifier">uid</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="393" xml:space="preserve"><span class="lineNumber">393</span>&nbsp;&nbsp;&nbsp;<span class="keyword">if</span>&nbsp;<span class="other">(</span><span class="identifier">result</span><span class="other">&nbsp;==&nbsp;</span><span class="other">-</span><span class="number">1</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="394" xml:space="preserve"><span class="lineNumber">394</span>&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="395" xml:space="preserve"><span class="lineNumber">395</span>&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/ns_System.html#function_ThrowSystemError_6A6C14023A2193CD98BDA01E9BCFE68D91E54A1A">ThrowSystemError</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="396" xml:space="preserve"><span class="lineNumber">396</span>&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="397" xml:space="preserve"><span class="lineNumber">397</span>&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="398" xml:space="preserve"><span class="lineNumber">398</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="399" xml:space="preserve"><span class="lineNumber">399</span>&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">void</span>&nbsp;<a href="../doc/ns_System.Os.html#function_SetGID_2FA4B68234C8F16D316694428BD1D14CF75F3725">SetGID</a><span class="other">(</span><span class="keyword">int</span>&nbsp;<span class="identifier">gid</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="400" xml:space="preserve"><span class="lineNumber">400</span>&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="401" xml:space="preserve"><span class="lineNumber">401</span>&nbsp;&nbsp;&nbsp;<span class="keyword">int</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../index.html#setgid">setgid</a><span class="other">(</span><span class="identifier">gid</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="402" xml:space="preserve"><span class="lineNumber">402</span>&nbsp;&nbsp;&nbsp;<span class="keyword">if</span>&nbsp;<span class="other">(</span><span class="identifier">result</span><span class="other">&nbsp;==&nbsp;</span><span class="other">-</span><span class="number">1</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="403" xml:space="preserve"><span class="lineNumber">403</span>&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="404" xml:space="preserve"><span class="lineNumber">404</span>&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/ns_System.html#function_ThrowSystemError_6A6C14023A2193CD98BDA01E9BCFE68D91E54A1A">ThrowSystemError</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="405" xml:space="preserve"><span class="lineNumber">405</span>&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="406" xml:space="preserve"><span class="lineNumber">406</span>&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="407" xml:space="preserve"><span class="lineNumber">407</span>&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="408" xml:space="preserve"><span class="lineNumber">408</span>&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">int</span>&nbsp;<a href="../doc/ns_System.Os.html#function_GetUID_10FEE7B09BB788B2127146A36D5CDDED0F2F0E7A">GetUID</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="409" xml:space="preserve"><span class="lineNumber">409</span>&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="410" xml:space="preserve"><span class="lineNumber">410</span>&nbsp;&nbsp;&nbsp;<span class="keyword">int</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../index.html#getuid">getuid</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="411" xml:space="preserve"><span class="lineNumber">411</span>&nbsp;&nbsp;&nbsp;<span class="keyword">if</span>&nbsp;<span class="other">(</span><span class="identifier">result</span><span class="other">&nbsp;==&nbsp;</span><span class="other">-</span><span class="number">1</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="412" xml:space="preserve"><span class="lineNumber">412</span>&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="413" xml:space="preserve"><span class="lineNumber">413</span>&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/ns_System.html#function_ThrowSystemError_6A6C14023A2193CD98BDA01E9BCFE68D91E54A1A">ThrowSystemError</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="414" xml:space="preserve"><span class="lineNumber">414</span>&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="415" xml:space="preserve"><span class="lineNumber">415</span>&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">result</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="416" xml:space="preserve"><span class="lineNumber">416</span>&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="417" xml:space="preserve"><span class="lineNumber">417</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="418" xml:space="preserve"><span class="lineNumber">418</span>&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">int</span>&nbsp;<a href="../doc/ns_System.Os.html#function_GetGID_6E2755F7423E09A1C95B2A6E5A84366C3291C4D8">GetGID</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="419" xml:space="preserve"><span class="lineNumber">419</span>&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="420" xml:space="preserve"><span class="lineNumber">420</span>&nbsp;&nbsp;&nbsp;<span class="keyword">int</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../index.html#getgid">getgid</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="421" xml:space="preserve"><span class="lineNumber">421</span>&nbsp;&nbsp;&nbsp;<span class="keyword">if</span>&nbsp;<span class="other">(</span><span class="identifier">result</span><span class="other">&nbsp;==&nbsp;</span><span class="other">-</span><span class="number">1</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="422" xml:space="preserve"><span class="lineNumber">422</span>&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="423" xml:space="preserve"><span class="lineNumber">423</span>&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/ns_System.html#function_ThrowSystemError_6A6C14023A2193CD98BDA01E9BCFE68D91E54A1A">ThrowSystemError</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="424" xml:space="preserve"><span class="lineNumber">424</span>&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="425" xml:space="preserve"><span class="lineNumber">425</span>&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">result</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="426" xml:space="preserve"><span class="lineNumber">426</span>&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="427" xml:space="preserve"><span class="lineNumber">427</span>&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="428" xml:space="preserve"><span class="lineNumber">428</span>&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">int</span>&nbsp;<a href="../doc/ns_System.Os.html#function_UMask_138B2731B9D5ED93B869150FEC4817589230CE23">UMask</a><span class="other">(</span><span class="keyword">int</span>&nbsp;<span class="identifier">mask</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="429" xml:space="preserve"><span class="lineNumber">429</span>&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="430" xml:space="preserve"><span class="lineNumber">430</span>&nbsp;&nbsp;&nbsp;<span class="keyword">int</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../index.html#umask">umask</a><span class="other">(</span><span class="identifier">mask</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="431" xml:space="preserve"><span class="lineNumber">431</span>&nbsp;&nbsp;&nbsp;<span class="keyword">if</span>&nbsp;<span class="other">(</span><span class="identifier">result</span><span class="other">&nbsp;==&nbsp;</span><span class="other">-</span><span class="number">1</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="432" xml:space="preserve"><span class="lineNumber">432</span>&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="433" xml:space="preserve"><span class="lineNumber">433</span>&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/ns_System.html#function_ThrowSystemError_6A6C14023A2193CD98BDA01E9BCFE68D91E54A1A">ThrowSystemError</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="434" xml:space="preserve"><span class="lineNumber">434</span>&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="435" xml:space="preserve"><span class="lineNumber">435</span>&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">result</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="436" xml:space="preserve"><span class="lineNumber">436</span>&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="437" xml:space="preserve"><span class="lineNumber">437</span>&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="438" xml:space="preserve"><span class="lineNumber">438</span>&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">void</span>&nbsp;<a href="../doc/ns_System.Os.html#function_ChMod_2B0767CDF9A84DF23B5246CD339F100AFC8D76C9">ChMod</a><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="keyword">char</span><span class="other">*</span>&nbsp;<span class="identifier">path</span><span class="other">,&nbsp;</span><span class="keyword">int</span>&nbsp;<span class="identifier">mode</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="439" xml:space="preserve"><span class="lineNumber">439</span>&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="440" xml:space="preserve"><span class="lineNumber">440</span>&nbsp;&nbsp;&nbsp;<span class="keyword">int</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../index.html#chmod">chmod</a><span class="other">(</span><span class="identifier">path</span><span class="other">,&nbsp;</span><span class="identifier">mode</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="441" xml:space="preserve"><span class="lineNumber">441</span>&nbsp;&nbsp;&nbsp;<span class="keyword">if</span>&nbsp;<span class="other">(</span><span class="identifier">result</span><span class="other">&nbsp;==&nbsp;</span><span class="other">-</span><span class="number">1</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="442" xml:space="preserve"><span class="lineNumber">442</span>&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="443" xml:space="preserve"><span class="lineNumber">443</span>&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/ns_System.html#function_ThrowSystemError_6A6C14023A2193CD98BDA01E9BCFE68D91E54A1A">ThrowSystemError</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="444" xml:space="preserve"><span class="lineNumber">444</span>&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="445" xml:space="preserve"><span class="lineNumber">445</span>&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="446" xml:space="preserve"><span class="lineNumber">446</span>&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="447" xml:space="preserve"><span class="lineNumber">447</span>&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">void</span>&nbsp;<a href="../doc/ns_System.Os.html#function_ChOwn_FD26B368ED799B268A7E8516BE0C8FC77CE19390">ChOwn</a><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="keyword">char</span><span class="other">*</span>&nbsp;<span class="identifier">path</span><span class="other">,&nbsp;</span><span class="keyword">int</span>&nbsp;<span class="identifier">uid</span><span class="other">,&nbsp;</span><span class="keyword">int</span>&nbsp;<span class="identifier">gid</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="448" xml:space="preserve"><span class="lineNumber">448</span>&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="449" xml:space="preserve"><span class="lineNumber">449</span>&nbsp;&nbsp;&nbsp;<span class="keyword">int</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../index.html#chown">chown</a><span class="other">(</span><span class="identifier">path</span><span class="other">,&nbsp;</span><span class="identifier">uid</span><span class="other">,&nbsp;</span><span class="identifier">gid</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="450" xml:space="preserve"><span class="lineNumber">450</span>&nbsp;&nbsp;&nbsp;<span class="keyword">if</span>&nbsp;<span class="other">(</span><span class="identifier">result</span><span class="other">&nbsp;==&nbsp;</span><span class="other">-</span><span class="number">1</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="451" xml:space="preserve"><span class="lineNumber">451</span>&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="452" xml:space="preserve"><span class="lineNumber">452</span>&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/ns_System.html#function_ThrowSystemError_6A6C14023A2193CD98BDA01E9BCFE68D91E54A1A">ThrowSystemError</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="453" xml:space="preserve"><span class="lineNumber">453</span>&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="454" xml:space="preserve"><span class="lineNumber">454</span>&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="455" xml:space="preserve"><span class="lineNumber">455</span>&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="456" xml:space="preserve"><span class="lineNumber">456</span>&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">void</span>&nbsp;<a href="../doc/ns_System.Os.html#function_Rename_8C414E99F72FEEF719C7C2333E151F3AEC5E1681">Rename</a><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="keyword">char</span><span class="other">*</span>&nbsp;<span class="identifier">source</span><span class="other">,&nbsp;</span><span class="keyword">const</span>&nbsp;<span class="keyword">char</span><span class="other">*</span>&nbsp;<span class="identifier">target</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="457" xml:space="preserve"><span class="lineNumber">457</span>&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="458" xml:space="preserve"><span class="lineNumber">458</span>&nbsp;&nbsp;&nbsp;<span class="keyword">int</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../index.html#rename">rename</a><span class="other">(</span><span class="identifier">source</span><span class="other">,&nbsp;</span><span class="identifier">target</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="459" xml:space="preserve"><span class="lineNumber">459</span>&nbsp;&nbsp;&nbsp;<span class="keyword">if</span>&nbsp;<span class="other">(</span><span class="identifier">result</span><span class="other">&nbsp;==&nbsp;</span><span class="other">-</span><span class="number">1</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="460" xml:space="preserve"><span class="lineNumber">460</span>&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="461" xml:space="preserve"><span class="lineNumber">461</span>&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/ns_System.html#function_ThrowSystemError_6A6C14023A2193CD98BDA01E9BCFE68D91E54A1A">ThrowSystemError</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="462" xml:space="preserve"><span class="lineNumber">462</span>&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="463" xml:space="preserve"><span class="lineNumber">463</span>&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="464" xml:space="preserve"><span class="lineNumber">464</span>&nbsp;<span class="other">}</span></span>
   <br/>
  </body>
 </html>

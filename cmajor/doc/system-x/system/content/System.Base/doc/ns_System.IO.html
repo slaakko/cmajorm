@@ -208,6 +208,10 @@
     <td xml:space="preserve"><a href="../../System.Base/doc/ns_System.IO.html#function_IsDirectoryEmpty_4939F0A7FF8E5A1BF339A661D87600F6E0D2A006">IsDirectoryEmpty</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;dirPath)</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve"><a href="../../System.Base/doc/ns_System.IO.html#function_MakeMode_DAEC4502C364F09EED4D69D7123F60D785DF047B">MakeMode</a>(<a href="../../System.Base/doc/enumerated_type_Access_AC9556A45C12A1EFAA6BF7A49AA1106BF4269CBA.html">Access</a>&nbsp;ownerAccess, <a href="../../System.Base/doc/enumerated_type_Access_AC9556A45C12A1EFAA6BF7A49AA1106BF4269CBA.html">Access</a>&nbsp;groupAccess, <a href="../../System.Base/doc/enumerated_type_Access_AC9556A45C12A1EFAA6BF7A49AA1106BF4269CBA.html">Access</a>&nbsp;otherAccess)</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>></td>
     <td xml:space="preserve"><a href="../../System.Base/doc/ns_System.IO.html#function_OpenFlagStr_534CD8FF65F108DEA3CE4B0824A5755A6946BB22">OpenFlagStr</a>(<a href="../../System.Base/doc/enumerated_type_OpenFlags_9D05E67CB814B4A03C090249266BE907B55BCBE1.html">OpenFlags</a>&nbsp;flags)</td>
    </tr>
@@ -351,6 +355,10 @@
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">modeShift = 4</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
     <td xml:space="preserve">pathMax = 4096</td>
    </tr>
    <tr>
@@ -378,14 +386,14 @@
   <h3 id="function_BufferedCopy_300DBAB3423ADACDDF2ADA58675217D28289B606" xml:space="preserve">BufferedCopy&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;BufferedCopy(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;sourceFilePath, <span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;destFilePath, <span class="kw">long</span>&nbsp;size)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#368">368</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#381">381</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_CopyFile_82DB1E144BC83E4D6B0D443E5EB60D4534C4D88E" xml:space="preserve">CopyFile&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;CopyFile(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;sourceFilePath, <span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;destFilePath, <a href="../../System.Base/doc/enumerated_type_FileCopyOptions_F6D6FA44868E322300BFDF1E9BBF94D7340043D0.html">FileCopyOptions</a>&nbsp;options)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#295">295</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#302">302</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -427,7 +435,7 @@
   <h3 id="function_FileExists_852193F22DDB02361D44B70F5E272C3724F73B91" xml:space="preserve">FileExists&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">bool</span>&nbsp;FileExists(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;filePath)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#203">203</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#210">210</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -462,35 +470,35 @@
   <h3 id="function_GetFileAccessTime_53FC4C0019A6FDC28999E3719300D343687FEAE0" xml:space="preserve">GetFileAccessTime&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html">DateTime</a>&nbsp;GetFileAccessTime(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;filePath)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#252">252</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#259">259</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_GetFileModificationTime_BA87768FDF7FB11F4A611E53D9FA21B5B29EC858" xml:space="preserve">GetFileModificationTime&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html">DateTime</a>&nbsp;GetFileModificationTime(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;filePath)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#263">263</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#270">270</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_GetFileSize_93C7BEFB483A8E17F4AB2590DF95081991C76198" xml:space="preserve">GetFileSize&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">long</span>&nbsp;GetFileSize(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;filePath)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#234">234</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#241">241</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_GetFileStatus_0EE62C3EDBF35350E80B3A844AC69B03E95D05AB" xml:space="preserve">GetFileStatus&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;GetFileStatus(<span class="kw">byte</span>*&nbsp;statBuf, <a href="../../System.Base/doc/class_FileStatus_3D474F78C14A3C55EF0122B03216387571393EEC.html">FileStatus</a>&amp;&nbsp;status)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#52">52</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#59">59</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_GetFileTimes_22470C10959AF7336EF8286AF12EFFB5B27026FB" xml:space="preserve">GetFileTimes&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;GetFileTimes(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;path, <a href="../../System.Base/doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html">DateTime</a>&amp;&nbsp;accessTime, <a href="../../System.Base/doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html">DateTime</a>&amp;&nbsp;modificationTime)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#274">274</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#281">281</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -505,6 +513,13 @@
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">bool</span>&nbsp;IsDirectoryEmpty(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;dirPath)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Directory.cm.html#144">144</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Directory.cm.html">System.Base/Directory.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="function_MakeMode_DAEC4502C364F09EED4D69D7123F60D785DF047B" xml:space="preserve">MakeMode&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">int</span>&nbsp;MakeMode(<a href="../../System.Base/doc/enumerated_type_Access_AC9556A45C12A1EFAA6BF7A49AA1106BF4269CBA.html">Access</a>&nbsp;ownerAccess, <a href="../../System.Base/doc/enumerated_type_Access_AC9556A45C12A1EFAA6BF7A49AA1106BF4269CBA.html">Access</a>&nbsp;groupAccess, <a href="../../System.Base/doc/enumerated_type_Access_AC9556A45C12A1EFAA6BF7A49AA1106BF4269CBA.html">Access</a>&nbsp;otherAccess)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#22">22</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -525,7 +540,7 @@
   <h3 id="function_RemoveFile_7BF6AC59F924FE462AE619C3AF8ADB10F1C42342" xml:space="preserve">RemoveFile&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;RemoveFile(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;filePath)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#381">381</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#394">394</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -539,21 +554,21 @@
   <h3 id="function_SetFileTimes_C718EDC6CEEF663E423F6855A4FEFF4C573B04E4" xml:space="preserve">SetFileTimes&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;SetFileTimes(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;path, <span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html">DateTime</a>&amp;&nbsp;accessTime, <span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html">DateTime</a>&amp;&nbsp;modificationTime)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#286">286</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#293">293</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_Stat_0ED668C60B43A3304C3823BCC52982F1FC008889" xml:space="preserve">Stat&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;Stat(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;path, <a href="../../System.Base/doc/class_FileStatus_3D474F78C14A3C55EF0122B03216387571393EEC.html">FileStatus</a>&amp;&nbsp;status)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#41">41</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#48">48</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_UTime_B09F8007A272E05AA8FCB1018B2677DE8D48DCC9" xml:space="preserve">UTime&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;UTime(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;path, <span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html">DateTime</a>&amp;&nbsp;atime, <span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html">DateTime</a>&amp;&nbsp;mtime)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#70">70</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/File.cm.html#77">77</a>&nbsp;of&nbsp;<a href="../../System.Base/file/File.cm.html">System.Base/File.cm</a></span>
   <br/>
   <br/>
   <hr/>

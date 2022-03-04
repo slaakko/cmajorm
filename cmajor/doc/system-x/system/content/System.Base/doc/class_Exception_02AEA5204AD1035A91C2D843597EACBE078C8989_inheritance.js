@@ -269,16 +269,17 @@ function drawDiagram(diagramNodes) {
 function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "System.Exception", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../System.Base/doc/class_Exception_02AEA5204AD1035A91C2D843597EACBE078C8989.html" },
-        { name: "System.ConversionException", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_ConversionException_968EDA1D00534F82FF78F973855F91349977511B.html" },
+        { name: "System.ConversionException", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_ConversionException_968EDA1D00534F82FF78F973855F91349977511B.html" },
         { name: "System.IO.FileSystemException", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_FileSystemException_BB9552A6F8CD7166104BC90F55939797AA006B1A.html" },
-        { name: "System.IO.InvalidPathException", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_InvalidPathException_B507BC7383A55580000E7A669FAAE1ABECF7FFBA.html" },
-        { name: "System.IndexOutOfBoundsException", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_IndexOutOfBoundsException_6C8CE1E5DFC294CE8A87C913779E2202A40B3D0A.html" },
-        { name: "System.InvalidParameterException", id: "diagram_node_7", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_InvalidParameterException_2228B2BDF1E2B10AA3E0D6FF93E7CDB96FD19271.html" },
-        { name: "System.Lex.ParsingException", id: "diagram_node_10", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Lex/doc/class_ParsingException_05B147C5054E1ADB84074F65FDF2E8CFBF5052EF.html" },
-        { name: "System.NullPointerException", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_NullPointerException_AE8E4C21577D2A0BC512B50EA668CCAFF9C43EDE.html" },
-        { name: "System.PreconditionViolationException", id: "diagram_node_8", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_PreconditionViolationException_D1767029DF08FFD6FE75AA250E4B549BBB2D7399.html" },
-        { name: "System.SystemError", id: "diagram_node_9", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_SystemError_25FF0F74A2A42F180F72EE68AF4D40F1356BA295.html" },
-        { name: "System.Unicode.UnicodeException", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_UnicodeException_F535D36BB8009200467ACEA05819217182306079.html" }];
+        { name: "System.IO.InvalidPathException", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_InvalidPathException_B507BC7383A55580000E7A669FAAE1ABECF7FFBA.html" },
+        { name: "System.IndexOutOfBoundsException", id: "diagram_node_7", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_IndexOutOfBoundsException_6C8CE1E5DFC294CE8A87C913779E2202A40B3D0A.html" },
+        { name: "System.InvalidParameterException", id: "diagram_node_8", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_InvalidParameterException_2228B2BDF1E2B10AA3E0D6FF93E7CDB96FD19271.html" },
+        { name: "System.Lex.ParsingException", id: "diagram_node_11", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Lex/doc/class_ParsingException_05B147C5054E1ADB84074F65FDF2E8CFBF5052EF.html" },
+        { name: "System.NullPointerException", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_NullPointerException_AE8E4C21577D2A0BC512B50EA668CCAFF9C43EDE.html" },
+        { name: "System.PreconditionViolationException", id: "diagram_node_9", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_PreconditionViolationException_D1767029DF08FFD6FE75AA250E4B549BBB2D7399.html" },
+        { name: "System.Security.SecurityException", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_SecurityException_F497934E2EB16B636E575BB82F84C249DEEA94FC.html" },
+        { name: "System.SystemError", id: "diagram_node_10", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_SystemError_25FF0F74A2A42F180F72EE68AF4D40F1356BA295.html" },
+        { name: "System.Unicode.UnicodeException", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_UnicodeException_F535D36BB8009200467ACEA05819217182306079.html" }];
     drawDiagram(diagramNodes);
 }
 
