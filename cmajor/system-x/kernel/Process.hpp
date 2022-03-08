@@ -9,6 +9,7 @@
 #include <system-x/kernel/Error.hpp>
 #include <system-x/kernel/File.hpp>
 #include <system-x/kernel/Region.hpp>
+#include <system-x/kernel/INodeManager.hpp>
 #include <system-x/object/Symbol.hpp>
 #include <system-x/object/FunctionTable.hpp>
 #include <system-x/machine/Debugger.hpp>
@@ -102,6 +103,9 @@ public:
     void SetINodeKeyOfWorkingDir(uint64_t inodeKeyOfWorkingDirAsULong_) override { inodeKeyOfWorkingDirAsULong = inodeKeyOfWorkingDirAsULong_; }
     void SetUMask(int32_t mask);
     int32_t UMask() const override { return umask; }
+    void SetDirectoriesChanged() { directoriesChanged = true; }
+    bool DirectoriesChanged() const { return directoriesChanged; }
+    void ClearDirectoriesChanged() { directoriesChanged = false; }
 private:
     int32_t id;
     uint64_t rv;
@@ -144,6 +148,7 @@ private:
     cmsx::object::TryRecord* currentTryRecord;
     void* kernelFiber;
     uint64_t inodeKeyOfWorkingDirAsULong;
+    bool directoriesChanged;
 };
 
 CMSX_KERNEL_API int32_t Fork(Process* parent);

@@ -222,6 +222,10 @@ private:
 
 CMSX_KERNEL_API INodePtr GetINode(INodeKey inodeKey, cmsx::machine::Process* process);
 
+CMSX_KERNEL_API void AddDirChangeNotification(INodeKey dirINodeKey, int32_t pid);
+CMSX_KERNEL_API std::vector<int32_t>* GetDirChangeNotificationPIDs(INodeKey dirINodeKey);
+CMSX_KERNEL_API void RemoveDirChangeNotifications(int32_t pid);
+
 CMSX_KERNEL_API void InitINodeManager();
 CMSX_KERNEL_API void DoneINodeManager();
 CMSX_KERNEL_API void SetINodeManagerMachine(cmsx::machine::Machine* machine);

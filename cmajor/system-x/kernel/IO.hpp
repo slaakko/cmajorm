@@ -61,6 +61,7 @@ CMSX_KERNEL_API int32_t Dup(Process* process, int32_t fd);
 CMSX_KERNEL_API void ChMod(Process* process, int64_t pathAddr, int32_t mode);
 CMSX_KERNEL_API void ChOwn(Process* process, int64_t pathAddr, int32_t uid, int32_t gid);
 CMSX_KERNEL_API void Rename(Process* process, int64_t sourcePathAddr, int64_t targetPathAddr);
+CMSX_KERNEL_API void AddDirChangeNotification(Process* process, int64_t directoryPathsAddr);
 
 } // namespace cmsx::kernel
 

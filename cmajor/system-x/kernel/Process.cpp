@@ -28,7 +28,7 @@ Process::Process(int32_t id_) :
     state(cmsx::machine::ProcessState::created), entryPoint(-1), argumentsStartAddress(-1), argumentsLength(0), environmentStartAddress(-1), environmentLength(0), 
     heapStartAddress(-1), heapLength(0), stackStartAddress(-1), startUserTime(), startSleepTime(), startSystemTime(), userTime(0), sleepTime(0), systemTime(0),
     exitCode(0), debugger(nullptr), processor(nullptr), currentExceptionAddress(0), currentExceptionClassId(0), currentTryRecord(nullptr), kernelFiber(nullptr),
-    inodeKeyOfWorkingDirAsULong(-1), uid(0), gid(0), umask(0)
+    inodeKeyOfWorkingDirAsULong(-1), uid(0), gid(0), umask(0), directoriesChanged(false)
 {
     SetINodeKeyOfWorkingDir(Kernel::Instance().GetINodeKeyOfRootDir());
 }
@@ -199,6 +199,7 @@ void Process::Exit(uint8_t exitCode_)
     symbolTable.reset();
     functionTable.reset();
     fileTable.CloseFiles(this);
+    RemoveDirChangeNotifications(id);
     Kernel::Instance().ClearProcessData(this);
     Process* parent = Parent();
     if (parent)

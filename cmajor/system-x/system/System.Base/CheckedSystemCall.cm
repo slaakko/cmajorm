@@ -465,4 +465,41 @@ namespace System.Os
 			ThrowSystemError();
 		}
 	}
+	
+	public void AddDirChangeNotification(const char* directories)
+	{
+		int result = add_dir_change_notification(directories);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+	}
+	
+	public void RemoveDirChangeNotifications()
+	{
+		int result = remove_dir_change_notifications();
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+	}
+	
+	public bool DirectoriesChanged() 
+	{
+		int result = directories_changed();
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+		return result == 1;
+	}
+	
+	public void ClearDirectoriesChanged()
+	{
+		int result = clear_directories_changed();
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+	}
 }

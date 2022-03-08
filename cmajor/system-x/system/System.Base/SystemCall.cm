@@ -63,6 +63,10 @@ public const byte trap_umask = 56u;
 public const byte trap_chmod = 57u;
 public const byte trap_chown = 58u;
 public const byte trap_rename = 59u;
+public const byte trap_add_dir_change_notification = 60u;
+public const byte trap_remove_dir_change_notifications = 61u;
+public const byte trap_directories_changed = 62u;
+public const byte trap_clear_directories_changed = 63u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -400,4 +404,24 @@ public cdecl nothrow int chown(const char* path, int uid, int gid)
 public cdecl nothrow int rename(const char* sourcePath, const char* targetPath)
 {
     return cast<int>(trap(0u, trap_rename, 0u, sourcePath, targetPath));
+}
+
+public cdecl nothrow int add_dir_change_notification(const char* directories)
+{
+	return cast<int>(trap(0u, trap_add_dir_change_notification, 0u, directories));
+}
+
+public cdecl nothrow int remove_dir_change_notifications()
+{
+	return cast<int>(trap(0u, trap_remove_dir_change_notifications, 0u));
+}
+
+public cdecl nothrow int directories_changed()
+{
+	return cast<int>(trap(0u, trap_directories_changed, 0u));
+}
+
+public cdecl nothrow int clear_directories_changed()
+{
+	return cast<int>(trap(0u, trap_clear_directories_changed, 0u));
 }

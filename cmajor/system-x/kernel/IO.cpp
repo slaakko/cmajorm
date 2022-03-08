@@ -15,6 +15,7 @@
 #include <system-x/machine/Processor.hpp>
 #include <soulng/util/MemoryReader.hpp>
 #include <soulng/util/Path.hpp>
+#include <soulng/util/Util.hpp>
 
 namespace cmsx::kernel {
 
@@ -747,6 +748,27 @@ void Rename(Process* process, int64_t sourcePathAddr, int64_t targetPathAddr)
     else
     {
         throw SystemError(ENOTFOUND, "source directory '" + sourceDirPath + "' not found");
+    }
+}
+
+void AddDirChangeNotification(Process* process, int64_t directoryPathsAddr)
+{
+    if (directoryPathsAddr == 0)
+    {
+        throw SystemError(EPARAM, "directory path is null");
+    }
+    cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
+    std::string directoryPaths = ReadString(process, directoryPathsAddr, mem);
+    std::vector<std::string> directories = Split(directoryPaths, ':');
+    Filesystem* fs = GetFs(rootFSNumber);
+    for (const std::string& directory : directories)
+    {
+        INodePtr dirINodePtr = PathToINode(directory, fs, process);
+        if (dirINodePtr.Get())
+        {
+            INodeKey dirINodeKey = dirINodePtr.Get()->Key();
+            cmsx::kernel::AddDirChangeNotification(dirINodeKey, process->Id());
+        }
     }
 }
 

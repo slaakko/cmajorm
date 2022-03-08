@@ -71,6 +71,10 @@ const uint8_t trap_umask = 56;
 const uint8_t trap_chmod = 57;
 const uint8_t trap_chown = 58;
 const uint8_t trap_rename = 59;
+const uint8_t trap_add_dir_change_notification = 60;
+const uint8_t trap_remove_dir_change_notifications = 61;
+const uint8_t trap_directories_changed = 62;
+const uint8_t clear_directories_changed = 63;
 
 class CMSX_KERNEL_API TrapHandler
 {

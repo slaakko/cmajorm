@@ -533,6 +533,94 @@ uint64_t TrapRenameHandler::HandleTrap(cmsx::machine::Processor& processor)
     }
 }
 
+class TrapAddDirChangeNotificationHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_add_dir_change_notification"; }
+};
+
+uint64_t TrapAddDirChangeNotificationHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int64_t directoryPathsAddr = processor.Regs().Get(cmsx::machine::regAX);
+        AddDirChangeNotification(process, directoryPathsAddr);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapRemoveDirChangeNotificationsHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_remove_dir_change_notifications"; }
+};
+
+uint64_t TrapRemoveDirChangeNotificationsHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        RemoveDirChangeNotifications(process->Id());
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapDirectoriesChangedHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_directories_changed"; }
+};
+
+uint64_t TrapDirectoriesChangedHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        return process->DirectoriesChanged();
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapClearDirectoriesChangedHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "clear_directories_changed"; }
+};
+
+uint64_t TrapClearDirectoriesChangedHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        process->ClearDirectoriesChanged();
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
 void InitIOTraps()
 {
     SetTrapHandler(trap_create, new TrapCreateHandler());
@@ -557,10 +645,18 @@ void InitIOTraps()
     SetTrapHandler(trap_chmod, new TrapChModHandler());
     SetTrapHandler(trap_chown, new TrapChOwnHandler());
     SetTrapHandler(trap_rename, new TrapRenameHandler());
+    SetTrapHandler(trap_add_dir_change_notification, new TrapAddDirChangeNotificationHandler());
+    SetTrapHandler(trap_remove_dir_change_notifications, new TrapRemoveDirChangeNotificationsHandler());
+    SetTrapHandler(trap_directories_changed, new TrapDirectoriesChangedHandler());
+    SetTrapHandler(clear_directories_changed, new TrapClearDirectoriesChangedHandler());
 }
 
 void DoneIOTraps()
 {
+    SetTrapHandler(clear_directories_changed, nullptr);
+    SetTrapHandler(trap_directories_changed, nullptr);
+    SetTrapHandler(trap_remove_dir_change_notifications, nullptr);
+    SetTrapHandler(trap_add_dir_change_notification, nullptr);
     SetTrapHandler(trap_rename, nullptr);
     SetTrapHandler(trap_chown, nullptr);
     SetTrapHandler(trap_chmod, nullptr);

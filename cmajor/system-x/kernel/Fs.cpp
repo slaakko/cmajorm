@@ -8,6 +8,7 @@
 #include <system-x/kernel/Kernel.hpp>
 #include <system-x/kernel/Mount.hpp>
 #include <system-x/kernel/BlockFile.hpp>
+#include <system-x/kernel/ProcessManager.hpp>
 #include <soulng/util/MemoryReader.hpp>
 #include <soulng/util/MemoryWriter.hpp>
 #include <soulng/util/Path.hpp>
@@ -784,6 +785,22 @@ DirectoryEntry GetDirectoryEntry(INode* dirINode, int32_t inodeNumber, Filesyste
     return DirectoryEntry();
 }
 
+void SetDirectoryChanged(INodeKey dirINodeKey)
+{
+    std::vector<int32_t>* changeNotificationPIDs = GetDirChangeNotificationPIDs(dirINodeKey);
+    if (changeNotificationPIDs)
+    {
+        for (int32_t pid : *changeNotificationPIDs)
+        {
+            Process* process = ProcessManager::Instance().GetProcess(pid);
+            if (process)
+            {
+                process->SetDirectoriesChanged();
+            }
+        }
+    }
+}
+
 void AddDirectoryEntry(const DirectoryEntry& entry, INode* dirINode, Filesystem* fs, cmsx::machine::Process* process)
 {
     if (dirINode->GetFileType() != FileType::directory)
@@ -803,6 +820,7 @@ void AddDirectoryEntry(const DirectoryEntry& entry, INode* dirINode, Filesystem*
             dirINode->SetFileSize(dirINode->FileSize() + DirectoryEntry::Size());
             dirINode->SetMTime(GetCurrentDateTime());
             dirINode->SetCTime(GetCurrentDateTime());
+            SetDirectoryChanged(dirINode->Key());
             WriteINode(dirINode, process);
             return;
         }
@@ -817,6 +835,7 @@ void AddDirectoryEntry(const DirectoryEntry& entry, INode* dirINode, Filesystem*
     dirINode->SetFileSize(dirINode->FileSize() + DirectoryEntry::Size());
     dirINode->SetMTime(GetCurrentDateTime());
     dirINode->SetCTime(GetCurrentDateTime());
+    SetDirectoryChanged(dirINode->Key());
     WriteINode(dirINode, process);
 }
 
@@ -858,6 +877,7 @@ void RemoveDirectoryEntry(const std::string& name, const std::string& filePath, 
                         dirINode->SetFileSize(dirINode->FileSize() - DirectoryEntry::Size());
                         dirINode->SetCTime(GetCurrentDateTime());
                         dirINode->SetMTime(GetCurrentDateTime());
+                        SetDirectoryChanged(dirINode->Key());
                         if (nlinks == 0 && inode->ReferenceCount() == 0)
                         {
                             FreeBlocks(inode, fs, process);
@@ -904,6 +924,7 @@ void RenameDirectoryEntry(INode* dirINode, const std::string& oldName, const std
                     WriteDirectoryBlock(directoryBlock, blockPtr, fs, process);
                     dirINode->SetMTime(GetCurrentDateTime());
                     dirINode->SetCTime(GetCurrentDateTime());
+                    SetDirectoryChanged(dirINode->Key());
                     return;
                 }
             }

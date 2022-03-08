@@ -12,6 +12,7 @@
 #include <system-x/machine/Event.hpp>
 #include <soulng/util/MemoryReader.hpp>
 #include <soulng/util/MemoryWriter.hpp>
+#include <set>
 
 namespace cmsx::kernel {
 
@@ -275,6 +276,111 @@ struct INodeHashQueueEntry
     INodeFreeList::iterator it;
 };
 
+struct DirChangeNotification
+{
+    DirChangeNotification(int32_t pid_) : pid(pid_), dirINodeKeys()
+    {
+    }
+    int32_t pid;
+    std::vector<INodeKey> dirINodeKeys;
+};
+
+class DirChangeNotificationMap
+{
+public:
+    DirChangeNotificationMap();
+    void AddDirChangeNotification(INodeKey dirINodeKey, int32_t pid);
+    void RemoveDirChangeNotification(int32_t pid);
+    DirChangeNotification* GetDirChangeNotification(int32_t pid);
+    DirChangeNotification* GetOrInsertDirChangeNotification(int32_t pid);
+    std::vector<int32_t>* GetDirChangeNotificationPIDs(const INodeKey& key);
+private:
+    std::map<int32_t, DirChangeNotification*> pidNotificationMap;
+    std::map<INodeKey, std::vector<int32_t>> dirINodePIDNotificationMap;
+};
+
+DirChangeNotificationMap::DirChangeNotificationMap() : pidNotificationMap(), dirINodePIDNotificationMap()
+{
+}
+
+DirChangeNotification* DirChangeNotificationMap::GetDirChangeNotification(int32_t pid)
+{
+    auto it = pidNotificationMap.find(pid);
+    if (it != pidNotificationMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+std::vector<int32_t>* DirChangeNotificationMap::GetDirChangeNotificationPIDs(const INodeKey& key)
+{
+    auto it = dirINodePIDNotificationMap.find(key);
+    if (it != dirINodePIDNotificationMap.cend())
+    {
+        return &(it->second);
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+DirChangeNotification* DirChangeNotificationMap::GetOrInsertDirChangeNotification(int32_t pid)
+{
+    DirChangeNotification* notification = GetDirChangeNotification(pid);
+    if (notification)
+    {
+        return notification;
+    }
+    else
+    {
+        DirChangeNotification* notification = new DirChangeNotification(pid);
+        pidNotificationMap[pid] = notification;
+        return notification;
+    }
+}
+
+void DirChangeNotificationMap::AddDirChangeNotification(INodeKey dirINodeKey, int32_t pid)
+{
+    DirChangeNotification* notification = GetOrInsertDirChangeNotification(pid);
+    if (std::find(notification->dirINodeKeys.begin(), notification->dirINodeKeys.end(), dirINodeKey) == notification->dirINodeKeys.end())
+    {
+        notification->dirINodeKeys.push_back(dirINodeKey);
+    }
+    std::vector<int32_t>& pids = dirINodePIDNotificationMap[dirINodeKey];
+    if (std::find(pids.begin(), pids.end(), pid) == pids.end())
+    {
+        pids.push_back(pid);
+    }
+}
+
+void DirChangeNotificationMap::RemoveDirChangeNotification(int32_t pid)
+{
+    DirChangeNotification* notification = GetDirChangeNotification(pid);
+    if (notification)
+    {
+        for (const INodeKey& key : notification->dirINodeKeys)
+        {
+            auto it = dirINodePIDNotificationMap.find(key);
+            if (it != dirINodePIDNotificationMap.cend())
+            {
+                std::vector<int32_t>& pids = it->second;
+                pids.erase(std::find(pids.begin(), pids.end(), pid), pids.end());
+                if (pids.empty())
+                {
+                    dirINodePIDNotificationMap.erase(key);
+                }
+            }
+        }
+        delete notification;
+        pidNotificationMap.erase(pid);
+    }
+}
+
 class INodeManager
 {
 public:
@@ -297,6 +403,7 @@ public:
     void RemoveINodeKeyEvent(const INodeKey& inodeKey);
     bool IsFreeListEmpty() const { return freeList.empty(); }
     INode* GetINodeFromFreeList();
+    DirChangeNotificationMap& GetDirChangeNotificationMap() { return dirChangeNotificationMap; }
 private:
     INodeManager();
     static std::unique_ptr<INodeManager> instance;
@@ -307,6 +414,7 @@ private:
     std::vector<std::list<INodeHashQueueEntry, boost::fast_pool_allocator<INodeHashQueueEntry>>> hashQueues;
     std::map<INodeKey, cmsx::machine::Event> inodeKeyMapEventMap;
     int nextINodeKeyEventId;
+    DirChangeNotificationMap dirChangeNotificationMap;
 };
 
 std::unique_ptr<INodeManager> INodeManager::instance;
@@ -522,6 +630,27 @@ void PutINode(INode* inode)
         inodeManager.RemoveINodeKeyEvent(inode->Key());
         inodeManager.PutINodeToFreeList(inode);
     }
+}
+
+void AddDirChangeNotification(INodeKey dirINodeKey, int32_t pid)
+{
+    INodeManager& inodeManager = INodeManager::Instance();
+    DirChangeNotificationMap& notificationMap = inodeManager.GetDirChangeNotificationMap();
+    notificationMap.AddDirChangeNotification(dirINodeKey, pid);
+}
+
+std::vector<int32_t>* GetDirChangeNotificationPIDs(INodeKey dirINodeKey)
+{
+    INodeManager& inodeManager = INodeManager::Instance();
+    DirChangeNotificationMap& notificationMap = inodeManager.GetDirChangeNotificationMap();
+    return notificationMap.GetDirChangeNotificationPIDs(dirINodeKey);
+}
+
+void RemoveDirChangeNotifications(int32_t pid)
+{
+    INodeManager& inodeManager = INodeManager::Instance();
+    DirChangeNotificationMap& notificationMap = inodeManager.GetDirChangeNotificationMap();
+    notificationMap.RemoveDirChangeNotification(pid);
 }
 
 void InitINodeManager()

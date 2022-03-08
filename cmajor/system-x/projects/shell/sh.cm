@@ -38,7 +38,7 @@ string GetLine(ShellEnvironment& environment)
     return line;
 }
 
-void ProcessLine(const string& line, ShellEnvironment& environment, const Map<string, string>& executableMap)
+void ProcessLine(const string& line, ShellEnvironment& environment, Map<string, string>& executableMap)
 {
 	if (line.IsEmpty()) return;
     ustring uline = ToUtf32(line);
@@ -58,16 +58,25 @@ void ProcessLine(const string& line, ShellEnvironment& environment, const Map<st
 		}
 		command.Execute(programEnvironment);
 	}
+	if (DirectoriesChanged())
+	{
+		ClearDirectoriesChanged();
+		string path = GetEnv("PATH");
+		ReadPathDirectories(path, executableMap);
+	}
 }
 
 void Run(ShellEnvironment& environment)
 {
 	Map<string, string> executableMap;
-	ReadPathDirectories(GetEnv("PATH"), executableMap);
+	string path = GetEnv("PATH");
+	AddDirChangeNotification(path.Chars());
+	ReadPathDirectories(path, executableMap);
     string line = GetLine(environment);
     while (line != "exit")
     {
         ProcessLine(line, environment, executableMap);
         line = GetLine(environment);
     }
+	RemoveDirChangeNotifications();
 }
