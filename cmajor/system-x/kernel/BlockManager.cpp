@@ -8,6 +8,8 @@
 #include <system-x/kernel/Process.hpp>
 #include <system-x/kernel/File.hpp>
 #include <system-x/kernel/DebugHelp.hpp>
+#include <system-x/kernel/Fs.hpp>
+#include <system-x/kernel/Mount.hpp>
 #include <system-x/machine/Config.hpp>
 #include <system-x/machine/Event.hpp>
 #include <condition_variable>
@@ -29,6 +31,19 @@ Block::Block(BlockKey key_) : flags(BlockFlags::none), key(key_), data()
 void Block::Clear()
 {
     std::memset(data, 0, Size());
+}
+
+
+bool Block::IsValid() const
+{
+    if (key.fsNumber == rootFSNumber)
+    {
+        return GetFlag(BlockFlags::valid);
+    }
+    else
+    {
+        return false;
+    }
 }
 
 BlockPtr::~BlockPtr()

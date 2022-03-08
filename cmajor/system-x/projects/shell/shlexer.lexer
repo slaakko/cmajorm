@@ -1,0 +1,85 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+classmap shclassmap;
+
+tokens shtokens
+{
+	(QUOTED_CHAR, "'quoted_char'"), (SINGLE_QUOTED, "'single_quoted'"), (DOUBLE_QUOTED, "'double_quoted'"), 
+	(CASE, "'case'"), (DO, "'do'"), (DONE, "'done'"), (ELIF, "'elif'"), (ELSE, "'else'"), 
+	(ESAC, "'esac'"), (FI, "'fi'"), (FOR, "'for'"), (IF, "'if'"), (IN, "'in'"), (THEN, "'then'"), 
+	(UNTIL, "'until'"), (WHILE, "'while'"), (TIME, "'time'"),
+	(AND_IF, "'&&'"), (OR_IF, "'||'"), (DSEMI, "';;'"), 
+	(DLESSDASH, "'<<-'"), (DLESS, "'<<'"), (DGREAT, "'>>'"),
+	(LBRACE, "'{'"), (RBRACE, "'}'"), (BANG, "'!'"), (PIPE, "'|'"), (LPAREN, "'('"), (RPAREN, "')'"), 
+	(LESSAND, "'<&'"), (GREATAND, "'>&'"), (LESSGREAT, "'<>'"), (CLOBBER, "'>|'"), (LESS, "'<'"), (GREAT, "'>'"), 
+	(AMP, "'&'"), (SEMI, "';'"), (BACKQUOTE, "'`'"), (TOKEN, "'token'")
+}
+
+keywords shkeywords
+{
+	("case", CASE), ("do", DO), ("done", DONE), ("elif", ELIF), ("else", ELSE), ("esac", ESAC),
+	("fi", FI), ("if", IF), ("then", THEN), ("until", UNTIL), ("while", WHILE),	("time", TIME)
+}
+
+expressions
+{
+	quoted_char="\\.";
+	single_quoted="'[^']*'";
+	double_quoted="\"[^\"]*\"";
+	and_if="&&";
+	or_if="\|\|";
+	dsemi=";;";
+	dlessdash="<<-";
+	dless="<<";
+	dgreat=">>";
+	lbrace="\{";
+	rbrace="\}";
+	bang="!";
+	pipe="\|";
+	lparen="\(";
+	rparen="\)";
+	less_and="<&";
+	great_and=">&";
+	less_great="<>";
+	clobber=">\|";
+	less="<";
+	great=">";
+	amp="&";
+	semi=";";
+	back_quote="`";
+	separator="[ \t]";
+	token="[^ \t\\'\"&|;<>{}`]+";
+}
+
+lexer shlexer
+{
+	"{separator}+" {}
+	"{quoted_char}"{ return QUOTED_CHAR; }
+	"{single_quoted}"{ return SINGLE_QUOTED; }
+	"{double_quoted}"{ return DOUBLE_QUOTED; }
+	"{and_if}"{ return AND_IF; }
+	"{or_if}"{ return OR_IF; }
+	"{dsemi}"{ return DSEMI; }
+	"{dlessdash}"{ return DLESSDASH; }
+	"{dless}"{ return DLESS; }
+	"{dgreat}"{ return DGREAT; }
+	"{lbrace}"{ return LBRACE; }
+	"{rbrace}"{ return RBRACE; }
+	"{bang}"{ return BANG; }
+	"{pipe}"{ return PIPE; }
+	"{lparen}"{ return LPAREN; }
+	"{rparen}"{ return RPAREN; }
+	"{less_and}"{ return LESSAND; }
+	"{great_and}"{ return GREATAND; }
+	"{less_great}"{ return LESSGREAT; }
+	"{clobber}"{ return CLOBBER; }
+	"{less}"{ return LESS; }
+	"{great}"{ return GREAT; }
+	"{amp}"{ return AMP; }
+	"{semi}"{ return SEMI; }
+	"{back_quote}"{ return BACKQUOTE; }
+    "{token}"{ return TOKEN; }
+}

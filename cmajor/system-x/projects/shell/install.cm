@@ -48,8 +48,8 @@ void CopyBin()
 
 void ChBinMode()
 {
-	ChMod("/bin/chmod.x",
-		MakeMode(cast<Access>(Access.read | Access.write | Access.execute), cast<Access>(Access.read | Access.execute), cast<Access>(Access.read | Access.execute)));
+    ChMod("/bin/chmod.x",
+        MakeMode(cast<Access>(Access.read | Access.write | Access.execute), cast<Access>(Access.read | Access.execute), cast<Access>(Access.read | Access.execute)));
     List<string> args;
     args.Add("755");
     args.Add("/bin/*.x");
@@ -64,61 +64,61 @@ void Install()
     {
         CopyBin();
     }
-	else
-	{
+    else
+    {
         byte exitCode = 0u;
         Wait(&exitCode);
         if (exitCode != 0u)
         {
             throw Exception("shell installation failed: child returned exit code " + ToString(exitCode));
         }
-		int pid = Fork();
-		if (pid == 0)
-		{
-			ChBinMode();
-		}
-		else
-		{
-			byte exitCode = 0u;
-			Wait(&exitCode);
-			if (exitCode != 0u)
-			{
-				throw Exception("shell installation failed: child returned exit code " + ToString(exitCode));
-			}
-			string userName = GetUserName();
-			if (!Directory.Exists("/etc")) 
-			{
-				CreateDirectories("/etc");
-			}
-			if (!File.Exists("/etc/passwd"))
-			{
-				StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/passwd", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), 
-					MakeMode(cast<Access>(Access.read | Access.write), Access.read, Access.read))));
-				// username:hash:uid:gid:info:home:shell
-				writer.WriteLine("root::0:0:root:/:/bin/sh");
-				writer.WriteLine(userName + "::1:0:" + userName + ":/home/" + userName + ":/bin/sh");
-			}
-			if (!File.Exists("/etc/group"))
-			{
-				StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/group", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate),
-					MakeMode(cast<Access>(Access.read | Access.write), Access.read, Access.read))));
-				// groupname:gid:usercsv
-				writer.WriteLine("root:0:root," + userName);
-			}
-			if (!File.Exists("/etc/environment"))
-			{
-				StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/environment", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate),
-					MakeMode(cast<Access>(Access.read | Access.write), Access.read, Access.read))));
-				writer.WriteLine("PATH=\"/bin\"");
-			}
-			if (!Directory.Exists("/home"))
-			{
-				CreateDirectories("/home");
-			}
-			if (!Directory.Exists("/home/" + userName))
-			{
-				CreateDirectories("/home/" + userName);
-			}
-		}
-	}
+        int pid = Fork();
+        if (pid == 0)
+        {
+            ChBinMode();
+        }
+        else
+        {
+            byte exitCode = 0u;
+            Wait(&exitCode);
+            if (exitCode != 0u)
+            {
+                throw Exception("shell installation failed: child returned exit code " + ToString(exitCode));
+            }
+            string userName = GetUserName();
+            if (!Directory.Exists("/etc")) 
+            {
+                CreateDirectories("/etc");
+            }
+            if (!File.Exists("/etc/passwd"))
+            {
+                StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/passwd", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), 
+                    MakeMode(cast<Access>(Access.read | Access.write), Access.read, Access.read))));
+                // username:hash:uid:gid:info:home:shell
+                writer.WriteLine("root::0:0:root:/:/bin/sh");
+                writer.WriteLine(userName + "::1:0:" + userName + ":/home/" + userName + ":/bin/sh");
+            }
+            if (!File.Exists("/etc/group"))
+            {
+                StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/group", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate),
+                    MakeMode(cast<Access>(Access.read | Access.write), Access.read, Access.read))));
+                // groupname:gid:usercsv
+                writer.WriteLine("root:0:root," + userName);
+            }
+            if (!File.Exists("/etc/environment"))
+            {
+                StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/environment", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate),
+                    MakeMode(cast<Access>(Access.read | Access.write), Access.read, Access.read))));
+                writer.WriteLine("PATH=\"/bin\"");
+            }
+            if (!Directory.Exists("/home"))
+            {
+                CreateDirectories("/home");
+            }
+            if (!Directory.Exists("/home/" + userName))
+            {
+                CreateDirectories("/home/" + userName);
+            }
+        }
+    }
 }

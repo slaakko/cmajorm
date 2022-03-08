@@ -22,8 +22,13 @@ namespace System.Os
         }
         return result;
     }
+	
+	public void Exec(const string& program, const List<string>& args)
+	{
+		Exec(program, args, Environment.Instance());
+	}
     
-    public void Exec(const string& program, const List<string>& args)
+    public void Exec(const string& program, const List<string>& args, const Environment& environment)
     {
         string prog = program;
         bool hasExtension = Path.HasExtension(prog);
@@ -37,7 +42,6 @@ namespace System.Os
             size = size + arg.Length() + 1 + 16;
         }
         size = size + 16;
-        Environment& environment = Environment.Instance();
         size = size + environment.Size();
         size = size + 16;
         UniquePtr<byte> block = cast<byte*>(MemAlloc(size));

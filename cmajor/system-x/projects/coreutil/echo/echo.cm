@@ -1,0 +1,98 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+void PrintHelp()
+{
+    Console.Out() << "echo [options] <arg>..." << endl() << endl();
+    Console.Out() << "Prints arguments to standard output." << endl() << endl();
+    Console.Out() << "Options:" << endl() << endl();
+    Console.Out() << "--help | -h" << endl();
+    Console.Out() << "  Print help and exit." << endl() << endl();
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        List<string> args;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("--"))
+            {
+                if (arg == "--help")
+                {
+                    PrintHelp();
+                    return 1;
+                }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else if (arg.StartsWith("-"))
+            {
+                string options = arg.Substring(1);
+                if (options.IsEmpty())
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+                else
+                {
+                    bool unknown = false;
+                    string uo;
+                    for (char o : options)
+                    {
+                        switch (o)
+                        {
+                            case 'h':
+                            {
+                                PrintHelp();
+                                return 1;
+                            }
+                            default:
+                            {
+                                unknown = true; 
+                                uo.Append(o);
+                                break;
+                            }
+                        }
+                        if (unknown)
+                        {
+                            throw Exception("unknown option '-" + uo + "'");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                args.Add(arg);
+            }
+        }
+        bool first = true;
+        for (const string& arg : args)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                Console.Out() << " ";
+            }
+            Console.Out() << arg;
+        }
+        Console.Out() << endl();
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
+}

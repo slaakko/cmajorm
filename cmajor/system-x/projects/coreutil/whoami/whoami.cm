@@ -1,0 +1,95 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Os;
+using System.Security;
+
+void PrintHelp()
+{
+    Console.Out() << "Usage: whoami [options]" << endl() << endl();
+    Console.Out() << "Prints the user ID and user name of the current user to standard output." << endl();
+    Console.Out() << "Options:" << endl() << endl();
+    Console.Out() << "--help | -h" << endl();
+    Console.Out() << "  Print help and exit." << endl() << endl();
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("--"))
+            {
+                if (arg == "--help")
+                {
+                    PrintHelp();
+                    return 1;
+                }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else if (arg.StartsWith("-"))
+            {
+                string options = arg.Substring(1);
+                if (options.IsEmpty())
+                {
+                    throw Exception("unknown argument '" + arg + "'");
+                }
+                else
+                {
+                    bool unknown = false;
+                    string uo;
+                    for (char o : options)
+                    {
+                        switch (o)
+                        {
+                            case 'h':
+                            {
+                                PrintHelp();
+                                return 1;
+                            }
+                            default:
+                            {
+                                unknown = true; 
+                                uo.Append(o);
+                                break;
+                            }
+                        }
+                        if (unknown)
+                        {
+                            throw Exception("unknown option '-" + uo + "'");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                throw Exception("unknown argument '" + arg + "'");
+            }
+        }
+        int uid = GetUID();
+        Users users = GetUsers();
+        User* user = users.GetUser(uid);
+        if (user != null)
+        {
+            Console.Out() << user->UID() << ":" << user->Name() << endl();
+        }
+        else
+        {
+            throw SystemError(ENOTFOUND, "user id " + ToString(uid) + " not found");
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
+}

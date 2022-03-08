@@ -4,14 +4,70 @@
 // =================================
 
 using System;
+using System.Collections;
 using System.Os;
 
 int main(int argc, const char** argv)
 {
     try
     {
+        List<string> files;
+        bool debug = false;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("--"))
+            {
+                if (arg == "--help")
+                {
+                    PrintHelp();
+                    return 1;
+                }
+                else if (arg == "--debug")
+                {
+                    debug = true;
+                }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else if (arg.StartsWith("-"))
+            {
+                string options = arg.Substring(1);
+                for (char o : options)
+                {
+                    bool unknown = false;
+                    string uo;
+                    switch (o)
+                    {
+                        case 'h':
+                        {
+                            PrintHelp();
+                            return 1;
+                        }
+                        default:
+                        {
+                            unknown = true;
+                            uo.Append(o);
+                            break;
+                        }
+                    }
+                    if (unknown)
+                    {
+                        throw Exception("unknown option '-" + uo + "'");
+                    }
+                }
+            }
+            else
+            {
+                files.Add(arg);
+            }
+        }
         Install();
+		ParseEnvironmentFile("/etc/environment");
         ShellEnvironment environment;
+        environment.SetDebug(debug);
         SetupShellEnvironment(environment);
         SetupCredentials(environment);
         ChDir(environment.Home().Chars());

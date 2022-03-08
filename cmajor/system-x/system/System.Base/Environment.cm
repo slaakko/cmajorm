@@ -14,7 +14,7 @@ namespace System
         static Environment() : instance(new Environment())
         {
         }
-        private Environment() : variables()
+        public Environment() : variables()
         {
             if (environment != null)
             {
@@ -67,6 +67,13 @@ namespace System
         {
             variables.Clear();
         }
+		public void CopyTo(Environment& that)
+		{
+			for (const Pair<string, string>& v : variables)
+			{
+				that.Set(v.first, v.second);
+			}
+		}
         public nothrow long Size() const
         {
             long size = 0;

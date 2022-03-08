@@ -154,7 +154,6 @@ int main(int argc, const char** argv)
         {
             std::string filePath = SearchBin("sh");
             args.push_back(filePath);
-            args.push_back("-v");
         }
         cmsx::machine::Machine machine;
         cmsx::kernel::Kernel::Instance().SetMachine(&machine);

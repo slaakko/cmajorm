@@ -82,7 +82,7 @@ public:
     bool IsLocked() const { return GetFlag(BlockFlags::locked); }
     void SetLocked() { SetFlag(BlockFlags::locked); }
     void ResetLocked() { ResetFlag(BlockFlags::locked); }
-    bool IsValid() const { return GetFlag(BlockFlags::valid); }
+    bool IsValid() const;
     void SetValid() { SetFlag(BlockFlags::valid); }
     void ResetValid() { ResetFlag(BlockFlags::valid); }
     bool IsDirty() const { return GetFlag(BlockFlags::dirty); }

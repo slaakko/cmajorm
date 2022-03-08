@@ -6,6 +6,7 @@
 #include <system-x/kernel/BlockFile.hpp>
 #include <system-x/kernel/BlockManager.hpp>
 #include <system-x/kernel/Fs.hpp>
+#include <system-x/kernel/Mount.hpp>
 #include <soulng/util/Path.hpp>
 
 namespace cmsx::kernel {

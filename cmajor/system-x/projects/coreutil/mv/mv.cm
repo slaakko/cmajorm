@@ -23,32 +23,32 @@ bool TargetIsDirectory(const string& target)
 
 void Move(const List<string>& files, const string& target, bool verbose)
 {
-	if (!TargetIsDirectory(target))
-	{
-		if (files.Count() == 1)
-		{
-			Rename(files.Front().Chars(), target.Chars());
-			if (verbose)
-			{
-				Console.Out() << files.Front() << " -> " << target << endl();
-			}
-		}
-		else if (files.Count() > 1)
-		{
-			throw Exception("'" + target + "': not directory");
-		}
-	}
-	else
-	{
-		for (const string& file : files)
-		{
-			string name = Path.GetFileName(file);
-			string targetPath = Path.Combine(target, name);
-			Rename(file.Chars(), targetPath.Chars());
-			if (verbose)
-			{
-				Console.Out() << file << " -> " << targetPath << endl();
-			}
-		}
-	}
+    if (!TargetIsDirectory(target))
+    {
+        if (files.Count() == 1)
+        {
+            Rename(files.Front().Chars(), target.Chars());
+            if (verbose)
+            {
+                Console.Out() << files.Front() << " -> " << target << endl();
+            }
+        }
+        else if (files.Count() > 1)
+        {
+            throw Exception("'" + target + "': not directory");
+        }
+    }
+    else
+    {
+        for (const string& file : files)
+        {
+            string name = Path.GetFileName(file);
+            string targetPath = Path.Combine(target, name);
+            Rename(file.Chars(), targetPath.Chars());
+            if (verbose)
+            {
+                Console.Out() << file << " -> " << targetPath << endl();
+            }
+        }
+    }
 }

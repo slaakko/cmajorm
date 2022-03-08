@@ -69,6 +69,14 @@ class ShellEnvironment
     {
         pwd = pwd_;
     }
+    public void SetDebug(bool debug_)
+    {
+        debug = debug_;
+    }
+    public bool Debug() const
+    {
+        return debug;
+    }
     private Users users;
     private string userName;
     private string hostName;
@@ -76,6 +84,7 @@ class ShellEnvironment
     private string home;
     private string shell;
     private string pwd;
+    private bool debug;
 }
 
 void SetPWD(ShellEnvironment& shellEnvironment)

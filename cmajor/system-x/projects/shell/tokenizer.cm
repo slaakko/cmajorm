@@ -1,0 +1,125 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Lex;
+using shtokens;
+
+public enum TokenFlags : int
+{
+	none = 0, hasSlash = 1 << 0, hasPatternChar = 1 << 1, hasAssignment = 1 << 2
+}
+
+public string TokenFlagStr(TokenFlags flags)
+{
+	string s;
+	if ((flags & TokenFlags.hasSlash) != TokenFlags.none)
+	{
+		s.Append("hasSlash");
+	}
+	if ((flags & TokenFlags.hasPatternChar) != TokenFlags.none)
+	{
+		if (!s.IsEmpty())
+		{
+			s.Append(" | ");
+		}
+		s.Append("hasPatternChar");
+	}
+	if ((flags & TokenFlags.hasAssignment) != TokenFlags.none)
+	{
+		if (!s.IsEmpty())
+		{
+			s.Append(" | ");
+		}
+		s.Append("hasAssignment");
+	}
+	if (s.IsEmpty())
+	{
+		s = "none";
+	}
+	return s;
+} 
+
+public class ShellToken
+{
+	public nothrow ShellToken(int id_, const Lexeme& match_, int line_, int startCol_, int endCol_) : 
+		flags(), id(id_), match(match_), line(line_), startCol(startCol_), endCol(endCol_)
+	{
+	}
+	public TokenFlags flags;
+	public int id;
+	public Lexeme match;
+	public int line;
+	public int startCol;
+	public int endCol;
+}
+
+public void SetTokenFlags(ShellToken& token)
+{
+	TokenFlags flags = TokenFlags.none;
+	uchar* i = token.match.begin;
+	while (i != token.match.end)
+	{
+		switch (*i)
+		{
+			case '/':
+			{
+				flags = cast<TokenFlags>(flags | TokenFlags.hasSlash);
+				break;
+			}
+			case '*': case '?': case '[':
+			{
+				flags = cast<TokenFlags>(flags | TokenFlags.hasPatternChar);
+				break;
+			}
+			case '=':
+			{
+				flags = cast<TokenFlags>(flags | TokenFlags.hasAssignment);
+				break;
+			}
+		}
+		++i;
+	}
+	token.flags = flags;
+}
+
+List<ShellToken> TokenizeLine(const ustring& line)
+{
+    List<ShellToken> tokens;
+    shlexer lexer(line.Chars(), line.Chars() + line.Length(), "", 0);
+    ++lexer;
+    while (*lexer != END)
+    {
+		if (lexer.token.id >= 0)
+		{
+			Span span = lexer.GetSpan();
+			int startCol;
+			int endCol;
+			lexer.GetColumns(span, startCol, endCol);
+			if (lexer.token.id == TOKEN)
+			{
+				int kw = lexer.GetKeywordToken(lexer.token.match);
+				if (kw != -1)
+				{
+					lexer.token.id = kw;
+				}
+			}
+			ShellToken shellToken(lexer.token.id, lexer.token.match, lexer.token.line, startCol, endCol);
+			SetTokenFlags(shellToken);
+			tokens.Add(shellToken);
+		}
+        ++lexer;
+    }
+    return tokens;
+}
+
+void PrintTokens(const List<ShellToken>& tokens)
+{
+	for (const ShellToken& token : tokens)
+	{
+		Console.Out() << "(" << TokenFlagStr(token.flags) << " : " << token.id << " : " << GetTokenName(token.id) << " : '" << token.match.ToString() << "')" << endl();
+	}
+}

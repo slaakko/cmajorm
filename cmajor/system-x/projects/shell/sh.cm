@@ -4,8 +4,11 @@
 // =================================
 
 using System;
+using System.Collections;
 using System.IO;
 using System.Os;
+using System.Lex;
+using shtokens;
 
 string CWD(ShellEnvironment& environment)
 {
@@ -35,11 +38,36 @@ string GetLine(ShellEnvironment& environment)
     return line;
 }
 
+void ProcessLine(const string& line, ShellEnvironment& environment, const Map<string, string>& executableMap)
+{
+	if (line.IsEmpty()) return;
+    ustring uline = ToUtf32(line);
+    List<ShellToken> tokens = TokenizeLine(uline);
+	if (environment.Debug())
+	{
+		PrintTokens(tokens);
+	}
+	Environment programEnvironment;
+	Environment.Instance().CopyTo(programEnvironment);
+	Command command = MakeCommand(tokens, executableMap);
+	if (!command.IsEmpty())
+	{
+		if (environment.Debug())
+		{
+			Console.Out() << "executing command: " << command.ToString() << endl();
+		}
+		command.Execute(programEnvironment);
+	}
+}
+
 void Run(ShellEnvironment& environment)
 {
+	Map<string, string> executableMap;
+	ReadPathDirectories(GetEnv("PATH"), executableMap);
     string line = GetLine(environment);
     while (line != "exit")
     {
+        ProcessLine(line, environment, executableMap);
         line = GetLine(environment);
     }
 }

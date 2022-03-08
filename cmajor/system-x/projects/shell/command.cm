@@ -1,0 +1,68 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Os;
+
+class Command
+{
+	public Command() : programFilePath(), args()
+	{
+	}
+	public Command(const string& programFilePath_) : programFilePath(programFilePath_), args()
+	{
+	}
+	public void AddArg(const string& arg)
+	{
+		args.Add(arg);
+	}
+	public void Execute(const Environment& environment)
+	{
+		int pid = Fork();
+		if (pid == 0)
+		{
+			Exec(programFilePath, args, environment);
+		}
+		else
+		{
+			byte exitCode = 0u;
+			Wait(&exitCode);
+		}
+	}
+	public nothrow bool IsEmpty() const
+	{
+		return programFilePath.IsEmpty();
+	}
+	public nothrow string ToString() const
+	{
+		string s;
+		s.Append(programFilePath);
+		for (const string& arg : args)
+		{
+			s.Append(' ').Append(arg);
+		}
+		return s;
+	}
+	private string programFilePath;
+	private List<string> args;
+}
+
+public Command MakeCommand(const List<ShellToken>& tokens, const Map<string, string>& executableMap)
+{
+	if (tokens.IsEmpty())
+	{
+		return Command();
+	}
+	string executableName = ToUtf8(tokens.Front().match.ToString());
+	string programFilePath = GetProgramFilePath(executableName, executableMap);
+	Command command(programFilePath);
+	int n = cast<int>(tokens.Count());
+	for (int i = 1; i < n; ++i)
+	{
+		command.AddArg(ToUtf8(tokens[i].match.ToString()));
+	}
+	return command;
+}

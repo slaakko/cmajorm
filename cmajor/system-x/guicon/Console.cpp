@@ -21,6 +21,7 @@ void ConsoleFile::Close(cmsx::kernel::Process* process)
 
 int64_t ConsoleFile::Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process)
 {
+/*
     for (uint8_t x : buffer)
     {
         utfEngine.Put(x);
@@ -52,6 +53,8 @@ int64_t ConsoleFile::Write(const std::vector<uint8_t>& buffer, cmsx::machine::Pr
         }
     }
     console->OutputLines();
+    return buffer.size();
+*/
     return buffer.size();
 }
 
