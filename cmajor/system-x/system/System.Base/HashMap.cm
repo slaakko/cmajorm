@@ -4,6 +4,7 @@
 // =================================
 
 using System;
+using System.IO;
 using System.Concepts;
 
 namespace System.Collections
@@ -102,4 +103,25 @@ namespace System.Collections
         }
         return true;
     }
+
+    [system_default]
+    public TextWriter& operator<<<K, T, H, C>(TextWriter& writer, const HashMap<K, T, H, C>& hashMap)
+    {
+        writer << "{";
+        bool first = true;
+        for (const Pair<K, T>& element : hashMap)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                writer << ", ";
+            }
+            writer << element;
+        }
+        writer << "}";
+        return writer;
+    }        
 }

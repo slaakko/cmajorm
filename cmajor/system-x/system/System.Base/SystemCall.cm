@@ -226,14 +226,14 @@ public enum IOControlItem : int
     hasColors = 2,
     columns = 3,
     rows = 4,
-	cursor_x = 5,
-	cursor_y = 6,
-	set_cursor_pos = 7,
-	set_cooked = 8,
-	set_raw = 9,
-	set_echo = 10,
-	push_lines = 11,
-	pop_lines = 12
+    cursor_x = 5,
+    cursor_y = 6,
+    set_cursor_pos = 7,
+    set_cooked = 8,
+    set_raw = 9,
+    set_echo = 10,
+    push_lines = 11,
+    pop_lines = 12
 }
 
 public cdecl nothrow int ioctl(int fd, IOControlItem item, byte* arg, long argSize)
@@ -363,42 +363,42 @@ public cdecl nothrow int pipe(int* readerFd, int* writerFd)
 
 public cdecl nothrow int dup(int fd)
 {
-	return cast<int>(trap(0u, trap_dup, 0u, fd));
+    return cast<int>(trap(0u, trap_dup, 0u, fd));
 }
 
 public cdecl nothrow int setuid(int uid)
 {
-	return cast<int>(trap(0u, trap_setuid, 0u, uid));
+    return cast<int>(trap(0u, trap_setuid, 0u, uid));
 }
 
 public cdecl nothrow int setgid(int gid)
 {
-	return cast<int>(trap(0u, trap_setgid, 0u, gid));
+    return cast<int>(trap(0u, trap_setgid, 0u, gid));
 }
 
 public cdecl nothrow int getuid()
 {
-	return cast<int>(trap(0u, trap_getuid, 0u));
+    return cast<int>(trap(0u, trap_getuid, 0u));
 }
 
 public cdecl nothrow int getgid()
 {
-	return cast<int>(trap(0u, trap_getgid, 0u));
+    return cast<int>(trap(0u, trap_getgid, 0u));
 }
 
 public cdecl nothrow int umask(int mask)
 {
-	return cast<int>(trap(0u, trap_umask, 0u, mask));
+    return cast<int>(trap(0u, trap_umask, 0u, mask));
 }
 
 public cdecl nothrow int chmod(const char* path, int mode)
 {
-	return cast<int>(trap(0u, trap_chmod, 0u, path, mode));
+    return cast<int>(trap(0u, trap_chmod, 0u, path, mode));
 }
 
 public cdecl nothrow int chown(const char* path, int uid, int gid)
 {
-	return cast<int>(trap(0u, trap_chown, 0u, path, uid, gid));
+    return cast<int>(trap(0u, trap_chown, 0u, path, uid, gid));
 }
 
 public cdecl nothrow int rename(const char* sourcePath, const char* targetPath)
@@ -408,20 +408,20 @@ public cdecl nothrow int rename(const char* sourcePath, const char* targetPath)
 
 public cdecl nothrow int add_dir_change_notification(const char* directories)
 {
-	return cast<int>(trap(0u, trap_add_dir_change_notification, 0u, directories));
+    return cast<int>(trap(0u, trap_add_dir_change_notification, 0u, directories));
 }
 
 public cdecl nothrow int remove_dir_change_notifications()
 {
-	return cast<int>(trap(0u, trap_remove_dir_change_notifications, 0u));
+    return cast<int>(trap(0u, trap_remove_dir_change_notifications, 0u));
 }
 
 public cdecl nothrow int directories_changed()
 {
-	return cast<int>(trap(0u, trap_directories_changed, 0u));
+    return cast<int>(trap(0u, trap_directories_changed, 0u));
 }
 
 public cdecl nothrow int clear_directories_changed()
 {
-	return cast<int>(trap(0u, trap_clear_directories_changed, 0u));
+    return cast<int>(trap(0u, trap_clear_directories_changed, 0u));
 }

@@ -4,6 +4,7 @@
 // =================================
 
 using System;
+using System.IO;
 using System.Concepts;
 
 namespace System.Collections
@@ -101,5 +102,26 @@ namespace System.Collections
         where Key is TotallyOrdered and Value is TotallyOrdered and KeyCompare is Relation and KeyCompare.Domain is Key
     {
         return LexicographicalCompare(left.CBegin(), left.CEnd(), right.CBegin(), right.CEnd(), Less<Pair<Key, Value>>());
+    }
+
+    [system_default]
+    public TextWriter& operator<<<Key, Value, KeyCompare>(TextWriter& writer, const Map<Key, Value, KeyCompare>& map)
+    {
+        writer << "{";
+        bool first = true;
+        for (const Pair<Key, Value>& element : map)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                writer << ", ";
+            }
+            writer << element;
+        }
+        writer << "}";
+        return writer;
     }
 }

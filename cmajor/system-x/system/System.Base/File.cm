@@ -19,12 +19,12 @@ namespace System.IO
         none = 0, read = 1 << 0, write = 1 << 1, execute = 1 << 2
     }
 
-	public int MakeMode(Access ownerAccess, Access groupAccess, Access otherAccess)
-	{
-		return (int(ownerAccess & 7) << 4) | ((int(groupAccess) & 7) << 7) | ((int(otherAccess) & 7) << 10);
-	}
-	
-	public const int modeShift = 4;
+    public int MakeMode(Access ownerAccess, Access groupAccess, Access otherAccess)
+    {
+        return (int(ownerAccess & 7) << 4) | ((int(groupAccess) & 7) << 7) | ((int(otherAccess) & 7) << 10);
+    }
+    
+    public const int modeShift = 4;
 
     public const int rootFileSystemNumber = 0;
 
@@ -364,12 +364,12 @@ namespace System.IO
             {
                 File.SetTimes(destFilePath, sourceAccessTime, sourceModificationTime);
             }
-			if ((options & FileCopyOptions.dontPreserveMode) == FileCopyOptions.none)
-			{
-				FileStatus status;
-				Stat(sourceFilePath.Chars(), status);
-				ChMod(destFilePath.Chars(), MakeMode(status.ownerAccess, status.groupAccess, status.otherAccess));
-			}
+            if ((options & FileCopyOptions.dontPreserveMode) == FileCopyOptions.none)
+            {
+                FileStatus status;
+                Stat(sourceFilePath.Chars(), status);
+                ChMod(destFilePath.Chars(), MakeMode(status.ownerAccess, status.groupAccess, status.otherAccess));
+            }
             if ((options & FileCopyOptions.verbose) != FileCopyOptions.none)
             {
                 // DEBUG PID: Console.WriteLine(ToString(GetPid()) + " : " + GetFullPath(sourceFilePath) + " -> " + GetFullPath(destFilePath));

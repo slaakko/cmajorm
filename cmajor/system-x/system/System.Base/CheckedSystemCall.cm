@@ -22,11 +22,11 @@ namespace System.Os
         }
         return result;
     }
-	
-	public void Exec(const string& program, const List<string>& args)
-	{
-		Exec(program, args, Environment.Instance());
-	}
+    
+    public void Exec(const string& program, const List<string>& args)
+    {
+        Exec(program, args, Environment.Instance());
+    }
     
     public void Exec(const string& program, const List<string>& args, const Environment& environment)
     {
@@ -380,126 +380,126 @@ namespace System.Os
             ThrowSystemError();
         }
     }
-	
-	public int Dup(int fd)
-	{
-		int result = dup(fd);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-		return result;
-	}
-	
-	public void SetUID(int uid)
-	{
-		int result = setuid(uid);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-	}
+    
+    public int Dup(int fd)
+    {
+        int result = dup(fd);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public void SetUID(int uid)
+    {
+        int result = setuid(uid);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
 
-	public void SetGID(int gid)
-	{
-		int result = setgid(gid);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-	}
-	
-	public int GetUID()
-	{
-		int result = getuid();
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-		return result;
-	}
+    public void SetGID(int gid)
+    {
+        int result = setgid(gid);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public int GetUID()
+    {
+        int result = getuid();
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
 
-	public int GetGID()
-	{
-		int result = getgid();
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-		return result;
-	}
-	
-	public int UMask(int mask)
-	{
-		int result = umask(mask);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-		return result;
-	}
-	
-	public void ChMod(const char* path, int mode)
-	{
-		int result = chmod(path, mode);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-	}
-	
-	public void ChOwn(const char* path, int uid, int gid)
-	{
-		int result = chown(path, uid, gid);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-	}
-	
-	public void Rename(const char* source, const char* target)
-	{
-		int result = rename(source, target);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-	}
-	
-	public void AddDirChangeNotification(const char* directories)
-	{
-		int result = add_dir_change_notification(directories);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-	}
-	
-	public void RemoveDirChangeNotifications()
-	{
-		int result = remove_dir_change_notifications();
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-	}
-	
-	public bool DirectoriesChanged() 
-	{
-		int result = directories_changed();
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-		return result == 1;
-	}
-	
-	public void ClearDirectoriesChanged()
-	{
-		int result = clear_directories_changed();
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-	}
+    public int GetGID()
+    {
+        int result = getgid();
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public int UMask(int mask)
+    {
+        int result = umask(mask);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public void ChMod(const char* path, int mode)
+    {
+        int result = chmod(path, mode);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public void ChOwn(const char* path, int uid, int gid)
+    {
+        int result = chown(path, uid, gid);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public void Rename(const char* source, const char* target)
+    {
+        int result = rename(source, target);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public void AddDirChangeNotification(const char* directories)
+    {
+        int result = add_dir_change_notification(directories);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public void RemoveDirChangeNotifications()
+    {
+        int result = remove_dir_change_notifications();
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public bool DirectoriesChanged() 
+    {
+        int result = directories_changed();
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result == 1;
+    }
+    
+    public void ClearDirectoriesChanged()
+    {
+        int result = clear_directories_changed();
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
 }

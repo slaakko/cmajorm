@@ -3,6 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
+using System.IO;
+
 namespace System
 {
     public abstract class CounterBase
@@ -466,5 +468,20 @@ namespace System
         {
             left->GetWeakThis().Assign(cast<T*>(right), SharedCountCast<T>(count));
         }
+    }
+
+    [system_default]
+    public TextWriter& operator<<<T>(TextWriter& writer, const SharedPtr<T>& ptr)
+    {
+        if (ptr.IsNull())
+        {
+            writer << "null";
+        }
+        else
+        {
+            const T& temp = *ptr;
+            writer << temp;
+        }
+        return writer;
     }
 }
