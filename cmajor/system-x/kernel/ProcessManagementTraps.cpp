@@ -278,6 +278,94 @@ uint64_t TrapGetGidHandler::HandleTrap(cmsx::machine::Processor& processor)
     }
 }
 
+class TrapSetEUidHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_seteuid"; }
+};
+
+uint64_t TrapSetEUidHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t euid = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
+        process->SetEUID(euid);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapSetEGidHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_setegid"; }
+};
+
+uint64_t TrapSetEGidHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t egid = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
+        process->SetEGID(egid);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapGetEUidHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_geteuid"; }
+};
+
+uint64_t TrapGetEUidHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        return process->EUID();
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapGetEGidHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_getegid"; }
+};
+
+uint64_t TrapGetEGidHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        return process->EGID();
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
 class TrapUMaskHandler : public TrapHandler
 {
 public:
@@ -317,6 +405,10 @@ void InitProcessManagementTraps()
     SetTrapHandler(trap_setgid, new TrapSetGidHandler());
     SetTrapHandler(trap_getuid, new TrapGetUidHandler());
     SetTrapHandler(trap_getgid, new TrapGetGidHandler());
+    SetTrapHandler(trap_seteuid, new TrapSetEUidHandler());
+    SetTrapHandler(trap_setegid, new TrapSetEGidHandler());
+    SetTrapHandler(trap_geteuid, new TrapGetEUidHandler());
+    SetTrapHandler(trap_getegid, new TrapGetEGidHandler());
     SetTrapHandler(trap_umask, new TrapUMaskHandler());
 }
 

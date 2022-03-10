@@ -1,0 +1,185 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Os;
+using System.Security;
+
+void PrintHelp()
+{
+    Console.Out() << "sudo [options] COMMAND [ARGS...]" << endl() << endl();
+    Console.Out() << "Execute COMMAND as superuser." << endl() << endl();
+    Console.Out() << "Options:" << endl() << endl();
+    Console.Out() << "--help | -h" << endl();
+    Console.Out() << "  Print help and exit." << endl() << endl();
+}
+
+string GetProgramFilePath(const string& fileName)
+{
+	string path = GetEnv("PATH");
+	List<string> pathDirs = path.Split(":");
+	for (const string& dir : pathDirs)
+	{
+		if (DirectoryExists(dir))
+		{
+			DirectoryReader reader(dir);
+			DirectoryEntry entry;
+			while (reader.Read(entry))
+			{
+				if (entry.IsDot() || entry.IsDotDot())
+				{
+					continue;
+				}
+				FileStatus status;
+				string p = Path.Combine(dir, entry.name);
+				Stat(p.Chars(), status);
+				if (status.fileType == FileType.regular && (status.ownerAccess & Access.execute) != Access.none)
+				{
+					if (entry.name == fileName || entry.name == fileName + ".x")
+					{
+						return p;
+					}
+				}
+			}
+		}
+	}
+	return fileName;
+}
+
+int main(int argc, const char** argv)
+{
+	try
+	{
+		List<string> args;
+		bool programSeen = false;
+		for (int i = 1; i < argc; ++i)
+		{
+			string arg = argv[i];
+			if (!programSeen)
+			{
+				if (arg.StartsWith("--"))
+				{
+					if (arg == "--help")
+					{
+						PrintHelp();
+						return 1;
+					}
+					else
+					{
+						throw Exception("unknown option '" + arg + "'");
+					}
+				}
+				else if (arg.StartsWith("-"))
+				{
+					string options = arg.Substring(1);
+					if (options.IsEmpty())
+					{
+						throw Exception("unknown argument '" + arg + "'");
+					}
+					else
+					{
+						bool unknown = false;
+						string uo;
+						for (char o : options)
+						{
+							switch (o)
+							{
+								case 'h':
+								{
+									PrintHelp();
+									return 1;
+								}
+								default:
+								{
+									unknown = true; 
+									uo.Append(o);
+									break;
+								}
+							}
+							if (unknown)
+							{
+								throw Exception("unknown option '-" + uo + "'");
+							}
+						}
+					}
+				}
+				else
+				{
+					programSeen = true;
+					args.Add(arg);
+				}
+			}
+			else
+			{
+				args.Add(arg);
+			}
+		}
+		if (args.IsEmpty())
+		{
+			throw Exception("no program to execute");
+		}
+		int uid = GetUID();
+        Users users = GetUsers();
+		User* user = users.GetUser(uid);
+		SetUID(0);
+		SetGID(0);
+		if (user->HasPassword())
+		{
+			int pid = Fork();
+			if (pid == 0)
+			{
+				List<string> loginArgs;
+				loginArgs.Add("--user");
+				loginArgs.Add(user->Name());
+				Exec("/bin/login", loginArgs);
+			}
+			else
+			{
+				byte loginExitCode = 0u;
+				if (Wait(&loginExitCode) != -1)
+				{
+					if (loginExitCode != 0u)
+					{
+						return loginExitCode;
+					}
+				}
+				else
+				{
+					throw Exception("login failed");
+				}
+			}
+		}
+		int pid = Fork();
+		if (pid == 0)
+		{
+			string program = GetProgramFilePath(args[0]);
+			List<string> progArgs;
+			for (int i = 1; i < args.Count(); ++i)
+			{
+				progArgs.Add(args[i]);
+			}
+			Exec(program, progArgs);
+		}
+		else
+		{
+			byte exitCode = 0u;
+			if (Wait(&exitCode) != -1)
+			{
+				return exitCode;
+			}
+			else
+			{
+				throw Exception("error executing '" + args[0] + "'");
+			}
+		}		
+	}
+	catch (const Exception& ex)
+	{
+		Console.Error() << ex.ToString() << endl();
+		return 1;
+	}
+	return 0;
+}

@@ -161,7 +161,7 @@ int main(int argc, const char** argv)
         cmsx::kernel::Process* process = cmsx::kernel::ProcessManager::Instance().CreateProcess();
         process->SetFilePath(args[0]);
         process->SetUMask(cmsx::machine::UMask());
-        if (process->FilePath() != "/mnt/sx/bin/sh.x")
+        if (Path::GetFileName(process->FilePath()) != "sh.x")
         {
             process->SetUID(cmsx::machine::UID());
             process->SetGID(cmsx::machine::GID());

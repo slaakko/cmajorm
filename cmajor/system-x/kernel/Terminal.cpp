@@ -70,6 +70,8 @@ private:
     void HandleRight();
     void HandleUp();
     void HandleDown();
+    void HandleControlLeft();
+    void HandleControlRight();
     void HandleDel();
     void ClearUpdateLine();
     void UpdateLine();
@@ -346,6 +348,16 @@ void Terminal::HandleInputChar(char32_t ch)
                     HandleDown();
                     break;
                 }
+                case static_cast<char32_t>(keyControlLeft):
+                {
+                    HandleControlLeft();
+                    break;
+                }
+                case static_cast<char32_t>(keyControlRight):
+                {
+                    HandleControlRight();
+                    break;
+                }
                 case static_cast<char32_t>(keyDel):
                 {
                     HandleDel();
@@ -390,19 +402,22 @@ void Terminal::HandleEscape()
 
 void Terminal::HandleNewLine()
 {
-    bool found = false;
-    for (const std::u32string& prevLine : lines)
+    if (!line.empty())
     {
-        if (line == prevLine)
+        bool found = false;
+        for (const std::u32string& prevLine : lines)
         {
-            found = true;
-            break;
+            if (line == prevLine)
+            {
+                found = true;
+                break;
+            }
         }
-    }
-    if (!found)
-    {
-        lines.push_back(line);
-        lineIndex = lines.size();
+        if (!found)
+        {
+            lines.push_back(line);
+            lineIndex = lines.size();
+        }
     }
     line.append(1, '\n');
     std::string inputLine = ToUtf8(line);
@@ -483,7 +498,10 @@ void Terminal::HandleUp()
     {
         ClearUpdateLine();
         --lineIndex;
-        line = lines[lineIndex];
+        if (lineIndex < lines.size())
+        {
+            line = lines[lineIndex];
+        }
         UpdateLine();
         HandleEnd();
     }
@@ -499,6 +517,100 @@ void Terminal::HandleDown()
         UpdateLine();
         HandleEnd();
     }
+}
+
+void Terminal::HandleControlLeft()
+{
+    if (pos > 0)
+    {
+        --pos;
+        if (pos > 0)
+        {
+            char c = line[pos];
+            while (c == ' ')
+            {
+                if (pos > 0)
+                {
+                    --pos;
+                }
+                if (pos > 0)
+                {
+                    c = line[pos];
+                }
+                else
+                {
+                    UpdateCursorPos();
+                    return;
+                }
+            }
+            while (c != ' ')
+            {
+                if (pos > 0)
+                {
+                    --pos;
+                }
+                if (pos > 0)
+                {
+                    c = line[pos];
+                }
+                else
+                {
+                    UpdateCursorPos();
+                    return;
+                }
+            }
+            if (c == ' ')
+            {
+                ++pos;
+            }
+        }
+    }
+    UpdateCursorPos();
+}
+
+void Terminal::HandleControlRight()
+{
+    if (pos < line.length())
+    {
+        ++pos;
+        if (pos < line.length())
+        {
+            char c = line[pos];
+            while (c != ' ')
+            {
+                if (pos < line.length())
+                {
+                    ++pos;
+                }
+                if (pos < line.length())
+                {
+                    c = line[pos];
+                }
+                else
+                {
+                    UpdateCursorPos();
+                    return;
+                }
+            }
+            while (c == ' ')
+            {
+                if (pos < line.length())
+                {
+                    ++pos;
+                }
+                if (pos < line.length())
+                {
+                    c = line[pos];
+                }
+                else
+                {
+                    UpdateCursorPos();
+                    return;
+                }
+            }
+        }
+    }
+    UpdateCursorPos();
 }
 
 void Terminal::HandleDel()
@@ -537,6 +649,7 @@ void Terminal::ClearUpdateLine()
     if (!updateLine.empty())
     {
         OsWriteConsole(consoleOutputHandle, updateLine.c_str());
+        x += updateLine.length();
         updateLine.clear();
     }
     for (int i = x; i < screenSizeX; ++i)

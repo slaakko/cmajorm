@@ -204,7 +204,7 @@ BlockFile* RootFilesystem::Open(const std::string& path, INode* dirINode, int32_
     OpenFlags openFlags = static_cast<OpenFlags>(flags);
     if ((openFlags & OpenFlags::create) != OpenFlags::none)
     {
-        CheckAccess(Access::write, process->UID(), process->GID(), dirINodePtr.Get(), "could not open directory '" + dirPath + "' for writing");
+        CheckAccess(Access::write, process->EUID(), process->EGID(), dirINodePtr.Get(), "could not open directory '" + dirPath + "' for writing");
     }
     bool truncated = false;
     if ((openFlags & OpenFlags::truncate) != OpenFlags::none)
@@ -234,11 +234,11 @@ BlockFile* RootFilesystem::Open(const std::string& path, INode* dirINode, int32_
             inode->SetMode(AlterMode(mode, process->UMask(), false));
             if ((openFlags & OpenFlags::read) != OpenFlags::none)
             {
-                CheckAccess(Access::read, process->UID(), process->GID(), inode, "could not open file '" + path + "' for reading");
+                CheckAccess(Access::read, process->EUID(), process->EGID(), inode, "could not open file '" + path + "' for reading");
             }
             if ((openFlags & OpenFlags::write) != OpenFlags::none)
             {
-                CheckAccess(Access::write, process->UID(), process->GID(), inode, "could not open file '" + path + "' for writing");
+                CheckAccess(Access::write, process->EUID(), process->EGID(), inode, "could not open file '" + path + "' for writing");
             }
             WriteINode(fileINode.Get(), process);
             DirectoryEntry entry;
@@ -253,11 +253,11 @@ BlockFile* RootFilesystem::Open(const std::string& path, INode* dirINode, int32_
     }
     if ((openFlags & OpenFlags::read) != OpenFlags::none)
     {
-        CheckAccess(Access::read, process->UID(), process->GID(), fileINode.Get(), "could not open file '" + path + "' for reading");
+        CheckAccess(Access::read, process->EUID(), process->EGID(), fileINode.Get(), "could not open file '" + path + "' for reading");
     }
     if ((openFlags & OpenFlags::write) != OpenFlags::none)
     {
-        CheckAccess(Access::write, process->UID(), process->GID(), fileINode.Get(), "could not open file '" + path + "' for writing");
+        CheckAccess(Access::write, process->EUID(), process->EGID(), fileINode.Get(), "could not open file '" + path + "' for writing");
     }
     fileINode.Get()->IncrementReferenceCount();
 #if (LOCK_DEBUG)
@@ -274,7 +274,7 @@ BlockFile* RootFilesystem::Open(const std::string& path, INode* dirINode, int32_
 
 INodePtr RootFilesystem::SearchDirectory(const std::string& name, INode* dirINode, const std::string& dirPath, cmsx::machine::Process* process)
 {
-    CheckAccess(Access::execute, process->UID(), process->GID(), dirINode, "could not search directory '" + dirPath + "'");
+    CheckAccess(Access::execute, process->EUID(), process->EGID(), dirINode, "could not search directory '" + dirPath + "'");
     return cmsx::kernel::SearchDirectory(name, dirINode, dirPath, this, process);
 }
 

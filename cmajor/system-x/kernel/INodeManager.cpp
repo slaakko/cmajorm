@@ -20,16 +20,21 @@ void PutINode(INode* inode);
 
 int32_t EncodeMode(FileType fileType, INodeFlags flags, Access ownerAccess, Access groupAccess, Access otherAccess)
 {
-    int32_t mode = 0;
+    int32_t mode = ((int32_t(ownerAccess) & 7) << 6) | ((int32_t(groupAccess) & 7) << 3) | ((int32_t(otherAccess) & 7));
+    int32_t setGIDBit = GetFlag(flags, INodeFlags::setGID) ? 1 : 0;
+    mode = mode | (setGIDBit << 10);
+    int32_t setUIDBit = GetFlag(flags, INodeFlags::setUID) ? 1 : 0;
+    mode = mode | (setUIDBit << 11);
     int32_t mntPointBit = GetFlag(flags, INodeFlags::mountPoint) ? 1 : 0;
-    mode = mode | (int32_t(fileType) & 7) | (mntPointBit << 3) | (int32_t(ownerAccess) & 7) << 4 | (int32_t(groupAccess) & 7) << 7 | (int32_t(otherAccess) & 7) << 10;
+    mode = mode | (mntPointBit << 12);
+    mode = mode | ((int32_t(fileType) & 7) << 13);
     return mode;
 }
 
 void DecodeMode(int32_t mode, FileType& fileType, INodeFlags& flags, Access& ownerAccess, Access& groupAccess, Access& otherAccess)
 {
-    fileType = FileType(mode & 7);
-    int32_t mntPointBit = (mode >> 3) & 1;
+    fileType = FileType((mode >> 13) & 7);
+    int32_t mntPointBit = (mode >> 12) & 1;
     if (mntPointBit)
     {
         SetFlag(flags, INodeFlags::mountPoint);
@@ -38,9 +43,27 @@ void DecodeMode(int32_t mode, FileType& fileType, INodeFlags& flags, Access& own
     {
         ResetFlag(flags, INodeFlags::mountPoint);
     }
-    ownerAccess = Access((mode >> 4) & 7);
-    groupAccess = Access((mode >> 7) & 7);
-    otherAccess = Access((mode >> 10) & 7);
+    int32_t setGIDBit = (mode >> 10) & 1;
+    if (setGIDBit)
+    {
+        SetFlag(flags, INodeFlags::setGID);
+    }
+    else
+    {
+        ResetFlag(flags, INodeFlags::setGID);
+    }
+    int32_t setUIDBit = (mode >> 11) & 1;
+    if (setUIDBit)
+    {
+        SetFlag(flags, INodeFlags::setUID);
+    }
+    else
+    {
+        ResetFlag(flags, INodeFlags::setUID);
+    }
+    ownerAccess = Access((mode >> 6) & 7);
+    groupAccess = Access((mode >> 3) & 7);
+    otherAccess = Access(mode & 7);
 }
 
 int32_t AlterMode(int32_t mode, int32_t umask, bool directory)
@@ -54,20 +77,20 @@ int32_t AlterMode(int32_t mode, int32_t umask, bool directory)
         }
         mode = cmsx::kernel::EncodeMode(FileType(), INodeFlags(), access, access, access);
     }
-    mode = ((mode >> modeShift) & 0777 & ~umask) << modeShift;
+    mode = mode & 0777 & ~umask;
     return mode;
 }
 
-void CheckAccess(Access access, int32_t uid, int32_t gid, INode* inode, const std::string& message)
+void CheckAccess(Access access, int32_t euid, int32_t egid, INode* inode, const std::string& message)
 {
-    if (uid == inode->UID())
+    if (euid == inode->UID())
     {
         if ((access & inode->OwnerAccess()) != Access::none)
         {
             return;
         }
     }
-    if (gid == inode->GID())
+    if (egid == inode->GID())
     {
         if ((access & inode->GroupAccess()) != Access::none)
         {
@@ -140,8 +163,24 @@ void INode::DecodeMode(int32_t mode)
 void INode::SetMode(int32_t mode)
 {
     FileType ft;
-    INodeFlags f;
+    INodeFlags f = INodeFlags::none;
     cmsx::kernel::DecodeMode(mode, ft, f, ownerAccess, groupAccess, otherAccess);
+    if ((f & INodeFlags::setUID) != INodeFlags::none)
+    {
+        SetSetUIDBit();
+    }
+    else
+    {
+        ResetSetUIDBit();
+    }
+    if ((f & INodeFlags::setGID) != INodeFlags::none)
+    {
+        SetSetGIDBit();
+    }
+    else
+    {
+        ResetSetGIDBit();
+    }
 }
 
 int32_t INode::GetDirectBlockNumber(int32_t index) const
@@ -226,6 +265,8 @@ void INode::WriteStat(MemoryWriter& writer)
     writer.Write(static_cast<int32_t>(ownerAccess));
     writer.Write(static_cast<int32_t>(groupAccess));
     writer.Write(static_cast<int32_t>(otherAccess));
+    writer.Write(static_cast<uint8_t>(SetUIDBit()));
+    writer.Write(static_cast<uint8_t>(SetGIDBit()));
     writer.Write(nlinks);
     writer.Write(uid);
     writer.Write(gid);

@@ -59,6 +59,16 @@ void KernelProcess::SetGID(int32_t gid)
     throw SystemError(EPERMISSION, "cannot set GID of kernel process");
 }
 
+void KernelProcess::SetEUID(int32_t euid)
+{
+    throw SystemError(EPERMISSION, "cannot set EUID of kernel process");
+}
+
+void KernelProcess::SetEGID(int32_t egid)
+{
+    throw SystemError(EPERMISSION, "cannot set EGID of kernel process");
+}
+
 std::unique_ptr<Kernel> Kernel::instance;
 
 void Kernel::Init()

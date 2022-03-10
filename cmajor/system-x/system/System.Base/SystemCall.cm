@@ -59,14 +59,18 @@ public const byte trap_setuid = 52u;
 public const byte trap_setgid = 53u;
 public const byte trap_getuid = 54u;
 public const byte trap_getgid = 55u;
-public const byte trap_umask = 56u;
-public const byte trap_chmod = 57u;
-public const byte trap_chown = 58u;
-public const byte trap_rename = 59u;
-public const byte trap_add_dir_change_notification = 60u;
-public const byte trap_remove_dir_change_notifications = 61u;
-public const byte trap_directories_changed = 62u;
-public const byte trap_clear_directories_changed = 63u;
+public const byte trap_seteuid = 56u;
+public const byte trap_setegid = 57u;
+public const byte trap_geteuid = 58u;
+public const byte trap_getegid = 59u;
+public const byte trap_umask = 60u;
+public const byte trap_chmod = 61u;
+public const byte trap_chown = 62u;
+public const byte trap_rename = 63u;
+public const byte trap_add_dir_change_notification = 64u;
+public const byte trap_remove_dir_change_notifications = 65u;
+public const byte trap_directories_changed = 66u;
+public const byte trap_clear_directories_changed = 67u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -384,6 +388,26 @@ public cdecl nothrow int getuid()
 public cdecl nothrow int getgid()
 {
     return cast<int>(trap(0u, trap_getgid, 0u));
+}
+
+public cdecl nothrow int seteuid(int euid)
+{
+	return cast<int>(trap(0u, trap_seteuid, 0u, euid));
+}
+
+public cdecl nothrow int setegid(int egid)
+{
+	return cast<int>(trap(0u, trap_setegid, 0u, egid));
+}
+
+public cdecl nothrow int geteuid()
+{
+	return cast<int>(trap(0u, trap_geteuid, 0u));
+}
+
+public cdecl nothrow int getegid()
+{
+	return cast<int>(trap(0u, trap_getegid, 0u));
 }
 
 public cdecl nothrow int umask(int mask)

@@ -1,0 +1,355 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+using System.Os;
+using System.Security;
+
+class EchoSetter
+{
+	public EchoSetter()
+	{
+		SetEcho(0, false);
+	}
+	public ~EchoSetter()
+	{
+		SetEcho(0, true);
+	}
+}
+
+void PrintHelp()
+{
+    Console.Out() << "passwd [options]" << endl() << endl();
+    Console.Out() << "Change the password of an account." << endl() << endl();
+    Console.Out() << "Options:" << endl() << endl();
+    Console.Out() << "--help | -h" << endl();
+    Console.Out() << "  Print help and exit." << endl() << endl();
+    Console.Out() << "--user USER | -u USER" << endl();
+    Console.Out() << "  Set account name to USER." << endl() << endl();
+    Console.Out() << "--delete | -d" << endl();
+    Console.Out() << "  Delete account's password." << endl() << endl();
+}
+
+bool CheckPassword(int uid, const string& hash)
+{
+	StreamReader reader = File.OpenRead("/etc/passwd_hash");
+	int lineNumber = 0;
+	while (!reader.Eof())
+	{
+		string line = reader.ReadLine();
+		if (!line.IsEmpty() && !line.StartsWith("#"))
+		{
+			List<string> fields = line.Split(':');
+			if (fields.Count() != 2)
+			{
+				throw SecurityException("invalid line " + ToString(lineNumber) + " in /etc/passwd_hash: wrong number of fields (" + ToString(fields.Count()) + "), should be 2.");
+			}
+			int puid = ParseInt(fields[0]);
+			if (puid == uid)
+			{
+				if (hash == fields[1])
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+		++lineNumber;
+	}
+	throw SecurityException("no matching user account for UID " + ToString(uid) + " found from /etc/passwd_hash");
+}
+
+bool CheckExistingPassword(User* user)
+{
+	if (!user->HasPassword())
+	{
+		return true;
+	}
+	int uid = GetUID();
+	if (uid == 0)
+	{
+		return true;
+	}
+	if (uid != user->UID())
+	{
+		throw SecurityException("unauthorized");
+	}
+	int secs = 5;
+	for (int i = 0; i < 3; ++i)
+	{
+		Console.Out() << "current password for " << user->Name() << ": ";
+		EchoSetter echoSetter;
+		string password = Console.ReadLine();
+		string hash = GetSha1MessageDigest(password);
+		if (CheckPassword(user->UID(), hash))
+		{
+			return true;
+		}
+		else
+		{
+			Sleep(Duration.FromSeconds(secs));
+			secs = 2 * secs;
+			if (i < 2)
+			{
+				Console.Out() << "incorrect password, try again" << endl();
+			}
+		}
+	}
+	return false;
+}
+
+string EnterNewPassword(const string& userName, bool retype)
+{
+	if (retype)
+	{
+		Console.Out() << "retype new password for " << userName << ": ";
+	}
+	else
+	{
+		Console.Out() << "new password for " << userName << ": ";
+	}
+	EchoSetter echoSetter;
+	string password = Console.ReadLine();
+	return password;
+}
+
+class PasswordHash
+{
+	public PasswordHash() : uid(), hash()
+	{
+	}
+	public PasswordHash(int uid_, const string& hash_) : uid(uid_), hash(hash_)
+	{
+	}
+	public void Write(StreamWriter& writer)
+	{
+		writer << uid << ":" << hash << endl();
+	}
+	public int uid;
+	public string hash;
+}
+
+List<PasswordHash> ReadPasswordHashFile()
+{
+	List<PasswordHash> pwh;
+	List<string> lines = File.ReadAllLines("/etc/passwd_hash");
+	int lineNumber = 0;
+	for (const string& line : lines)
+	{
+		if (!line.IsEmpty() && !line.StartsWith("#"))
+		{
+			List<string> fields = line.Split(':');
+			if (fields.Count() != 2)
+			{
+				throw SecurityException("invalid line " + ToString(lineNumber) + " in /etc/passwd_hash: wrong number of fields (" + ToString(fields.Count()) + "), should be 2.");
+			}
+			PasswordHash passwordHash(ParseInt(fields[0]), fields[1]);
+			pwh.Add(passwordHash);
+		}
+	}
+	return pwh;
+}
+
+void WritePasswordHashFile(const List<PasswordHash>& list)
+{
+	StreamWriter writer = File.CreateText("/etc/passwd_hash");
+	for (const PasswordHash& pwh : list)
+	{
+		pwh.Write(writer);
+	}
+}
+
+void RemovePasswordHash(List<PasswordHash>& list, int uid)
+{
+	int n = cast<int>(list.Count());
+	for (int i = 0; i < n; ++i)
+	{
+		const PasswordHash& pwh = list[i];
+		if (pwh.uid == uid)
+		{
+			list.Remove(list.Begin() + i);
+			break;
+		}
+	}
+}
+
+void AddPasswordHash(List<PasswordHash>& list, const PasswordHash& pwh)
+{
+	list.Add(pwh);
+}
+
+void SetPasswordHash(Users& users, User* user, const string& hash)
+{
+	user->SetHasPassword(true);
+	User clone(*user);
+	users.RemoveUser(user);
+	users.AddUser(clone);
+	WriteUsers(users);
+	List<PasswordHash> pwhList = ReadPasswordHashFile();
+	RemovePasswordHash(pwhList, clone.UID());
+	PasswordHash pwh(clone.UID(), hash);
+	AddPasswordHash(pwhList, pwh);
+	WritePasswordHashFile(pwhList);
+}
+
+void DeletePassword(Users& users, User* user)
+{
+	user->SetHasPassword(false);
+	User clone(*user);
+	users.RemoveUser(user);
+	users.AddUser(clone);
+	WriteUsers(users);
+	List<PasswordHash> pwhList = ReadPasswordHashFile();
+	RemovePasswordHash(pwhList, clone.UID());
+	WritePasswordHashFile(pwhList);
+	Console.Out() << "password for user '" + clone.Name() + "' removed" << endl();
+}
+
+int main(int argc, const char** argv)
+{
+	try
+	{
+		Users users = GetUsers();
+		User* user = null;
+		string userName;
+		bool prevWasUser = false;
+		bool del = false;
+		for (int i = 1; i < argc; ++i)
+		{
+			string arg = argv[i];
+			if (arg.StartsWith("--"))
+			{
+				if (arg == "--help")
+				{
+					PrintHelp();
+					return 1;
+				}
+				else if (arg == "--user")
+				{
+					prevWasUser = true;
+				}
+				else if (arg == "--delete")
+				{
+					del = true;
+				}
+				else
+				{
+					throw Exception("unknown option '" + arg + "'");
+				}
+			}
+			else if (arg.StartsWith("-"))
+			{
+				string options = arg.Substring(1);
+				if (options.IsEmpty())
+				{
+					throw Exception("unknown argument '" + arg + "'");
+				}
+				else
+				{
+					bool unknown = false;
+					string uo;
+					for (char o : options)
+					{
+						switch (o)
+						{
+							case 'h':
+							{
+								PrintHelp();
+								return 1;
+							}
+							case 'd':
+							{
+								del = true;
+								break;
+							}
+							case 'u':
+							{
+								prevWasUser = true;
+								break;
+							}
+							default:
+							{
+								unknown = true; 
+								uo.Append(o);
+								break;
+							}
+						}
+                        if (unknown)
+                        {
+                            throw Exception("unknown option '-" + uo + "'");
+                        }
+					}
+				}
+			}
+			else if (prevWasUser)
+			{
+				prevWasUser = false;
+				userName = arg;
+			}
+		}
+		if (userName.IsEmpty())
+		{
+			int uid = GetUID();
+			user = users.GetUser(uid);
+		}
+		else
+		{	
+			user = users.GetUser(userName);
+		}
+		if (user == null)
+		{
+			throw SecurityException("user '" + userName + "' not found");
+		}
+		userName = user->Name();
+		if (CheckExistingPassword(user))
+		{
+			if (del)
+			{
+				DeletePassword(users, user);
+			}
+			else
+			{
+				string password = EnterNewPassword(userName, false);
+				string retypedPassword = EnterNewPassword(userName, true);
+				if (password != retypedPassword)
+				{
+					for (int i = 0; i < 2; ++i)
+					{
+						Console.Out() << "retyped password differs, try again" << endl();
+						retypedPassword = EnterNewPassword(userName, true);
+						if (retypedPassword == password)
+						{
+							break;
+						}
+					}
+				}
+				if (password != retypedPassword)
+				{
+					Console.Out() << "retyped password differs, password not changed" << endl();
+					return 1;
+				}
+				string hash = GetSha1MessageDigest(password);
+				SetPasswordHash(users, user, hash);
+				Console.Out() << "password changed for user '" + userName + "'" << endl();
+			}
+		}
+		else
+		{
+			Console.Out() << "existing password incorrect, password not changed" << endl();
+			return 1;
+		}
+	}
+	catch (const Exception& ex)
+	{
+		Console.Error() << ex.ToString() << endl();
+		return 1;
+	}
+	return 0;
+}

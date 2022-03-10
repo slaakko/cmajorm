@@ -16,16 +16,14 @@ namespace System.IO
 
     public enum Access : int
     {
-        none = 0, read = 1 << 0, write = 1 << 1, execute = 1 << 2
+        none = 0, read = 1 << 2, write = 1 << 1, execute = 1 << 0
     }
 
     public int MakeMode(Access ownerAccess, Access groupAccess, Access otherAccess)
     {
-        return (int(ownerAccess & 7) << 4) | ((int(groupAccess) & 7) << 7) | ((int(otherAccess) & 7) << 10);
+        return (int(ownerAccess & 7) << 6) | ((int(groupAccess) & 7) << 3) | (int(otherAccess) & 7);
     }
     
-    public const int modeShift = 4;
-
     public const int rootFileSystemNumber = 0;
 
     public class FileStatus
@@ -36,6 +34,8 @@ namespace System.IO
         public Access ownerAccess;
         public Access groupAccess;
         public Access otherAccess;
+		public bool setUID;
+		public bool setGID;
         public int nlinks;
         public int uid;
         public int gid;
@@ -65,6 +65,8 @@ namespace System.IO
         status.ownerAccess = cast<Access>(reader.ReadInt());
         status.groupAccess = cast<Access>(reader.ReadInt());
         status.otherAccess = cast<Access>(reader.ReadInt());
+		status.setUID = reader.ReadByte() == 1;
+		status.setGID = reader.ReadByte() == 1;
         status.nlinks = reader.ReadInt();
         status.uid = reader.ReadInt();
         status.gid = reader.ReadInt();

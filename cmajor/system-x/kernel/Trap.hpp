@@ -67,14 +67,18 @@ const uint8_t trap_setuid = 52;
 const uint8_t trap_setgid = 53;
 const uint8_t trap_getuid = 54;
 const uint8_t trap_getgid = 55;
-const uint8_t trap_umask = 56;
-const uint8_t trap_chmod = 57;
-const uint8_t trap_chown = 58;
-const uint8_t trap_rename = 59;
-const uint8_t trap_add_dir_change_notification = 60;
-const uint8_t trap_remove_dir_change_notifications = 61;
-const uint8_t trap_directories_changed = 62;
-const uint8_t clear_directories_changed = 63;
+const uint8_t trap_seteuid = 56;
+const uint8_t trap_setegid = 57;
+const uint8_t trap_geteuid = 58;
+const uint8_t trap_getegid = 59;
+const uint8_t trap_umask = 60;
+const uint8_t trap_chmod = 61;
+const uint8_t trap_chown = 62;
+const uint8_t trap_rename = 63;
+const uint8_t trap_add_dir_change_notification = 64;
+const uint8_t trap_remove_dir_change_notifications = 65;
+const uint8_t trap_directories_changed = 66;
+const uint8_t clear_directories_changed = 67;
 
 class CMSX_KERNEL_API TrapHandler
 {

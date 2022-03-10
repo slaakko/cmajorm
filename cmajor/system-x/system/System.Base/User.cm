@@ -18,21 +18,21 @@ namespace System.Security
 
     public class User
     {
-        public nothrow User(const string& username_, const string& hash_, int uid_, int gid_, const string& info_, const string& home_, const string& shell_) : 
-            username(username_), hash(hash_), uid(uid_), gid(gid_), info(info_), home(home_), shell(shell_)
+        public nothrow User(const string& username_, bool hasPassword_, int uid_, int gid_, const string& info_, const string& home_, const string& shell_) : 
+            username(username_), hasPassword(hasPassword_), uid(uid_), gid(gid_), info(info_), home(home_), shell(shell_)
         {
         }
         public nothrow inline const string& Name() const
         {
             return username;
         }
-        public nothrow inline const string& Hash() const
+        public nothrow inline bool HasPassword() const
         {
-            return hash;
+            return hasPassword;
         }
-        public nothrow void SetHash(const string& hash_)
+        public nothrow void SetHasPassword(bool hasPassword_)
         {
-            hash = hash_;
+            hasPassword = hasPassword_;
         }
         public nothrow inline int UID() const
         {
@@ -56,10 +56,15 @@ namespace System.Security
         }
         public void Write(StreamWriter& writer)
         {
-            writer << username << ":" << hash << ":" << uid << ":" << gid << ":" << info << ":" << home << ":" << shell << endl();
+			string hpwd;
+			if (hasPassword)
+			{
+				hpwd = "x";
+			}
+            writer << username << ":" << hpwd << ":" << uid << ":" << gid << ":" << info << ":" << home << ":" << shell << endl();
         }
         private string username;
-        private string hash;
+        private bool hasPassword;
         private int uid;
         private int gid;
         private string info;
@@ -80,6 +85,24 @@ namespace System.Security
                 lastUserId = user.UID();
             }
         }
+		public void RemoveUser(User* user)
+		{
+			int index = -1;
+			int n = cast<int>(users.Count());
+			for (int i = 0; i < n; ++i)
+			{
+				const User& usr = users[i];
+				if (usr.UID() == user->UID())
+				{
+					index = i;
+					break;
+				}
+			}
+			if (index != -1)
+			{
+				users.Remove(users.Begin() + index);
+			}
+		}
         public User* GetUser(int uid) const
         {
             Map<int, User*>.ConstIterator it = uidUserMap.CFind(uid);
@@ -222,7 +245,7 @@ namespace System.Security
                 {
                     throw SecurityException("invalid line " + ToString(lineNumber) + " in /etc/passwd: wrong number of fields (" + ToString(fields.Count()) + "), should be 7.");
                 }
-                User user(fields[0], fields[1], ParseInt(fields[2]), ParseInt(fields[3]), fields[4], fields[5], fields[6]);
+                User user(fields[0], fields[1] == "x", ParseInt(fields[2]), ParseInt(fields[3]), fields[4], fields[5], fields[6]);
                 if (user.UID() == uid)
                 {
                     return user;
@@ -248,7 +271,7 @@ namespace System.Security
                 {
                     throw SecurityException("invalid line " + ToString(lineNumber) + " in /etc/passwd: wrong number of fields (" + ToString(fields.Count()) + "), should be 7.");
                 }
-                User user(fields[0], fields[1], ParseInt(fields[2]), ParseInt(fields[3]), fields[4], fields[5], fields[6]);
+                User user(fields[0], fields[1] == "x", ParseInt(fields[2]), ParseInt(fields[3]), fields[4], fields[5], fields[6]);
                 users.AddUser(user);
             }
             ++lineNumber;

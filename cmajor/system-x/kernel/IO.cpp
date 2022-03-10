@@ -299,7 +299,7 @@ void Unlink(Process* process, int64_t pathAddr)
     {
         throw SystemError(EFAIL, "could not unlink: directory '" + dirName + "' not found");
     }
-    CheckAccess(Access::write, process->UID(), process->GID(), dirINode.Get(), "could not open directory '" + dirName + "' for writing");
+    CheckAccess(Access::write, process->EUID(), process->EGID(), dirINode.Get(), "could not open directory '" + dirName + "' for writing");
     std::string fileName = Path::GetFileName(path);
     RemoveDirectoryEntry(fileName, path, dirINode.Get(), GetFs(rootFSNumber), process, true);
 }
@@ -460,7 +460,7 @@ void MkDir(Process* process, int64_t pathAddr, int32_t mode)
     if (parentINode)
     {
         Filesystem* ds = GetFs(parentINode->Key().fsNumber);
-        CheckAccess(Access::write, process->UID(), process->GID(), parentINode, "could not create directory '" + path + "'");
+        CheckAccess(Access::write, process->EUID(), process->EGID(), parentINode, "could not create directory '" + path + "'");
         ds->MkDir(parentINode, dirName, process, mode);
     }
     else
@@ -482,7 +482,7 @@ int32_t OpenDir(Process* process, int64_t pathAddr)
     INode* inode = inodePtr.Get();
     if (inode)
     {
-        CheckAccess(Access::read, process->UID(), process->GID(), inode, "could not open directory '" + path + "' for reading");
+        CheckAccess(Access::read, process->EUID(), process->EGID(), inode, "could not open directory '" + path + "' for reading");
         Filesystem* ds = GetFs(inode->Key().fsNumber);
         DirFile* dirFile = ds->OpenDir(path, inode, process);
         ProcessFileTable& fileTable = process->GetFileTable();
@@ -618,7 +618,7 @@ void ChMod(Process* process, int64_t pathAddr, int32_t mode)
     INode* inode = inodePtr.Get();
     if (inode)
     {
-        if (process->UID() == 0 || process->UID() == inode->UID())
+        if (process->EUID() == 0 || process->EUID() == inode->UID())
         {
             inode->SetMode(mode);
             inode->SetCTime(GetCurrentDateTime());
@@ -637,7 +637,7 @@ void ChMod(Process* process, int64_t pathAddr, int32_t mode)
 
 void ChOwn(Process* process, int64_t pathAddr, int32_t uid, int32_t gid)
 {
-    if (process->UID() != 0)
+    if (process->EUID() != 0)
     {
         throw SystemError(EPERMISSION, "unauthorized");
     }
@@ -673,6 +673,7 @@ void Rename(Process* process, int64_t sourcePathAddr, int64_t targetPathAddr)
     {
         throw SystemError(EPARAM, "target path is null");
     }
+    Filesystem* fs = GetFs(rootFSNumber);
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::string sourcePath = ReadString(process, sourcePathAddr, mem);
     std::string targetPath = ReadString(process, targetPathAddr, mem);
@@ -700,17 +701,16 @@ void Rename(Process* process, int64_t sourcePathAddr, int64_t targetPathAddr)
             targetDirPath = ".";
         }
     }
-    Filesystem* fs = GetFs(rootFSNumber);
     INodePtr sourceDirINodePtr = PathToINode(sourceDirPath, fs, process);
     INode* sourceDirINode = sourceDirINodePtr.Get();
     if (sourceDirINode)
     {
-        CheckAccess(Access::read, process->UID(), process->GID(), sourceDirINode, "could not open directory '" + sourceDirPath + "' for reading");
+        CheckAccess(Access::write, process->EUID(), process->EGID(), sourceDirINode, "could not open directory '" + sourceDirPath + "' for writing");
         INodePtr targetDirINodePtr = PathToINode(targetDirPath, fs, process);
         INode* targetDirINode = targetDirINodePtr.Get();
         if (targetDirINode)
         {
-            CheckAccess(Access::write, process->UID(), process->GID(), sourceDirINode, "could not open directory '" + targetDirPath + "' for writing");
+            CheckAccess(Access::write, process->EUID(), process->EGID(), sourceDirINode, "could not open directory '" + targetDirPath + "' for writing");
             if (sourceDirINode == targetDirINode)
             {
                 RenameDirectoryEntry(sourceDirINode, Path::GetFileName(sourcePath), Path::GetFileName(targetPath), fs, process);

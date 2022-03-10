@@ -23,16 +23,11 @@ void ReadPathDirectories(const string& path, Map<string, string>& executableMap)
 				{
 					continue;
 				}
-				FileStatus status;
 				string p = Path.Combine(directory, entry.name);
-				Stat(p.Chars(), status);
-				if (status.fileType == FileType.regular && (status.ownerAccess & Access.execute) != Access.none)
+				Map<string, string>.ConstIterator it = executableMap.CFind(entry.name);
+				if (it == executableMap.CEnd())
 				{
-					Map<string, string>.ConstIterator it = executableMap.CFind(entry.name);
-					if (it == executableMap.CEnd())
-					{
-						executableMap[entry.name] = p;
-					}
+					executableMap[entry.name] = p;
 				}
 			}
 		}

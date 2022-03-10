@@ -84,8 +84,14 @@ public:
     const std::chrono::steady_clock::duration& ChildSystemTime() const { return childSystemTime; }
     int32_t UID() const override { return uid; }
     void SetUID(int32_t uid_) override;
+    int32_t EUID() const override { return euid; }
+    void SetEUID(int32_t euid_);
+    void SetEUIDTrusted(int32_t euid_);
     int32_t GID() const override { return gid; }
     void SetGID(int32_t gid_) override;
+    int32_t EGID() const override { return egid; }
+    void SetEGID(int32_t egid_);
+    void SetEGIDTrusted(int32_t egid_);
     RegionTable& GetRegionTable() { return regionTable; }
     ProcessFileTable& GetFileTable() { return fileTable; }
     void SetError(const SystemError& error_);
@@ -126,6 +132,8 @@ private:
     uint8_t exitCode;
     int32_t uid;
     int32_t gid;
+    int32_t euid;
+    int32_t egid;
     int32_t umask;
     std::chrono::steady_clock::time_point startUserTime;
     std::chrono::steady_clock::time_point startSleepTime;

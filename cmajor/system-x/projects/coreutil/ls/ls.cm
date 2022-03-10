@@ -131,7 +131,7 @@ FieldValue MakeSizeFieldValue(long size, bool humanReadableSize)
     }
 }
 
-string AccessStr(Access access)
+string AccessStr(Access access, bool setUIDorSetGIDBit)
 {
     string accessStr;
     if ((access & Access.read) != Access.none)
@@ -150,14 +150,21 @@ string AccessStr(Access access)
     {
         accessStr.Append('-');
     }
-    if ((access & Access.execute) != Access.none)
-    {
-        accessStr.Append('x');
-    }
-    else
-    {
-        accessStr.Append('-');
-    }
+	if (setUIDorSetGIDBit)
+	{
+		accessStr.Append('s');
+	}
+	else
+	{
+		if ((access & Access.execute) != Access.none)
+		{
+			accessStr.Append('x');
+		}
+		else
+		{
+			accessStr.Append('-');
+		}
+	}
     return accessStr;
 }
 
@@ -172,9 +179,9 @@ FieldValue MakeAccessFieldValue(const FileStatus& fileStatus)
     {
         accessStr.Append('-');
     }
-    accessStr.Append(AccessStr(fileStatus.ownerAccess));
-    accessStr.Append(AccessStr(fileStatus.groupAccess));
-    accessStr.Append(AccessStr(fileStatus.otherAccess));
+    accessStr.Append(AccessStr(fileStatus.ownerAccess, fileStatus.setUID));
+    accessStr.Append(AccessStr(fileStatus.groupAccess, fileStatus.setGID));
+    accessStr.Append(AccessStr(fileStatus.otherAccess, false));
     return FieldValue(ToUtf32(accessStr), Fields.access);
 }
 

@@ -28,7 +28,7 @@ Process::Process(int32_t id_) :
     state(cmsx::machine::ProcessState::created), entryPoint(-1), argumentsStartAddress(-1), argumentsLength(0), environmentStartAddress(-1), environmentLength(0), 
     heapStartAddress(-1), heapLength(0), stackStartAddress(-1), startUserTime(), startSleepTime(), startSystemTime(), userTime(0), sleepTime(0), systemTime(0),
     exitCode(0), debugger(nullptr), processor(nullptr), currentExceptionAddress(0), currentExceptionClassId(0), currentTryRecord(nullptr), kernelFiber(nullptr),
-    inodeKeyOfWorkingDirAsULong(-1), uid(0), gid(0), umask(0), directoriesChanged(false)
+    inodeKeyOfWorkingDirAsULong(-1), uid(0), gid(0), euid(0), egid(0), umask(0), directoriesChanged(false)
 {
     SetINodeKeyOfWorkingDir(Kernel::Instance().GetINodeKeyOfRootDir());
 }
@@ -148,9 +148,10 @@ void Process::SetError(const SystemError& error_)
 
 void Process::SetUID(int32_t uid_)
 {
-    if (uid == 0)
+    if (uid == 0 || euid == 0)
     {
         uid = uid_;
+        euid = uid_;
     }
     else
     {
@@ -158,16 +159,43 @@ void Process::SetUID(int32_t uid_)
     }
 }
 
+void Process::SetEUID(int32_t euid_)
+{
+    if (uid == 0 || euid == 0)
+    {
+        euid = euid_;
+    }
+}
+
+void Process::SetEUIDTrusted(int32_t euid_)
+{
+    euid = euid_;
+}
+
 void Process::SetGID(int32_t gid_)
 {
-    if (gid == 0)
+    if (uid == 0 || euid == 0 || gid == 0 || egid == 0)
     {
         gid = gid_;
+        egid = gid_;
     }
     else
     {
         throw SystemError(EPERMISSION, "unauthorized");
     }
+}
+
+void Process::SetEGID(int32_t egid_)
+{
+    if (uid == 0 || euid == 0)
+    {
+        egid = egid_;
+    }
+}
+
+void Process::SetEGIDTrusted(int32_t egid_)
+{
+    egid = egid_;
 }
 
 void Process::Exit(uint8_t exitCode_)
@@ -392,7 +420,9 @@ int32_t Fork(Process* parent)
     uint64_t rv = machine->Mem().AllocateTranslationMap();
     child->SetRV(rv);
     child->SetUID(parent->UID());
+    child->SetEUID(parent->EUID());
     child->SetGID(parent->GID());
+    child->SetEGID(parent->EGID());
     child->SetUMask(parent->UMask());
     TextSegmentWriteProtectionGuard guard(rv, machine->Mem());
     SetupRegions(parent, child);
@@ -476,7 +506,15 @@ void Exec(Process* process, int64_t filePathAddress, int64_t argvAddress, int64_
     }
     if (!filePath.starts_with("/mnt/sx/bin"))
     {
-        CheckAccess(Access::execute, process->UID(), process->GID(), inode, "could not execute '" + filePath + "'");
+        CheckAccess(Access::execute, process->EUID(), process->EGID(), inode, "could not execute '" + filePath + "'");
+    }
+    if (inode->SetUIDBit())
+    {
+        process->SetEUIDTrusted(inode->UID());
+    }
+    if (inode->SetGIDBit())
+    {
+        process->SetEGIDTrusted(inode->GID());
     }
     process->SetFilePath(filePath);
     std::vector<uint8_t> content = ReadFile(process, filePathAddress);

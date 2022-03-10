@@ -36,9 +36,13 @@ public:
     virtual uint64_t GetINodeKeyOfWorkingDir() const = 0;
     virtual void SetINodeKeyOfWorkingDir(uint64_t inodeKeyAsULong) = 0;
     virtual int32_t UID() const = 0;
+    virtual int32_t EUID() const = 0;
     virtual int32_t GID() const = 0;
+    virtual int32_t EGID() const = 0;
     virtual void SetUID(int32_t uid) = 0;
+    virtual void SetEUID(int32_t euid) = 0;
     virtual void SetGID(int32_t gid) = 0;
+    virtual void SetEGID(int32_t egid) = 0;
     virtual int32_t UMask() const = 0;
 };
 

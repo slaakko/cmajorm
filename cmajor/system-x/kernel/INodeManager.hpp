@@ -27,7 +27,7 @@ enum class FileType : int32_t
     
 enum class Access : int32_t
 {
-    none = 0, read = 1 << 0, write = 1 << 1, execute = 1 << 2
+    none = 0, read = 1 << 2, write = 1 << 1, execute = 1 << 0
 };
 
 CMSX_KERNEL_API inline Access operator|(Access left, Access right)
@@ -47,7 +47,7 @@ CMSX_KERNEL_API inline Access operator~(Access access)
 
 enum class INodeFlags : int32_t
 {
-    none = 0, mountPoint = 1 << 0, locked = 1 << 1, valid = 1 << 2
+    none = 0, mountPoint = 1 << 0, setUID = 1 << 1, setGID = 1 << 2, locked = 1 << 3, valid = 1 << 4
 };
 
 CMSX_KERNEL_API inline INodeFlags operator|(INodeFlags left, INodeFlags right)
@@ -74,9 +74,7 @@ class INode;
 CMSX_KERNEL_API int32_t EncodeMode(FileType fileType, INodeFlags flags, Access ownerAccess, Access groupAccess, Access otherAccess);
 CMSX_KERNEL_API void DecodeMode(int32_t mode, FileType& fileType, INodeFlags& flags, Access& ownerAccess, Access& groupAccess, Access& otherAccess);
 CMSX_KERNEL_API int32_t AlterMode(int32_t mode, int32_t umask, bool directory);
-CMSX_KERNEL_API void CheckAccess(Access access, int32_t uid, int32_t gid, INode* inode, const std::string& message);
-
-const int modeShift = 4;
+CMSX_KERNEL_API void CheckAccess(Access access, int32_t euid, int32_t egid, INode* inode, const std::string& message);
 
 struct CMSX_KERNEL_API INodeKey
 {
@@ -125,6 +123,12 @@ public:
     int32_t EncodeMode() const;
     void DecodeMode(int32_t mode);
     void SetMode(int32_t mode);
+    void SetSetUIDBit() { SetFlag(flags, INodeFlags::setUID);}
+    void ResetSetUIDBit() { ResetFlag(flags, INodeFlags::setUID); }
+    bool SetUIDBit() const { return GetFlag(flags, INodeFlags::setUID); }
+    void SetSetGIDBit() { SetFlag(flags, INodeFlags::setGID); }
+    void ResetSetGIDBit() { ResetFlag(flags, INodeFlags::setGID); }
+    bool SetGIDBit() const { return GetFlag(flags, INodeFlags::setGID); }
     void Read(Block* block, int index);
     void Write(Block* block, int index);
     bool IsLocked() const { return GetFlag(flags, INodeFlags::locked); }
@@ -176,7 +180,7 @@ public:
     int32_t ReferenceCount() const { return referenceCount; }
     void IncrementReferenceCount() { ++referenceCount; }
     void DecrementReferenceCount() { --referenceCount; }
-    static constexpr int32_t StatBufSize() { return 68; }
+    static constexpr int32_t StatBufSize() { return 70; }
     void WriteStat(MemoryWriter& writer);
 private:
     INodeKey key;

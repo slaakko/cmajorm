@@ -730,7 +730,7 @@ INodePtr SearchDirectory(const std::string& name, INode* dirINode, const std::st
     {
         throw SystemError(EFAIL, "not a directory inode");
     }
-    CheckAccess(Access::execute, process->UID(), process->GID(), dirINode, "could not search directory '" + dirPath + "'");
+    CheckAccess(Access::execute, process->EUID(), process->EGID(), dirINode, "could not search directory '" + dirPath + "'");
     int32_t logicalBlockNumber = 0;
     int32_t blockNumber = MapBlockNumber(logicalBlockNumber, dirINode, fs, process);
     while (blockNumber != -1)
@@ -870,7 +870,7 @@ void RemoveDirectoryEntry(const std::string& name, const std::string& filePath, 
                     {
                         INodePtr inodePtr = ReadINode(MakeINodeKey(fs->Id(), inodeNumber), process);
                         INode* inode = inodePtr.Get();
-                        CheckAccess(Access::write, process->UID(), process->GID(), inode, "could not unlink '" + filePath + "'");
+                        CheckAccess(Access::write, process->EUID(), process->EGID(), inode, "could not unlink '" + filePath + "'");
                         int32_t nlinks = inode->NLinks();
                         --nlinks;
                         inode->SetNLinks(nlinks);

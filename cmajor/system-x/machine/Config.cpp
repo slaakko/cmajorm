@@ -106,7 +106,7 @@ Configuration::Configuration() :
     rootFSNumBlocks(16384),
     rootFSMaxFiles(1024),
     umask(0),
-    uid(0),
+    uid(1),
     gid(0)
 {
     if (!boost::filesystem::exists(filePath))
