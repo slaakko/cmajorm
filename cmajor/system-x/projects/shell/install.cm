@@ -38,10 +38,10 @@ void InstallUser(const string& userName, int& uid, string& shell, string& home)
 
 void CopyBin()
 {
-	if (!Directory.Exists("/bin"))
-	{
-		MkDir("/bin", MakeMode(cast<Access>(Access.read | Access.write | Access.execute), cast<Access>(Access.read | Access.execute), cast<Access>(Access.read | Access.execute)));
-	}
+    if (!Directory.Exists("/bin"))
+    {
+        MkDir("/bin", MakeMode(cast<Access>(Access.read | Access.write | Access.execute), cast<Access>(Access.read | Access.execute), cast<Access>(Access.read | Access.execute)));
+    }
     List<string> args;
     args.Add("-vu");
     args.Add("/mnt/sx/bin/*.x");
@@ -61,10 +61,10 @@ void ChBinMode()
 
 void ChTrustedMode()
 {
-	ChMod("/bin/passwd.x", cast<int>(ParseOctal("4755")));
-	ChMod("/bin/passwdd.x", cast<int>(ParseOctal("4755")));
-	ChMod("/bin/sudo.x", cast<int>(ParseOctal("4755")));
-	ChMod("/bin/sudod.x", cast<int>(ParseOctal("4755")));
+    ChMod("/bin/passwd.x", cast<int>(ParseOctal("4755")));
+    ChMod("/bin/passwdd.x", cast<int>(ParseOctal("4755")));
+    ChMod("/bin/sudo.x", cast<int>(ParseOctal("4755")));
+    ChMod("/bin/sudod.x", cast<int>(ParseOctal("4755")));
 }
 
 void Install()
@@ -96,7 +96,7 @@ void Install()
             {
                 throw Exception("shell installation failed: child returned exit code " + ToString(exitCode));
             }
-			ChTrustedMode();
+            ChTrustedMode();
             string userName = GetUserName();
             if (!Directory.Exists("/etc")) 
             {
@@ -110,12 +110,12 @@ void Install()
                 writer.WriteLine("root::0:0:root:/:/bin/sh");
                 writer.WriteLine(userName + "::1:0:" + userName + ":/home/" + userName + ":/bin/sh");
             }
-			if (!File.Exists("/etc/passwd_hash"))
-			{
+            if (!File.Exists("/etc/passwd_hash"))
+            {
                 StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/passwd_hash", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), 
                     MakeMode(cast<Access>(Access.read | Access.write), Access.none, Access.none))));
                 // uid:hash
-			}
+            }
             if (!File.Exists("/etc/sudoers"))
             {
                 StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/sudoers", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), 
@@ -142,9 +142,9 @@ void Install()
             }
             if (!Directory.Exists("/home/" + userName))
             {
-				string homeDir = "/home/" + userName;
-				MkDir(homeDir.Chars(), MakeMode(cast<Access>(Access.read | Access.write | Access.execute), cast<Access>(Access.read | Access.execute), Access.none));
-				ChOwn(homeDir.Chars(), 1, 0);
+                string homeDir = "/home/" + userName;
+                MkDir(homeDir.Chars(), MakeMode(cast<Access>(Access.read | Access.write | Access.execute), cast<Access>(Access.read | Access.execute), Access.none));
+                ChOwn(homeDir.Chars(), 1, 0);
             }
         }
     }

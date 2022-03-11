@@ -56,11 +56,11 @@ namespace System.Security
         }
         public void Write(StreamWriter& writer)
         {
-			string hpwd;
-			if (hasPassword)
-			{
-				hpwd = "x";
-			}
+            string hpwd;
+            if (hasPassword)
+            {
+                hpwd = "x";
+            }
             writer << username << ":" << hpwd << ":" << uid << ":" << gid << ":" << info << ":" << home << ":" << shell << endl();
         }
         private string username;
@@ -85,24 +85,24 @@ namespace System.Security
                 lastUserId = user.UID();
             }
         }
-		public void RemoveUser(User* user)
-		{
-			int index = -1;
-			int n = cast<int>(users.Count());
-			for (int i = 0; i < n; ++i)
-			{
-				const User& usr = users[i];
-				if (usr.UID() == user->UID())
-				{
-					index = i;
-					break;
-				}
-			}
-			if (index != -1)
-			{
-				users.Remove(users.Begin() + index);
-			}
-		}
+        public void RemoveUser(User* user)
+        {
+            int index = -1;
+            int n = cast<int>(users.Count());
+            for (int i = 0; i < n; ++i)
+            {
+                const User& usr = users[i];
+                if (usr.UID() == user->UID())
+                {
+                    index = i;
+                    break;
+                }
+            }
+            if (index != -1)
+            {
+                users.Remove(users.Begin() + index);
+            }
+        }
         public User* GetUser(int uid) const
         {
             Map<int, User*>.ConstIterator it = uidUserMap.CFind(uid);

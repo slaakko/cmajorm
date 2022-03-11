@@ -540,10 +540,10 @@ namespace System.Os
             ThrowSystemError();
         }
     }
-	
-	public void SetEcho(int fd, bool value)
-	{
-		byte arg = cast<byte>(value);
-		IOCtl(fd, IOControlItem.set_echo, &arg, 1);
-	}
+    
+    public void SetEcho(int fd, bool value)
+    {
+        byte arg = cast<byte>(value);
+        IOCtl(fd, IOControlItem.set_echo, &arg, 1);
+    }
 }

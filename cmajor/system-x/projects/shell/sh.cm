@@ -40,43 +40,43 @@ string GetLine(ShellEnvironment& environment)
 
 void ProcessLine(const string& line, ShellEnvironment& environment, Map<string, string>& executableMap)
 {
-	if (line.IsEmpty()) return;
+    if (line.IsEmpty()) return;
     ustring uline = ToUtf32(line);
     List<ShellToken> tokens = TokenizeLine(uline);
-	if (environment.Debug())
-	{
-		PrintTokens(tokens);
-	}
-	Environment programEnvironment;
-	Environment.Instance().CopyTo(programEnvironment);
-	Command command = MakeCommand(tokens, executableMap);
-	if (!command.IsEmpty())
-	{
-		if (environment.Debug())
-		{
-			Console.Out() << "executing command: " << command.ToString() << endl();
-		}
-		command.Execute(programEnvironment);
-	}
-	if (DirectoriesChanged())
-	{
-		ClearDirectoriesChanged();
-		string path = GetEnv("PATH");
-		ReadPathDirectories(path, executableMap);
-	}
+    if (environment.Debug())
+    {
+        PrintTokens(tokens);
+    }
+    Environment programEnvironment;
+    Environment.Instance().CopyTo(programEnvironment);
+    Command command = MakeCommand(tokens, executableMap);
+    if (!command.IsEmpty())
+    {
+        if (environment.Debug())
+        {
+            Console.Out() << "executing command: " << command.ToString() << endl();
+        }
+        command.Execute(programEnvironment);
+    }
+    if (DirectoriesChanged())
+    {
+        ClearDirectoriesChanged();
+        string path = GetEnv("PATH");
+        ReadPathDirectories(path, executableMap);
+    }
 }
 
 void Run(ShellEnvironment& environment)
 {
-	Map<string, string> executableMap;
-	string path = GetEnv("PATH");
-	AddDirChangeNotification(path.Chars());
-	ReadPathDirectories(path, executableMap);
+    Map<string, string> executableMap;
+    string path = GetEnv("PATH");
+    AddDirChangeNotification(path.Chars());
+    ReadPathDirectories(path, executableMap);
     string line = GetLine(environment);
     while (line != "exit")
     {
         ProcessLine(line, environment, executableMap);
         line = GetLine(environment);
     }
-	RemoveDirChangeNotifications();
+    RemoveDirChangeNotifications();
 }

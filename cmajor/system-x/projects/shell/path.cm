@@ -9,44 +9,44 @@ using System.IO;
 
 void ReadPathDirectories(const string& path, Map<string, string>& executableMap)
 {
-	executableMap.Clear();
-	List<string> directories = path.Split(':');
-	for (const string& directory : directories)
-	{
-		if (DirectoryExists(directory))
-		{
-			DirectoryReader reader(directory);
-			DirectoryEntry entry;
-			while (reader.Read(entry))
-			{
-				if (entry.IsDot() || entry.IsDotDot())
-				{
-					continue;
-				}
-				string p = Path.Combine(directory, entry.name);
-				Map<string, string>.ConstIterator it = executableMap.CFind(entry.name);
-				if (it == executableMap.CEnd())
-				{
-					executableMap[entry.name] = p;
-				}
-			}
-		}
-	}
+    executableMap.Clear();
+    List<string> directories = path.Split(':');
+    for (const string& directory : directories)
+    {
+        if (DirectoryExists(directory))
+        {
+            DirectoryReader reader(directory);
+            DirectoryEntry entry;
+            while (reader.Read(entry))
+            {
+                if (entry.IsDot() || entry.IsDotDot())
+                {
+                    continue;
+                }
+                string p = Path.Combine(directory, entry.name);
+                Map<string, string>.ConstIterator it = executableMap.CFind(entry.name);
+                if (it == executableMap.CEnd())
+                {
+                    executableMap[entry.name] = p;
+                }
+            }
+        }
+    }
 }
 
 string GetProgramFilePath(const string& executableName, const Map<string, string>& executableMap)
 {
-	Map<string, string>.ConstIterator it = executableMap.CFind(executableName);
-	if (it != executableMap.CEnd())
-	{
-		return it->second;
-	}
-	string executableNameWithExt = executableName;
-	executableNameWithExt.Append(".x");
-	it = executableMap.CFind(executableNameWithExt);
-	if (it != executableMap.CEnd())
-	{
-		return it->second;
-	}
-	return executableName;
+    Map<string, string>.ConstIterator it = executableMap.CFind(executableName);
+    if (it != executableMap.CEnd())
+    {
+        return it->second;
+    }
+    string executableNameWithExt = executableName;
+    executableNameWithExt.Append(".x");
+    it = executableMap.CFind(executableNameWithExt);
+    if (it != executableMap.CEnd())
+    {
+        return it->second;
+    }
+    return executableName;
 }

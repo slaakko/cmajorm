@@ -150,21 +150,21 @@ string AccessStr(Access access, bool setUIDorSetGIDBit)
     {
         accessStr.Append('-');
     }
-	if (setUIDorSetGIDBit)
-	{
-		accessStr.Append('s');
-	}
-	else
-	{
-		if ((access & Access.execute) != Access.none)
-		{
-			accessStr.Append('x');
-		}
-		else
-		{
-			accessStr.Append('-');
-		}
-	}
+    if (setUIDorSetGIDBit)
+    {
+        accessStr.Append('s');
+    }
+    else
+    {
+        if ((access & Access.execute) != Access.none)
+        {
+            accessStr.Append('x');
+        }
+        else
+        {
+            accessStr.Append('-');
+        }
+    }
     return accessStr;
 }
 

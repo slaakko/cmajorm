@@ -67,17 +67,17 @@ int main(int argc, const char** argv)
             {
                 if (mode == -1)
                 {
-					if (arg.Length() < 3)
-					{
-						throw Exception("invalid mode argument: three or more octal digits expected");
-					}
-					for (char o : arg)
-					{
-						if (o < '0' || o > '7')
-						{
-							throw Exception("invalid mode argument: octal digits expected");
-						}
-					}
+                    if (arg.Length() < 3)
+                    {
+                        throw Exception("invalid mode argument: three or more octal digits expected");
+                    }
+                    for (char o : arg)
+                    {
+                        if (o < '0' || o > '7')
+                        {
+                            throw Exception("invalid mode argument: octal digits expected");
+                        }
+                    }
                     mode = cast<int>(ParseOctal(arg));
                 }
                 else

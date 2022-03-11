@@ -9,31 +9,31 @@ using System.IO;
 
 void ThrowEnvironmentFileException(int lineNumber, const string& environmentFilePath)
 {
-	throw Exception("invalid line " + ToString(lineNumber) + " in " + environmentFilePath + ": format 'ENV=\"value\"' expected");
+    throw Exception("invalid line " + ToString(lineNumber) + " in " + environmentFilePath + ": format 'ENV=\"value\"' expected");
 }
 
 void ParseEnvironmentFile(const string& environmentFilePath)
 {
-	StreamReader reader = File.OpenRead(environmentFilePath);
-	int lineNumber = 1;
-	while (!reader.Eof())
-	{
-		string line = reader.ReadLine();
-		if (!line.IsEmpty() && !line.StartsWith("#"))
-		{
-			List<string> fields = line.Split('=');
-			if (fields.Count() != 2)
-			{
-				ThrowEnvironmentFileException(lineNumber, environmentFilePath);
-			}
-			string envName = fields[0];
-			if (envName.IsEmpty() || fields[1].Length() < 2 || fields[1][0] != '"' || fields[1][fields[1].Length() - 1] != '"')
-			{
-				ThrowEnvironmentFileException(lineNumber, environmentFilePath);
-			}
-			string envValue = fields[1].Substring(1, fields[1].Length() - 2);
-			SetEnv(envName, envValue);
-		}
-		++lineNumber;
-	}
+    StreamReader reader = File.OpenRead(environmentFilePath);
+    int lineNumber = 1;
+    while (!reader.Eof())
+    {
+        string line = reader.ReadLine();
+        if (!line.IsEmpty() && !line.StartsWith("#"))
+        {
+            List<string> fields = line.Split('=');
+            if (fields.Count() != 2)
+            {
+                ThrowEnvironmentFileException(lineNumber, environmentFilePath);
+            }
+            string envName = fields[0];
+            if (envName.IsEmpty() || fields[1].Length() < 2 || fields[1][0] != '"' || fields[1][fields[1].Length() - 1] != '"')
+            {
+                ThrowEnvironmentFileException(lineNumber, environmentFilePath);
+            }
+            string envValue = fields[1].Substring(1, fields[1].Length() - 2);
+            SetEnv(envName, envValue);
+        }
+        ++lineNumber;
+    }
 }
