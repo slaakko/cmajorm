@@ -1,0 +1,44 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using shtokens;
+
+class TokenLexer
+{
+	public TokenLexer(const List<ShellToken>& tokens_) : tokens(tokens_), pos(0)
+	{
+	}
+	public nothrow inline int operator*() const
+	{
+		if (pos >= tokens.Count())
+		{
+			return END;
+		}
+		else
+		{
+			return tokens[pos].id;
+		}
+	}
+	public nothrow inline void operator++() 
+	{
+		++pos;
+	}
+	public nothrow inline int GetPos() const
+	{
+		return pos;
+	}
+	public nothrow inline void SetPos(int pos_)
+	{
+		pos = pos_;
+	}
+	public nothrow const ShellToken& CurrentToken() const 
+	{
+		return tokens[pos];
+	}
+	private const List<ShellToken>& tokens;
+	private int pos;
+}

@@ -7,19 +7,102 @@ using System;
 using System.Collections;
 using System.Os;
 
-class Command
+abstract class Command
 {
-    public Command() : programFilePath(), args()
+	public Command(const string& name_) : name(name_)
+	{
+	}
+	public nothrow const string& Name() const
+	{
+		return name;
+	}
+	public abstract void Execute(const List<string>& args, const Environment& environment);
+	public virtual nothrow string ToString(const List<string>& args) const
+	{
+        string s;
+        s.Append(name);
+        for (const string& arg : args)
+        {
+            s.Append(' ').Append(arg);
+        }
+        return s;
+	}
+	private string name;
+}
+
+class CdCommand : Command
+{
+	public CdCommand() : base("cd")
+	{
+	}
+	public override void Execute(const List<string>& args, const Environment& environment)
+	{
+		string dir;
+		if (args.IsEmpty())
+		{
+			dir = GetEnv("HOME");
+		}
+		else if (args.Count() == 1)
+		{
+			dir = args.Front();
+		}
+		else
+		{
+			throw Exception("cd: too many arguments");
+		}
+		ChDir(dir.Chars());
+	}
+}
+
+class InternalCommandMap
+{
+	static InternalCommandMap() : instance(new InternalCommandMap())
+	{
+	}
+	public static InternalCommandMap& Instance() 
+	{
+		return *instance;
+	}
+	public Command* GetInternalCommand(const string& commandName) const
+	{
+		Map<string, Command*>.ConstIterator it = commandMap.CFind(commandName);
+		if (it != commandMap.CEnd())
+		{
+			return it->second;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	private InternalCommandMap()
+	{
+		Command* cdCommand = new CdCommand();
+		commands.Add(UniquePtr<Command>(cdCommand));
+		for (const UniquePtr<Command>& command : commands)
+		{
+			commandMap[command->Name()] = command.Get();
+		}
+	}
+	private static UniquePtr<InternalCommandMap> instance;
+	private List<UniquePtr<Command>> commands;
+	private Map<string, Command*> commandMap;
+}
+
+nothrow Command* GetInternalCommand(const string& commandName)
+{
+	return InternalCommandMap.Instance().GetInternalCommand(commandName);
+}
+
+class SimpleCommand : Command
+{
+    public SimpleCommand() : programFilePath()
     {
     }
-    public Command(const string& programFilePath_) : programFilePath(programFilePath_), args()
+    public SimpleCommand(const string& programFilePath_) : programFilePath(programFilePath_)
     {
     }
-    public void AddArg(const string& arg)
-    {
-        args.Add(arg);
-    }
-    public void Execute(const Environment& environment)
+    public override void Execute(const List<string>& args, const Environment& environment)
     {
         int pid = Fork();
         if (pid == 0)
@@ -32,11 +115,7 @@ class Command
             Wait(&exitCode);
         }
     }
-    public nothrow bool IsEmpty() const
-    {
-        return programFilePath.IsEmpty();
-    }
-    public nothrow string ToString() const
+    public override nothrow string ToString(const List<string>& args) const
     {
         string s;
         s.Append(programFilePath);
@@ -47,22 +126,21 @@ class Command
         return s;
     }
     private string programFilePath;
-    private List<string> args;
 }
 
-public Command MakeCommand(const List<ShellToken>& tokens, const Map<string, string>& executableMap)
+public Command* MakeCommand(const List<ShellToken>& tokens, const Map<string, string>& executableMap, TokenFlags globalFlags, UniquePtr<Command>& cmd)
 {
     if (tokens.IsEmpty())
     {
-        return Command();
+        return null;
     }
-    string executableName = ToUtf8(tokens.Front().match.ToString());
-    string programFilePath = GetProgramFilePath(executableName, executableMap);
-    Command command(programFilePath);
-    int n = cast<int>(tokens.Count());
-    for (int i = 1; i < n; ++i)
-    {
-        command.AddArg(ToUtf8(tokens[i].match.ToString()));
-    }
+    string commandName = ToUtf8(tokens.Front().match);
+	Command* command = GetInternalCommand(commandName);
+	if (command == null)
+	{
+		string programFilePath = GetProgramFilePath(commandName, executableMap);
+		command = new SimpleCommand(programFilePath);
+		cmd.Reset(command);
+	}
     return command;
 }

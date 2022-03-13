@@ -938,6 +938,17 @@ void RenameDirectoryEntry(INode* dirINode, const std::string& oldName, const std
 INodePtr MakeDirectory(const std::string& path, Filesystem* fs, cmsx::machine::Process* process, int32_t mode)
 {
     std::string parentDirectoryPath = Path::GetDirectoryName(path);
+    if (parentDirectoryPath.empty())
+    {
+        if (path.starts_with("/"))
+        {
+            parentDirectoryPath = "/";
+        }
+        else
+        {
+            parentDirectoryPath = ".";
+        }
+    }
     INodePtr parentDirINode = PathToINode(parentDirectoryPath, fs, process);
     if (!parentDirINode.Get())
     {

@@ -177,6 +177,21 @@ namespace System
         sleepTime = Duration(sleepTm);
         systemTime = Duration(systemTm);
     }
+	
+	public void ChildTimes(Duration& userTime, Duration& sleepTime, Duration& systemTime)
+	{
+        long userTm = 0;
+        long sleepTm = 0;
+        long systemTm = 0;
+        int result = child_times(&userTm, &sleepTm, &systemTm);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        userTime = Duration(userTm);
+        sleepTime = Duration(sleepTm);
+        systemTime = Duration(systemTm);
+	}
 
     public nothrow string HourStr(const Duration& duration)
     {

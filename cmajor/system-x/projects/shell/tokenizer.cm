@@ -10,7 +10,7 @@ using shtokens;
 
 public enum TokenFlags : int
 {
-    none = 0, hasSlash = 1 << 0, hasPatternChar = 1 << 1, hasAssignment = 1 << 2
+    none = 0, hasSlash = 1 << 0, hasPatternChar = 1 << 1, hasAssignment = 1 << 2, hasDollar = 1 << 3, hasTilde = 1 << 4, brace = 1 << 5
 }
 
 public string TokenFlagStr(TokenFlags flags)
@@ -36,6 +36,30 @@ public string TokenFlagStr(TokenFlags flags)
         }
         s.Append("hasAssignment");
     }
+    if ((flags & TokenFlags.hasDollar) != TokenFlags.none)
+    {
+        if (!s.IsEmpty())
+        {
+            s.Append(" | ");
+        }
+        s.Append("hasDollar");
+    }
+	if ((flags & TokenFlags.hasTilde) != TokenFlags.none)
+    {
+        if (!s.IsEmpty())
+        {
+            s.Append(" | ");
+        }
+        s.Append("hasTilde");
+    }
+    if ((flags & TokenFlags.brace) != TokenFlags.none)
+    {
+        if (!s.IsEmpty())
+        {
+            s.Append(" | ");
+        }
+        s.Append("brace");
+    }
     if (s.IsEmpty())
     {
         s = "none";
@@ -45,48 +69,80 @@ public string TokenFlagStr(TokenFlags flags)
 
 public class ShellToken
 {
-    public nothrow ShellToken(int id_, const Lexeme& match_, int line_, int startCol_, int endCol_) : 
+	public nothrow ShellToken(int id_, const ustring& match_) : 
+		flags(), id(id_), match(match_), line(0), startCol(0), endCol(0)
+	{
+	}
+    public nothrow ShellToken(int id_, const ustring& match_, int line_, int startCol_, int endCol_) : 
         flags(), id(id_), match(match_), line(line_), startCol(startCol_), endCol(endCol_)
     {
     }
+	public nothrow const uchar* Begin() const
+	{
+		return match.Chars();
+	}
+	public nothrow const uchar* End() const
+	{
+		return match.Chars() + match.Length();
+	}
     public TokenFlags flags;
     public int id;
-    public Lexeme match;
+    public ustring match;
     public int line;
     public int startCol;
     public int endCol;
 }
 
-public void SetTokenFlags(ShellToken& token)
+public void SetTokenFlags(ShellToken& token, TokenFlags& globalFlags)
 {
     TokenFlags flags = TokenFlags.none;
-    uchar* i = token.match.begin;
-    while (i != token.match.end)
+    uchar* i = token.Begin();
+	uchar* e = token.End();
+    while (i != e)
     {
         switch (*i)
         {
             case '/':
             {
                 flags = cast<TokenFlags>(flags | TokenFlags.hasSlash);
+				globalFlags = cast<TokenFlags>(globalFlags | TokenFlags.hasSlash);
                 break;
             }
             case '*': case '?': case '[':
             {
                 flags = cast<TokenFlags>(flags | TokenFlags.hasPatternChar);
+				globalFlags = cast<TokenFlags>(globalFlags | TokenFlags.hasPatternChar);
                 break;
             }
             case '=':
             {
                 flags = cast<TokenFlags>(flags | TokenFlags.hasAssignment);
+				globalFlags = cast<TokenFlags>(globalFlags | TokenFlags.hasAssignment);
                 break;
             }
+			case '$':
+			{
+				flags = cast<TokenFlags>(flags | TokenFlags.hasDollar);
+				globalFlags = cast<TokenFlags>(globalFlags | TokenFlags.hasDollar);
+				break;
+			}
+			case '~':
+			{
+				flags = cast<TokenFlags>(flags | TokenFlags.hasTilde);
+				globalFlags = cast<TokenFlags>(globalFlags | TokenFlags.hasTilde);
+				break;
+			}
         }
         ++i;
     }
+	if (token.id == LBRACE)
+	{
+		globalFlags = cast<TokenFlags>(globalFlags | TokenFlags.brace);
+	}
     token.flags = flags;
 }
 
-List<ShellToken> TokenizeLine(const ustring& line)
+List<ShellToken> TokenizeLine(const ustring& line, TokenFlags& globalFlags)
 {
     List<ShellToken> tokens;
     shlexer lexer(line.Chars(), line.Chars() + line.Length(), "", 0);
@@ -107,8 +163,8 @@ List<ShellToken> TokenizeLine(const ustring& line)
                     lexer.token.id = kw;
                 }
             }
-            ShellToken shellToken(lexer.token.id, lexer.token.match, lexer.token.line, startCol, endCol);
-            SetTokenFlags(shellToken);
+            ShellToken shellToken(lexer.token.id, lexer.token.match.ToString(), lexer.token.line, startCol, endCol);
+            SetTokenFlags(shellToken, globalFlags);
             tokens.Add(shellToken);
         }
         ++lexer;
@@ -120,6 +176,73 @@ void PrintTokens(const List<ShellToken>& tokens)
 {
     for (const ShellToken& token : tokens)
     {
-        Console.Out() << "(" << TokenFlagStr(token.flags) << " : " << token.id << " : " << GetTokenName(token.id) << " : '" << token.match.ToString() << "')" << endl();
+        Console.Out() << "(" << TokenFlagStr(token.flags) << " : " << token.id << " : " << GetTokenName(token.id) << " : '" << token.match << "')" << endl();
     }
+}
+
+void AddWord(const ShellToken& token, List<ShellToken>& words, bool& brk)
+{
+	if (!brk && !words.IsEmpty() && words.Back().id == WORD)
+	{
+		words.Back().match.Append(token.match);
+	}
+	else
+	{
+		brk = false;
+		ShellToken wordToken(WORD, token.match);
+		words.Add(wordToken);
+	}
+}
+
+void AddQuotedChar(const ShellToken& token, List<ShellToken>& words, bool& brk)
+{
+	ShellToken chToken(WORD, token.match.Substring(1));
+	AddWord(chToken, words, brk);
+}
+
+void AddQuotedStr(const ShellToken& token, List<ShellToken>& words, bool& brk)
+{
+	ShellToken strToken(WORD, token.match.Substring(1, token.match.Length() - 2));
+	AddWord(strToken, words, brk);
+}
+
+List<ShellToken> MakeWords(const List<ShellToken>& tokens)
+{
+	bool brk = false;
+	List<ShellToken> words;
+	TokenLexer lexer(tokens);
+	while (*lexer != END)
+	{
+		switch (*lexer)
+		{
+			case TOKEN:
+			{
+				AddWord(lexer.CurrentToken(), words, brk);
+				break;
+			}
+			case QUOTED_CHAR:
+			{
+				AddQuotedChar(lexer.CurrentToken(), words, brk);
+				break;
+			}
+			case SINGLE_QUOTED:
+			case DOUBLE_QUOTED:
+			{
+				AddQuotedStr(lexer.CurrentToken(), words, brk);
+				break;
+			}
+			case SPACE:
+			{
+				brk = true;
+				break;
+			}
+			default:
+			{
+				words.Add(lexer.CurrentToken());
+				break;
+			}
+		}
+		++lexer;
+	}
+	return words;
 }

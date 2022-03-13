@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.Os;
 using System.Security;
+using paths;
 
 void PrintHelp()
 {
@@ -15,38 +16,6 @@ void PrintHelp()
     Console.Out() << "Options:" << endl() << endl();
     Console.Out() << "--help | -h" << endl();
     Console.Out() << "  Print help and exit." << endl() << endl();
-}
-
-string GetProgramFilePath(const string& fileName)
-{
-    string path = GetEnv("PATH");
-    List<string> pathDirs = path.Split(":");
-    for (const string& dir : pathDirs)
-    {
-        if (DirectoryExists(dir))
-        {
-            DirectoryReader reader(dir);
-            DirectoryEntry entry;
-            while (reader.Read(entry))
-            {
-                if (entry.IsDot() || entry.IsDotDot())
-                {
-                    continue;
-                }
-                FileStatus status;
-                string p = Path.Combine(dir, entry.name);
-                Stat(p.Chars(), status);
-                if (status.fileType == FileType.regular && (status.ownerAccess & Access.execute) != Access.none)
-                {
-                    if (entry.name == fileName || entry.name == fileName + ".x")
-                    {
-                        return p;
-                    }
-                }
-            }
-        }
-    }
-    return fileName;
 }
 
 int main(int argc, const char** argv)

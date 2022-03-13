@@ -79,6 +79,7 @@ const uint8_t trap_add_dir_change_notification = 64;
 const uint8_t trap_remove_dir_change_notifications = 65;
 const uint8_t trap_directories_changed = 66;
 const uint8_t clear_directories_changed = 67;
+const uint8_t trap_child_times = 68;
 
 class CMSX_KERNEL_API TrapHandler
 {

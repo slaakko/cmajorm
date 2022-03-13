@@ -42,21 +42,26 @@ void ProcessLine(const string& line, ShellEnvironment& environment, Map<string, 
 {
     if (line.IsEmpty()) return;
     ustring uline = ToUtf32(line);
-    List<ShellToken> tokens = TokenizeLine(uline);
-    if (environment.Debug())
-    {
-        PrintTokens(tokens);
-    }
+	TokenFlags globalFlags = TokenFlags.none;
+    List<ShellToken> tokens = TokenizeLine(uline, globalFlags);
+	Expand(tokens, environment, globalFlags);
     Environment programEnvironment;
     Environment.Instance().CopyTo(programEnvironment);
-    Command command = MakeCommand(tokens, executableMap);
-    if (!command.IsEmpty())
+	UniquePtr<Command> cmd;
+    Command* command = MakeCommand(tokens, executableMap, globalFlags, cmd);
+    if (command != null)
     {
+		List<string> args;
+		int n = cast<int>(tokens.Count());
+		for (int i = 1; i < n; ++i)
+		{
+			args.Add(ToUtf8(tokens[i].match));
+		}
         if (environment.Debug())
         {
-            Console.Out() << "executing command: " << command.ToString() << endl();
+            Console.Out() << "executing command: " << command->ToString(args) << endl();
         }
-        command.Execute(programEnvironment);
+        command->Execute(args, programEnvironment);
     }
     if (DirectoriesChanged())
     {

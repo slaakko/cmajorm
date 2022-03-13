@@ -15,12 +15,74 @@
 		<b>chmod [options] &lt;octal-mode> &lt;file></b><br/>
     </p>
 	
+	<p>
+		<b>octal-mode</b> should be bitwise OR of the following octal values:
+		<table class="type">
+			<tr>
+				<th>octal value</th>
+				<th>access</th>
+				<th>description</th>
+			</tr>
+			<tr>
+				<td>4000</td>
+				<td>setuid bit</td>
+				<td>run the program file as the user ID of the file's owner</td>
+			</tr>
+			<tr>
+				<td>2000</td>
+				<td>setgid bit</td>
+				<td>run the program file as the group ID of the file's group</td>
+			</tr>
+			<tr>
+				<td>400</td>
+				<td>owner read access</td>
+			</tr>
+			<tr>
+				<td>200</td>
+				<td>owner write access</td>
+			</tr>
+			<tr>
+				<td>100</td>
+				<td>owner execute access</td>
+			</tr>
+			<tr>
+				<td>40</td>
+				<td>group read access</td>
+			</tr>
+			<tr>
+				<td>20</td>
+				<td>group write access</td>
+			</tr>
+			<tr>
+				<td>10</td>
+				<td>group execute access</td>
+			</tr>
+			<tr>
+				<td>4</td>
+				<td>others read access</td>
+			</tr>
+			<tr>
+				<td>2</td>
+				<td>others write access</td>
+			</tr>
+			<tr>
+				<td>1</td>
+				<td>others execute access</td>
+			</tr>
+		</table>
+	</p>
+	
 	<h2>
 		Example
 	</h2>
 	
 	<p>
-		sxx chmod 755 /bin/cp.x<br/>
+		sxx<br/>
+		sudo chmod 755 /bin/cp.x<br/>
+	</p>
+	
+	<p>
+		755: allow owner to read, write and execute, group to read and execute and others to read and execute.
 	</p>
 
 	<h2>

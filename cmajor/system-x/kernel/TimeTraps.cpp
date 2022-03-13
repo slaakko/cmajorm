@@ -184,6 +184,46 @@ uint64_t TrapTimesHandler::HandleTrap(cmsx::machine::Processor& processor)
     }
 }
 
+class TrapChildTimesHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_child_times"; }
+};
+
+uint64_t TrapChildTimesHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        uint64_t ax = processor.Regs().Get(cmsx::machine::regAX);
+        uint64_t bx = processor.Regs().Get(cmsx::machine::regBX);
+        uint64_t cx = processor.Regs().Get(cmsx::machine::regCX);
+        if (ax == 0)
+        {
+            throw SystemError(EPARAM, "child user time pointer is null");
+        }
+        if (bx == 0)
+        {
+            throw SystemError(EPARAM, "child sleep time pointer is null");
+        }
+        if (cx == 0)
+        {
+            throw SystemError(EPARAM, "child system time pointer is null");
+        }
+        cmsx::machine::Memory& mem = processor.GetMachine()->Mem();
+        mem.WriteOcta(process->RV(), ax, process->ChildUserTime().count(), cmsx::machine::Protection::write);
+        mem.WriteOcta(process->RV(), bx, process->ChildSleepTime().count(), cmsx::machine::Protection::write);
+        mem.WriteOcta(process->RV(), cx, process->ChildSystemTime().count(), cmsx::machine::Protection::write);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
 void InitTimeTraps()
 {
     SetTrapHandler(trap_current_time_point, new TrapCurrentTimePointHandler());
@@ -191,10 +231,12 @@ void InitTimeTraps()
     SetTrapHandler(trap_current_date, new TrapCurrentDateHandler());
     SetTrapHandler(trap_current_date_time, new TrapCurrentDateTimeHandler());
     SetTrapHandler(trap_times, new TrapTimesHandler());
+    SetTrapHandler(trap_child_times, new TrapChildTimesHandler());
 }
 
 void DoneTimeTraps()
 {
+    SetTrapHandler(trap_child_times, nullptr);
     SetTrapHandler(trap_times, nullptr);
     SetTrapHandler(trap_current_date_time, nullptr);
     SetTrapHandler(trap_current_date, nullptr);

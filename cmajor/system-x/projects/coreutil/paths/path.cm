@@ -1,0 +1,55 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+using System.Os;
+
+namespace paths
+{
+    string ReadDir(const string& dir, const string& fileName, const string& fileNameX)
+    {
+        if (DirectoryExists(dir))
+        {
+            DirectoryEntry entry;
+            FileStatus status;
+            DirectoryReader reader(dir);
+            while (reader.Read(entry))
+            {
+                if (entry.IsDot() || entry.IsDotDot())
+                {
+                    continue;
+                }
+                string p = Path.Combine(dir, entry.name);
+                Stat(p.Chars(), status);
+                if (status.fileType == FileType.regular && (status.ownerAccess & Access.execute) != Access.none)
+                {
+                    if (entry.name == fileName || entry.name == fileNameX)
+                    {
+                        return p;
+                    }
+                }
+            }
+        }
+        return string();
+    }
+
+    public string GetProgramFilePath(const string& fileName)
+    {
+        string fileNameX = fileName + ".x";
+        string path = GetEnv("PATH");
+        List<string> pathDirs = path.Split(":");
+        for (const string& dir : pathDirs)
+        {
+            string p = ReadDir(dir, fileName, fileNameX);
+            if (!p.IsEmpty())
+            {
+                return p;
+            }
+        }
+        return fileName;
+    }
+}

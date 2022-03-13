@@ -15,7 +15,8 @@ tokens shtokens
 	(DLESSDASH, "'<<-'"), (DLESS, "'<<'"), (DGREAT, "'>>'"),
 	(LBRACE, "'{'"), (RBRACE, "'}'"), (BANG, "'!'"), (PIPE, "'|'"), (LPAREN, "'('"), (RPAREN, "')'"), 
 	(LESSAND, "'<&'"), (GREATAND, "'>&'"), (LESSGREAT, "'<>'"), (CLOBBER, "'>|'"), (LESS, "'<'"), (GREAT, "'>'"), 
-	(AMP, "'&'"), (SEMI, "';'"), (BACKQUOTE, "'`'"), (TOKEN, "'token'")
+	(AMP, "'&'"), (SEMI, "';'"), (BACKQUOTE, "'`'"), (TOKEN, "'token'"), (WORD, "'word'"),
+	(SPACE, "' '")
 }
 
 keywords shkeywords
@@ -56,7 +57,7 @@ expressions
 
 lexer shlexer
 {
-	"{separator}+" {}
+	"{separator}+" { return SPACE; }
 	"{quoted_char}"{ return QUOTED_CHAR; }
 	"{single_quoted}"{ return SINGLE_QUOTED; }
 	"{double_quoted}"{ return DOUBLE_QUOTED; }

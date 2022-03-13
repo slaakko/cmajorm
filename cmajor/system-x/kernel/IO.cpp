@@ -294,6 +294,17 @@ void Unlink(Process* process, int64_t pathAddr)
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::string path = ReadString(process, pathAddr, mem);
     std::string dirName = Path::GetDirectoryName(path);
+    if (dirName.empty())
+    {
+        if (path.starts_with("/"))
+        {
+            dirName = "/";
+        }
+        else
+        {
+            dirName = ".";
+        }
+    }
     INodePtr dirINode = PathToINode(dirName, GetFs(rootFSNumber), process);
     if (!dirINode.Get())
     {
@@ -454,6 +465,17 @@ void MkDir(Process* process, int64_t pathAddr, int32_t mode)
         throw SystemError(EALREADYEXISTS, "directory path '" + path + "' already exists");
     }
     std::string parentPath = Path::GetDirectoryName(path);
+    if (parentPath.empty())
+    {
+        if (path.starts_with("/"))
+        {
+            parentPath = "/";
+        }
+        else
+        {
+            parentPath = ".";
+        }
+    }
     std::string dirName = Path::GetFileName(path);
     INodePtr inodePtr = PathToINode(parentPath, fs, process);
     INode* parentINode = inodePtr.Get();

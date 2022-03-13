@@ -1,0 +1,40 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+void Expand(List<ShellToken>& tokens, ShellEnvironment& environment, TokenFlags globalFlags)
+{
+    if (environment.Debug())
+    {
+		Console.Out() << "tokens before expansions:" << endl();
+        PrintTokens(tokens);
+    }
+	if ((globalFlags & TokenFlags.brace) != TokenFlags.none)
+	{
+		tokens = BraceExpand(tokens);
+		if (environment.Debug())
+		{
+			Console.Out() << "tokens after brace expansion:" << endl();
+			PrintTokens(tokens);
+		}
+	}
+	if ((globalFlags & TokenFlags.hasTilde) != TokenFlags.none)
+	{
+		tokens = TildeExpand(tokens);
+		if (environment.Debug())
+		{
+			Console.Out() << "tokens after tilde expansion:" << endl();
+			PrintTokens(tokens);
+		}
+	}
+	tokens = MakeWords(tokens);
+	if (environment.Debug())
+	{
+		Console.Out() << "tokens after expansions:" << endl();
+        PrintTokens(tokens);
+	}
+}

@@ -169,7 +169,7 @@
 		<tr>
 			<td><span class="kw">trap_create</span></td>
 			<td>22</td>
-			<td>address of file path to create (pointer to string), mode (int) (mode not currently used)</td>
+			<td>address of file path to create (pointer to string), mode (int)</td>
 			<td>creates a file, returns a nonnegative file descriptor (int), or -1 in case of error, has the same effect as calling trap_open 
 			with flags OpenFlags.create | OpenFlags.truncate | OpenFlags.write</td>
 		</tr>
@@ -177,7 +177,7 @@
 			<td><span class="kw">trap_open</span></td>
 			<td>23</td>
 			<td>address of file path to open (pointer to string), flags (int): 1 << 0 = read, 1 << 1 = write, 1 << 2 = create, 1 << 3 = append, 1 << 4 = truncate, 
-			1 << 5 = text, 1 << 6 = random_access, mode (int) (mode not currently used)</td>
+			1 << 5 = text, 1 << 6 = random_access, mode (int)</td>
 			<td>opens a file, returns a nonnegative file descriptor (int), or -1 in case of error</td>
 		</tr>
 		<tr>
@@ -201,13 +201,22 @@
 		<tr>
 			<td><span class="kw">trap_ioctl</span></td>
 			<td>27</td>
-			<td>a file descriptor (int), an item ID (int)</td>
+			<td>a file descriptor (int), an item ID (int), argument pointer (pointer to byte), argument size (</td>
 			<td>performs I/O-control function or returns information about a file:
 			IOControlItem.isConsole=0, returns 1 if file is a console, 0 if file is not a console, -1 if error;
 			IOControlItem.isHostTextFile=1, returns 1 if file is is host text file, 0 if file is not a host text file, -1 if error;
 			IOControlItem.hasColors=2, returns 1 if file has colors, 0 if file does not have colors, -1 if error;
 			IOControlItem.columns=3, returns the number of screen columns, 0 if file has no screen columns, -1 if error;
-			IOControlItem.rows=4, returns the number of screen rows, 0 if file has no screen rows, -1 if error;</td>
+			IOControlItem.rows=4, returns the number of screen rows, 0 if file has no screen rows, -1 if error;
+			IOControlItem.cursor_x=5, returns the x-coordinate of the cursor location;
+			IOControlItem.cursor_y=6, returns the y-coordinate of the cursor location;
+			IOControlItem.set_cursor_pos=7, sets the cursor location, argument must point to two ints;
+			IOControlItem.set_cooked=8, sets the terminal to the cooked mode (default);
+			IOControlItem.set_raw=9, sets the terminal to the raw mode;
+			IOControlItem.set_echo=10, sets terminal echo on/off, argument must point to a byte with value (1 = on, or 0 = off);
+			IOControlItem.push_lines=11, push terminal line history;
+			IOControlItem.pop_lines=12, pop terminal line history</td>
+			</td>
 		</tr>
 		<tr>
 			<td><span class="kw">trap_unlink</span></td>
@@ -352,6 +361,109 @@
 			<td>51</td>
 			<td>file descriptor (int)</td>
 			<td>duplicates a file descriptor returning an identical file descriptor that has the smallest available number, returns -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_setuid</span></td>
+			<td>52</td>
+			<td>user identifier (int)</td>
+			<td>sets the user ID and the effective user ID of the current process, if permissions allow it, returns -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_setgid</span></td>
+			<td>53</td>
+			<td>group identifier (int)</td>
+			<td>sets the group ID and the effective group ID of the current process, if permissions allow it, returns -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_getuid</span></td>
+			<td>54</td>
+			<td>-</td>
+			<td>returns the user ID of the current process, returns -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_getgid</span></td>
+			<td>55</td>
+			<td>-</td>
+			<td>returns the group ID of the current process, returns -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_seteuid</span></td>
+			<td>56</td>
+			<td>effective user identifier (int)</td>
+			<td>sets the effective user ID of the current process, if permissions allow it, returns -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_setegid</span></td>
+			<td>57</td>
+			<td>effective group identifier (int)</td>
+			<td>sets the effective group ID of the current process, if permissions allow it, returns -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_geteuid</span></td>
+			<td>58</td>
+			<td>-</td>
+			<td>returns the effective user ID of the current process, returns -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_getegid</span></td>
+			<td>59</td>
+			<td></td>
+			<td>returns the effective group ID of the current process, returns -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_umask</span></td>
+			<td>60</td>
+			<td>umask (int)</td>
+			<td>sets the umask of the current process, returns -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_chmod</span></td>
+			<td>61</td>
+			<td>path (pointer to a string), mode (int)</td>
+			<td>changes the access mode of a file, returns -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_chown</span></td>
+			<td>62</td>
+			<td>path (pointer to a string), UID (int), GID (int)</td>
+			<td>changes the owner of a file, if permmissions allow it, returns -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_rename</span></td>
+			<td>63</td>
+			<td>source file path (pointer to a string), target file path (pointer to a string)</td>
+			<td>renames or moves a file, returns -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_add_dir_change_notification</span></td>
+			<td>64</td>
+			<td>directories separated by colons (pointer to a string)</td>
+			<td>starts watching changes in the specified directories, returns -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_remove_dir_change_notifications</span></td>
+			<td>65</td>
+			<td>-</td>
+			<td>stops watching changes in directories, returns -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_directories_changed</span></td>
+			<td>66</td>
+			<td>-</td>
+			<td>returns 1 if watched directories have been changed (new or removed files), 0 if no changes have occurred, returns -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">clear_directories_changed</span></td>
+			<td>67</td>
+			<td>-</td>
+			<td>resets the 'directories changed' flag from the current process, returns -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_child_times</span></td>
+			<td>68</td>
+			<td>address of a variable containing child user time in nanoseconds (pointer to ulong), address of a variable containing child sleep time in nanoseconds (pointer to ulong), 
+			address of a variable containing child kernel time in nanoseconds (pointer to ulong)</td>
+			<td>obtains execution statistics for the exited child processes of the current process</td>
 		</tr>
 	</table>
 </body>

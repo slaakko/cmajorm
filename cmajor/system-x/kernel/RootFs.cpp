@@ -189,6 +189,17 @@ BlockFile* RootFilesystem::Open(const std::string& path, INode* dirINode, int32_
         throw SystemError(EPARAM, "could not open: path '" + path + "' not valid");
     }
     std::string dirPath = Path::GetDirectoryName(path);
+    if (dirPath.empty())
+    {
+        if (path.starts_with("/"))
+        {
+            dirPath = "/";
+        }
+        else
+        {
+            dirPath = ".";
+        }
+    }
     std::string fileName = Path::GetFileName(path);
     INodePtr dirINodePtr = PathToINode(dirPath, this, process);
     if (!dirINodePtr.Get())

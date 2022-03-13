@@ -84,6 +84,10 @@ namespace shtokens
 
     public const int TOKEN = 39;
 
+    public const int WORD = 40;
+
+    public const int SPACE = 41;
+
     internal class TokenMap
     {
         static TokenMap() :
@@ -150,11 +154,13 @@ namespace shtokens
             tokenIdMap[u"RPAREN"] = 29;
             tokenIdMap[u"SEMI"] = 37;
             tokenIdMap[u"SINGLE_QUOTED"] = 2;
+            tokenIdMap[u"SPACE"] = 41;
             tokenIdMap[u"THEN"] = 14;
             tokenIdMap[u"TIME"] = 17;
             tokenIdMap[u"TOKEN"] = 39;
             tokenIdMap[u"UNTIL"] = 15;
             tokenIdMap[u"WHILE"] = 16;
+            tokenIdMap[u"WORD"] = 40;
             tokenNameList.Add(u"END");
             tokenInfoList.Add(u"end of file");
             tokenNameList.Add(u"QUOTED_CHAR");
@@ -235,6 +241,10 @@ namespace shtokens
             tokenInfoList.Add(u"'`'");
             tokenNameList.Add(u"TOKEN");
             tokenInfoList.Add(u"'token'");
+            tokenNameList.Add(u"WORD");
+            tokenInfoList.Add(u"'word'");
+            tokenNameList.Add(u"SPACE");
+            tokenInfoList.Add(u"' '");
         }
         private static System.UniquePtr<TokenMap> instance;
         private System.Collections.Map<ustring, int> tokenIdMap;

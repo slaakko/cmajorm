@@ -71,6 +71,7 @@ public const byte trap_add_dir_change_notification = 64u;
 public const byte trap_remove_dir_change_notifications = 65u;
 public const byte trap_directories_changed = 66u;
 public const byte trap_clear_directories_changed = 67u;
+public const byte trap_child_times = 68u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -448,4 +449,9 @@ public cdecl nothrow int directories_changed()
 public cdecl nothrow int clear_directories_changed()
 {
     return cast<int>(trap(0u, trap_clear_directories_changed, 0u));
+}
+
+public cdecl nothrow int child_times(long* childUserTime, long* childSleepTime, long* childSystemTime)
+{
+    return cast<int>(trap(0u, trap_child_times, 0u, childUserTime, childSleepTime, childSystemTime));
 }

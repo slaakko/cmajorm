@@ -9,7 +9,54 @@
 <body>
     <h1>System X Filesystem</h1>
 
+	<h2>
+		Root Filesystem Organization
+	</h2>
+
 	<p>
+		The System X root filesystem is implemented as a Windows file 'root.fs' located in the system-x/fs subdirectory of the %CMAJOR_ROOT% (e.g. C:\cmajor) directory.
+		The root filesystem file consists of a sequence of 4K blocks of various kind:
+	</p>
+	
+	<table class="type">
+		<tr>
+			<th>block</th>
+			<td>cardinality</td>
+			<th>description</th>
+		</tr>
+		<tr>
+			<td>superblock</td>
+			<td>1</td>
+			<td>information about the root filesystem amounts</td>
+		</tr>
+		<tr>
+			<td>block number blocks</td>
+			<td>N</td>
+			<td>list of blocks containing free block numbers</td>
+		</tr>
+		<tr>
+			<td>inode blocks</td>
+			<td>N</td>
+			<td>list of blocks containing inodes (one inode per file)</td>
+		</tr>
+		<tr>
+			<td>directory blocks and file data blocks</td>
+			<td>N</td>
+			<td>list of data blocks that contain either directory entries or file data, in arbitrary order</td>
+		</tr>
+	</table>
+	
+	<p>
+		If the Windows 'root.fs' file is removed or renamed, the kernel creates a new default one next time the <b>sxx</b> virtual machine is run.
+		This is for the case the current 'root.fs' becomes corrupted for example.
+	</p>
+	
+	<h2>
+		File Paths
+	</h2>
+	
+	<p>
+		The directory separator character is '/' as in Unix.
 	</p>
 	
 	<h2>
@@ -46,5 +93,36 @@
 			<td><span class="kw">/mnt/sx</span></td>
 		</tr>
 	</table>
+	
+	<h2>
+		User Accounts and File Access Permissions
+	</h2>
+	
+	<p>
+		The System X kernel creates two user accounts the first time the <b>sxx</b> virtual machine is run:
+		the <b>root</b> account (UID 0), and a user account (UID 1) with the same name as the logged on Windows user.
+		The current Windows user is by default member of the admin group (root, GID 0) and is added to the <b>/etc/sudoers</b> file.
+		By default these accounts have no passwords, but a password can be set for an account using the <b>passwd</b> utility.
+	</p>
+	
+	<p>
+		Each file and directory have permission bits for the current user, for the group of the current user and for others.
+		The <b>/bin</b> and <b>/etc</b> directories are by default owned by the root account and given only read and execute permissions 
+		for the root group and other accounts. Write access can be obtained by executing a command with the <b>sudo</b> utility.
+	</p>
+	
+	<p>
+		The System X access permission system is not designed for real security in mind. It protects the files and directories for removal or change by accident, not against fraud.
+		To strengthen the security, Windows files e.g. 'root.fs' and directories, executables and Cmajor configuration files should be protected using the Windows security system.
+	</p>
+	
+	<h2>
+		User Home Directory
+	</h2>
+	
+	<p>
+		Each time the shell <b>sh.x</b> is run, for each user (other than root) a home directory <b>/home/USER</b> owned by the USER is created if it does not already exist.
+	</p>
 </body>
 </html>
+
