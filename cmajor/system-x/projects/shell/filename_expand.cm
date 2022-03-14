@@ -1,0 +1,201 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.RegularExpressions;
+using shtokens;
+
+bool ContainsPatternChar(const ustring& str)
+{
+    for (uchar c : str)
+    {
+        if (c == '*' || c == '?' || c == '[') return true;
+    }
+    return false;
+}
+
+public List<string> GetMatchingNames(const List<string>& names, const ustring& pattern, Context& context)
+{
+    List<string> matchingNames;
+    Nfa nfa = CompileFilePattern(context, pattern);
+    for (const string& name : names)
+    {
+        ustring nm = ToUtf32(name);
+        if (PatternMatch(nm, nfa))
+        {
+            matchingNames.Add(name);
+        }
+    }
+    return matchingNames;
+}
+
+List<ustring> Expand(const ustring& prefix, const ustring& pattern, Context& context)
+{
+    string prfx = ToUtf8(prefix);
+    string dirPath = prfx;
+    if (dirPath.IsEmpty())
+    {
+        dirPath = ".";
+    }
+    List<string> names;
+    DirectoryEntry entry;
+    DirectoryReader reader(dirPath);
+    while (reader.Read(entry))
+    {
+        if (entry.IsDot() || entry.IsDotDot())
+        {
+            continue;
+        }
+        names.Add(entry.name);
+    }
+    List<string> matchingNames = GetMatchingNames(names, pattern, context);
+    Sort(matchingNames);
+    List<ustring> expanded;
+    for (const string& name : matchingNames)
+    {
+        if (prefix.IsEmpty())
+        {
+            expanded.Add(ToUtf32(name));
+        }
+        else
+        {
+            expanded.Add(ToUtf32(Path.Combine(prfx, name)));
+        }
+    }
+    return expanded;
+}
+
+public List<ustring> Combine(const ustring& prefix, const List<ustring>& components, Context& context)
+{
+    List<ustring> allCombinations;
+    ustring pre = prefix;
+    bool expanded = false;
+    long n = components.Count();
+    for (long i = 0; i < n; ++i)
+    {
+        if (prefix.IsEmpty() && i == 0 && components[i].IsEmpty())
+        {
+            pre.Append('/');
+        }
+        else
+        {
+            ustring comp = components[i];
+            if (ContainsPatternChar(comp))
+            {
+                List<ustring> prefixes = Expand(pre, comp, context);
+                List<ustring> suffix;
+                for (long j = i + 1; j < n; ++j)
+                {
+                    suffix.Add(components[j]);
+                }
+                for (const ustring& prefix : prefixes)
+                {
+                    List<ustring> combinations = Combine(prefix, suffix, context);
+                    for (const ustring& c : combinations)
+                    {
+                        allCombinations.Add(c);
+                    }
+                }
+                expanded = true;
+            }
+            else if (pre.IsEmpty() || pre[pre.Length() - 1] == '/')
+            {
+                pre.Append(components[i]);
+            }
+            else
+            {
+                pre.Append('/').Append(components[i]);
+            }
+        }
+    }
+    if (!expanded)
+    {
+        allCombinations.Add(pre);
+    }
+    return allCombinations;
+}
+
+void ExpandPattern(const ustring& pattern, Context& context, List<ShellToken>& expandedTokens)
+{
+    List<ustring> components = pattern.Split('/');
+    List<ustring> paths = Combine(ustring(), components, context);
+    bool first = true;
+    for (const ustring& path : paths)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            expandedTokens.Add(ShellToken(SPACE, u" "));
+        }
+        expandedTokens.Add(ShellToken(TOKEN, path));
+    }
+}
+
+bool ParsePatternExpression(TokenLexer& lexer, Context& context, List<ShellToken>& expandedTokens)
+{
+    List<ShellToken> patternTokens;
+    int save = lexer.GetPos();
+    bool prevWasToken = false;
+    bool hasPatternChar = false;
+    while (*lexer == TOKEN || *lexer == QUOTED_CHAR)
+    {
+        if (*lexer == TOKEN)
+        {
+            if (prevWasToken)
+            {
+                break;
+            }
+            hasPatternChar = hasPatternChar || (lexer.CurrentToken().flags & TokenFlags.hasPatternChar) != TokenFlags.none;
+            prevWasToken = true;
+        }
+        else if (*lexer == QUOTED_CHAR)
+        {
+            prevWasToken = false;
+        }
+        patternTokens.Add(lexer.CurrentToken());
+        ++lexer;
+    }
+    if (hasPatternChar)
+    {
+        ustring pattern;
+        for (const ShellToken& token : patternTokens)
+        {
+            if (token.id == TOKEN)
+            {
+                pattern.Append(token.match);
+            }
+            else if (token.id == QUOTED_CHAR)
+            {
+                pattern.Append(token.match.Substring(1));
+            }
+        }
+        ExpandPattern(pattern, context, expandedTokens);
+        return true;
+    }
+    else
+    {
+        lexer.SetPos(save);
+        return false;
+    }
+}
+
+List<ShellToken> FilenameExpand(const List<ShellToken>& tokens, Context& context)
+{
+    TokenLexer lexer(tokens);
+    List<ShellToken> expandedTokens;
+    while (*lexer != END)
+    {
+        if (!ParsePatternExpression(lexer, context, expandedTokens))
+        {
+            expandedTokens.Add(lexer.CurrentToken());
+            ++lexer;
+        }
+    }
+    return expandedTokens;
+}

@@ -5,36 +5,55 @@
 
 using System;
 using System.Collections;
+using System.RegularExpressions;
 
-void Expand(List<ShellToken>& tokens, ShellEnvironment& environment, TokenFlags globalFlags)
+void Expand(List<ShellToken>& tokens, ShellEnvironment& environment, Params& params, Context& context, TokenFlags globalFlags)
 {
     if (environment.Debug())
     {
-		Console.Out() << "tokens before expansions:" << endl();
+        Console.Out() << "tokens before expansions:" << endl();
         PrintTokens(tokens);
     }
-	if ((globalFlags & TokenFlags.brace) != TokenFlags.none)
-	{
-		tokens = BraceExpand(tokens);
-		if (environment.Debug())
-		{
-			Console.Out() << "tokens after brace expansion:" << endl();
-			PrintTokens(tokens);
-		}
-	}
-	if ((globalFlags & TokenFlags.hasTilde) != TokenFlags.none)
-	{
-		tokens = TildeExpand(tokens);
-		if (environment.Debug())
-		{
-			Console.Out() << "tokens after tilde expansion:" << endl();
-			PrintTokens(tokens);
-		}
-	}
-	tokens = MakeWords(tokens);
-	if (environment.Debug())
-	{
-		Console.Out() << "tokens after expansions:" << endl();
+    if ((globalFlags & TokenFlags.brace) != TokenFlags.none)
+    {
+        tokens = BraceExpand(tokens);
+        if (environment.Debug())
+        {
+            Console.Out() << "tokens after brace expansion:" << endl();
+            PrintTokens(tokens);
+        }
+    }
+    if ((globalFlags & TokenFlags.hasTilde) != TokenFlags.none)
+    {
+        tokens = TildeExpand(tokens);
+        if (environment.Debug())
+        {
+            Console.Out() << "tokens after tilde expansion:" << endl();
+            PrintTokens(tokens);
+        }
+    }
+    if ((globalFlags & TokenFlags.hasDollar) != TokenFlags.none)
+    {
+        tokens = ParameterExpand(tokens, environment, params, context);
+        if (environment.Debug())
+        {
+            Console.Out() << "tokens after parameter expansion:" << endl();
+            PrintTokens(tokens);
+        }
+    }
+    if ((globalFlags & TokenFlags.hasPatternChar) != TokenFlags.none)
+    {
+        tokens = FilenameExpand(tokens, context);
+        if (environment.Debug())
+        {
+            Console.Out() << "tokens after filename expansion:" << endl();
+            PrintTokens(tokens);
+        }
+    }
+    tokens = MakeWords(tokens);
+    if (environment.Debug())
+    {
+        Console.Out() << "tokens after expansions:" << endl();
         PrintTokens(tokens);
-	}
+    }
 }

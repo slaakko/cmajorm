@@ -1,0 +1,194 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.RegularExpressions;
+using shtokens;
+
+class Params
+{
+    public void Add(const string& param)
+    {
+        positionalParams.Add(param);
+    }
+    public List<ShellToken> GetParameterValue(ShellEnvironment& environment, const string& paramName, Context& context) 
+    {
+        string replacementStr;
+        int index = 0;
+        if (ParseInt(paramName, index))
+        {
+            if (index >= 0 && index < positionalParams.Count())
+            {
+                replacementStr = positionalParams[index];
+            }
+        }
+        else if (HasEnv(paramName))
+        {
+            replacementStr = GetEnv(paramName);
+        }
+        if (!replacementStr.IsEmpty())
+        {
+            TokenFlags globalFlags = TokenFlags.none;
+            List<ShellToken> tokens = TokenizeLine(ToUtf32(replacementStr), globalFlags);
+            Expand(tokens, environment, *this, context, globalFlags);
+            return tokens;
+        }
+        else
+        {
+            List<ShellToken> emptyTokens;
+            return emptyTokens;
+        }
+    }
+    private List<string> positionalParams;
+}
+
+bool ExpandParam(const ustring& paramName, ShellEnvironment& environment, Params& params, Context& context, List<ShellToken>& expandedTokens)
+{
+    List<ShellToken> replacementTokens = params.GetParameterValue(environment, ToUtf8(paramName), context);
+    if (!replacementTokens.IsEmpty())
+    {
+        for (const ShellToken& token : replacementTokens)
+        {
+            expandedTokens.Add(token);
+        }
+        return true;
+    }
+    return false;
+}
+
+bool ParseParameterExpression(TokenLexer& lexer, ShellEnvironment& environment, Params& params, Context& context, List<ShellToken>& expandedTokens)
+{
+    bool dollarMatched = false;
+    bool digitMatched = false;
+    bool digitPossible = true;
+    ustring paramName;
+    int save = lexer.GetPos();
+    ustring prefix;
+    ustring suffix;
+    List<ShellToken> resultTokens;
+    if (*lexer == TOKEN)
+    {
+        uchar* begin = lexer.CurrentToken().Begin();
+        uchar* end = lexer.CurrentToken().End();
+        uchar* i = begin;
+        while (i != end)
+        {
+            if (*i == '$')
+            {
+                prefix = ustring(begin, i);
+                begin = i + 1;
+                dollarMatched = true;
+            }
+            else if (dollarMatched)
+            {
+                if (!digitMatched && digitPossible)
+                {
+                    if (*i >= '0' && *i <= '9')
+                    {
+                        digitMatched = true;
+                        if (!prefix.IsEmpty())
+                        {
+                            resultTokens.Add(ShellToken(TOKEN, prefix));
+                            prefix.Clear();
+                        }
+                        ExpandParam(ustring(*i), environment, params, context, resultTokens);
+                        begin = i + 1;
+                    }
+                    else 
+                    {
+                        digitPossible = false;
+                        paramName.Append(*i);
+                    }
+                }
+                else
+                {
+                    if (digitMatched)
+                    {
+                        suffix.Append(*i);
+                    }
+                    else
+                    {
+                        paramName.Append(*i);
+                    }
+                }
+            }
+            ++i;
+        }
+        if (dollarMatched)
+        {
+            ++lexer;
+        }
+        if (digitMatched)
+        {
+            if (!suffix.IsEmpty())
+            {
+                resultTokens.Add(ShellToken(TOKEN, suffix));
+            }
+        }
+    }
+    if (dollarMatched)
+    {
+        if (digitMatched)
+        {
+            AddTokens(expandedTokens, resultTokens);
+            return true;
+        }
+        else if (!paramName.IsEmpty())
+        {
+            if (!prefix.IsEmpty())
+            {
+                resultTokens.Add(ShellToken(TOKEN, prefix));
+                prefix.Clear();
+            }
+            if (ExpandParam(paramName, environment, params, context, resultTokens))
+            {
+                AddTokens(expandedTokens, resultTokens);
+                return true;
+            }
+        }
+        else
+        {
+            if (*lexer == LBRACE)
+            {
+                ++lexer;
+                if (*lexer == TOKEN)
+                {
+                    paramName = lexer.CurrentToken().match;
+                    if (!paramName.IsEmpty())
+                    {
+                        if (ExpandParam(paramName, environment, params, context, resultTokens))
+                        {
+                            ++lexer;
+                            if (*lexer == RBRACE)
+                            {
+                                ++lexer;
+                                AddTokens(expandedTokens, resultTokens);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    lexer.SetPos(save);
+    return false;
+}
+
+List<ShellToken> ParameterExpand(const List<ShellToken>& tokens, ShellEnvironment& environment, Params& params, Context& context)
+{
+    TokenLexer lexer(tokens);
+    List<ShellToken> expandedTokens;
+    while (*lexer != END)
+    {
+        if (!ParseParameterExpression(lexer, environment, params, context, expandedTokens))
+        {
+            expandedTokens.Add(lexer.CurrentToken());
+            ++lexer;
+        }
+    }
+    return expandedTokens;
+}

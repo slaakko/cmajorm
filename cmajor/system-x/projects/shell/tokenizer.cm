@@ -44,7 +44,7 @@ public string TokenFlagStr(TokenFlags flags)
         }
         s.Append("hasDollar");
     }
-	if ((flags & TokenFlags.hasTilde) != TokenFlags.none)
+    if ((flags & TokenFlags.hasTilde) != TokenFlags.none)
     {
         if (!s.IsEmpty())
         {
@@ -69,22 +69,22 @@ public string TokenFlagStr(TokenFlags flags)
 
 public class ShellToken
 {
-	public nothrow ShellToken(int id_, const ustring& match_) : 
-		flags(), id(id_), match(match_), line(0), startCol(0), endCol(0)
-	{
-	}
+    public nothrow ShellToken(int id_, const ustring& match_) : 
+        flags(), id(id_), match(match_), line(0), startCol(0), endCol(0)
+    {
+    }
     public nothrow ShellToken(int id_, const ustring& match_, int line_, int startCol_, int endCol_) : 
         flags(), id(id_), match(match_), line(line_), startCol(startCol_), endCol(endCol_)
     {
     }
-	public nothrow const uchar* Begin() const
-	{
-		return match.Chars();
-	}
-	public nothrow const uchar* End() const
-	{
-		return match.Chars() + match.Length();
-	}
+    public nothrow const uchar* Begin() const
+    {
+        return match.Chars();
+    }
+    public nothrow const uchar* End() const
+    {
+        return match.Chars() + match.Length();
+    }
     public TokenFlags flags;
     public int id;
     public ustring match;
@@ -97,7 +97,7 @@ public void SetTokenFlags(ShellToken& token, TokenFlags& globalFlags)
 {
     TokenFlags flags = TokenFlags.none;
     uchar* i = token.Begin();
-	uchar* e = token.End();
+    uchar* e = token.End();
     while (i != e)
     {
         switch (*i)
@@ -105,40 +105,40 @@ public void SetTokenFlags(ShellToken& token, TokenFlags& globalFlags)
             case '/':
             {
                 flags = cast<TokenFlags>(flags | TokenFlags.hasSlash);
-				globalFlags = cast<TokenFlags>(globalFlags | TokenFlags.hasSlash);
+                globalFlags = cast<TokenFlags>(globalFlags | TokenFlags.hasSlash);
                 break;
             }
             case '*': case '?': case '[':
             {
                 flags = cast<TokenFlags>(flags | TokenFlags.hasPatternChar);
-				globalFlags = cast<TokenFlags>(globalFlags | TokenFlags.hasPatternChar);
+                globalFlags = cast<TokenFlags>(globalFlags | TokenFlags.hasPatternChar);
                 break;
             }
             case '=':
             {
                 flags = cast<TokenFlags>(flags | TokenFlags.hasAssignment);
-				globalFlags = cast<TokenFlags>(globalFlags | TokenFlags.hasAssignment);
+                globalFlags = cast<TokenFlags>(globalFlags | TokenFlags.hasAssignment);
                 break;
             }
-			case '$':
-			{
-				flags = cast<TokenFlags>(flags | TokenFlags.hasDollar);
-				globalFlags = cast<TokenFlags>(globalFlags | TokenFlags.hasDollar);
-				break;
-			}
-			case '~':
-			{
-				flags = cast<TokenFlags>(flags | TokenFlags.hasTilde);
-				globalFlags = cast<TokenFlags>(globalFlags | TokenFlags.hasTilde);
-				break;
-			}
+            case '$':
+            {
+                flags = cast<TokenFlags>(flags | TokenFlags.hasDollar);
+                globalFlags = cast<TokenFlags>(globalFlags | TokenFlags.hasDollar);
+                break;
+            }
+            case '~':
+            {
+                flags = cast<TokenFlags>(flags | TokenFlags.hasTilde);
+                globalFlags = cast<TokenFlags>(globalFlags | TokenFlags.hasTilde);
+                break;
+            }
         }
         ++i;
     }
-	if (token.id == LBRACE)
-	{
-		globalFlags = cast<TokenFlags>(globalFlags | TokenFlags.brace);
-	}
+    if (token.id == LBRACE)
+    {
+        globalFlags = cast<TokenFlags>(globalFlags | TokenFlags.brace);
+    }
     token.flags = flags;
 }
 
@@ -180,69 +180,77 @@ void PrintTokens(const List<ShellToken>& tokens)
     }
 }
 
+void AddTokens(List<ShellToken>& result, const List<ShellToken>& tokens)
+{
+    for (const ShellToken& token : tokens)
+    {
+        result.Add(token);
+    }
+}
+
 void AddWord(const ShellToken& token, List<ShellToken>& words, bool& brk)
 {
-	if (!brk && !words.IsEmpty() && words.Back().id == WORD)
-	{
-		words.Back().match.Append(token.match);
-	}
-	else
-	{
-		brk = false;
-		ShellToken wordToken(WORD, token.match);
-		words.Add(wordToken);
-	}
+    if (!brk && !words.IsEmpty() && words.Back().id == WORD)
+    {
+        words.Back().match.Append(token.match);
+    }
+    else
+    {
+        brk = false;
+        ShellToken wordToken(WORD, token.match);
+        words.Add(wordToken);
+    }
 }
 
 void AddQuotedChar(const ShellToken& token, List<ShellToken>& words, bool& brk)
 {
-	ShellToken chToken(WORD, token.match.Substring(1));
-	AddWord(chToken, words, brk);
+    ShellToken chToken(WORD, token.match.Substring(1));
+    AddWord(chToken, words, brk);
 }
 
 void AddQuotedStr(const ShellToken& token, List<ShellToken>& words, bool& brk)
 {
-	ShellToken strToken(WORD, token.match.Substring(1, token.match.Length() - 2));
-	AddWord(strToken, words, brk);
+    ShellToken strToken(WORD, token.match.Substring(1, token.match.Length() - 2));
+    AddWord(strToken, words, brk);
 }
 
 List<ShellToken> MakeWords(const List<ShellToken>& tokens)
 {
-	bool brk = false;
-	List<ShellToken> words;
-	TokenLexer lexer(tokens);
-	while (*lexer != END)
-	{
-		switch (*lexer)
-		{
-			case TOKEN:
-			{
-				AddWord(lexer.CurrentToken(), words, brk);
-				break;
-			}
-			case QUOTED_CHAR:
-			{
-				AddQuotedChar(lexer.CurrentToken(), words, brk);
-				break;
-			}
-			case SINGLE_QUOTED:
-			case DOUBLE_QUOTED:
-			{
-				AddQuotedStr(lexer.CurrentToken(), words, brk);
-				break;
-			}
-			case SPACE:
-			{
-				brk = true;
-				break;
-			}
-			default:
-			{
-				words.Add(lexer.CurrentToken());
-				break;
-			}
-		}
-		++lexer;
-	}
-	return words;
+    bool brk = false;
+    List<ShellToken> words;
+    TokenLexer lexer(tokens);
+    while (*lexer != END)
+    {
+        switch (*lexer)
+        {
+            case TOKEN:
+            {
+                AddWord(lexer.CurrentToken(), words, brk);
+                break;
+            }
+            case QUOTED_CHAR:
+            {
+                AddQuotedChar(lexer.CurrentToken(), words, brk);
+                break;
+            }
+            case SINGLE_QUOTED:
+            case DOUBLE_QUOTED:
+            {
+                AddQuotedStr(lexer.CurrentToken(), words, brk);
+                break;
+            }
+            case SPACE:
+            {
+                brk = true;
+                break;
+            }
+            default:
+            {
+                words.Add(lexer.CurrentToken());
+                break;
+            }
+        }
+        ++lexer;
+    }
+    return words;
 }

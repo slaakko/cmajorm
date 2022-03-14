@@ -10,71 +10,71 @@ using shtokens;
 
 ShellToken TildeExpand(const ShellToken& token)
 {
-	if (token.match.StartsWith(u"~"))
-	{
-		ustring tildePrefix;
-		long slashPos = token.match.Find('/');
-		if (slashPos != -1)
-		{
-			tildePrefix = token.match.Substring(1, slashPos - 1);
-		}
-		else
-		{
-			tildePrefix = token.match.Substring(1);
-		}
-		if (tildePrefix.IsEmpty())
-		{
-			string home = GetEnv("HOME");
-			if (slashPos != -1)
-			{
-				return ShellToken(TOKEN, ToUtf32(home) + token.match.Substring(slashPos));
-			}
-			else
-			{
-				return ShellToken(TOKEN, ToUtf32(home));
-			}
-		}
-		else
-		{
-			Users users = GetUsers();
-			User* user = users.GetUser(ToUtf8(tildePrefix));
-			if (user != null)
-			{
-				string home = user->Home();
-				if (slashPos != -1)
-				{
-					if (home.EndsWith("/"))
-					{
-						return ShellToken(TOKEN, ToUtf32(home) + token.match.Substring(slashPos + 1));
-					}
-					else
-					{
-						return ShellToken(TOKEN, ToUtf32(home) + token.match.Substring(slashPos));
-					}
-				}
-				else
-				{
-					return ShellToken(TOKEN, ToUtf32(home));
-				}
-			}
-		}
-	}
-	return token;
+    if (token.match.StartsWith(u"~"))
+    {
+        ustring tildePrefix;
+        long slashPos = token.match.Find('/');
+        if (slashPos != -1)
+        {
+            tildePrefix = token.match.Substring(1, slashPos - 1);
+        }
+        else
+        {
+            tildePrefix = token.match.Substring(1);
+        }
+        if (tildePrefix.IsEmpty())
+        {
+            string home = GetEnv("HOME");
+            if (slashPos != -1)
+            {
+                return ShellToken(TOKEN, ToUtf32(home) + token.match.Substring(slashPos));
+            }
+            else
+            {
+                return ShellToken(TOKEN, ToUtf32(home));
+            }
+        }
+        else
+        {
+            Users users = GetUsers();
+            User* user = users.GetUser(ToUtf8(tildePrefix));
+            if (user != null)
+            {
+                string home = user->Home();
+                if (slashPos != -1)
+                {
+                    if (home.EndsWith("/"))
+                    {
+                        return ShellToken(TOKEN, ToUtf32(home) + token.match.Substring(slashPos + 1));
+                    }
+                    else
+                    {
+                        return ShellToken(TOKEN, ToUtf32(home) + token.match.Substring(slashPos));
+                    }
+                }
+                else
+                {
+                    return ShellToken(TOKEN, ToUtf32(home));
+                }
+            }
+        }
+    }
+    return token;
 }
 
 List<ShellToken> TildeExpand(const List<ShellToken>& tokens)
 {
-	List<ShellToken> expandedTokens;
-	for (const ShellToken& token : tokens)
-	{
-		if ((token.flags & TokenFlags.hasTilde) != TokenFlags.none)
-		{
-			expandedTokens.Add(TildeExpand(token));
-		}
-		else
-		{
-			expandedTokens.Add(token);
-		}
-	}
-	return expandedTokens;
+    List<ShellToken> expandedTokens;
+    for (const ShellToken& token : tokens)
+    {
+        if ((token.flags & TokenFlags.hasTilde) != TokenFlags.none)
+        {
+            expandedTokens.Add(TildeExpand(token));
+        }
+        else
+        {
+            expandedTokens.Add(token);
+        }
+    }
+    return expandedTokens;
 }

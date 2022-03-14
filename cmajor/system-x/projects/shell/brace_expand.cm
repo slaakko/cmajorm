@@ -13,180 +13,172 @@ using shtokens;
 
 bool EndsWithDollar(const ShellToken& token)
 {
-	return token.id == TOKEN && ((token.flags & TokenFlags.hasDollar) != TokenFlags.none) && token.match.EndsWith(u"$");
-}
-
-void AddTokens(List<ShellToken>& result, const List<ShellToken>& tokens)
-{
-	for (const ShellToken& token : tokens)
-	{
-		result.Add(token);
-	}
+    return token.id == TOKEN && ((token.flags & TokenFlags.hasDollar) != TokenFlags.none) && token.match.EndsWith(u"$");
 }
 
 bool ParsePreamble(TokenLexer& lexer, List<ShellToken>& preamble, bool& dollarLBrace)
 {
-	int save = lexer.GetPos();
-	bool endsWithDollar = false;
-	while (*lexer != LBRACE && *lexer != SPACE && *lexer != END)
-	{
-		preamble.Add(lexer.CurrentToken());
-		endsWithDollar = EndsWithDollar(lexer.CurrentToken());
-		++lexer;
-	}
-	if (*lexer == LBRACE)
-	{
-		if (endsWithDollar)
-		{
-			dollarLBrace = true;
-			lexer.SetPos(save);
-			return false;
-		}
-		++lexer;
-		return true;
-	}
-	else
-	{
-		lexer.SetPos(save);
-		return false;
-	}
+    int save = lexer.GetPos();
+    bool endsWithDollar = false;
+    while (*lexer != LBRACE && *lexer != SPACE && *lexer != END)
+    {
+        preamble.Add(lexer.CurrentToken());
+        endsWithDollar = EndsWithDollar(lexer.CurrentToken());
+        ++lexer;
+    }
+    if (*lexer == LBRACE)
+    {
+        if (endsWithDollar)
+        {
+            dollarLBrace = true;
+            lexer.SetPos(save);
+            return false;
+        }
+        ++lexer;
+        return true;
+    }
+    else
+    {
+        lexer.SetPos(save);
+        return false;
+    }
 }
 
 class CommaListItem
 {
-	public nothrow CommaListItem()
-	{
-	}
-	public List<ShellToken> tokens;
+    public nothrow CommaListItem()
+    {
+    }
+    public List<ShellToken> tokens;
 }
 
 bool ParseCommaList(TokenLexer& lexer, List<CommaListItem>& commaList)
 {
-	CommaListItem item;
-	bool hasComma = false;
-	while (*lexer != END)
-	{
-		if (*lexer == TOKEN)
-		{
-			uchar* begin = lexer.CurrentToken().Begin();
-			uchar* end = lexer.CurrentToken().End();
-			uchar* i = begin;
-			while (i != end)
-			{
-				if (*i == ',')
-				{
-					hasComma = true;
-					item.tokens.Add(ShellToken(TOKEN, ustring(begin, i)));
-					commaList.Add(item);
-					item = CommaListItem();
-					begin = i + 1;
-				}
-				++i;
-			}
-			if (begin != end)
-			{
-				item.tokens.Add(ShellToken(TOKEN, ustring(begin, end)));
-			}
-			++lexer;
-		}
-		else if (*lexer == LBRACE)
-		{
-			if (!ParseBraceExpression(lexer, item.tokens))
-			{
-				return false;
-			}
-		}
-		else if (*lexer == RBRACE)
-		{
-			if (hasComma)
-			{
-				if (!item.tokens.IsEmpty())
-				{
-					commaList.Add(item);
-				}
-				++lexer;
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		else
-		{
-			item.tokens.Add(lexer.CurrentToken());
-			++lexer;
-		}
-	}
-	return false;
+    CommaListItem item;
+    bool hasComma = false;
+    while (*lexer != END)
+    {
+        if (*lexer == TOKEN)
+        {
+            uchar* begin = lexer.CurrentToken().Begin();
+            uchar* end = lexer.CurrentToken().End();
+            uchar* i = begin;
+            while (i != end)
+            {
+                if (*i == ',')
+                {
+                    hasComma = true;
+                    item.tokens.Add(ShellToken(TOKEN, ustring(begin, i)));
+                    commaList.Add(item);
+                    item = CommaListItem();
+                    begin = i + 1;
+                }
+                ++i;
+            }
+            if (begin != end)
+            {
+                item.tokens.Add(ShellToken(TOKEN, ustring(begin, end)));
+            }
+            ++lexer;
+        }
+        else if (*lexer == LBRACE)
+        {
+            if (!ParseBraceExpression(lexer, item.tokens))
+            {
+                return false;
+            }
+        }
+        else if (*lexer == RBRACE)
+        {
+            if (hasComma)
+            {
+                if (!item.tokens.IsEmpty())
+                {
+                    commaList.Add(item);
+                }
+                ++lexer;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            item.tokens.Add(lexer.CurrentToken());
+            ++lexer;
+        }
+    }
+    return false;
 }
 
 bool ParsePostscript(TokenLexer& lexer, List<ShellToken>& postscript)
 {
-	while (*lexer != RBRACE && *lexer != LBRACE && *lexer != SPACE && *lexer != END)
-	{
-		postscript.Add(lexer.CurrentToken());
-		++lexer;
-	}
-	return true;
+    while (*lexer != RBRACE && *lexer != LBRACE && *lexer != SPACE && *lexer != END)
+    {
+        postscript.Add(lexer.CurrentToken());
+        ++lexer;
+    }
+    return true;
 }
 
 bool ParseBraceExpression(TokenLexer& lexer, List<ShellToken>& expandedTokens)
 {
-	int save = lexer.GetPos();
-	List<ShellToken> preamble;
-	bool dollarLBrace = false;
-	if (ParsePreamble(lexer, preamble, dollarLBrace))
-	{
-		List<CommaListItem> commaList;
-		if (ParseCommaList(lexer, commaList))
-		{
-			List<ShellToken> postscript;
-			if (ParsePostscript(lexer, postscript))
-			{
-				bool first = true;
-				for (const CommaListItem& item : commaList)
-				{
-					if (first)
-					{
-						first = false;
-					}
-					else
-					{
-						expandedTokens.Add(ShellToken(SPACE, u" "));
-					}
-					AddTokens(expandedTokens, preamble);
-					AddTokens(expandedTokens, item.tokens);
-					AddTokens(expandedTokens, postscript);
-				}
-				return true;
-			}
-		}
-	}
-	else if (dollarLBrace)
-	{
-		while (*lexer != RBRACE && *lexer != END)
-		{
-			expandedTokens.Add(lexer.CurrentToken());
-			++lexer;
-		}
-		return true;
-	}
-	lexer.SetPos(save);
-	return false;
+    int save = lexer.GetPos();
+    List<ShellToken> preamble;
+    bool dollarLBrace = false;
+    if (ParsePreamble(lexer, preamble, dollarLBrace))
+    {
+        List<CommaListItem> commaList;
+        if (ParseCommaList(lexer, commaList))
+        {
+            List<ShellToken> postscript;
+            if (ParsePostscript(lexer, postscript))
+            {
+                bool first = true;
+                for (const CommaListItem& item : commaList)
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        expandedTokens.Add(ShellToken(SPACE, u" "));
+                    }
+                    AddTokens(expandedTokens, preamble);
+                    AddTokens(expandedTokens, item.tokens);
+                    AddTokens(expandedTokens, postscript);
+                }
+                return true;
+            }
+        }
+    }
+    else if (dollarLBrace)
+    {
+        while (*lexer != RBRACE && *lexer != END)
+        {
+            expandedTokens.Add(lexer.CurrentToken());
+            ++lexer;
+        }
+        return true;
+    }
+    lexer.SetPos(save);
+    return false;
 }
 
 List<ShellToken> BraceExpand(const List<ShellToken>& tokens)
 {
-	TokenLexer lexer(tokens);
-	List<ShellToken> expandedTokens;
-	while (*lexer != END)
-	{
-		if (!ParseBraceExpression(lexer, expandedTokens))
-		{
-			expandedTokens.Add(lexer.CurrentToken());
-			++lexer;
-		}
-	}
-	return expandedTokens;
+    TokenLexer lexer(tokens);
+    List<ShellToken> expandedTokens;
+    while (*lexer != END)
+    {
+        if (!ParseBraceExpression(lexer, expandedTokens))
+        {
+            expandedTokens.Add(lexer.CurrentToken());
+            ++lexer;
+        }
+    }
+    return expandedTokens;
 }

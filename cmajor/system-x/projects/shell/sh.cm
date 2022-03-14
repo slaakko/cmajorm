@@ -8,6 +8,7 @@ using System.Collections;
 using System.IO;
 using System.Os;
 using System.Lex;
+using System.RegularExpressions;
 using shtokens;
 
 string CWD(ShellEnvironment& environment)
@@ -38,25 +39,25 @@ string GetLine(ShellEnvironment& environment)
     return line;
 }
 
-void ProcessLine(const string& line, ShellEnvironment& environment, Map<string, string>& executableMap)
+void ProcessLine(const string& line, ShellEnvironment& environment, Params& params, Context& context, Map<string, string>& executableMap)
 {
     if (line.IsEmpty()) return;
     ustring uline = ToUtf32(line);
-	TokenFlags globalFlags = TokenFlags.none;
+    TokenFlags globalFlags = TokenFlags.none;
     List<ShellToken> tokens = TokenizeLine(uline, globalFlags);
-	Expand(tokens, environment, globalFlags);
+    Expand(tokens, environment, params, context, globalFlags);
     Environment programEnvironment;
     Environment.Instance().CopyTo(programEnvironment);
-	UniquePtr<Command> cmd;
+    UniquePtr<Command> cmd;
     Command* command = MakeCommand(tokens, executableMap, globalFlags, cmd);
     if (command != null)
     {
-		List<string> args;
-		int n = cast<int>(tokens.Count());
-		for (int i = 1; i < n; ++i)
-		{
-			args.Add(ToUtf8(tokens[i].match));
-		}
+        List<string> args;
+        int n = cast<int>(tokens.Count());
+        for (int i = 1; i < n; ++i)
+        {
+            args.Add(ToUtf8(tokens[i].match));
+        }
         if (environment.Debug())
         {
             Console.Out() << "executing command: " << command->ToString(args) << endl();
@@ -71,7 +72,7 @@ void ProcessLine(const string& line, ShellEnvironment& environment, Map<string, 
     }
 }
 
-void Run(ShellEnvironment& environment)
+void Run(ShellEnvironment& environment, Params& params, Context& context)
 {
     Map<string, string> executableMap;
     string path = GetEnv("PATH");
@@ -80,7 +81,7 @@ void Run(ShellEnvironment& environment)
     string line = GetLine(environment);
     while (line != "exit")
     {
-        ProcessLine(line, environment, executableMap);
+        ProcessLine(line, environment, params, context, executableMap);
         line = GetLine(environment);
     }
     RemoveDirChangeNotifications();

@@ -103,7 +103,7 @@ void SetupShellEnvironment(ShellEnvironment& environment)
     else
     {
         environment.SetUserName(GetUserName());
-		SetEnv("USER", environment.UserName());
+        SetEnv("USER", environment.UserName());
     }
     if (HasEnv("HOSTNAME"))
     {
@@ -112,7 +112,7 @@ void SetupShellEnvironment(ShellEnvironment& environment)
     else
     {
         environment.SetHostName(GetHostName());
-		SetEnv("HOSTNAME", environment.HostName());
+        SetEnv("HOSTNAME", environment.HostName());
     }
     int uid = -1;
     string shell;
@@ -136,7 +136,7 @@ void SetupShellEnvironment(ShellEnvironment& environment)
     else
     {
         environment.SetUID(uid);
-		SetEnv("UID", ToString(uid));
+        SetEnv("UID", ToString(uid));
     }
     if (HasEnv("HOME"))
     {
@@ -145,7 +145,7 @@ void SetupShellEnvironment(ShellEnvironment& environment)
     else
     {
         environment.SetHome(home);
-		SetEnv("HOME", home);
+        SetEnv("HOME", home);
     }
     if (HasEnv("SHELL"))
     {
@@ -154,6 +154,6 @@ void SetupShellEnvironment(ShellEnvironment& environment)
     else
     {
         environment.SetShell(shell);
-		SetEnv("SHELL", shell);
+        SetEnv("SHELL", shell);
     }
 }
