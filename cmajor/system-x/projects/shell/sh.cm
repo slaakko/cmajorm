@@ -28,14 +28,14 @@ void PrintPrompt(ShellEnvironment& environment)
     {
         prompt = "# ";
     }
-    Console.Out() << SetColors(ConsoleColor.green, DefaultConsoleBackColor()).Append(environment.UserName()).Append("@").Append(environment.HostName()).Append(ResetColors()).
+    Terminal.Out() << SetColors(ConsoleColor.green, DefaultConsoleBackColor()).Append(environment.UserName()).Append("@").Append(environment.HostName()).Append(ResetColors()).
         Append(":").Append(CWD(environment)).Append(prompt);
 }
 
 string GetLine(ShellEnvironment& environment)
 {
     PrintPrompt(environment);
-    string line = Console.ReadLine();
+    string line = Terminal.ReadLine();
     return line;
 }
 
@@ -46,23 +46,35 @@ void ProcessLine(const string& line, ShellEnvironment& environment, Params& para
     TokenFlags globalFlags = TokenFlags.none;
     List<ShellToken> tokens = TokenizeLine(uline, globalFlags);
     Expand(tokens, environment, params, context, globalFlags);
-    Environment programEnvironment;
-    Environment.Instance().CopyTo(programEnvironment);
-    UniquePtr<Command> cmd;
-    Command* command = MakeCommand(tokens, executableMap, globalFlags, cmd);
-    if (command != null)
+    TokenLexer lexer(tokens);
+    try
     {
-        List<string> args;
-        int n = cast<int>(tokens.Count());
-        for (int i = 1; i < n; ++i)
+        UniquePtr<Command> command = ParseCommand(lexer);
+        if (!command.IsNull())
         {
-            args.Add(ToUtf8(tokens[i].match));
+            if (environment.Debug())
+            {
+                command->Print();
+                Terminal.WriteLine();
+            }
+            ExecutionContext ctx;
+            ctx.wait = true;
+            ctx.environment = &Environment.Instance();
+            ctx.executableMap = &executableMap;
+            command->Execute(ctx);
         }
-        if (environment.Debug())
+        else
         {
-            Console.Out() << "executing command: " << command->ToString(args) << endl();
+            if (environment.Debug())
+            {
+                Terminal.WriteLine("command is empty");
+            }
         }
-        command->Execute(args, programEnvironment);
+    }
+    catch (const Exception& ex)
+    {
+        Terminal.Out() << ex.Message() << ":" << endl();
+        lexer.PrintErrorLines();
     }
     if (DirectoriesChanged())
     {

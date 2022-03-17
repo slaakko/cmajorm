@@ -10,6 +10,7 @@
 
 namespace cmsx::kernel {
 
+class File;
 class BlockFile;
 class DirFile;
 
@@ -21,10 +22,11 @@ public:
     int32_t Id() const { return id; }
     virtual void SetMachine(cmsx::machine::Machine* machine) = 0;
     virtual void Initialize() = 0;
-    virtual BlockFile* Create(const std::string& path, INode* dirINode, int32_t mode, cmsx::machine::Process* process) = 0;
-    virtual BlockFile* Open(const std::string& path, INode* dirINode, int32_t flags, int32_t mode, cmsx::machine::Process* process) = 0;
+    virtual File* Create(const std::string& path, INode* dirINode, int32_t mode, cmsx::machine::Process* process) = 0;
+    virtual File* Open(const std::string& path, INode* dirINode, int32_t flags, int32_t mode, cmsx::machine::Process* process) = 0;
     virtual BlockFile* HostFile() const = 0;
     virtual INodeKey MountPoint() const { return INodeKey(); }
+    virtual void SetMountPoint(INodeKey mountPoint_) {}
     virtual INodePtr SearchDirectory(const std::string& name, INode* dirINode, const std::string& dirPath, cmsx::machine::Process* process) = 0;
     virtual void Stat(INode* inode, cmsx::machine::Process* process) = 0;
     virtual DirFile* OpenDir(const std::string& path, INode* dirINode, cmsx::machine::Process* process) = 0;

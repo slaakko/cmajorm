@@ -9,7 +9,7 @@ using shtokens;
 
 class TokenLexer
 {
-    public TokenLexer(const List<ShellToken>& tokens_) : tokens(tokens_), pos(0)
+    public TokenLexer(const List<ShellToken>& tokens_) : tokens(tokens_), pos(0), farthestPos(0)
     {
     }
     public nothrow inline int operator*() const
@@ -26,6 +26,10 @@ class TokenLexer
     public nothrow inline void operator++() 
     {
         ++pos;
+        if (pos > farthestPos)
+        {
+            farthestPos = pos;
+        }
     }
     public nothrow inline int GetPos() const
     {
@@ -39,6 +43,35 @@ class TokenLexer
     {
         return tokens[pos];
     }
+    public nothrow void PrintErrorLines()
+    {
+        bool first = true;
+        for (const ShellToken& token : tokens)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                Terminal.Out() << " ";
+            }
+            Terminal.Out() << token.match;
+        }
+        Terminal.WriteLine();
+        ustring s;
+        for (int i = 0; i < farthestPos; ++i)
+        {
+            if (i > 0)
+            {
+                s.Append(' ');
+            }
+            const ShellToken& token = tokens[i];
+            s.Append(' ', token.match.Length());
+        }
+        Terminal.Out() << s << "^" << endl();
+    }
     private const List<ShellToken>& tokens;
     private int pos;
+    private int farthestPos;
 }

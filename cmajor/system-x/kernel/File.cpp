@@ -101,7 +101,7 @@ void ProcessFileTable::CloseFiles(cmsx::kernel::Process* process)
 int32_t ProcessFileTable::Dup(int32_t fd)
 {
     File* file = GetFile(fd);
-    return AddFile(file);
+    return AddFile(file->Share());
 }
 
 void ProcessFileTable::CopyFrom(const ProcessFileTable& that)

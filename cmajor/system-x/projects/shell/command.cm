@@ -6,28 +6,419 @@
 using System;
 using System.Collections;
 using System.Os;
+using shtokens;
+
+class ExecutionContext
+{
+    public bool wait;
+    public List<string> args;
+    public Environment* environment;
+    public Map<string, string>* executableMap;
+}
 
 abstract class Command
 {
-    public Command(const string& name_) : name(name_)
+    public nothrow Command(const string& name_) : name(name_)
     {
     }
+    public default virtual ~Command();
     public nothrow const string& Name() const
     {
         return name;
     }
-    public abstract void Execute(const List<string>& args, const Environment& environment);
-    public virtual nothrow string ToString(const List<string>& args) const
+    public virtual byte Execute(ExecutionContext& ctx)
     {
-        string s;
-        s.Append(name);
-        for (const string& arg : args)
-        {
-            s.Append(' ').Append(arg);
-        }
-        return s;
+        return 0u;
+    }
+    public virtual void Print()
+    {
+        Terminal.Out() << name;
+    }
+    public nothrow Command* Parent() 
+    {
+        return parent;
+    }
+    public nothrow void SetParent(Command* parent_)
+    {
+        parent = parent_;
+    }
+    public nothrow virtual bool HasSimpleCommand() const
+    {
+        return false;
     }
     private string name;
+    private Command* parent;
+}
+
+abstract class UnaryCommand : Command
+{
+    public nothrow UnaryCommand(const string& name_, Command* child_) : base(name_), child(child_)
+    {
+        child->SetParent(this);
+    }
+    public Command* Child() 
+    {
+        return child.Get();
+    }
+    public override void Print()
+    {
+        base->Print();
+        Terminal.Out() << "(";
+        child->Print();
+        Terminal.Out() << ")";
+    }
+    public nothrow override bool HasSimpleCommand() const
+    {
+        return child->HasSimpleCommand();
+    }
+    private UniquePtr<Command> child;
+}
+
+abstract class BinaryCommand : Command
+{
+    public nothrow BinaryCommand(const string& name_, Command* left_, Command* right_) : base(name_), left(left_), right(right_)
+    {
+        left->SetParent(this);
+        right->SetParent(this);
+    }
+    public Command* Left() 
+    {
+        return left.Get();
+    }
+    public Command* Right() 
+    {
+        return right.Get();
+    }
+    public override void Print()
+    {
+        base->Print();
+        Terminal.Out() << "(";
+        left->Print();
+        Terminal.Out() << ", ";
+        right->Print();
+        Terminal.Out() << ")";
+    }
+    public nothrow override bool HasSimpleCommand() const
+    {
+        return left->HasSimpleCommand() || right->HasSimpleCommand();
+    }
+    private UniquePtr<Command> left;
+    private UniquePtr<Command> right;
+}
+
+class SequenceCommand : BinaryCommand
+{
+    public nothrow SequenceCommand(Command* left_, Command* right_) : base("SEQ", left_, right_)
+    {
+    }
+    public override byte Execute(ExecutionContext& ctx)
+    {
+        byte leftResult = Left()->Execute(ctx);
+        byte rightResult = Right()->Execute(ctx);
+        return rightResult;
+    }
+}
+
+class AndIfCommand : BinaryCommand
+{
+    public nothrow AndIfCommand(Command* left_, Command* right_) : base("AND", left_, right_)
+    {
+    }
+    public override byte Execute(ExecutionContext& ctx)
+    {
+        byte result = Left()->Execute(ctx);
+        if (result == 0u)
+        {
+            result = Right()->Execute(ctx);
+        }
+        return result;
+    }
+}
+
+class OrIfCommand : BinaryCommand
+{
+    public nothrow OrIfCommand(Command* left_, Command* right_) : base("OR", left_, right_)
+    {
+    }
+    public override byte Execute(ExecutionContext& ctx)
+    {
+        byte result = Left()->Execute(ctx);
+        if (result != 0u)
+        {
+            result = Right()->Execute(ctx);
+        }
+        return result;
+    }
+}
+
+class PipeCommand : BinaryCommand
+{
+    public nothrow PipeCommand(Command* left_, Command* right_) : base("PIPE", left_, right_)
+    {
+    }
+    public override byte Execute(ExecutionContext& ctx)
+    {
+        int readFd = 0;
+        int writeFd = 0;
+        Pipe(&readFd, &writeFd);
+        int pid = Fork();
+        if (pid == 0)
+        {
+            Close(readFd);
+            Close(1);
+            Dup(writeFd);
+            Close(writeFd);
+            byte result = Left()->Execute(ctx);
+             Exit(result);
+        }
+        else
+        {
+            int pid = Fork();
+            if (pid == 0)
+            {
+                Close(writeFd);
+                Close(0);
+                Dup(readFd);
+                Close(readFd);
+                byte result = Right()->Execute(ctx);
+                Exit(result);
+            }
+            else
+            {
+                Close(readFd);
+                Close(writeFd);
+                byte exitCode = 0u;
+                int pid = Wait(&exitCode);
+                while (pid != -1)
+                {
+                    pid = Wait(&exitCode);
+                }
+                return exitCode;
+            }
+        }
+    }
+}
+
+class BangCommand : UnaryCommand
+{
+    public BangCommand(Command* child_) : base("BANG", child_)
+    {
+    }
+    public override byte Execute(ExecutionContext& ctx)
+    {
+        return 0u; // todo
+    }
+}
+
+class AsyncCommand : UnaryCommand
+{
+    public AsyncCommand(Command* child_) : base("ASYNC", child_)
+    {
+    }
+    public override byte Execute(ExecutionContext& ctx)
+    {
+        ExecutionContext asyncContext(ctx);
+        asyncContext.wait = false;
+        return Child()->Execute(asyncContext);
+    }
+}
+
+class SyncCommand : UnaryCommand
+{
+    public SyncCommand(Command* child_) : base("SYNC", child_)
+    {
+    }
+    public override byte Execute(ExecutionContext& ctx)
+    {
+        ExecutionContext syncContext(ctx);
+        syncContext.wait = true;
+        return Child()->Execute(syncContext);
+    }
+}
+
+class IORedirectCommand : Command
+{
+    public nothrow IORedirectCommand(int ioOp_, int ioNumber_, const string& filename_) : base("IO_REDIRECT"), ioOp(ioOp_), ioNumber(ioNumber_), filename(filename_)
+    {
+    }
+    public override byte Execute(ExecutionContext& ctx)
+    {
+        return 0u; // todo
+    }
+    public override void Print()
+    {
+        base->Print();
+        Terminal.Out() << "(" << GetTokenName(ioOp) << ", " << ioNumber << ", " << filename << ")";
+    }
+    private int ioOp;
+    private int ioNumber;
+    private string filename;
+}
+
+class AssignmentCommand : Command
+{
+    public nothrow AssignmentCommand(const ustring& name_, const ustring& value_) : base("ASSIGN"), name(name_), value(value_)
+    {
+    }
+    public override void Print()
+    {
+        base->Print();
+        Terminal.Out() << "(" << name << "=" << value << ")";
+    }
+    public override byte Execute(ExecutionContext& ctx)
+    {
+        ctx.environment->Set(ToUtf8(name), ToUtf8(value));
+        return 0u;
+    }
+    private ustring name;
+    private ustring value;
+}
+
+class PrefixCommand : Command
+{
+    public nothrow PrefixCommand() : base("PREFIX")
+    {
+    }
+    public nothrow void Add(Command* command)
+    {
+        command->SetParent(this);
+        commands.Add(UniquePtr<Command>(command));
+    }
+    public override byte Execute(ExecutionContext& ctx)
+    {
+        bool hasSimpleCommand = false;
+        Command* parent = Parent();
+        while (parent != null)
+        {
+            if (parent->HasSimpleCommand())
+            {
+                hasSimpleCommand = true;
+            }
+            parent = parent->Parent();
+        }
+        Environment* prevEnvironment = ctx.environment;
+        if (hasSimpleCommand)
+        {
+            environment.Reset(new Environment());
+            prevEnvironment->CopyTo(*environment);
+            ctx.environment = environment.Get();
+        }
+        for (UniquePtr<Command>& command : commands)
+        {
+            try
+            {
+                byte result = command->Execute(ctx);
+                if (result != 0u)
+                {
+                    ctx.environment = prevEnvironment;
+                    return result;
+                }
+            }
+            catch (const Exception& ex)
+            {
+                Terminal.Error() << ex.Message() << endl();
+                ctx.environment = prevEnvironment;
+                return 1u;
+            }
+        }
+        ctx.environment = prevEnvironment;
+        return 0u;
+    }
+    public override void Print()
+    {
+        base->Print();
+        Terminal.Out() << "(";
+        bool first = true;
+        for (const UniquePtr<Command>& command : commands)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                Terminal.Out() << ", ";
+            }
+            command->Print();
+        }
+        Terminal.Out() << ")";
+    }
+    public nothrow override bool HasSimpleCommand() const
+    {
+        for (const UniquePtr<Command>& command : commands)
+        {
+            if (command->HasSimpleCommand())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    private List<UniquePtr<Command>> commands;
+    private UniquePtr<Environment> environment;
+}
+
+class SuffixCommand : Command
+{
+    public nothrow SuffixCommand() : base("SUFFIX")
+    {
+    }
+    public nothrow void Add(Command* command)
+    {
+        command->SetParent(this);
+        commands.Add(UniquePtr<Command>(command));
+    }
+    public override byte Execute(ExecutionContext& ctx)
+    {
+        for (UniquePtr<Command>& command : commands)
+        {
+            try
+            {
+                byte result = command->Execute(ctx);
+                if (result != 0u)
+                {
+                    return result;
+                }
+            }
+            catch (const Exception& ex)
+            {
+                Terminal.Error() << ex.Message() << endl();
+                return 1u;
+            }
+        }
+        return 0u;
+    }
+    public override void Print()
+    {
+        base->Print();
+        Terminal.Out() << "(";
+        bool first = true;
+        for (const UniquePtr<Command>& command : commands)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                Terminal.Out() << ", ";
+            }
+            command->Print();
+        }
+        Terminal.Out() << ")";
+    }
+    public nothrow override bool HasSimpleCommand() const
+    {
+        for (const UniquePtr<Command>& command : commands)
+        {
+            if (command->HasSimpleCommand())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    private List<UniquePtr<Command>> commands;
 }
 
 class CdCommand : Command
@@ -35,23 +426,175 @@ class CdCommand : Command
     public CdCommand() : base("cd")
     {
     }
-    public override void Execute(const List<string>& args, const Environment& environment)
+    public override byte Execute(ExecutionContext& ctx)
     {
-        string dir;
-        if (args.IsEmpty())
+        try
         {
-            dir = GetEnv("HOME");
+            string dir;
+            if (ctx.args.IsEmpty())
+            {
+                dir = GetEnv("HOME");
+            }
+            else if (ctx.args.Count() == 1)
+            {
+                dir = ctx.args.Front();
+            }
+            else
+            {
+                throw Exception("cd: too many arguments");
+            }
+            ChDir(dir.Chars());
         }
-        else if (args.Count() == 1)
+        catch (const Exception& ex)
         {
-            dir = args.Front();
+            Terminal.Error() << ex.ToString() << endl();
+            return 1u;
+        }
+        return 0u;
+    }
+}
+
+class PrefixSuffixCommand : Command
+{
+    public nothrow PrefixSuffixCommand(Command* prefixCommand_, Command* simpleCommand_, Command* suffixCommand_) : 
+        base("COMMAND"), prefixCommand(prefixCommand_), simpleCommand(simpleCommand_), suffixCommand(suffixCommand_)
+    {
+        if (!prefixCommand.IsNull())
+        {
+            prefixCommand->SetParent(this);
+        }
+        if (!simpleCommand.IsNull())
+        {
+            simpleCommand->SetParent(this);
+        }
+        if (!suffixCommand.IsNull())
+        {
+            suffixCommand->SetParent(this);
+        }
+    }
+    public override byte Execute(ExecutionContext& ctx)
+    {
+        if (!prefixCommand.IsNull())
+        {
+            byte result = prefixCommand->Execute(ctx);
+            if (result != 0u)
+            {
+                return result;
+            }
+        }
+        if (!simpleCommand.IsNull())
+        {
+            byte result = simpleCommand->Execute(ctx);
+            if (result != 0u)
+            {
+                return result;
+            }
+        }
+        if (!suffixCommand.IsNull())
+        {
+            byte result = suffixCommand->Execute(ctx);
+            if (result != 0u)
+            {
+                return result;
+            }
+        }
+        return 0u;
+    }
+    public override void Print()
+    {
+        base->Print();
+        Terminal.Out() << "(";
+        if (!prefixCommand.IsNull())
+        {
+            prefixCommand->Print();
         }
         else
         {
-            throw Exception("cd: too many arguments");
+            Terminal.Out() << "NULL";
         }
-        ChDir(dir.Chars());
+        Terminal.Out() << ", ";
+        if (!simpleCommand.IsNull())
+        {
+            simpleCommand->Print();
+        }
+        else
+        {
+            Terminal.Out() << "NULL";
+        }
+        Terminal.Out() << ", ";
+        if (!suffixCommand.IsNull())
+        {
+            suffixCommand->Print();
+        }
+        else
+        {
+            Terminal.Out() << "NULL";
+        }
+        Terminal.Out() << ")";
     }
+    public nothrow override bool HasSimpleCommand() const
+    {
+        return !simpleCommand.IsNull();
+    }
+    private UniquePtr<Command> prefixCommand;
+    private UniquePtr<Command> simpleCommand;
+    private UniquePtr<Command> suffixCommand;
+}
+
+class SimpleCommand : Command
+{
+    public SimpleCommand(const string& name_) : base(name_)
+    {
+    }
+    public void AddArg(const string& arg) 
+    {
+        args.Add(arg);
+    }
+    public override byte Execute(ExecutionContext& ctx)
+    {
+        Command* internalCommand = GetInternalCommand(Name());
+        if (internalCommand != null)
+        {
+            ctx.args = args;
+            return internalCommand->Execute(ctx);
+        }        
+        int pid = Fork();
+        if (pid == 0)
+        {
+            Environment* environment = ctx.environment;
+            if (environment == null)
+            {
+                environment = &Environment.Instance();
+            }
+            string programFilePath = GetProgramFilePath(Name(), *ctx.executableMap);
+            Exec(programFilePath, args, *environment);
+        }
+        else
+        {
+            if (ctx.wait)
+            {
+                byte exitCode = 0u;
+                if (Wait(&exitCode) != -1)
+                {
+                    return exitCode;
+                }
+                else
+                {
+                    return 1u;
+                }
+            }
+            return 0u;
+        }
+    }
+    public override void Print()
+    {
+        base->Print();
+        for (const string& arg : args)
+        {
+            Terminal.Out() << " " << arg;
+        }
+    }
+    private List<string> args;
 }
 
 class InternalCommandMap
@@ -92,55 +635,4 @@ class InternalCommandMap
 nothrow Command* GetInternalCommand(const string& commandName)
 {
     return InternalCommandMap.Instance().GetInternalCommand(commandName);
-}
-
-class SimpleCommand : Command
-{
-    public SimpleCommand() : programFilePath()
-    {
-    }
-    public SimpleCommand(const string& programFilePath_) : programFilePath(programFilePath_)
-    {
-    }
-    public override void Execute(const List<string>& args, const Environment& environment)
-    {
-        int pid = Fork();
-        if (pid == 0)
-        {
-            Exec(programFilePath, args, environment);
-        }
-        else
-        {
-            byte exitCode = 0u;
-            Wait(&exitCode);
-        }
-    }
-    public override nothrow string ToString(const List<string>& args) const
-    {
-        string s;
-        s.Append(programFilePath);
-        for (const string& arg : args)
-        {
-            s.Append(' ').Append(arg);
-        }
-        return s;
-    }
-    private string programFilePath;
-}
-
-public Command* MakeCommand(const List<ShellToken>& tokens, const Map<string, string>& executableMap, TokenFlags globalFlags, UniquePtr<Command>& cmd)
-{
-    if (tokens.IsEmpty())
-    {
-        return null;
-    }
-    string commandName = ToUtf8(tokens.Front().match);
-    Command* command = GetInternalCommand(commandName);
-    if (command == null)
-    {
-        string programFilePath = GetProgramFilePath(commandName, executableMap);
-        command = new SimpleCommand(programFilePath);
-        cmd.Reset(command);
-    }
-    return command;
 }

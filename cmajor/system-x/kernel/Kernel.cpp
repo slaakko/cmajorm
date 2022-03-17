@@ -15,6 +15,7 @@
 #include <system-x/kernel/Mount.hpp>
 #include <system-x/kernel/RootFs.hpp>
 #include <system-x/kernel/HostFs.hpp>
+#include <system-x/kernel/DevFs.hpp>
 #include <system-x/kernel/Terminal.hpp>
 
 namespace cmsx::kernel {
@@ -121,6 +122,8 @@ void Kernel::Start()
     mountTable->AddFilesystem(rootFs);
     HostFilesystem* hostFs = new HostFilesystem(hostFSNumber, std::string());
     mountTable->AddFilesystem(hostFs);
+    DevFilesystem* devFs = new DevFilesystem();
+    mountTable->AddFilesystem(devFs);
     StartBlockManager();
     StartINodeManager();
     StartHostFileManager();

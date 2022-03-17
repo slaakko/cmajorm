@@ -18,6 +18,7 @@ class Filesystem;
 
 const int32_t rootFSNumber = 0;
 const int32_t hostFSNumber = 1;
+const int32_t devFSNumber = 2;
 
 class CMSX_KERNEL_API MountTable
 {
@@ -41,7 +42,8 @@ private:
     std::map<std::string, std::string> driveMap;
 };
 
-void Mount(const std::string& hostPath, const std::string& dirPath, cmsx::machine::Process* process, int32_t mode);
+void MountHostDir(const std::string& hostPath, const std::string& dirPath, cmsx::machine::Process* process, int32_t mode);
+void MountDevDir(const std::string& dirPath, cmsx::machine::Process* process, int32_t mode);
 void MapDrive(const std::string& drive, const std::string& mountedPath);
 std::string MapPath(const std::string& windowsFilePath);
 

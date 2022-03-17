@@ -202,13 +202,13 @@ void HostFilesystem::Initialize()
 {
 }
 
-BlockFile* HostFilesystem::Create(const std::string& path, INode* dirINode, int32_t mode, cmsx::machine::Process* process)
+File* HostFilesystem::Create(const std::string& path, INode* dirINode, int32_t mode, cmsx::machine::Process* process)
 {
     OpenFlags openFlags = OpenFlags::create | OpenFlags::truncate | OpenFlags::write | OpenFlags::random_access;
     return Open(path, dirINode, static_cast<int32_t>(openFlags), mode, process);
 }
 
-BlockFile* HostFilesystem::Open(const std::string& path, INode* dirINode, int32_t flags, int32_t mode, cmsx::machine::Process* process)
+File* HostFilesystem::Open(const std::string& path, INode* dirINode, int32_t flags, int32_t mode, cmsx::machine::Process* process)
 {
 #if (LOCK_DEBUG)
     DebugLock startDebugLock(&machine->Lock(), HOST_FILE_SYSTEM, process->Id(), NO_LOCK | OPEN);

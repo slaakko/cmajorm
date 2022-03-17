@@ -258,6 +258,10 @@ void PipeInputFile::Close(cmsx::kernel::Process* process)
     {
         delete pipe;
     }
+    else
+    {
+        Wakeup(pipe->NotFullEvent());
+    }
 }
 
 std::vector<uint8_t> PipeInputFile::Read(int64_t count, cmsx::machine::Process* process)
@@ -351,6 +355,10 @@ void PipeOutputFile::Close(cmsx::kernel::Process* process)
     if (pipe->ReaderCount() == 0 && pipe->WriterCount() == 0)
     {
         delete pipe;
+    }
+    else
+    {
+        Wakeup(pipe->NotEmptyEvent());
     }
 }
 

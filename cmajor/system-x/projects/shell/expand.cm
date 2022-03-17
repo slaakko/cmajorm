@@ -11,7 +11,7 @@ void Expand(List<ShellToken>& tokens, ShellEnvironment& environment, Params& par
 {
     if (environment.Debug())
     {
-        Console.Out() << "tokens before expansions:" << endl();
+        Terminal.Out() << "tokens before expansions:" << endl();
         PrintTokens(tokens);
     }
     if ((globalFlags & TokenFlags.brace) != TokenFlags.none)
@@ -19,7 +19,7 @@ void Expand(List<ShellToken>& tokens, ShellEnvironment& environment, Params& par
         tokens = BraceExpand(tokens);
         if (environment.Debug())
         {
-            Console.Out() << "tokens after brace expansion:" << endl();
+            Terminal.Out() << "tokens after brace expansion:" << endl();
             PrintTokens(tokens);
         }
     }
@@ -28,7 +28,7 @@ void Expand(List<ShellToken>& tokens, ShellEnvironment& environment, Params& par
         tokens = TildeExpand(tokens);
         if (environment.Debug())
         {
-            Console.Out() << "tokens after tilde expansion:" << endl();
+            Terminal.Out() << "tokens after tilde expansion:" << endl();
             PrintTokens(tokens);
         }
     }
@@ -37,7 +37,7 @@ void Expand(List<ShellToken>& tokens, ShellEnvironment& environment, Params& par
         tokens = ParameterExpand(tokens, environment, params, context);
         if (environment.Debug())
         {
-            Console.Out() << "tokens after parameter expansion:" << endl();
+            Terminal.Out() << "tokens after parameter expansion:" << endl();
             PrintTokens(tokens);
         }
     }
@@ -46,14 +46,14 @@ void Expand(List<ShellToken>& tokens, ShellEnvironment& environment, Params& par
         tokens = FilenameExpand(tokens, context);
         if (environment.Debug())
         {
-            Console.Out() << "tokens after filename expansion:" << endl();
+            Terminal.Out() << "tokens after filename expansion:" << endl();
             PrintTokens(tokens);
         }
     }
     tokens = MakeWords(tokens);
     if (environment.Debug())
     {
-        Console.Out() << "tokens after expansions:" << endl();
+        Terminal.Out() << "tokens after expansions:" << endl();
         PrintTokens(tokens);
     }
 }

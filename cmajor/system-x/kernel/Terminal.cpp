@@ -47,6 +47,7 @@ public:
     std::vector<uint8_t> Read(int64_t count, cmsx::machine::Process* process);
     int64_t Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process);
     void SetMachine(cmsx::machine::Machine* machine_) { machine = machine_; }
+    File* GetTerminalFile() { return &terminalFile; }
     void Start();
     void Stop();
     void Run();
@@ -877,6 +878,14 @@ void StopTerminal()
     if (Terminal::Initialized())
     {
         Terminal::Instance().Stop();
+    }
+}
+
+File* GetTerminalFile()
+{
+    if (Terminal::Initialized())
+    {
+        return Terminal::Instance().GetTerminalFile();
     }
 }
 

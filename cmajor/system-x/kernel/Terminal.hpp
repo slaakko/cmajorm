@@ -42,6 +42,7 @@ public:
 CMSX_KERNEL_API void SetTerminalMachine(cmsx::machine::Machine* machine);
 CMSX_KERNEL_API void StartTerminal();
 CMSX_KERNEL_API void StopTerminal();
+CMSX_KERNEL_API File* GetTerminalFile();
 CMSX_KERNEL_API void InitTerminal();
 CMSX_KERNEL_API void DoneTerminal();
 

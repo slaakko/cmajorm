@@ -127,7 +127,7 @@ int32_t Create(Process* process, int64_t pathAddr, int32_t mode)
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::string path = ReadString(process, pathAddr, mem);
     Filesystem* fs = GetFs(rootFSNumber);
-    BlockFile* file = fs->Create(path, nullptr, mode, process);
+    File* file = fs->Create(path, nullptr, mode, process);
     ProcessFileTable& fileTable = process->GetFileTable();
     int32_t fd = fileTable.AddFile(file);
     if (fd == -1)

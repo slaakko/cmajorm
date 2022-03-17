@@ -7,10 +7,6 @@ using System;
 using System.Collections;
 using shtokens;
 
-// PREAMBLE: (ANY - (LBRACE | SPACE | END))*
-// BRACE_EXPR: PREAMBLE LBRACE (COMMA_LIST | BRACE_EXPR)+ RBRACE POSTSCRIPT
-// POSTSCRIPT: (ANY - (LBRACE | RBRACE | END | SPACE))*
-
 bool EndsWithDollar(const ShellToken& token)
 {
     return token.id == TOKEN && ((token.flags & TokenFlags.hasDollar) != TokenFlags.none) && token.match.EndsWith(u"$");

@@ -153,6 +153,7 @@ int32_t RootFilesystemDirFile::Read(DirectoryEntry& dirEntry, cmsx::machine::Pro
 }
 
 void MountHostDirectories(Filesystem* fs, cmsx::machine::Process* kernelProcess, int32_t mode);
+void MountDeviceFilesystem(Filesystem* fs, cmsx::machine::Process* kernelProcess, int32_t mode);
 
 RootFilesystem::RootFilesystem() : Filesystem(rootFSNumber), machine(nullptr), hostFs(nullptr), hostFile(nullptr), nextFileId(0)
 {
@@ -164,25 +165,28 @@ void RootFilesystem::Initialize()
     if (!RootFsExists())
     {
         int32_t mode = 0;
-        hostFile = hostFs->Create(RootFsHostFilePath(), nullptr, mode, Kernel::Instance().GetKernelProcess());
+        File* file = hostFs->Create(RootFsHostFilePath(), nullptr, mode, Kernel::Instance().GetKernelProcess());
+        hostFile = static_cast<BlockFile*>(file);
         MakeRootFs(*this);
     }
     else
     {
         OpenFlags flags = OpenFlags::read | OpenFlags::write | OpenFlags::random_access;
         int32_t mode = 0;
-        hostFile = hostFs->Open(RootFsHostFilePath(), nullptr, static_cast<int32_t>(flags), mode, Kernel::Instance().GetKernelProcess());
+        File* file = hostFs->Open(RootFsHostFilePath(), nullptr, static_cast<int32_t>(flags), mode, Kernel::Instance().GetKernelProcess());
+        hostFile = static_cast<BlockFile*>(file);
         MountHostDirectories(this, Kernel::Instance().GetKernelProcess(), mode);
+        MountDeviceFilesystem(this, Kernel::Instance().GetKernelProcess(), mode);
     }
 }
 
-BlockFile* RootFilesystem::Create(const std::string& path, INode* dirINode, int32_t mode, cmsx::machine::Process* process)
+File* RootFilesystem::Create(const std::string& path, INode* dirINode, int32_t mode, cmsx::machine::Process* process)
 {
     OpenFlags flags = OpenFlags::create | OpenFlags::truncate | OpenFlags::write;
     return Open(path, dirINode, static_cast<int32_t>(flags), mode, process);
 }
 
-BlockFile* RootFilesystem::Open(const std::string& path, INode* dirINode, int32_t flags, int32_t mode, cmsx::machine::Process* process)
+File* RootFilesystem::Open(const std::string& path, INode* dirINode, int32_t flags, int32_t mode, cmsx::machine::Process* process)
 {
     if (path.empty() || path == "/")
     {
@@ -490,7 +494,7 @@ void MountHostDirectories(Filesystem* fs, cmsx::machine::Process* kernelProcess,
         {
             std::string hostPath = GetFullPath(drive);
             std::string driveMountDirPath = "/mnt/" + std::string(1, std::tolower(hostPath[0]));
-            cmsx::kernel::Mount(hostPath, driveMountDirPath, kernelProcess, mode);
+            cmsx::kernel::MountHostDir(hostPath, driveMountDirPath, kernelProcess, mode);
             std::string driveStr(1, hostPath[0]);
             driveStr.append(1, ':');
             cmsx::kernel::MapDrive(driveStr, driveMountDirPath);
@@ -498,10 +502,15 @@ void MountHostDirectories(Filesystem* fs, cmsx::machine::Process* kernelProcess,
     }
     std::string cmajorRootPath = GetFullPath(CmajorRoot());
     std::string cmajorMountDirPath = "/mnt/cmajor";
-    cmsx::kernel::Mount(cmajorRootPath, cmajorMountDirPath, kernelProcess, mode);
+    cmsx::kernel::MountHostDir(cmajorRootPath, cmajorMountDirPath, kernelProcess, mode);
     std::string sxRootPath = GetFullPath(Path::Combine(CmajorRoot(), "system-x"));
     std::string sxMountDirPath = "/mnt/sx";
-    cmsx::kernel::Mount(sxRootPath, sxMountDirPath, kernelProcess, mode);
+    cmsx::kernel::MountHostDir(sxRootPath, sxMountDirPath, kernelProcess, mode);
+}
+
+void MountDeviceFilesystem(Filesystem* fs, cmsx::machine::Process* kernelProcess, int32_t mode)
+{
+    cmsx::kernel::MountDevDir("/dev", kernelProcess, mode);
 }
 
 void MakeRootFs(RootFilesystem& rootFs)
@@ -523,6 +532,7 @@ void MakeRootFs(RootFilesystem& rootFs)
     int32_t mode = 0;
     MakeRootDirectory(kernelProcess, mode);
     MountHostDirectories(&rootFs, kernelProcess, mode);
+    MountDeviceFilesystem(&rootFs, kernelProcess, mode);
 }
 
 } // namespace cmsx::kernel

@@ -176,7 +176,7 @@ void PrintTokens(const List<ShellToken>& tokens)
 {
     for (const ShellToken& token : tokens)
     {
-        Console.Out() << "(" << TokenFlagStr(token.flags) << " : " << token.id << " : " << GetTokenName(token.id) << " : '" << token.match << "')" << endl();
+        Terminal.Out() << "(" << TokenFlagStr(token.flags) << " : " << token.id << " : " << GetTokenName(token.id) << " : '" << token.match << "')" << endl();
     }
 }
 
@@ -198,6 +198,7 @@ void AddWord(const ShellToken& token, List<ShellToken>& words, bool& brk)
     {
         brk = false;
         ShellToken wordToken(WORD, token.match);
+        wordToken.flags = token.flags;
         words.Add(wordToken);
     }
 }

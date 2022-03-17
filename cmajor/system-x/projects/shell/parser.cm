@@ -1,0 +1,536 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using shtokens;
+
+class ParseResult
+{
+    public nothrow ParseResult() : command()
+    {
+    }
+    public Command* GetCommand() 
+    {
+        return command.Get();
+    }
+    public nothrow void ResetCommand(Command* command_)
+    {
+        command.Reset(command_);
+    }
+    public nothrow Command* ReleaseCommand() 
+    {
+        return command.Release();
+    }
+    private UniquePtr<Command> command;
+}
+
+Command* ParseCommand(TokenLexer& lexer)
+{
+    ParseResult result;
+    if (ParseCompleteCommand(lexer, result))
+    {
+        if (*lexer != END)
+        {
+            throw Exception("incomplete input");
+        }
+        Command* command = result.ReleaseCommand();
+        return command;
+    }
+    else
+    {
+        throw Exception("syntax error");
+    }
+}
+
+bool ParseCompleteCommand(TokenLexer& lexer, ParseResult& result)
+{
+    if (ParseList(lexer, result))
+    {
+        if (ParseSeparator(lexer, result))
+        {
+            return true;
+        }
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool ParseSeparator(TokenLexer& lexer, ParseResult& result)
+{
+    if (*lexer == AMP)
+    {
+        ++lexer;
+        result.ResetCommand(new AsyncCommand(result.ReleaseCommand()));
+        return true;
+    }
+    else if (*lexer == SEMI)
+    {
+        ++lexer;
+        result.ResetCommand(new SyncCommand(result.ReleaseCommand()));
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool ParseList(TokenLexer& lexer, ParseResult& result)
+{
+    int save = lexer.GetPos();
+    ParseResult leftResult;
+    if (ParseAndOr(lexer, leftResult))
+    {
+        int save2 = lexer.GetPos();
+        while (ParseSeparator(lexer, leftResult))
+        {
+            save2 = lexer.GetPos();
+            ParseResult rightResult;
+            if (ParseAndOr(lexer, rightResult))
+            {
+                leftResult.ResetCommand(new SequenceCommand(leftResult.ReleaseCommand(), rightResult.ReleaseCommand()));
+                save2 = lexer.GetPos();
+            }
+            else
+            {
+                break;
+            }
+        }
+        lexer.SetPos(save2);
+        result.ResetCommand(leftResult.ReleaseCommand());
+        return true;
+    }
+    lexer.SetPos(save);
+    return false;
+}
+
+bool ParseAndOr(TokenLexer& lexer, ParseResult& result)
+{
+    ParseResult leftResult;
+    int save = lexer.GetPos();
+    if (ParsePipeline(lexer, leftResult))
+    {
+        int save2 = lexer.GetPos();
+        while (*lexer == AND_IF || *lexer == OR_IF)
+        {
+            if (*lexer == AND_IF)
+            {
+                ++lexer;
+                ParseResult rightResult;
+                if (ParsePipeline(lexer, rightResult))
+                {
+                    leftResult.ResetCommand(new AndIfCommand(leftResult.ReleaseCommand(), rightResult.ReleaseCommand()));
+                    save2 = lexer.GetPos();
+                }
+                else
+                {
+                    break;
+                }
+            }
+            else if (*lexer == OR_IF)
+            {
+                ++lexer;
+                ParseResult rightResult;
+                if (ParsePipeline(lexer, rightResult))
+                {
+                    leftResult.ResetCommand(new OrIfCommand(leftResult.ReleaseCommand(), rightResult.ReleaseCommand()));
+                    save2 = lexer.GetPos();
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        lexer.SetPos(save2);
+        result.ResetCommand(leftResult.ReleaseCommand());
+        return true;
+    }
+    lexer.SetPos(save);
+    return false;
+}
+
+bool ParsePipeline(TokenLexer& lexer, ParseResult& result)
+{
+    int save = lexer.GetPos();
+    bool bang = false;
+    if (*lexer == BANG)
+    {
+        ++lexer;
+        bang = true;
+    }
+    ParseResult leftResult;
+    if (ParseCommand(lexer, leftResult))
+    {
+        int save2 = lexer.GetPos();
+        while (*lexer == PIPE)
+        {
+            ++lexer;
+            ParseResult rightResult;
+            if (ParseCommand(lexer, rightResult))
+            {
+                leftResult.ResetCommand(new PipeCommand(leftResult.ReleaseCommand(), rightResult.ReleaseCommand()));
+                save2 = lexer.GetPos();
+            }
+            else
+            {
+                break;
+            }
+        }
+        if (bang)
+        {
+            result.ResetCommand(new BangCommand(leftResult.ReleaseCommand()));
+        }
+        else
+        {
+            result.ResetCommand(leftResult.ReleaseCommand());
+        }
+        lexer.SetPos(save2);
+        return true;
+    }
+    lexer.SetPos(save);
+    return false;
+}
+
+bool ParseCommand(TokenLexer& lexer, ParseResult& result)
+{
+    if (ParseSimpleCommand(lexer, result))
+    {
+        return true;
+    }
+    else if (ParseCompoundCommand(lexer, result))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool ParseSimpleCommand(TokenLexer& lexer, ParseResult& result)
+{
+    int save = lexer.GetPos();
+    ParseResult prefixResult;
+    if (ParseCommandPrefix(lexer, prefixResult))
+    {
+        ParseResult simpleCommandResult;
+        SimpleCommand* simpleCommand = null;
+        if (ParseCommandName(lexer, simpleCommand, simpleCommandResult))
+        {
+            ParseResult suffixResult;
+            if (ParseCommandSuffix(lexer, simpleCommand, suffixResult))
+            {
+                result.ResetCommand(new PrefixSuffixCommand(prefixResult.ReleaseCommand(), simpleCommandResult.ReleaseCommand(), suffixResult.ReleaseCommand()));
+                return true;
+            }
+            else
+            {
+                result.ResetCommand(new PrefixSuffixCommand(prefixResult.ReleaseCommand(), simpleCommandResult.ReleaseCommand(), null));
+                return true;
+            }
+        }
+        else
+        {
+            result.ResetCommand(new PrefixSuffixCommand(prefixResult.ReleaseCommand(), null, null));
+            return true;
+        }
+    }
+    else 
+    {
+        SimpleCommand* simpleCommand = null;
+        ParseResult simpleCommandResult;
+        if (ParseCommandName(lexer, simpleCommand, simpleCommandResult))
+        {
+            ParseResult suffixResult;
+            if (ParseCommandSuffix(lexer, simpleCommand, suffixResult))
+            {
+                result.ResetCommand(new PrefixSuffixCommand(null, simpleCommandResult.ReleaseCommand(), suffixResult.ReleaseCommand()));
+                return true;
+            }
+            else
+            {
+                result.ResetCommand(new PrefixSuffixCommand(null, simpleCommandResult.ReleaseCommand(), null));
+                return true;
+            }
+        }
+    }
+    lexer.SetPos(save);
+    return false;
+}
+
+bool ParseCommandPrefix(TokenLexer& lexer, ParseResult& result)
+{
+    UniquePtr<PrefixCommand> prefixCommand(new PrefixCommand());
+    bool prefixParsed = false;
+    int save = lexer.GetPos();
+    while (*lexer != END)
+    {
+        bool ioNumberParsed = false;
+        bool ioFileParsed = false;
+        bool assignmentWordParsed = false;
+        int ioNumber = -1;
+        ParseResult singleResult;
+        if (ParseIONumber(lexer, ioNumber))
+        {
+            ioNumberParsed = true;
+        }
+        if (ParseIOFile(lexer, ioNumber, singleResult))
+        {
+            ioFileParsed = true;
+        }
+        if (!ioFileParsed && !ioNumberParsed)
+        {
+            if (ParseAssignmentWord(lexer, singleResult))
+            {
+                assignmentWordParsed = true;
+            }
+        }
+        if (ioNumberParsed && !ioFileParsed)
+        {
+            break;
+        }
+        else if (ioFileParsed || assignmentWordParsed)
+        {
+            prefixParsed = true;
+            prefixCommand->Add(singleResult.ReleaseCommand());
+            save = lexer.GetPos();
+        }
+        else
+        {
+            break;
+        }
+    }
+    lexer.SetPos(save);
+    if (prefixParsed)
+    {
+        result.ResetCommand(prefixCommand.Release());
+    }
+    return prefixParsed;}
+
+bool ParseIONumber(TokenLexer& lexer, int& ioNumber)
+{
+    if (*lexer == WORD)
+    {
+        if (ParseInt(ToUtf8(lexer.CurrentToken().match), ioNumber))
+        {
+            ++lexer;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool ParseAssignmentWord(TokenLexer& lexer, ParseResult& result)
+{
+    if (*lexer == WORD)
+    {
+        if ((lexer.CurrentToken().flags & TokenFlags.hasAssignment) != TokenFlags.none)
+        {
+            ustring name;
+            ustring value;
+            List<ustring> components = lexer.CurrentToken().match.Split('=');
+            if (components.Count() == 2)
+            {
+                name = components[0];
+                value = components[1];
+                result.ResetCommand(new AssignmentCommand(name, value));
+                ++lexer;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool ParseIOFile(TokenLexer& lexer, int ioNumber, ParseResult& result)
+{
+    int save = lexer.GetPos();
+    int ioOp = -1;
+    switch (*lexer)
+    {
+        case LESSAND:
+        {
+            ioOp = LESSAND;
+            ++lexer;
+            break;
+        }
+        case LESS:
+        {
+            ioOp = LESS;
+            ++lexer;
+            break;
+        }
+        case GREATAND:
+        {
+            ioOp = GREATAND;
+            ++lexer;
+            break;
+        }
+        case GREAT:
+        {
+            ioOp = GREAT;
+            ++lexer;
+            break;
+        }
+        case DGREAT:
+        {
+            ioOp = DGREAT;
+            ++lexer;
+            break;
+        }
+        case LESSGREAT:
+        {
+            ioOp = LESSGREAT;
+            ++lexer;
+            break;
+        }
+        case CLOBBER:
+        {
+            ioOp = CLOBBER;
+            ++lexer;
+            break;
+        }
+        default:
+        {
+            return false;
+        }
+    }
+    if (*lexer == WORD)
+    {
+        string filename = ToUtf8(lexer.CurrentToken().match);
+        result.ResetCommand(new IORedirectCommand(ioOp, ioNumber, filename));
+        ++lexer;
+        return true;
+    }
+    lexer.SetPos(save);
+    return false;
+}
+
+bool ParseCommandSuffix(TokenLexer& lexer, SimpleCommand* simpleCommand, ParseResult& result)
+{
+    UniquePtr<SuffixCommand> suffixCommand(new SuffixCommand());
+    int save = lexer.GetPos();
+    bool suffixParsed = false;
+    while (*lexer != END)
+    {
+        ParseResult singleResult;
+        bool ioNumberParsed = false;
+        bool ioFileParsed = false;
+        bool wordParsed = false;
+        int ioNumber = -1;
+        if (ParseIONumber(lexer, ioNumber))
+        {
+            ioNumberParsed = true;
+        }
+        if (ParseIOFile(lexer, ioNumber, singleResult))
+        {
+            ioFileParsed = true;
+        }
+        if (!ioFileParsed && !ioNumberParsed)
+        {
+            if (*lexer == WORD)
+            {
+                simpleCommand->AddArg(ToUtf8(lexer.CurrentToken().match));
+                wordParsed = true;
+                ++lexer;
+            }
+        }
+        if (ioNumberParsed && !ioFileParsed)
+        {
+            break;
+        }
+        else if (wordParsed || ioFileParsed)
+        {
+            suffixParsed = true;
+            if (ioFileParsed)
+            {
+                suffixCommand->Add(singleResult.ReleaseCommand());
+            }
+            save = lexer.GetPos();
+        }
+        else
+        {
+            break;
+        }
+    }
+    lexer.SetPos(save);
+    if (suffixParsed)
+    {
+        result.ResetCommand(suffixCommand.Release());
+    }
+    return suffixParsed;
+}
+
+bool ParseCommandName(TokenLexer& lexer, SimpleCommand*& simpleCommand, ParseResult& result)
+{
+    simpleCommand = null;
+    if (*lexer == WORD)
+    {
+        simpleCommand = new SimpleCommand(ToUtf8(lexer.CurrentToken().match));
+        result.ResetCommand(simpleCommand);
+        ++lexer;
+        return true;
+    }
+    return false;
+}
+
+bool ParseCompoundCommand(TokenLexer& lexer, ParseResult& result)
+{
+    if (ParseBraceGroup(lexer, result))
+    {
+        return true;
+    }
+    else if (ParseSubshell(lexer, result))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool ParseBraceGroup(TokenLexer& lexer, ParseResult& result)
+{
+    return false; // todo
+}
+
+bool ParseSubshell(TokenLexer& lexer, ParseResult& result)
+{
+    int save = lexer.GetPos();
+    if (*lexer == LPAREN)
+    {
+        ++lexer;
+        while (*lexer != RPAREN)
+        {
+            if (ParseAndOr(lexer, result))
+            {
+                if (ParseSeparator(lexer, result))
+                {
+                }
+                else
+                {
+                    break;
+                }
+            }
+            else 
+            {
+                break;
+            }
+        }
+        if (*lexer == RPAREN)
+        {
+            ++lexer;
+            return true;
+        }
+    }
+    lexer.SetPos(save);
+    return false;
+}

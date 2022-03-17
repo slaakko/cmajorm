@@ -24,6 +24,7 @@ const int PROCESS_MANAGER = 8;
 const int ROOT_FILE_SYSTEM = 9;
 const int SCHEDULER = 10;
 const int PIPE = 11;
+const int DEV_FILE_SYSTEM = 12;
 
 const int NO_LOCK = 0;
 const int HAS_LOCK = 1;
