@@ -46,6 +46,10 @@ abstract class Command
     {
         return false;
     }
+	public nothrow virtual bool IsInternalCommand() const
+	{
+		return false;
+	}
     private string name;
     private Command* parent;
 }
@@ -492,8 +496,7 @@ class PrefixSuffixCommand : Command
     }
     public override byte Execute(ExecutionContext& ctx)
     {
-		int pid = Fork();
-		if (pid == 0)
+		if (simpleCommand.IsNull() || simpleCommand->IsInternalCommand())
 		{
 			byte result = 0u;
 			if (!prefixCommand.IsNull())
@@ -514,17 +517,43 @@ class PrefixSuffixCommand : Command
 					result = simpleCommand->Execute(ctx);
 				}
 			}
-			Exit(result);
 		}
 		else
 		{
-			byte exitCode = 0u;
-			int pid = Wait(&exitCode);
-			while (pid != -1)
+			int pid = Fork();
+			if (pid == 0)
 			{
-				pid = Wait(&exitCode);
+				byte result = 0u;
+				if (!prefixCommand.IsNull())
+				{
+					result = prefixCommand->Execute(ctx);
+				}
+				if (result == 0u)
+				{
+					if (!suffixCommand.IsNull())
+					{
+						result = suffixCommand->Execute(ctx);
+					}
+				}
+				if (result == 0u)
+				{
+					if (!simpleCommand.IsNull())
+					{
+						result = simpleCommand->Execute(ctx);
+					}
+				}
+				Exit(result);
 			}
-			return exitCode;
+			else
+			{
+				byte exitCode = 0u;
+				int pid = Wait(&exitCode);
+				while (pid != -1)
+				{
+					pid = Wait(&exitCode);
+				}
+				return exitCode;
+			}
 		}
         return 0u;
     }
@@ -571,21 +600,25 @@ class PrefixSuffixCommand : Command
 
 class SimpleCommand : Command
 {
-    public SimpleCommand(const string& name_) : base(name_)
+    public SimpleCommand(const string& name_) : base(name_), internalCommand(null)
     {
-    }
+		internalCommand = GetInternalCommand(Name());
+	}
+	public nothrow override bool IsInternalCommand() const
+	{
+		return internalCommand != null;
+	}
     public void AddArg(const string& arg) 
     {
         args.Add(arg);
     }
     public override byte Execute(ExecutionContext& ctx)
     {
-        Command* internalCommand = GetInternalCommand(Name());
-        if (internalCommand != null)
-        {
+		if (internalCommand != null)
+		{
             ctx.args = args;
             return internalCommand->Execute(ctx);
-        }        
+		}
         int pid = Fork();
         if (pid == 0)
         {
@@ -622,6 +655,7 @@ class SimpleCommand : Command
             Terminal.Out() << " " << arg;
         }
     }
+	private Command* internalCommand;
     private List<string> args;
 }
 
