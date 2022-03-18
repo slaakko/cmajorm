@@ -88,7 +88,16 @@ int32_t RootFilesystemFile::GetBlockNumber(INode* inode, cmsx::machine::Process*
 
 INodePtr RootFilesystemFile::GetINode(cmsx::machine::Process* process)
 {
-    return cmsx::kernel::ReadINode(GetINodeKey(), process);
+    INodePtr inodePtr = cmsx::kernel::ReadINode(GetINodeKey(), process);
+    INode* inode = inodePtr.Get();
+    if (inode)
+    {
+        if ((flags & OpenFlags::append) != OpenFlags::none)
+        {
+            SetFilePos(inode->FileSize());
+        }
+    }
+    return inodePtr;
 }
 
 int64_t RootFilesystemFile::Read(Block* block, cmsx::machine::Process* process)

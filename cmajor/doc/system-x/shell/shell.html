@@ -14,7 +14,8 @@
 	</p>
 	
 	<p>
-		The command <span class="kw">sxx sh --debug</span> starts the shell in debug mode. When in debug mode, the token expansion information and command line parsing results are printed to the terminal.
+		The command <span class="kw">sxx sh --debug</span> starts the shell in debug mode. When in debug mode, the token expansion information and command line parsing results are printed to the terminal
+		along with the command output.
 	</p>
     
 	<p>
@@ -22,7 +23,7 @@
 		<ul>
 			<li>chops the command line into <a href="#tokenization">tokens</a></li>
 			<li><a href="#token-expansion">expands</a> the tokens</li>
-			<li>parses the tokens into commands</li>
+			<li><a href="#parsing">parses</a> the tokens into commands</li>
 			<li>executes the commands</li>
 		</ul>
 	</p>
@@ -297,7 +298,7 @@
 			<li><a href="#tilde-expansion">tilde expansion</a></li>
 			<li><a href="#parameter-expansion">parameter expansion</a></li>
 			<li><a href="#filename-expansion">filename expansion</a></li>
-			<li><a href="#unquoting">unquoting</a></li>
+			<li><a href="#quote-removal">quote removal</a></li>
 		</ul>
 	</p>
 	
@@ -474,12 +475,12 @@
 		</tr>
 	</table>
 
-	<h3 id="unquoting">
-		Unquoting
+	<h3 id="quote-removal">
+		Quote removal
 	</h3>
 
 	<p>
-		The last token conversion phase is to remove quotation and conversion of <a href="#rule.token">token</a>s into <a href="#rule.word">word</a>s.
+		The last token conversion phase is to remove quotation and to convert <a href="#rule.token">token</a>s into <a href="#rule.word">word</a>s.
 	</p>
 
 	<h2 id="parsing">
@@ -631,7 +632,9 @@
 			<td class="rule" id="rule.brace-group">brace&#8209;group</td>
 			<td class="sep">&rarr;</td>
 			<td class="rcontent">
-				TODO
+				<span class="rule"><a href="#rule.lbrace">lbrace</a></span>
+				<span class="rule"><a href="#rule.command&#8209;line">command-line</a></span>
+				<span class="rule"><a href="#rule.rbrace">rbrace</a></span>
 			</td>
 		</tr>
 		<tr>
