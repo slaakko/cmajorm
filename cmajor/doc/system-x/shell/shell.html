@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>System X Shell</title>
+    <link rel="stylesheet" type="text/css" href="../style/style.css" />
+</head>
+<body>
+    <h1>System X Shell</h1>
+	
+	<p>
+		When you enter command <span class="kw">sxx</span> without arguments in the Windows Terminal window (wt.exe), the <span class="kw">sxx</span> virtual machine starts a System X shell session.
+	</p>
+	
+	<p>
+		The command <span class="kw">sxx sh --debug</span> starts the shell in debug mode. When in debug mode, the token expansion information and command line parsing results are printed to the terminal.
+	</p>
+    
+	<p>
+		When you type a command line in the shell and press ENTER, the shell 
+		<ul>
+			<li>chops the command line into <a href="#tokenization">tokens</a></li>
+			<li><a href="#token-expansion">expands</a> the tokens</li>
+			<li>parses the tokens into commands</li>
+			<li>executes the commands</li>
+		</ul>
+	</p>
+	
+	<h2 id="tokenization">
+		Tokenization
+	</h2>
+	
+	<p>
+		First the command line is chopped into tokens consisting of meta-characters and series of other characters classified as <em>token</em>s.
+		The following table lists the tokenization rules:
+	</p>
+	
+	<table class="grammar">
+		<tr>
+			<th>rule name</th>
+			<th></th>
+			<th>rule content</th>
+			<th>token name</th>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.sep">sep</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.space">space</a></span> | <span class="rule"><a href="#rule.tab">tab</a></span>
+			</td>
+			<td class="kw">SEPARATOR</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.space">space</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">' '</span>
+			</td>
+			<td class="kw">SPACE</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.tab">tab</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">'\t'</span>
+			</td>
+			<td class="kw">TAB</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.quoted-char">quoted-char</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">'\\'</span>
+				<span class="op">any</span>
+			</td>
+			<td class="kw">QUOTED_CHAR</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.single-quoted">single-quoted</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">\'[^']*\'</span>
+			</td>
+			<td class="kw">SINGLE_QUOTED</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.double-quoted">double-quoted</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">\"[^"]*\"</span>
+			</td>
+			<td class="kw">DOUBLE_QUOTED</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.and-if">and-if</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">&amp;&amp;</span>
+			</td>
+			<td class="kw">AND_IF</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.or-if">or-if</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">||</span>
+			</td>
+			<td class="kw">OR_IF</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.dsemi">dsemi</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">;;</span>
+			</td>
+			<td class="kw">DSEMI</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.dlessdash">dlessdash</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">&lt;&lt;-</span>
+			</td>
+			<td class="kw">DLESSDASH</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.dless">dless</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">&lt;&lt;</span>
+			</td>
+			<td class="kw">DLESS</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.dgreat">dgreat</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">>></span>
+			</td>
+			<td class="kw">DGREAT</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.lbrace">lbrace</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">{</span>
+			</td>
+			<td class="kw">LBRACE</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.rbrace">rbrace</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">}</span>
+			</td>
+			<td class="kw">RBRACE</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.bang">bang</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">!</span>
+			</td>
+			<td class="kw">BANG</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.pipe">pipe</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">|</span>
+			</td>
+			<td class="kw">PIPE</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.lparen">lparen</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">(</span>
+			</td>
+			<td class="kw">LPAREN</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.rparen">rparen</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">)</span>
+			</td>
+			<td class="kw">RPAREN</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.less-and">less-and</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">&lt;&amp;</span>
+			</td>
+			<td class="kw">LESSAND</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.great-and">great-and</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">>&amp;</span>
+			</td>
+			<td class="kw">GREATAND</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.less-great">less-great</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">&lt;></span>
+			</td>
+			<td class="kw">LESSGREAT</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.clobber">clobber</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">>|</span>
+			</td>
+			<td class="kw">CLOBBER</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.less">less</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">&lt;</span>
+			</td>
+			<td class="kw">LESS</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.great">great</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">></span>
+			</td>
+			<td class="kw">GREAT</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.amp">amp</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">&amp;</span>
+			</td>
+			<td class="kw">AMP</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.semi">semi</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">;</span>
+			</td>
+			<td class="kw">SEMI</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.back-quote">back-quote</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">`</span>
+			</td>
+			<td class="kw">BACKQUOTE</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.token">token</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">[^ \t\\'\"&|;<>{}`]+</span>
+			</td>
+			<td class="kw">TOKEN</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.word">word</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.token">token</a></span>
+			</td>
+			<td class="kw">WORD</td>
+		</tr>
+	</table>
+	
+	<p>
+		The backslash character quotes the character coming after it.
+		A token enclosed in apostrophes quotes the enclosed characters.
+		A token enclosed in double quotes the enclosed characters.
+		Tokens containing quotation are not subject to token expansions.
+		Exception to this is the filename expansion, in which backslash-quoted characters are included in the filename.
+	</p>
+	
+	<h2 id="token-expansion">
+		Token expansions
+	</h2>
+	
+	<p>
+		After tokenization the tokens are expanded using the following expansions:
+		<ul>
+			<li><a href="#brace-expansion">brace expansion</a></li>
+			<li><a href="#tilde-expansion">tilde expansion</a></li>
+			<li><a href="#parameter-expansion">parameter expansion</a></li>
+			<li><a href="#filename-expansion">filename expansion</a></li>
+			<li><a href="#unquoting">unquoting</a></li>
+		</ul>
+	</p>
+	
+	<h3 id="brace-expansion">
+		Brace expansion
+	</h3>
+	
+	<p>
+		In brace expansion the tokens are grouped to form brace expressions consisting of
+		<ul>
+		<li>a possibly empty preamble</li>
+		<li>comma-separated list of tokens enclosed in braces and</li>
+		<li>a possibly empty postfix.</li>
+		</ul>
+	</p>
+	
+	<p>
+		These groups are separated by <a href="#rule.sep"><span class="rule">sep</span></a> tokens.
+	</p>
+	
+	<p>
+		The expansion is purely textual.
+	</p>
+	
+	<h4>Example</h4>
+	
+	<table class="type">
+		<tr>
+			<th>command</th>
+			<th>prints</th>
+		</tr>
+		<tr>
+			<td><span class="kw">echo a{c,p,t}e ate all the bananas</span></td>
+			<td>ace ape ate all the bananas</td>
+		</tr>
+		<tr>
+			<td><span class="kw">echo file{.txt,.bak,.log}</span></td>
+			<td>file.txt file.bak file.log</td>
+		</tr>
+	</table>
+	
+	<h3 id="tilde-expansion">
+		Tilde expansion
+	</h3>
+	
+	<p>
+		In tilde expansion tokens starting with a tilde character ('~') are expanded as follows:
+	</p>
+	
+	<ul>
+	<p>
+	<li>
+		If a token contains a slash ('/'), characters after the tilde and before the slash form a <em>tilde prefix</em>,
+		otherwise characters after the tilde form the tilde prefix. 
+		Thus a tilde prefix can be empty.
+	</li>
+	</p>
+	
+	<p>
+	<li>
+		If the tilde prefix is empty, and the token contains a slash, 
+		the token is expanded to contain current user's home directory path followed by the characters of the token starting with the slash.
+	</li>
+	</p>
+	
+	<p>
+	<li>
+		If the tilde prefix is empty, and the token does not contain a slash, 
+		the token is expanded to contain current user's home directory path.
+	</li>
+	</p>
+	
+	<p>
+	<li>
+		When the tilde prefix is not empty, the tilde prefix is considered as a user name.
+		If the token contains a slash, the token is expanded to contains that user's home directory path followed by the characters of the token starting with the slash.
+		Otherwise the token does not contain a slash, so the token is expanded to contain that user's home directory path.
+	</li>
+	</p>
+	</ul>
+	
+	<h4>
+		Example
+	</h4>
+	
+	<table class="type">
+		<tr>
+			<th>command</th>
+			<th>prints</th>
+		</tr>
+		<tr>
+			<td><span class="kw">echo ~</span></td>
+			<td>/home/seppo</td>
+		</tr>
+		<tr>
+			<td><span class="kw">echo ~/foo</span></td>
+			<td>/home/seppo/foo</td>
+		</tr>
+		<tr>
+			<td><span class="kw">echo ~root</span></td>
+			<td>/</td>
+		</tr>
+		<tr>
+			<td><span class="kw">echo ~root/bin</span></td>
+			<td>/bin</td>
+		</tr>
+	</table>
+
+	<h3 id="parameter-expansion">
+		Parameter expansion
+	</h3>
+	
+	<p>
+		When a token contains an unquoted dollar character ($), the token is subject to parameter expansion.
+	</p>
+	
+	<p>
+		The parameter expansion expands a name of an environment variable to the value of that environment variable.
+	</p>
+	
+	<p>
+		The name of the parameter can be optionally enclosed in braces. 
+	</p>
+	
+	<h4>
+		Example
+	</h4>
+	
+	<table class="type">
+		<tr>
+			<th>command</th>
+			<th>prints</th>
+		</tr>
+		<tr>
+			<td><span class="kw">echo $PATH</span></td>
+			<td>/bin</td>
+		</tr>
+		<tr>
+			<td><span class="kw">echo ${SHELL}</span></td>
+			<td>/bin/sh</td>
+		</tr>
+	</table>
+
+	<h3 id="filename-expansion">
+		Filename expansion
+	</h3>
+
+	<p>
+		When a token contains a pattern character '*', '?' or '[',
+		the token containing the pattern is expanded into path tokens containing 
+		filenames found in the path prefix before the pattern.
+	</p>
+	
+	<h4>
+		Example
+	</h4>
+	
+	<table class="type">
+		<tr>
+			<th>command</th>
+			<th>prints</th>
+		</tr>
+		<tr>
+			<td><span class="kw">echo&nbsp;/etc/*</span></td>
+			<td>/etc/environment /etc/group /etc/passwd /etc/passwd_hash /etc/sudoers</td>
+		</tr>
+		<tr>
+			<td><span class="kw">echo&nbsp;/mnt/sx/system/System.Lex/*.cm</span></td>
+			<td>/mnt/sx/system/System.Lex/ClassMap.cm /mnt/sx/system/System.Lex/Keyword.cm 
+			/mnt/sx/system/System.Lex/Lexeme.cm /mnt/sx/system/System.Lex/Lexer.cm 
+			/mnt/sx/system/System.Lex/ParsingException.cm /mnt/sx/system/System.Lex/ParsingLog.cm 
+			/mnt/sx/system/System.Lex/Span.cm /mnt/sx/system/System.Lex/Token.cm 
+			/mnt/sx/system/System.Lex/TrivialLexer.cm /mnt/sx/system/System.Lex/XmlParsingLog.cm</td>
+		</tr>
+	</table>
+
+	<h3 id="unquoting">
+		Unquoting
+	</h3>
+
+	<p>
+		The last token conversion phase is to remove quotation and conversion of <a href="#rule.token">token</a>s into <a href="#rule.word">word</a>s.
+	</p>
+
+	<h2 id="parsing">
+		Parsing
+	</h2>
+	
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.command-line">command-line</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.list">list</a></span>
+				<span class="rule"><a href="#rule.separator">separator</a></span>?
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.list">list</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.and-or">and-or</a></span>
+				(
+					<span class="rule"><a href="#rule.separator">separator</a></span>
+					<span class="rule"><a href="#rule.and-or">and-or</a></span>
+				)*
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.separator">separator</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.amp">amp</a></span> |
+				<span class="rule"><a href="#rule.semi">semi</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.and-or">and-or</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.pipeline">pipeline</a></span>
+				(
+					<span class="rule"><a href="#rule.and-if">and-if</a></span> 
+					<span class="rule"><a href="#rule.pipeline">pipeline</a></span>
+					|
+					<span class="rule"><a href="#rule.or-if">or-if</a></span>
+					<span class="rule"><a href="#rule.pipeline">pipeline</a></span>
+					
+				)*
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.pipeline">pipeline</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.bang">bang</a></span>?
+				<span class="rule"><a href="#rule.command">command</a></span>
+				(<span class="rule"><a href="#rule.pipe">pipe</a></span>
+				<span class="rule"><a href="#rule.command">command</a></span>
+				)*
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.command">command</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.simple-command">simple-command</a></span> | 
+				<span class="rule"><a href="#rule.compound-command">compound-command</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.simple-command">simple&#8209;command</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.command-prefix">command-prefix</a></span> 
+				(<span class="rule"><a href="#rule.command-name">command-name</a></span>
+					<span class="rule"><a href="#rule.compound-suffix">command-suffix</a></span>? 
+				)? |
+				<span class="rule"><a href="#rule.command-name">command-name</a></span>
+					<span class="rule"><a href="#rule.compound-suffix">command-suffix</a></span>?
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.command-prefix">command&#8209;prefix</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				(<span class="rule"><a href="#rule.io-number">io&#8209;number</a></span>?
+				<span class="rule"><a href="#rule.io-file">io&#8209;file</a></span> |
+				<span class="rule"><a href="#rule.assignment-word">assignment&#8209;word</a></span>)+
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.command-name">command&#8209;name</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.word">word</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.io-number">io&#8209;number</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.word">word</a></span> containing only digits
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.io-number">io&#8209;file</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.less-and">less&#8209;and</a></span> <span class="rule"><a href="#rule.filename">filename</a></span> |
+				<span class="rule"><a href="#rule.less">less</a></span> <span class="rule"><a href="#rule.filename">filename</a></span> |
+				<span class="rule"><a href="#rule.great-and">great&#8209;and</a></span> <span class="rule"><a href="#rule.filename">filename</a></span> | 
+				<span class="rule"><a href="#rule.great">great</a></span> <span class="rule"><a href="#rule.filename">filename</a></span> |
+				<span class="rule"><a href="#rule.dgreat">dgreat</a></span> <span class="rule"><a href="#rule.filename">filename</a></span> |
+				<span class="rule"><a href="#rule.less-great">less&#8209;great</a></span> <span class="rule"><a href="#rule.filename">filename</a></span> |
+				<span class="rule"><a href="#rule.clobber">clobber</a></span> <span class="rule"><a href="#rule.filename">filename</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.filename">filename</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.word">word</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.assignment-word">assignment&#8209;word</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.word">word</a></span> containing an assignment symbol (=)
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.command-suffix">command&#8209;suffix</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				(<span class="rule"><a href="#rule.io-number">io&#8209;number</a></span>?
+				<span class="rule"><a href="#rule.io-file">io&#8209;file</a></span> |
+				<span class="rule"><a href="#rule.word">word</a></span>)+
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.compound-command">compound&#8209;command</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.brace-group">brace&#8209;group</a></span> |
+				<span class="rule"><a href="#rule.subshell">subshell</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.brace-group">brace&#8209;group</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				TODO
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.subshell">subshell</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.lparen">lparen</a></span>
+				<span class="rule"><a href="#rule.command&#8209;line">command-line</a></span>
+				<span class="rule"><a href="#rule.rparen">rparen</a></span>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

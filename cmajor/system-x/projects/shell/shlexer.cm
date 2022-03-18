@@ -94,15 +94,15 @@ public class shlexer : System.Lex.Lexer
                     {
                         return 12;
                     }
-                    case 13: case 14: case 15: case 16: 
+                    case 13: 
                     {
                         return 13;
                     }
-                    case 17: 
+                    case 14: 
                     {
                         return 14;
                     }
-                    case 18: 
+                    case 15: case 16: case 17: case 18: 
                     {
                         return 15;
                     }
@@ -118,74 +118,6 @@ public class shlexer : System.Lex.Lexer
                 return -1;
             }
             case 16: 
-            {
-                System.Lex.Lexeme prevMatch = token.match;
-                token.match = lexeme;
-                int tokenId = GetTokenId(15);
-                if (tokenId == CONTINUE_TOKEN)
-                {
-                    token.id = CONTINUE_TOKEN;
-                    return -1;
-                }
-                else
-                {
-                    if (tokenId != INVALID_TOKEN)
-                    {
-                        token.id = tokenId;
-                    }
-                    else
-                    {
-                        token.match = prevMatch;
-                    }
-                }
-                switch (i)
-                {
-                    case 13: case 14: case 15: case 16: case 17: case 18: case 19: 
-                    {
-                        return 13;
-                    }
-                    default: 
-                    {
-                        return -1;
-                    }
-                }
-                return -1;
-            }
-            case 15: 
-            {
-                System.Lex.Lexeme prevMatch = token.match;
-                token.match = lexeme;
-                int tokenId = GetTokenId(14);
-                if (tokenId == CONTINUE_TOKEN)
-                {
-                    token.id = CONTINUE_TOKEN;
-                    return -1;
-                }
-                else
-                {
-                    if (tokenId != INVALID_TOKEN)
-                    {
-                        token.id = tokenId;
-                    }
-                    else
-                    {
-                        token.match = prevMatch;
-                    }
-                }
-                switch (i)
-                {
-                    case 13: case 14: case 15: case 16: case 17: case 18: case 19: 
-                    {
-                        return 13;
-                    }
-                    default: 
-                    {
-                        return -1;
-                    }
-                }
-                return -1;
-            }
-            case 14: 
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
@@ -208,9 +140,9 @@ public class shlexer : System.Lex.Lexer
                 }
                 switch (i)
                 {
-                    case 13: case 14: case 15: case 16: case 17: case 18: case 19: 
+                    case 15: case 16: case 17: case 18: case 19: 
                     {
-                        return 13;
+                        return 15;
                     }
                     default: 
                     {
@@ -219,7 +151,7 @@ public class shlexer : System.Lex.Lexer
                 }
                 return -1;
             }
-            case 13: 
+            case 15: 
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
@@ -242,9 +174,9 @@ public class shlexer : System.Lex.Lexer
                 }
                 switch (i)
                 {
-                    case 13: case 14: case 15: case 16: case 17: case 18: case 19: 
+                    case 15: case 16: case 17: case 18: case 19: 
                     {
-                        return 13;
+                        return 15;
                     }
                     default: 
                     {
@@ -253,11 +185,57 @@ public class shlexer : System.Lex.Lexer
                 }
                 return -1;
             }
-            case 12: 
+            case 14: 
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
                 int tokenId = GetTokenId(24);
+                if (tokenId == CONTINUE_TOKEN)
+                {
+                    token.id = CONTINUE_TOKEN;
+                    return -1;
+                }
+                else
+                {
+                    if (tokenId != INVALID_TOKEN)
+                    {
+                        token.id = tokenId;
+                    }
+                    else
+                    {
+                        token.match = prevMatch;
+                    }
+                }
+                return -1;
+            }
+            case 13: 
+            {
+                System.Lex.Lexeme prevMatch = token.match;
+                token.match = lexeme;
+                int tokenId = GetTokenId(15);
+                if (tokenId == CONTINUE_TOKEN)
+                {
+                    token.id = CONTINUE_TOKEN;
+                    return -1;
+                }
+                else
+                {
+                    if (tokenId != INVALID_TOKEN)
+                    {
+                        token.id = tokenId;
+                    }
+                    else
+                    {
+                        token.match = prevMatch;
+                    }
+                }
+                return -1;
+            }
+            case 12: 
+            {
+                System.Lex.Lexeme prevMatch = token.match;
+                token.match = lexeme;
+                int tokenId = GetTokenId(14);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -521,7 +499,7 @@ public class shlexer : System.Lex.Lexer
                 }
                 switch (i)
                 {
-                    case 16: 
+                    case 18: 
                     {
                         return 23;
                     }

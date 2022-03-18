@@ -240,6 +240,43 @@ class SyncCommand : UnaryCommand
     }
 }
 
+class SubshellCommand : UnaryCommand
+{
+	public SubshellCommand(Command* child_) : base("SUBSHELL", child_)
+	{
+	}
+	public override byte Execute(ExecutionContext& ctx)
+	{
+		int pid = Fork();
+		if (pid == 0)
+		{
+			byte result = Child()->Execute(ctx);
+			Exit(result);
+		}
+		else
+		{
+			byte exitCode = 0u;
+			int pid = Wait(&exitCode);
+			while (pid != -1)
+			{
+				pid = Wait(&exitCode);
+			}
+			return exitCode;
+		}
+	}
+}
+
+class BraceGroupCommand : UnaryCommand
+{
+	public BraceGroupCommand(Command* child_) : base("GROUP", child_)
+	{
+	}
+	public override byte Execute(ExecutionContext& ctx)
+	{
+		return Child()->Execute(ctx);
+	}
+}
+
 class IORedirectCommand : Command
 {
     public nothrow IORedirectCommand(int ioOp_, int ioNumber_, const string& filename_) : base("IO_REDIRECT"), ioOp(ioOp_), ioNumber(ioNumber_), filename(filename_)

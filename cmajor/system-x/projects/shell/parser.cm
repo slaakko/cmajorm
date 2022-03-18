@@ -312,7 +312,8 @@ bool ParseCommandPrefix(TokenLexer& lexer, ParseResult& result)
     {
         result.ResetCommand(prefixCommand.Release());
     }
-    return prefixParsed;}
+    return prefixParsed;
+}
 
 bool ParseIONumber(TokenLexer& lexer, int& ioNumber)
 {
@@ -499,7 +500,33 @@ bool ParseCompoundCommand(TokenLexer& lexer, ParseResult& result)
 
 bool ParseBraceGroup(TokenLexer& lexer, ParseResult& result)
 {
-    return false; // todo
+    int save = lexer.GetPos();
+    if (*lexer == LBRACE)
+	{
+		++lexer;
+		if (ParseCompleteCommand(lexer, result))
+		{
+			if (*lexer == RBRACE)
+			{
+				++lexer;
+				Command* command = result.ReleaseCommand();
+				result.ResetCommand(new BraceGroupCommand(command));
+				return true;
+			}
+			else
+			{
+				lexer.SetPos(save);
+				return false;
+			}
+		}
+		else
+		{
+			lexer.SetPos(save);
+			return false;
+		}
+    }
+    lexer.SetPos(save);
+    return false;
 }
 
 bool ParseSubshell(TokenLexer& lexer, ParseResult& result)
@@ -508,28 +535,26 @@ bool ParseSubshell(TokenLexer& lexer, ParseResult& result)
     if (*lexer == LPAREN)
     {
         ++lexer;
-        while (*lexer != RPAREN)
-        {
-            if (ParseAndOr(lexer, result))
-            {
-                if (ParseSeparator(lexer, result))
-                {
-                }
-                else
-                {
-                    break;
-                }
-            }
-            else 
-            {
-                break;
-            }
-        }
-        if (*lexer == RPAREN)
-        {
-            ++lexer;
-            return true;
-        }
+		if (ParseCompleteCommand(lexer, result))
+		{
+			if (*lexer == RPAREN)
+			{
+				++lexer;
+				Command* command = result.ReleaseCommand();
+				result.ResetCommand(new SubshellCommand(command));
+				return true;
+			}
+			else
+			{
+				lexer.SetPos(save);
+				return false;
+			}
+		}
+		else
+		{
+			lexer.SetPos(save);
+			return false;
+		}
     }
     lexer.SetPos(save);
     return false;
