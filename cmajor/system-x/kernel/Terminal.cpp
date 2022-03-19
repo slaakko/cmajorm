@@ -175,8 +175,11 @@ void Terminal::PushLines()
 
 void Terminal::PopLines()
 {
-    lines = std::move(linesStack.top());
-    linesStack.pop();
+    if (!linesStack.empty())
+    {
+        lines = std::move(linesStack.top());
+        linesStack.pop();
+    }
 }
 
 void TerminalInputWaiting()

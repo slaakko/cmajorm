@@ -266,6 +266,7 @@ int32_t IOCtl(Process* process, int32_t fd, int32_t item, int64_t argAddr, int64
             {
                 file->SetEcho(false);
             }
+            break;
         }
         case IOControlItem::push_lines:
         {

@@ -11,6 +11,18 @@ using System.Lex;
 using System.RegularExpressions;
 using shtokens;
 
+class PushPopLines
+{
+	public PushPopLines()
+	{
+		PushLines();
+	}
+	public ~PushPopLines()
+	{
+		PopLines();
+	}
+}
+
 string CWD(ShellEnvironment& environment)
 {
     string cwd = GetCurrentWorkingDirectory();
@@ -61,6 +73,7 @@ void ProcessLine(const string& line, ShellEnvironment& environment, Params& para
             ctx.wait = true;
             ctx.environment = &Environment.Instance();
             ctx.executableMap = &executableMap;
+			PushPopLines pushPopLines;
             command->Execute(ctx);
         }
         else
@@ -93,7 +106,7 @@ void Run(ShellEnvironment& environment, Params& params, Context& context)
     string line = GetLine(environment);
     while (line != "exit")
     {
-        ProcessLine(line, environment, params, context, executableMap);
+		ProcessLine(line, environment, params, context, executableMap);
         line = GetLine(environment);
     }
     RemoveDirChangeNotifications();

@@ -11,7 +11,15 @@ void Catenate(const List<string>& files)
 {
     for (const string& file : files)
     {
-        string content = File.ReadAllText(file);
-        Console.Out() << content;
+        if (file.IsEmpty())
+        {
+            string content = Console.In().ReadToEnd();
+            Console.Out() << content;
+        }
+        else
+        {
+            string content = File.ReadAllText(file);
+            Console.Out() << content;
+        }
     }
 }

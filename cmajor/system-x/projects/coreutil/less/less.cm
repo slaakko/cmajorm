@@ -1,0 +1,264 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+void PrintHelp()
+{
+    // todo
+}
+
+int MaxWidth(const List<ustring>& lines)
+{
+    int maxWidth = 0;
+    for (const ustring& line : lines)
+    {
+        if (line.Length() > maxWidth)
+        {
+            maxWidth = cast<int>(line.Length());
+        }
+    }
+    return maxWidth;
+}
+
+void ViewScreen(const List<ustring>& lines, int offsetY, int screenWidth, int screenHeight)
+{
+    ClearScreen(screenWidth, screenHeight);
+    int n = Min(cast<int>(lines.Count()), screenHeight - 1);
+    for (int i = 0; i < n; ++i)
+    {
+        SetCursorPos(0, i);
+        const ustring& line = lines[i + offsetY];
+        Terminal.Out() << line;
+    }
+    SetCursorPos(0, screenHeight - 1);
+    Terminal.Out() << ":";
+}
+
+void Start(int& offsetY)
+{
+    offsetY = 0;
+}
+
+void End(const List<ustring>& lines, int& offsetY, int screenHeight)
+{
+    offsetY = cast<int>(lines.Count()) - screenHeight;
+    if (offsetY < 0)
+    {
+        offsetY = 0;
+    }
+}
+
+void LineUp(int& offsetY)
+{
+    if (offsetY > 0)
+    {
+        --offsetY;
+    }
+}
+
+void LineDown(const List<ustring>& lines, int& offsetY, int screenHeight)
+{
+    if (offsetY < lines.Count() - screenHeight)
+    {
+        ++offsetY;
+    }
+}
+
+void PageUp(int& offsetY, int screenHeight)
+{
+    offsetY = Max(cast<int>(0), offsetY - screenHeight);
+}
+
+void PageDown(const List<ustring>& lines, int& offsetY, int screenHeight)
+{
+    offsetY = Min(offsetY + screenHeight, cast<int>(lines.Count()) - screenHeight);
+    if (offsetY < 0)
+    {
+        offsetY = 0;
+    }
+}
+
+void View(List<ustring>& lines)
+{
+    SetRaw(Terminal.Descriptor());
+    SetEcho(Terminal.Descriptor(), false);
+    int maxWidth = MaxWidth(lines);
+    int screenWidth = TermimalWindowWidth();
+    int screenHeight = TermimalWindowHeight();
+    List<ustring> lns;
+    if (maxWidth > screenWidth)
+    {
+        for (const ustring& line : lines)
+        {
+            if (line.Length() > screenWidth)
+            {
+                lns.Add(line.Substring(0, screenWidth));
+                lns.Add(line.Substring(screenWidth));
+            }
+            else
+            {
+                lns.Add(line);
+            }
+        }
+        Swap(lines, lns);
+    }
+    int offsetY = 0;
+    ViewScreen(lines, offsetY, screenWidth, screenHeight);
+    uchar key = ReadKey(Terminal.Descriptor());
+    while (key != keyEscape)
+    {
+        int prevOffsetY = offsetY;
+        switch (key)
+        {
+            case keyHome:
+            {
+                Start(offsetY);
+                break;
+            }
+            case keyEnd:
+            {
+                End(lines, offsetY, screenHeight - 1);
+                break;
+            }
+            case keyUp:
+            {
+                LineUp(offsetY);
+                break;
+            }
+            case keyDown:
+            {
+                LineDown(lines, offsetY, screenHeight - 1);
+                break;
+            }
+            case keyPgUp:
+            {
+                PageUp(offsetY, screenHeight - 1);
+                break;
+            }
+            case keyPgDown:
+            {
+                PageDown(lines, offsetY, screenHeight - 1);
+                break;
+            }
+        }
+        if (prevOffsetY != offsetY)
+        {
+            ViewScreen(lines, offsetY, screenWidth, screenHeight);
+        }
+        key = ReadKey(Terminal.Descriptor());
+    }
+    ClearScreen(screenWidth, screenHeight);
+    SetCursorPos(0, 0);
+}
+
+void ViewFiles(const List<string>& files)
+{
+    List<ustring> lines;
+    for (const string& file : files)
+    {
+        StreamReader reader(SharedPtr<Stream>());
+        if (!file.IsEmpty())
+        {
+            reader = File.OpenRead(file);
+        }
+        else
+        {
+            if (IsConsole(0))
+            {
+                reader = StreamReader(SharedPtr<Stream>(new FileStream(0)));
+            }
+            else
+            {
+                reader = StreamReader(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(new FileStream(0)))));
+            }
+        }
+        while (!reader.Eof())
+        {
+            string line = reader.ReadLine();
+            lines.Add(ToUtf32(line));
+        }
+    }
+    if (!IsConsole(1))
+    {
+        for (const ustring& line : lines)
+        {
+            Console.Out() << line << endl();
+        }
+    }
+    else
+    {
+        View(lines);
+    }
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        List<string> files;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("--"))
+            {
+                if (arg == "--help")
+                {
+                    PrintHelp();
+                    return 1;
+                }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else if (arg.StartsWith("-"))
+            {
+                string options = arg.Substring(1);
+                for (char o : options)
+                {
+                    bool unknown = false;
+                    string uo;
+                    switch (o)
+                    {
+                        case 'h':
+                        {
+                            PrintHelp();
+                            return 1;
+                        }
+                        default:
+                        {
+                            uo.Append(o);
+                            unknown = true;
+                            break;
+                        }
+                    }
+                    if (unknown)
+                    {
+                        throw Exception("unknown option '-" + uo + "'");
+                    }
+                }
+            }
+            else
+            {
+                files.Add(arg);
+            }
+        }
+        if (files.IsEmpty())
+        {
+            files.Add(string());
+        }
+        ViewFiles(files);
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    SetCooked(Terminal.Descriptor());
+    SetEcho(Terminal.Descriptor(), true);
+    return 0;
+}

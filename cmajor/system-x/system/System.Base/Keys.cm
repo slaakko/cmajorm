@@ -1,0 +1,160 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.Os;
+using System.Unicode;
+
+namespace System
+{
+	public const uchar keyBackspace = '\b';
+	public const uchar keyTab = '\t';
+	public const uchar keyNewline = '\n';
+	public const uchar keyControlA = cast<uchar>(0x001);
+	public const uchar keyControlB = cast<uchar>(0x002);
+	public const uchar keyControlC = cast<uchar>(0x003);
+	public const uchar keyControlD = cast<uchar>(0x004);
+	public const uchar keyControlE = cast<uchar>(0x005);
+	public const uchar keyControlF = cast<uchar>(0x006);
+	public const uchar keyControlG = cast<uchar>(0x007);
+	public const uchar keyControlH = cast<uchar>(0x008);
+	public const uchar keyControlI = cast<uchar>(0x009);
+	public const uchar keyControlJ = cast<uchar>(0x00A);
+	public const uchar keyControlK = cast<uchar>(0x00B);
+	public const uchar keyControlL = cast<uchar>(0x00C);
+	public const uchar keyControlM = cast<uchar>(0x00D);
+	public const uchar keyControlN = cast<uchar>(0x00E);
+	public const uchar keyControlO = cast<uchar>(0x00F);
+	public const uchar keyControlP = cast<uchar>(0x010);
+	public const uchar keyControlQ = cast<uchar>(0x011);
+	public const uchar keyControlR = cast<uchar>(0x012);
+	public const uchar keyControlS = cast<uchar>(0x013);
+	public const uchar keyControlT = cast<uchar>(0x014);
+	public const uchar keyControlU = cast<uchar>(0x015);
+	public const uchar keyControlV = cast<uchar>(0x016);
+	public const uchar keyControlW = cast<uchar>(0x017);
+	public const uchar keyControlX = cast<uchar>(0x018);
+	public const uchar keyControlY = cast<uchar>(0x019);
+	public const uchar keyControlZ = cast<uchar>(0x01A);
+	public const uchar keyEscape = cast<uchar>(0x01B);
+	public const uchar keyFS = cast<uchar>(0x01C);
+	public const uchar keyGS = cast<uchar>(0x01D);
+	public const uchar keyRS = cast<uchar>(0x01E);
+	public const uchar keyUS = cast<uchar>(0x01F);
+	
+// special keys are mapped to Unicode Private Use Area
+
+	public const uchar keyDown = cast<uchar>(0xE000);
+	public const uchar keyUp = cast<uchar>(0xE001);
+	public const uchar keyLeft = cast<uchar>(0xE002);
+	public const uchar keyRight = cast<uchar>(0xE003);
+	public const uchar keyHome = cast<uchar>(0xE004);
+	public const uchar keyF0 = cast<uchar>(0xE005);
+	public const uchar keyF1 = cast<uchar>(0xE006);
+	public const uchar keyF2 = cast<uchar>(0xE007);
+	public const uchar keyF3 = cast<uchar>(0xE008);
+	public const uchar keyF4 = cast<uchar>(0xE009);
+	public const uchar keyF5 = cast<uchar>(0xE00A);
+	public const uchar keyF6 = cast<uchar>(0xE00B);
+	public const uchar keyF7 = cast<uchar>(0xE00C);
+	public const uchar keyF8 = cast<uchar>(0xE00D);
+	public const uchar keyF9 = cast<uchar>(0xE00E);
+	public const uchar keyF10 = cast<uchar>(0xE00F);
+	public const uchar keyF11 = cast<uchar>(0xE010);
+	public const uchar keyF12 = cast<uchar>(0xE011);
+	public const uchar keyDel = cast<uchar>(0xE012);
+	public const uchar keyIns = cast<uchar>(0xE013);
+	public const uchar keyPgDown = cast<uchar>(0xE014);
+	public const uchar keyPgUp = cast<uchar>(0xE015);
+	public const uchar keyPrint = cast<uchar>(0xE016);
+	public const uchar keyEnd = cast<uchar>(0xE017);
+	public const uchar keyShiftDel = cast<uchar>(0xE018);
+	public const uchar keyShiftEnd = cast<uchar>(0xE019);
+	public const uchar keyShiftHome = cast<uchar>(0xE01A);
+	public const uchar keyShiftLeft = cast<uchar>(0xE01B);
+	public const uchar keyShiftRight = cast<uchar>(0xE01C);
+	public const uchar keyResize = cast<uchar>(0xE01D);
+	public const uchar keyShiftUp = cast<uchar>(0xE01E);
+	public const uchar keyShiftDown = cast<uchar>(0xE01F);
+	public const uchar keyControlUp = cast<uchar>(0xE020);
+	public const uchar keyControlDown = cast<uchar>(0xE021);
+	public const uchar keyControlLeft = cast<uchar>(0xE022);
+	public const uchar keyControlRight = cast<uchar>(0xE023);
+	public const uchar keyControlPgUp = cast<uchar>(0xE024);
+	public const uchar keyControlPgDown = cast<uchar>(0xE025);
+	public const uchar keyControlHome = cast<uchar>(0xE026);
+	public const uchar keyControlEnd = cast<uchar>(0xE027);
+	
+	public const uchar keyControlDel = cast<uchar>(0xE028);
+	public const uchar keyControlF1 = cast<uchar>(0xE029);
+	public const uchar keyControlF2 = cast<uchar>(0xE02A);
+	public const uchar keyControlF3 = cast<uchar>(0xE02B);
+	public const uchar keyControlF4 = cast<uchar>(0xE02C);
+	public const uchar keyControlF5 = cast<uchar>(0xE02D);
+	public const uchar keyControlF6 = cast<uchar>(0xE02E);
+	public const uchar keyControlF7 = cast<uchar>(0xE02F);
+	public const uchar keyControlF8 = cast<uchar>(0xE030);
+	public const uchar keyControlF9 = cast<uchar>(0xE031);
+	public const uchar keyControlF10 = cast<uchar>(0xE032);
+	public const uchar keyControlF11 = cast<uchar>(0xE033);
+	public const uchar keyControlF12 = cast<uchar>(0xE034);
+	public const uchar keyShiftPgUp = cast<uchar>(0xE035);
+	public const uchar keyShiftPgDown = cast<uchar>(0xE036);
+	public const uchar keyShiftF1 = cast<uchar>(0xE037);
+	public const uchar keyShiftF2 = cast<uchar>(0xE038);
+	public const uchar keyShiftF3 = cast<uchar>(0xE039);
+	public const uchar keyShiftF4 = cast<uchar>(0xE03A);
+	public const uchar keyShiftF5 = cast<uchar>(0xE03B);
+	public const uchar keyShiftF6 = cast<uchar>(0xE03C);
+	public const uchar keyShiftF7 = cast<uchar>(0xE03D);
+	public const uchar keyShiftF8 = cast<uchar>(0xE03E);
+	public const uchar keyShiftF9 = cast<uchar>(0xE03F);
+	public const uchar keyShiftF10 = cast<uchar>(0xE040);
+	public const uchar keyShiftF11 = cast<uchar>(0xE041);
+	public const uchar keyShiftF12 = cast<uchar>(0xE042);
+
+	public const uchar specialKeyEnd = cast<uchar>(0xE042);
+
+	public class KeyBuffer
+	{
+		static KeyBuffer() : instance(new KeyBuffer())
+		{
+		}
+		public static nothrow KeyBuffer& Instance() 
+		{
+			return *instance;
+		}
+		public nothrow void Put(byte ch)
+		{
+			engine.Put(ch);
+		}
+		public nothrow bool KeyReady() const
+		{
+			return engine.ResultReady();
+		}
+		public nothrow uchar GetKey() const
+		{
+			return engine.Get();
+		}
+		private static UniquePtr<KeyBuffer> instance;
+		private UnicodeEngine engine;
+	}
+	
+	public uchar ReadKey(int fd)
+	{
+		KeyBuffer& keyBuffer = KeyBuffer.Instance();
+		byte ch = 0u;
+		long count = Read(fd, &ch, 1);
+		while (count > 0)
+		{
+			keyBuffer.Put(ch);
+			if (keyBuffer.KeyReady())
+			{
+				return keyBuffer.GetKey();
+			}
+			count = Read(fd, &ch, 1);
+		}
+		return cast<uchar>(0);
+	}
+}

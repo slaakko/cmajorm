@@ -31,7 +31,14 @@ void PrintTail(const List<string>& files, int lineCount, bool startLine)
         }
         else
         {
-            reader = StreamReader(SharedPtr<Stream>(new FileStream(0)));
+            if (IsConsole(0))
+            {
+                reader = StreamReader(SharedPtr<Stream>(new FileStream(0)));
+            }
+            else
+            {
+                reader = StreamReader(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(new FileStream(0)))));
+            }
         }
         List<string> lines;
         while (!reader.Eof())

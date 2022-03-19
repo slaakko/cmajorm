@@ -83,14 +83,14 @@ void EmitOptSwitch(SwitchInstruction& inst, CodeGenerator& codeGen)
         codeGen.Emit(bnInst);
 
         cmsx::assembler::Instruction* setEndInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
-        setEndInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regCX)));
+        setEndInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regDX)));
         setEndInst->AddOperand(cmsx::assembler::MakeConstantExpr(end));
         codeGen.Emit(setEndInst);
 
         cmsx::assembler::Instruction* cmpEndInst = new cmsx::assembler::Instruction(cmsx::machine::CMP);
         cmpEndInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
         cmpEndInst->AddOperand(MakeRegOperand(inst.Cond(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regBX), codeGen));
-        cmpEndInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regCX)));
+        cmpEndInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regDX)));
         codeGen.Emit(cmpEndInst);
 
         cmsx::assembler::Instruction* bpInst = new cmsx::assembler::Instruction(cmsx::machine::BP);
@@ -101,20 +101,20 @@ void EmitOptSwitch(SwitchInstruction& inst, CodeGenerator& codeGen)
         std::string jumpTableStructName = "jmptab@" + codeGen.CurrentFunction()->Name() + "@" + std::to_string(codeGen.CurrentLineNumber());
 
         cmsx::assembler::Instruction* ldoInst = new cmsx::assembler::Instruction(cmsx::machine::LDOU);
-        ldoInst->AddOperand(cmsx::assembler::MakeGlobalRegOperand(cmsx::machine::regCX));
+        ldoInst->AddOperand(cmsx::assembler::MakeGlobalRegOperand(cmsx::machine::regEX));
         ldoInst->AddOperand(cmsx::assembler::MakeGlobalSymbol(jumpTableStructName));
         codeGen.Emit(ldoInst);
 
         cmsx::assembler::Instruction* subInst = new cmsx::assembler::Instruction(cmsx::machine::SUB);
         subInst->AddOperand(cmsx::assembler::MakeGlobalRegOperand(cmsx::machine::regBX));
         subInst->AddOperand(MakeRegOperand(inst.Cond(), GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regBX), codeGen));
-        subInst->AddOperand(cmsx::assembler::MakeConstantExpr(start));
+        subInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regCX)));
         codeGen.Emit(subInst);
 
         cmsx::assembler::Instruction* i8AdduInst = new cmsx::assembler::Instruction(cmsx::machine::I8ADDU);
         i8AdduInst->AddOperand(cmsx::assembler::MakeGlobalRegOperand(cmsx::machine::regAX));
         i8AdduInst->AddOperand(cmsx::assembler::MakeGlobalRegOperand(cmsx::machine::regBX));
-        i8AdduInst->AddOperand(cmsx::assembler::MakeGlobalRegOperand(cmsx::machine::regCX));
+        i8AdduInst->AddOperand(cmsx::assembler::MakeGlobalRegOperand(cmsx::machine::regEX));
         codeGen.Emit(i8AdduInst);
 
         cmsx::assembler::Instruction* ldouInst = new cmsx::assembler::Instruction(cmsx::machine::LDOU);

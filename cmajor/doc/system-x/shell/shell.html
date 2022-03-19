@@ -24,7 +24,7 @@
 			<li>chops the command line into <a href="#tokenization">tokens</a></li>
 			<li><a href="#token-expansion">expands</a> the tokens</li>
 			<li><a href="#parsing">parses</a> the tokens into commands</li>
-			<li>executes the commands</li>
+			<li>executes the <a href="#commands">commands</a></li>
 		</ul>
 	</p>
 	
@@ -487,7 +487,17 @@
 		Parsing
 	</h2>
 	
+	<p>
+		After the tokens are expanded, the shell parses the expanded tokens into command objects according to the following grammar:
+	</p>
+	
 	<table class="grammar">
+		<tr>
+			<th>rule name</th>
+			<th></th>
+			<th>rule content</th>
+			<th>expression</th>
+		</tr>
 		<tr>
 			<td class="rule" id="rule.command-line">command-line</td>
 			<td class="sep">&rarr;</td>
@@ -506,12 +516,12 @@
 					<span class="rule"><a href="#rule.and-or">and-or</a></span>
 				)*
 			</td>
+			<td><a href="#sequence">sequence</a></td>
 		</tr>
 		<tr>
 			<td class="rule" id="rule.separator">separator</td>
 			<td class="sep">&rarr;</td>
 			<td class="rcontent">
-				<span class="rule"><a href="#rule.amp">amp</a></span> |
 				<span class="rule"><a href="#rule.semi">semi</a></span>
 			</td>
 		</tr>
@@ -526,9 +536,9 @@
 					|
 					<span class="rule"><a href="#rule.or-if">or-if</a></span>
 					<span class="rule"><a href="#rule.pipeline">pipeline</a></span>
-					
 				)*
 			</td>
+			<td><a href="#and-or">and-or</a></td>
 		</tr>
 		<tr>
 			<td class="rule" id="rule.pipeline">pipeline</td>
@@ -540,6 +550,7 @@
 				<span class="rule"><a href="#rule.command">command</a></span>
 				)*
 			</td>
+			<td><a href="#pipeline">pipeline</a></td>
 		</tr>
 		<tr>
 			<td class="rule" id="rule.command">command</td>
@@ -556,10 +567,11 @@
 				<span class="rule"><a href="#rule.command-prefix">command-prefix</a></span> 
 				(<span class="rule"><a href="#rule.command-name">command-name</a></span>
 					<span class="rule"><a href="#rule.compound-suffix">command-suffix</a></span>? 
-				)? |
+				)? |<br/>
 				<span class="rule"><a href="#rule.command-name">command-name</a></span>
 					<span class="rule"><a href="#rule.compound-suffix">command-suffix</a></span>?
 			</td>
+			<td><a href="#simple-command">simple&#8209;command</td>
 		</tr>
 		<tr>
 			<td class="rule" id="rule.command-prefix">command&#8209;prefix</td>
@@ -596,6 +608,7 @@
 				<span class="rule"><a href="#rule.less-great">less&#8209;great</a></span> <span class="rule"><a href="#rule.filename">filename</a></span> |
 				<span class="rule"><a href="#rule.clobber">clobber</a></span> <span class="rule"><a href="#rule.filename">filename</a></span>
 			</td>
+			<td><a href="#io-redirections">I/O redirections</a></td>
 		</tr>
 		<tr>
 			<td class="rule" id="rule.filename">filename</td>
@@ -610,6 +623,7 @@
 			<td class="rcontent">
 				<span class="rule"><a href="#rule.word">word</a></span> containing an assignment symbol (=)
 			</td>
+			<td><a href="#assignment">assignment</a>
 		</tr>
 		<tr>
 			<td class="rule" id="rule.command-suffix">command&#8209;suffix</td>
@@ -636,6 +650,7 @@
 				<span class="rule"><a href="#rule.command&#8209;line">command-line</a></span>
 				<span class="rule"><a href="#rule.rbrace">rbrace</a></span>
 			</td>
+			<td><a href="#brace-group">brace-group</a></td>
 		</tr>
 		<tr>
 			<td class="rule" id="rule.subshell">subshell</td>
@@ -645,6 +660,284 @@
 				<span class="rule"><a href="#rule.command&#8209;line">command-line</a></span>
 				<span class="rule"><a href="#rule.rparen">rparen</a></span>
 			</td>
+			<td><a href="#subshell">subshell</a></td>
+		</tr>
+	</table>
+
+	<h2 id="commands">
+		Commands
+	</h2>
+
+	<h3 id="sequence">
+		Command sequence
+	</h3>
+
+	<p>
+		Execute a list of commands separated by the <span class="kw">;</span> control operator.
+		The exit code of the command list is the exit code of the last executed command.
+	</p>
+
+	<h4>
+		Example
+	</h4>
+	
+	<table class="type">
+		<tr>
+			<th>command</th>
+			<th>prints</th>
+		</tr>
+		<tr>
+			<td><span class="kw">echo hot >meal; echo dog >>meal; cat meal</span></td>
+			<td>hot<br/>
+			dog</td>
+		</tr>
+	</table>
+
+	<h3 id="and-or">
+		And-Or command
+	</h3>
+
+	<p>
+		Execute command expressions separated by the <span class="kw">&amp;&amp;</span> and <span class="kw">||</span> operators from left to right.
+	</p>
+	
+	<h4>
+		<span class="kw">&amp;&amp;</span> operator
+	</h4>
+	
+	<p>
+		The <em>left-command</em> <span class="kw">&amp;&amp;</span> <em>right-command</em> expression is executed so that the <em>right-command</em> is executed only if the exit code of the 
+		<em>left-command</em> is zero.
+		The exit code of the command expression is the exit code of the <em>left-command</em> if it is nonzero, otherwise it is the exit code of the <em>right-command</em>.
+	</p>
+
+	<h5>
+		Example
+	</h5>
+	
+	<table class="type">
+		<tr>
+			<th>command</th>
+			<th>prints</th>
+		</tr>
+		<tr>
+			<td><span class="kw">echo foo && echo bar</span></td>
+			<td>foo<br/>bar</td>
+		</tr>
+	</table>
+
+	<h4>
+		<span class="kw">||</span> operator
+	</h4>
+
+	<p>
+		The <em>left-command</em> <span class="kw">||</span> <em>right-command</em> expression is executed so that the <em>right-command</em> is executed only if the exit code of the 
+		<em>left-command</em> is nonzero.
+		The exit code of the command expression is the exit code of the <em>right-command</em> if the exit code of the <em>left-command</em> is zero, otherwise it is the exit code of the <em>left-command</em>.
+	</p>
+
+	<h5>
+		Example
+	</h5>
+	
+	<table class="type">
+		<tr>
+			<th>command</th>
+			<th>prints</th>
+		</tr>
+		<tr>
+			<td><span class="kw">rm nonexistent || echo NOT REMOVED</span></td>
+			<td>System.SystemError: path 'nonexistent' not found...<br/>NOT REMOVED</td>
+		</tr>
+	</table>
+
+
+	<h3 id="pipeline">
+		Pipeline
+	</h3>
+
+	<h4>
+		<span class="kw">|</span> operator
+	</h4>
+
+	<p>
+		The shell executes the <em>left-command</em> <span class="kw">|</span> <em>right-command</em> expression by directing standard output of the <em>left-command</em> to standard input of the <em>right-command</em>.
+		The shell waits the commands of the pipeline to terminate and then returns the exit code of the <em>right-command</em> as the exit code of the pipeline.
+	</p>
+
+	<h4>
+		Example
+	</h4>
+
+	<table class="type">
+		<tr>
+			<th>command</th>
+			<th>prints</th>
+		</tr>
+		<tr>
+			<td><span class="kw">cat /etc/environment | head --lines=1</span></td>
+			<td>PATH="/bin"</td>
+		</tr>
+	</table>
+	
+	<h3 id="simple-command">
+		Simple command
+	</h3>
+
+	<p>
+		Executes the variable assignments and I/O redirections contained by the <em><a href="#rule.command-prefix">command-prefix</a></em> and the I/O redirections of the <em><a href="#rule.command-suffix">command-suffix</a></em>.
+		Then if the simple command contains a <em><a href="#rule.command-name">command-name</a></em> executes that command with arguments specified in the <em><a href="#rule.command-suffix">command-suffix</a></em>.
+	</p>
+
+	<h4>
+		Example
+	</h4>
+
+	<table class="type">
+		<tr>
+			<th>command</th>
+			<th>prints</th>
+		</tr>
+		<tr>
+			<td><span class="kw">echo foo bar baz</span></td>
+			<td>foo bar baz</td>
+		</tr>
+	</table>
+
+	<h3 id="assignment">
+		Assignment command
+	</h3>
+		
+	<table class="type">
+		<tr>
+			<td><span class="kw">NAME=VALUE</span></td>
+			<td>assign <span class="kw">VALUE</span> to the variable <span class="kw">NAME</span> in the command's environment; 
+			if <a href="#rule.simple-command"><em>simple-command</em></a> contains no <em><a href="#rule.command-name">command-name</a></em>, assigns <span class="kw">VALUE</span> to the variable <span class="kw">NAME</span> in the shell's environment</td>
+		</tr>
+	</table>
+
+	<h4>
+		Example
+	</h4>
+
+	<table class="type">
+		<tr>
+			<th>command</th>
+			<th>prints</th>
+		</tr>
+		<tr>
+			<td><span class="kw">FOO=BAR</span></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><span class="kw">echo $FOO</span></td>
+			<td>BAR</td>
+		</tr>
+	</table>
+
+	<h3 id="io-redirections">
+		I/O redirection commands
+	</h3>
+	
+	<table class="type">
+		<tr>
+			<td><span class="kw">&lt;filename</span></td>
+			<td>open 'filename' for reading and redirect its contents to command's standard input (file descriptor 0)</td>
+		</tr>
+		<tr>
+			<td><span class="kw">N&lt;filename</span></td>
+			<td>open 'filename' for reading and redirect its contents to command's file descriptor N</td>
+		</tr>
+		<tr>
+			<td><span class="kw">>filename</span></td>
+			<td>open 'filename' with create, truncate, and write flags and redirect commmand's standard output (file descriptor 1) to it</td>
+		</tr>
+		<tr>
+			<td><span class="kw">N>filename</span></td>
+			<td>open 'filename' with create, truncate, and write flags and redirect command's file descriptor N to it</td>
+		</tr>
+		<tr>
+			<td><span class="kw">>>filename</span></td>
+			<td>open 'filename' for appending and redirect command's standard output (file descriptor 1) to it</td></td>
+		</tr>
+		<tr>
+			<td><span class="kw">N>>filename</span></td>
+			<td>open 'filename' for appending and redirect command's file descriptor N to it</td></td>
+		</tr>
+	</table>
+	
+	<h4>
+		Example
+	</h4>
+	
+	<table class="type">
+		<tr>
+			<th>command</th>
+			<th>prints</th>
+		</tr>
+		<tr>
+			<td><span class="kw">echo hot >meal</span></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><span class="kw">echo dog >>meal</span></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><span class="kw">cat meal</span></td>
+			<td>hot<br/>
+			dog</td>
+		</tr>
+	</table>
+
+	<h3 id="brace-group">
+		Brace group
+	</h3>
+	
+	<p>
+		Executes the commands contained by the brace group in the current shell process.
+	</p>
+	
+	<h3 id="subshell">
+		Subshell
+	</h3>
+	
+	<p>
+		Executes the commands contained by the subshell expression in the subshell child process of the current shell process.
+	</p>
+	
+	<h3 id="internal-commands">
+		Internal commands
+	</h3>
+	
+	<p>
+		The following table contains the commands built into the shell:
+	</p>
+	
+	<table class="type">
+		<tr>
+			<th>command</th>
+			<th>description</th>
+			<th>notes</th>
+		</tr>
+		<tr>
+			<td><span class="kw">cd&nbsp;[ARG]</span></td>
+			<td>changes current directory</td>
+			<td>if the <span class="kw">cd</span> command is invoked with a directory argument, changes the current directory to that directory, 
+			otherwise if the command is invoked without arguments, changes the current directory to the home directory of the current user.
+			</td>
+		</tr>
+		<tr>
+			<td><span class="kw">exit</span></td>
+			<td>exits the shell</td>
+		</tr>
+		<tr>
+			<td><span class="kw">printenv</span></td>
+			<td>prints the environment</td>
+		</tr>
+		<tr>
+			<td><span class="kw">unset&nbsp;ARG</span></td>
+			<td>removes an environment variable from the shell's environment</td>
 		</tr>
 	</table>
 </body>
