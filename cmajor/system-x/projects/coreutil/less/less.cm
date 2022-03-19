@@ -8,7 +8,11 @@ using System.Collections;
 
 void PrintHelp()
 {
-    // todo
+    Console.WriteLine("Usage: less [options] [FILE]...");
+    Console.WriteLine("View paginated output.");
+    Console.WriteLine("Options:");
+    Console.WriteLine("--help | -h");
+    Console.WriteLine("  Print help and exit.");
 }
 
 int MaxWidth(const List<ustring>& lines)
@@ -45,11 +49,7 @@ void Start(int& offsetY)
 
 void End(const List<ustring>& lines, int& offsetY, int screenHeight)
 {
-    offsetY = cast<int>(lines.Count()) - screenHeight;
-    if (offsetY < 0)
-    {
-        offsetY = 0;
-    }
+    offsetY = Max(cast<int>(0), cast<int>(lines.Count()) - screenHeight);
 }
 
 void LineUp(int& offsetY)
@@ -75,11 +75,7 @@ void PageUp(int& offsetY, int screenHeight)
 
 void PageDown(const List<ustring>& lines, int& offsetY, int screenHeight)
 {
-    offsetY = Min(offsetY + screenHeight, cast<int>(lines.Count()) - screenHeight);
-    if (offsetY < 0)
-    {
-        offsetY = 0;
-    }
+    offsetY = Max(cast<int>(0), Min(offsetY + screenHeight, cast<int>(lines.Count()) - screenHeight));
 }
 
 void View(List<ustring>& lines)
