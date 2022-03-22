@@ -8,34 +8,34 @@ using System.Collections;
 
 namespace System.Screen
 {
-	public class WindowManager
-	{
-		public nothrow WindowManager() : nextWindowHandle(0)
-		{
-		}
-		public void AddWindow(Control* window)
-		{
-			window->SetHandle(nextWindowHandle++);
-			windowMap[window->Handle()] = window;
-		}
-		public Control* GetWindow(int windowHandle)	const
-		{
-			Map<int, Control*>.ConstIterator it = windowMap.CFind(windowHandle);
-			if (it != windowMap.CEnd())
-			{
-				Control* control = it->second;
-				return control;
-			}
-			else
-			{
-				return null;
-			}
-		}
-		public void RemoveWindow(Control* window)
-		{
-			windowMap.Remove(window->Handle());
-		}
-		private int nextWindowHandle;
-		private Map<int, Control*> windowMap;
-	}
+    public class WindowManager
+    {
+        public nothrow WindowManager() : nextWindowHandle(0)
+        {
+        }
+        public void AddWindow(Control* window)
+        {
+            window->SetHandle(nextWindowHandle++);
+            windowMap[window->Handle()] = window;
+        }
+        public Control* GetWindow(int windowHandle)    const
+        {
+            Map<int, Control*>.ConstIterator it = windowMap.CFind(windowHandle);
+            if (it != windowMap.CEnd())
+            {
+                Control* control = it->second;
+                return control;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public void RemoveWindow(Control* window)
+        {
+            windowMap.Remove(window->Handle());
+        }
+        private int nextWindowHandle;
+        private Map<int, Control*> windowMap;
+    }
 }

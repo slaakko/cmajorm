@@ -9,19 +9,19 @@ namespace System.IO
 {
     public class StreamReader
     {
-        public nothrow StreamReader(const SharedPtr<Stream>& stream_) : stream(stream_), buffered(false), buffer(-1), state(0), eof(false)
+        public nothrow StreamReader(const SharedPtr<Stream>& stream_) : stream(stream_), buffered(false), buffer(-1), state(0), eos(false)
         {
         }
         public int Read()
         {
             int x = Get(false);
-            eof = x == -1;
+            eos = x == -1;
             return x;
         }
         public int Peek()
         {
             int x = Get(true);
-            eof = x == -1;
+            eos = x == -1;
             return x;
         }
         public string ReadLine()
@@ -40,7 +40,7 @@ namespace System.IO
                 }
                 x = Read();
             }
-            eof = true;
+            eos = true;
             if (state == 1)
             {
                 result.Append('\r');
@@ -56,7 +56,7 @@ namespace System.IO
                 result.Append(cast<char>(x));
                 x = Read();
             }
-            eof = true;
+            eos = true;
             if (state == 1)
             {
                 result.Append('\r');
@@ -137,13 +137,13 @@ namespace System.IO
             }
             return -1;
         }
-        public nothrow inline bool Eof() const
+        public nothrow inline bool EndOfStream() const
         {
-            return eof;
+            return eos;
         }
-        public nothrow inline void ResetEof()
+        public nothrow inline void ResetEndOfStream()
         {
-            eof = false;
+            eos = false;
         }
         public nothrow const SharedPtr<Stream>& GetStream() const
         {
@@ -153,6 +153,6 @@ namespace System.IO
         private bool buffered;
         private int buffer;
         private int state;
-        private bool eof;
+        private bool eos;
     }
 }

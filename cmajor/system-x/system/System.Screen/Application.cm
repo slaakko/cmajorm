@@ -10,118 +10,118 @@ namespace System.Screen
 {
     public class Application
     {
-		static Application() : instance(new Application())
-		{
-		}
-		public ~Application()
-		{
-			try
-			{
-				CloseMsgQ(msgQ);
-				SetCooked(Terminal.Descriptor());
-				SetEcho(Terminal.Descriptor(), true);
-				Terminal.Out() << ResetColors();
-				ClearScreen(TerminalWindowWidth(), TerminalWindowHeight());
-				SetCursorPos(0, 0);
-			}
-			catch (const Exception& ex)
-			{
-			}
-		}
-		public static Application& Instance() 
-		{
-			return *instance;
-		}
-		private Application() : msgQ(MsgQ("system.screen.msg_queue"))
-		{
-			SetRaw(Terminal.Descriptor());
-			SetEcho(Terminal.Descriptor(), false);
-		}
-		public nothrow Window* MainWindow() 
-		{
-			return mainWindow;
-		}
-		public WindowManager& GetWindowManager() const
-		{
-			return windowManager;
-		}
+        static Application() : instance(new Application())
+        {
+        }
+        public ~Application()
+        {
+            try
+            {
+                CloseMsgQ(msgQ);
+                SetCooked(Terminal.Descriptor());
+                SetEcho(Terminal.Descriptor(), true);
+                Terminal.Out() << ResetColors();
+                ClearScreen(TerminalWindowWidth(), TerminalWindowHeight());
+                SetCursorPos(0, 0);
+            }
+            catch (const Exception& ex)
+            {
+            }
+        }
+        public static Application& Instance() 
+        {
+            return *instance;
+        }
+        private Application() : msgQ(MsgQ("system.screen.msg_queue"))
+        {
+            SetRaw(Terminal.Descriptor());
+            SetEcho(Terminal.Descriptor(), false);
+        }
+        public nothrow Window* MainWindow() 
+        {
+            return mainWindow;
+        }
+        public WindowManager& GetWindowManager() const
+        {
+            return windowManager;
+        }
         public void Run(Window& mainWindow_)
         {
-			mainWindow = &mainWindow_;
-			mainWindow->SetMainWindow();
-			mainWindow->Invalidate();
+            mainWindow = &mainWindow_;
+            mainWindow->SetMainWindow();
+            mainWindow->Invalidate();
             UniquePtr<Message> message = ReadMessage();
-			while (!(message.Get() is QuitMessage*))
-			{
-				bool handled = false;
-				if (message->TargetWindowHandle() != -1)
-				{
-					Control* control = windowManager.GetWindow(message->TargetWindowHandle());
-					if (control != null)
-					{
-						handled = control->HandleMessage(message.Get());
-					}
-				}
-				if (!handled)
-				{
-					handled = mainWindow->HandleMessage(message.Get());
-				}
-				message = ReadMessage();
-			}
+            while (!(message.Get() is QuitMessage*))
+            {
+                bool handled = false;
+                if (message->TargetWindowHandle() != -1)
+                {
+                    Control* control = windowManager.GetWindow(message->TargetWindowHandle());
+                    if (control != null)
+                    {
+                        handled = control->HandleMessage(message.Get());
+                    }
+                }
+                if (!handled)
+                {
+                    handled = mainWindow->HandleMessage(message.Get());
+                }
+                message = ReadMessage();
+            }
         }
-		public void Exit()
-		{
-			QuitMessage quitMessage;
-			PostMessage(quitMessage);
-		}
-		public void PostMessage(Message& message)
-		{
-			int msgSize = message.Size();
-			UniquePtr<byte> msg(cast<byte*>(MemAlloc(msgSize)));
-			MemoryWriter writer(msg.Get(), msgSize);
-			message.Write(writer);
-			PutMsg(msgQ, msg.Get(), msgSize);
-			SendKey(keyMsg);
-		}
-		private UniquePtr<Message> ReadMessage()
-		{
-			uchar key = ReadKey(Terminal.Descriptor());
-			if (key == keyMsg)
-			{
-				return GetMessage();
-			}
-			else
-			{
-				UniquePtr<Message> keyPressedMessage(new KeyPressedMessage(key));
-				return keyPressedMessage;
-			}
-		}
-		private UniquePtr<Message> GetMessage()
-		{
-			int qlen = GetMsgQLength(msgQ);
-			if (qlen > 0)
-			{
-				int msgSize = GetMsgSize(msgQ);
-				if (msgSize > 0)
-				{
-					UniquePtr<byte> msgData(cast<byte*>(MemAlloc(msgSize)));
-					GetMsg(msgQ, msgData.Get());
-					UniquePtr<Message> message(ReadMessage(msgData.Get(), msgSize));
-					return message;
-				}
-				else
-				{
-					throw Exception("invalid message size 0");
-				}
-			}
-			else
-			{
-				throw Exception("message queue " + ToString(msgQ) + " is empty");
-			}
-		}
-		private static UniquePtr<Application> instance;
-		private Window* mainWindow;
-		private WindowManager windowManager;
-		private int msgQ;
+        public void Exit()
+        {
+            QuitMessage quitMessage;
+            PostMessage(quitMessage);
+        }
+        public void PostMessage(Message& message)
+        {
+            int msgSize = message.Size();
+            UniquePtr<byte> msg(cast<byte*>(MemAlloc(msgSize)));
+            MemoryWriter writer(msg.Get(), msgSize);
+            message.Write(writer);
+            PutMsg(msgQ, msg.Get(), msgSize);
+            SendKey(keyMsg);
+        }
+        private UniquePtr<Message> ReadMessage()
+        {
+            uchar key = ReadKey(Terminal.Descriptor());
+            if (key == keyMsg)
+            {
+                return GetMessage();
+            }
+            else
+            {
+                UniquePtr<Message> keyPressedMessage(new KeyPressedMessage(key));
+                return keyPressedMessage;
+            }
+        }
+        private UniquePtr<Message> GetMessage()
+        {
+            int qlen = GetMsgQLength(msgQ);
+            if (qlen > 0)
+            {
+                int msgSize = GetMsgSize(msgQ);
+                if (msgSize > 0)
+                {
+                    UniquePtr<byte> msgData(cast<byte*>(MemAlloc(msgSize)));
+                    GetMsg(msgQ, msgData.Get());
+                    UniquePtr<Message> message(ReadMessage(msgData.Get(), msgSize));
+                    return message;
+                }
+                else
+                {
+                    throw Exception("invalid message size 0");
+                }
+            }
+            else
+            {
+                throw Exception("message queue " + ToString(msgQ) + " is empty");
+            }
+        }
+        private static UniquePtr<Application> instance;
+        private Window* mainWindow;
+        private WindowManager windowManager;
+        private int msgQ;
     }
 }

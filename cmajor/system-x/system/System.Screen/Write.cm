@@ -7,14 +7,14 @@ using System;
 
 namespace System.Screen
 {
-	public void Clear(const Rect& rect, ConsoleColor foreColor, ConsoleColor backColor)
-	{
-		Terminal.Out() << SetColors(foreColor, backColor);
-		ustring blankLine(' ', rect.size.w);
-		for (int i = 0; i < rect.size.h; ++i)
-		{
-			SetCursorPos(rect.location.x, rect.location.y + i);
-			Terminal.Out() << blankLine;
-		}
-	}
+    public void Clear(const Rect& rect, ConsoleColor foreColor, ConsoleColor backColor)
+    {
+        Terminal.Out() << SetColors(foreColor, backColor);
+        ustring blankLine(' ', rect.size.w);
+        for (int i = 0; i < rect.size.h; ++i)
+        {
+            SetCursorPos(rect.location.x, rect.location.y + i);
+            Terminal.Out() << blankLine;
+        }
+    }
 }
