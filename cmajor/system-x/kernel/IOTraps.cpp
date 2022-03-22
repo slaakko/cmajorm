@@ -8,6 +8,8 @@
 #include <system-x/kernel/Trap.hpp>
 #include <system-x/kernel/Process.hpp>
 #include <system-x/kernel/Pipe.hpp>
+#include <system-x/kernel/Terminal.hpp>
+#include <system-x/kernel/MsgQueue.hpp>
 #include <system-x/machine/Processor.hpp>
 
 namespace cmsx::kernel {
@@ -603,7 +605,7 @@ class TrapClearDirectoriesChangedHandler : public TrapHandler
 {
 public:
     uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
-    std::string TrapName() const { return "clear_directories_changed"; }
+    std::string TrapName() const { return "trap_clear_directories_changed"; }
 };
 
 uint64_t TrapClearDirectoriesChangedHandler::HandleTrap(cmsx::machine::Processor& processor)
@@ -612,6 +614,167 @@ uint64_t TrapClearDirectoriesChangedHandler::HandleTrap(cmsx::machine::Processor
     try
     {
         process->ClearDirectoriesChanged();
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapSendKeyHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_sendkey"; }
+};
+
+uint64_t TrapSendKeyHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        char32_t key = static_cast<char32_t>(processor.Regs().Get(cmsx::machine::regAX));
+        SendKey(key);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapMsgQHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_msgq"; }
+};
+
+uint64_t TrapMsgQHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int64_t nameAddr = processor.Regs().Get(cmsx::machine::regAX);
+        return MsgQ(process, nameAddr);
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapCloseMsgQHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_close_msgq"; }
+};
+
+uint64_t TrapCloseMsgQHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t md = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
+        CloseMsgQ(process, md);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapPutMsgHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_put_msg"; }
+};
+
+uint64_t TrapPutMsgHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t md = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
+        int64_t msgDataAddr = processor.Regs().Get(cmsx::machine::regBX);
+        int32_t msgSize = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regCX));
+        PutMsg(process, md, msgDataAddr, msgSize);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapGetMsgQLengthHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_get_msgq_length"; }
+};
+
+uint64_t TrapGetMsgQLengthHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t md = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
+        return GetMsgQueueLength(process, md);
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapGetMsgSizeHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_get_msg_size"; }
+};
+
+uint64_t TrapGetMsgSizeHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t md = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
+        return GetMsgSize(process, md);
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapGetMsgHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_get_msg"; }
+};
+
+uint64_t TrapGetMsgHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t md = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
+        int64_t bufferAddr = processor.Regs().Get(cmsx::machine::regBX);
+        GetMsg(process, md, bufferAddr);
         return 0;
     }
     catch (const SystemError& error)
@@ -648,12 +811,26 @@ void InitIOTraps()
     SetTrapHandler(trap_add_dir_change_notification, new TrapAddDirChangeNotificationHandler());
     SetTrapHandler(trap_remove_dir_change_notifications, new TrapRemoveDirChangeNotificationsHandler());
     SetTrapHandler(trap_directories_changed, new TrapDirectoriesChangedHandler());
-    SetTrapHandler(clear_directories_changed, new TrapClearDirectoriesChangedHandler());
+    SetTrapHandler(trap_clear_directories_changed, new TrapClearDirectoriesChangedHandler());
+    SetTrapHandler(trap_sendkey, new TrapSendKeyHandler());
+    SetTrapHandler(trap_msgq, new TrapMsgQHandler());
+    SetTrapHandler(trap_close_msgq, new TrapCloseMsgQHandler());
+    SetTrapHandler(trap_put_msg, new TrapPutMsgHandler());
+    SetTrapHandler(trap_get_msgq_length, new TrapGetMsgQLengthHandler());
+    SetTrapHandler(trap_get_msg_size, new TrapGetMsgSizeHandler());
+    SetTrapHandler(trap_get_msg, new TrapGetMsgHandler());
 }
 
 void DoneIOTraps()
 {
-    SetTrapHandler(clear_directories_changed, nullptr);
+    SetTrapHandler(trap_get_msg, nullptr);
+    SetTrapHandler(trap_get_msg_size, nullptr);
+    SetTrapHandler(trap_get_msgq_length, nullptr);
+    SetTrapHandler(trap_put_msg, nullptr);
+    SetTrapHandler(trap_close_msgq, nullptr);
+    SetTrapHandler(trap_msgq, nullptr);
+    SetTrapHandler(trap_sendkey, nullptr);
+    SetTrapHandler(trap_clear_directories_changed, nullptr);
     SetTrapHandler(trap_directories_changed, nullptr);
     SetTrapHandler(trap_remove_dir_change_notifications, nullptr);
     SetTrapHandler(trap_add_dir_change_notification, nullptr);

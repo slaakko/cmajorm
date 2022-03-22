@@ -1,0 +1,396 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+
+namespace System.Screen
+{
+	public class MenuControlCreateParams 
+	{
+		public nothrow MenuControlCreateParams  () : 
+			controlCreateParams(), 
+			highlightColor(ConsoleColor.defaultColor)
+		{
+		}
+		public ControlCreateParams controlCreateParams;
+		public ConsoleColor highlightColor;
+	}
+
+	public class MenuControl : Control
+	{
+		public nothrow MenuControl(MenuControlCreateParams& createParams) : base(createParams.controlCreateParams)
+		{
+			if (createParams.highlightColor == ConsoleColor.defaultColor)
+			{
+				highlightColor = ConsoleColor.red;
+			}
+			else
+			{
+				highlightColor = createParams.highlightColor;
+			}
+		}
+		public nothrow ConsoleColor HighlightColor() const
+		{
+			return highlightColor;
+		}
+		private ConsoleColor highlightColor;
+	}
+
+	public enum MenuBarFlags
+	{
+		none = 0, changed = 1 << 0
+	}
+
+	public class MenuBar : MenuControl
+	{
+		public nothrow MenuBar(MenuControlCreateParams& createParams) : base(createParams), flags(MenuBarFlags.none)
+		{
+			if (Location().IsDefault())
+			{
+				SetLocation(Point(0, 0));
+			}
+			if (GetSize().IsDefault())
+			{
+				SetSize(Size(TerminalWindowWidth(), 1));
+			}
+			if (ForeColor() == ConsoleColor.defaultColor)
+			{
+				SetForeColor(ConsoleColor.black);
+			}
+			if (BackColor() == ConsoleColor.defaultColor)
+			{
+				SetBackColor(ConsoleColor.gray);
+			}
+			SetChanged();
+		}
+		public nothrow void SetChanged()
+		{
+			flags = cast<MenuBarFlags>(flags | MenuBarFlags.changed);
+		}
+		public nothrow bool IsChanged() const
+		{
+			return (flags & MenuBarFlags.changed) != MenuBarFlags.none;
+		}
+		public void AddMenuItem(MenuItem* menuItem)
+		{
+			menuItem->SetMenuControl(this);
+			menuItems.AddChild(menuItem);
+		}
+		public override void OnKeyPressed(KeyEventArgs& args)
+		{
+			if (args.Handled()) return;
+			uchar key = args.Key();
+			if (key >= 'a' && key >= 'z')
+			{
+				key = ToUpper(key);
+			}
+			Component* child = menuItems.FirstChild();
+			while (child != null)
+			{
+				if (child is MenuItem*)
+				{
+					MenuItem* menuItem = cast<MenuItem*>(child);
+					if (menuItem->IsEnabled())
+					{
+						if (menuItem->AccessKey() == key)
+						{
+							args.SetHandled();
+							menuItem->SetState(MenuItemState.open);
+							return;
+						}
+						else
+						{
+							if (menuItem->DispatchKey(key))
+							{
+								args.SetHandled();
+								return;
+							}
+						}
+					}
+				}
+				child = child->NextSibling();
+			}
+		}
+		public override void OnWriteScreen(WriteScreenEventArgs& args)
+		{
+			Rect rect = args.GetRect();
+			if (rect.IsDefault())
+			{
+				rect = Rect(Location(), GetSize());
+			}
+			Clear(rect, ForeColor(), BackColor());
+			if (IsChanged())
+			{
+				Measure();
+			}
+			WriteMenuItems();
+		}
+		private void Measure()
+		{
+			Point loc = Location();
+			loc.x = loc.x + 1;
+			Component* child = menuItems.FirstChild();
+			while (child != null)
+			{
+				if (child is MenuItem*)
+				{
+					MenuItem* menuItem = cast<MenuItem*>(child);
+					menuItem->Measure(loc);
+				}
+				child = child->NextSibling();
+			}
+		}
+		private void WriteMenuItems()
+		{
+			Component* child = menuItems.FirstChild();
+			while (child != null)
+			{
+				if (child is MenuItem*)
+				{
+					MenuItem* menuItem = cast<MenuItem*>(child);
+					menuItem->WriteScreen();
+				}
+				child = child->NextSibling();
+			}
+		}
+		private MenuBarFlags flags;
+		private Container menuItems;
+	}
+	
+	public enum MenuItemState
+	{
+		closed = 0, open = 1
+	}
+
+	public enum MenuItemFlags 
+	{
+		none = 0, disabled = 1 << 0
+	}
+	
+	public class MenuItem : Component
+	{
+		public nothrow MenuItem(const string& text_, uchar shortcut_) : state(MenuItemState.closed), flags(MenuItemFlags.none), text(ToUtf32(text_)), accessKey(), shortcut(shortcut_)
+		{
+			SetAccessKey();
+		}
+		public nothrow MenuItem(const string& text_) : this(text_, uchar())
+		{
+		}
+		public nothrow void SetText(const string& text_)
+		{
+			text = ToUtf32(text_);
+			SetAccessKey();
+		}
+		public nothrow void SetDisabled()
+		{
+			flags = cast<MenuItemFlags>(flags | MenuItemFlags.disabled);
+		}
+		public nothrow void SetEnabled()
+		{
+			flags = cast<MenuItemFlags>(flags & ~MenuItemFlags.disabled);
+		}
+		public nothrow bool IsDisabled() const
+		{
+			return (flags & MenuItemFlags.disabled) != MenuItemFlags.none;
+		}
+		public nothrow bool IsEnabled() const
+		{
+			return (flags & MenuItemFlags.disabled) == MenuItemFlags.none;
+		}
+		public nothrow void SetState(MenuItemState state_)
+		{
+			if (state != state_)
+			{
+				state = state_;
+				Application.Instance().MainWindow()->Invalidate(childRect);
+			}
+		}
+		public nothrow bool IsTopLevel() const
+		{
+			return GetContainer()->Parent() == null;
+		}
+		public nothrow bool HasChildItems() const
+		{
+			return !items.IsEmpty();
+		}
+		public nothrow void SetMenuControl(MenuControl* menuControl_)
+		{
+			menuControl = menuControl_;
+		}
+		public bool DispatchKey(uchar key)
+		{
+			Component* child = items.FirstChild();
+			while (child != null)
+			{
+				if (child is MenuItem*)
+				{
+					MenuItem* menuItem = cast<MenuItem*>(child);
+					if (menuItem->IsEnabled())
+					{
+						if (state == MenuItemState.open)
+						{
+							if (menuItem->AccessKey() == key)
+							{
+								if (menuItem->HasChildItems())
+								{
+									menuItem->SetState(MenuItemState.open);
+									return true;
+								}
+								else
+								{
+									menuItem->Select();
+									return true;
+								}
+							}
+						}
+						else if (menuItem->Shortcut() == key)
+						{
+							menuItem->Select();
+							return true;
+						}
+						else
+						{
+							return menuItem->DispatchKey(key);
+						}
+					}
+				}
+				child = child->NextSibling();
+			}
+			return false;
+		}
+		public nothrow Event<SelectEventHandler>& SelectEvent() 
+		{ 
+			return selectEvent; 
+		}
+		public void Select()
+		{
+			SetState(MenuItemState.closed);
+			selectEvent.Fire();
+		}
+		public void WriteScreen()
+		{
+			if (IsTopLevel())
+			{
+				WriteTopLevel();
+			}
+			else
+			{
+				WriteChild();
+			}
+		}
+		public nothrow void Measure(Point& loc)
+		{
+			if (IsTopLevel())
+			{
+				MeasureTopLevel(loc);
+			}
+			else
+			{
+				MeasureChild(loc);
+			}
+		}
+		public nothrow int TextLength() const
+		{
+			int ampPos = cast<int>(text.Find('&'));
+			if (ampPos != -1)
+			{
+				int n = cast<int>(text.Length() - 1);
+				return n;
+			}
+			else
+			{
+				return cast<int>(text.Length());
+			}
+		}
+		public nothrow uchar AccessKey() const
+		{
+			return accessKey;
+		}
+		public nothrow void SetAccessKey()
+		{
+			int ampPos = cast<int>(text.Find('&'));
+			if (ampPos != -1 && ampPos < text.Length() - 1)
+			{
+				if (IsTopLevel())
+				{
+					accessKey = cast<uchar>(cast<int>(keyAltA) + (cast<int>(ToUpper(text[ampPos + 1])) - cast<int>('A')));
+				}
+				else
+				{
+					accessKey = ToUpper(text[ampPos + 1]);
+				}
+			}
+			else
+			{
+				accessKey = '\0';
+			}
+		}
+		public nothrow uchar Shortcut() const
+		{
+			return shortcut;
+		}
+		private void MeasureTopLevel(Point& loc)
+		{
+			location = loc;
+			loc.x = loc.x + TextLength() + 2;
+		}
+		private void MeasureChild(Point& loc)
+		{
+		}
+		private void WriteTopLevel()
+		{
+			WriteText();
+		}
+		private void WriteChild()
+		{
+			WriteText();
+		}
+		private void WriteText()
+		{
+			SetCursorPos(location.x, location.y);
+			int ampPos = cast<int>(text.Find('&'));
+			if (ampPos != -1)
+			{
+				ustring prefix = text.Substring(0, ampPos);
+				Terminal.Out() << prefix;
+				ustring highlightStr = text.Substring(ampPos + 1, 1);
+				Terminal.Out() << SetColors(menuControl->HighlightColor(), menuControl->BackColor());
+				Terminal.Out() << highlightStr;
+				Terminal.Out() << SetColors(menuControl->ForeColor(), menuControl->BackColor());
+				ustring suffix = text.Substring(0, ampPos + 2);
+				Terminal.Out() << suffix;
+			}
+			else
+			{
+				Terminal.Out() << text;
+			}
+		}
+		private MenuItemState state;
+		private MenuItemFlags flags;
+		private MenuControl* menuControl;
+		private Point location;
+		private Rect childRect;
+		private ustring text;
+		private Container items;
+		private uchar accessKey;
+		private uchar shortcut;
+		private Event<SelectEventHandler> selectEvent;
+	}
+	
+	public abstract class SelectAction 
+	{
+		public SelectAction(MenuItem* menuItem)
+		{
+			menuItem->SelectEvent().AddHandler(Select);
+		}
+		public default virtual ~SelectAction();
+		public abstract void Execute();
+		private void Select()
+		{
+			Execute();
+		}
+	}
+}

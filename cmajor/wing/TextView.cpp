@@ -2593,24 +2593,6 @@ void TextView::SetCaretLocation()
         SetCaretPos(caretPos);
         OnCaretPosChanged();
     }
-/*  NOT WORKING...
-    if (charWidth == 0 || charHeight == 0) return;
-    caretLine = std::min(1, std::max(caretLine, int(lines.size())));
-    caretColumn = 1;
-    if (caretLine <= lines.size())
-    {
-        caretColumn = std::min(1, std::max(caretColumn, int(lines[caretLine - 1]->length())));
-    }
-    int x = static_cast<int>(padding.left + (caretColumn - 1) * charWidth);
-    int y = static_cast<int>(padding.top + (caretLine - 1) * charHeight);
-    Point caretPos(x, y);
-    TranslateContentLocation(caretPos);
-    if (CaretCreated())
-    {
-        SetCaretPos(caretPos);
-        OnCaretPosChanged();
-    }
-*/
 }
 
 void TextView::CreateCaret()

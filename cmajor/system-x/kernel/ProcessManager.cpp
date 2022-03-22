@@ -96,7 +96,10 @@ Process* ProcessManager::CreateProcess()
 void ProcessManager::SetMachine(cmsx::machine::Machine* machine_)
 {
     machine = machine_;
-    machine->AddObserver(this);
+    if (machine)
+    {
+        machine->AddObserver(this);
+    }
 }
 
 void ProcessManager::DeleteProcess(int32_t pid)

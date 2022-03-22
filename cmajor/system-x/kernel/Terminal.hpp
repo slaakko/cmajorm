@@ -32,6 +32,7 @@ public:
     void SetCooked() override;
     void SetRaw() override;
     void SetEcho(bool echo) override;
+    void SendKey(char32_t key) override;
     void PushLines() override;
     void PopLines() override;
     bool IsDirFile() const override { return false; }
@@ -42,7 +43,6 @@ public:
 CMSX_KERNEL_API void SetTerminalMachine(cmsx::machine::Machine* machine);
 CMSX_KERNEL_API void StartTerminal();
 CMSX_KERNEL_API void StopTerminal();
-CMSX_KERNEL_API File* GetTerminalFile();
 CMSX_KERNEL_API void InitTerminal();
 CMSX_KERNEL_API void DoneTerminal();
 

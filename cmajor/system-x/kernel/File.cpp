@@ -9,8 +9,7 @@
 
 namespace cmsx::kernel {
 
-File* terminalOutputFile = nullptr;
-File* terminalInputFile = nullptr;
+File* terminalFile = nullptr;
 
 File::File(const std::string& name_) : name(name_)
 {
@@ -58,6 +57,11 @@ void File::SetEcho(bool echo)
     throw SystemError(EBADF, name + ": cannot set echo");
 }
 
+void File::SendKey(char32_t key)
+{
+    throw SystemError(EBADF, name + ": cannot send key");
+}
+
 void File::PushLines()
 {
     throw SystemError(EBADF, name + ": cannot push lines");
@@ -81,9 +85,9 @@ int64_t File::Tell(cmsx::machine::Process* process)
 ProcessFileTable::ProcessFileTable()
 {
     files.resize(cmsx::machine::MaxOpenFiles());
-    files[0] = terminalInputFile;
-    files[1] = terminalOutputFile;
-    files[2] = terminalOutputFile;
+    files[0] = terminalFile;
+    files[1] = terminalFile;
+    files[2] = terminalFile;
 }
 
 void ProcessFileTable::CloseFiles(cmsx::kernel::Process* process)
@@ -150,22 +154,26 @@ File* ProcessFileTable::GetFile(int32_t fd) const
     return file;
 }
 
-void SetTerminalFiles(File* terminalOutputFile, File* terminalInputFile)
+void SetTerminalFile(File* terminalFile)
 {
-    cmsx::kernel::terminalOutputFile = terminalOutputFile;
-    cmsx::kernel::terminalInputFile = terminalInputFile;
+    cmsx::kernel::terminalFile = terminalFile;
+}
+
+File* GetTerminalFile()
+{
+    return cmsx::kernel::terminalFile;
 }
 
 void WriteToTerminal(const std::string& text, cmsx::machine::Process* process)
 {
-    if (cmsx::kernel::terminalOutputFile)
+    if (cmsx::kernel::terminalFile)
     {
         std::vector<std::uint8_t> buffer;
         for (char c : text)
         {
             buffer.push_back(static_cast<uint8_t>(c));
         }
-        cmsx::kernel::terminalOutputFile->Write(buffer, process);
+        cmsx::kernel::terminalFile->Write(buffer, process);
     }
 }
 

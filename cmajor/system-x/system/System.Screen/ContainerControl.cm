@@ -1,0 +1,45 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Screen
+{
+	public class ContainerControl : Control
+	{
+		public nothrow ContainerControl(ControlCreateParams& createParams) : base(createParams), container(this)
+		{
+		}
+		public void AddChild(Control* child)
+		{
+			container.AddChild(child);
+		}
+		public void InsertChildBefore(Component* child, Component* before)
+		{
+			container.InsertBefore(child, before);
+		}
+		public void InsertChildAfter(Component* child, Component* after)
+		{
+			container.InsertAfter(child, after);
+		}
+		public override bool HandleWriteScreen(WriteScreenMessage* message)
+		{
+			WriteScreenEventArgs args(message->GetRect());
+			OnWriteScreen(args);
+			Component* child = container.FirstChild();
+			while (child != null)
+			{
+				if (child is Control*)
+				{
+					Control* controlChild = cast<Control*>(child);
+					controlChild->HandleWriteScreen(message);
+				}
+				child = child->NextSibling();
+			}
+			return true;
+		}
+		private Container container;
+	}
+}

@@ -2,14 +2,14 @@ using System;
 
 void main()
 {
-	int w = TermimalWindowWidth();
-	int h = TermimalWindowHeight();
+	int w = TerminalWindowWidth();
+	int h = TerminalWindowHeight();
 	int x = CursorX();
 	int y = CursorY();
-	SetCursorPos(0, h - 1);
+	SetCursorPos(0, h - 2);
 	SetRaw(0);
 	uchar c = ReadKey(0);
-	if (c == keyDown)
+	if (c == keyAltX)
 	{
 		Terminal.Out() << "Hip hip hurraa!";
 		SetCursorPos(x, y);

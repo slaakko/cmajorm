@@ -9,13 +9,13 @@
 #include <system-x/db/CodeView.hpp>
 #include <system-x/db/RegisterView.hpp>
 #include <system-x/db/DataView.hpp>
-#include <system-x/guicon/Console.hpp>
+#include <system-x/guiterm/Terminal.hpp>
+#include <system-x/guiterm/TerminalControl.hpp>
 #include <wing/LogView.hpp>
 #include <wing/Window.hpp>
 #include <wing/Menu.hpp>
 #include <wing/SplitContainer.hpp>
 #include <wing/TabControl.hpp>
-#include <wing/Console.hpp>
 #include <machine/Machine.hpp>
 #include <kernel/Process.hpp>
 #include <db/Debugger.hpp>
@@ -61,6 +61,8 @@ public:
     void NotifyDebuggingStopped();
     void NotifyDebuggerError();
 protected:
+    void OnKeyDown(KeyEventArgs& args);
+    void OnKeyPress(KeyPressEventArgs& args);
     bool ProcessMessage(Message& msg) override;
     void OnMouseWheel(MouseWheelEventArgs& args) override;
 private:
@@ -113,7 +115,6 @@ private:
     void PrintError(const std::string& errorMessage);
     void PrintExit();
     void SetState(DebuggingState state_);
-    void ConsoleInputReady();
     MainDebuggerObserver observer;
     std::unique_ptr<cmsx::machine::Machine> machine;
     std::unique_ptr<Debugger> debugger;
@@ -136,8 +137,8 @@ private:
     cmajor::wing::SplitContainer* verticalSplitContainer;
     cmajor::wing::TabControl* topTabControl;
     cmajor::wing::TabControl* bottomTabControl;
-    cmajor::wing::Console* console;
-    std::unique_ptr<cmsx::guicon::ConsoleFile> consoleFile;
+    std::unique_ptr<cmsx::guiterm::TerminalFile> terminalFile;
+    cmsx::guiterm::TerminalControl* terminalControl;
     DebugView* currentTopView;
     DebugView* currentBottomView;
     std::vector<DebugView*> views;

@@ -101,7 +101,7 @@ enum class Keys : int
     kanaMode = 21,
     kanjiMode = 25,
     keyCode = 65535,
-    l = 75,
+    l = 76,
     launchApplication1 = 182,
     launchApplication2 = 183,
     launchMail = 180,

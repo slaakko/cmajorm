@@ -47,7 +47,7 @@ public:
     std::vector<uint8_t> Read(int64_t count, cmsx::machine::Process* process);
     int64_t Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process);
     void SetMachine(cmsx::machine::Machine* machine_) { machine = machine_; }
-    File* GetTerminalFile() { return &terminalFile; }
+    void SendKey(char32_t key);
     void Start();
     void Stop();
     void Run();
@@ -111,6 +111,7 @@ private:
     std::u32string line;
     int pos;
     int lineIndex;
+    bool eof;
 };
 
 bool Terminal::initialized = false;
@@ -168,6 +169,13 @@ void Terminal::GetTerminalInput()
     }
 }
 
+void Terminal::SendKey(char32_t key)
+{
+    terminalInputQueue.push_back(key);
+    terminalInputReady = true;
+    terminalEventVar.notify_one();
+}
+
 void Terminal::PushLines()
 {
     linesStack.push(std::move(lines));
@@ -222,12 +230,13 @@ Terminal::Terminal() :
     started(false),
     stopped(false),
     pos(0),
-    lineIndex(0)
+    lineIndex(0),
+    eof(false)
 {
     GetScreenBufferInfo();
     defaultAttrs = attrs;
     OsRegisterConsoleCallBack(consoleInputHandle, &TerminalInputWaiting, waitHandle);
-    SetTerminalFiles(&terminalFile, &terminalFile);
+    SetTerminalFile(&terminalFile);
 }
 
 Terminal::~Terminal()
@@ -278,10 +287,17 @@ void Terminal::HandleInputChar(char32_t ch)
                 PrintNewLine();
             }
         }
-        std::string chars = ToUtf8(std::u32string(1, ch));
-        for (char c : chars)
+        if (ch == keyControlD)
         {
-            terminalInputBuffer.push_back(static_cast<uint8_t>(c));
+            HandleEof();
+        }
+        else
+        {
+            std::string chars = ToUtf8(std::u32string(1, ch));
+            for (char c : chars)
+            {
+                terminalInputBuffer.push_back(static_cast<uint8_t>(c));
+            }
         }
         Wakeup(terminalInputEvent);
     }
@@ -365,11 +381,6 @@ void Terminal::HandleInputChar(char32_t ch)
                 case static_cast<char32_t>(keyDel):
                 {
                     HandleDel();
-                    break;
-                }
-                case static_cast<char32_t>(keyBackspace):
-                {
-                    HandleBackspace();
                     break;
                 }
             }
@@ -463,7 +474,7 @@ void Terminal::HandleTab()
 
 void Terminal::HandleEof()
 {
-
+    eof = true;
 }
 
 void Terminal::HandleHome()
@@ -728,9 +739,14 @@ std::vector<uint8_t> Terminal::Read(int64_t count, cmsx::machine::Process* proce
         std::unique_lock<std::recursive_mutex> lock(machine->Lock());
         if (terminalInputBuffer.empty())
         {
+            if (eof)
+            {
+                eof = false;
+                return std::vector<uint8_t>();
+            }
             sleepingOnTerminalInputEvent = true;
             Sleep(terminalInputEvent, process, lock);
-            if (exiting || machine->Exiting()) return bytes;
+            if (exiting || machine->Exiting()) return std::vector<uint8_t>();
             lock.lock();
             sleepingOnTerminalInputEvent = false;
             continue;
@@ -776,7 +792,7 @@ int64_t Terminal::Write(const std::vector<uint8_t>& buffer, cmsx::machine::Proce
             {
                 uint8_t fgColor = static_cast<uint32_t>(ch) & 0xFF;
                 uint8_t bgColor = (static_cast<uint32_t>(ch) >> 8) & 0xFF;
-                uint16_t colorAttrs = fgColor | (bgColor << 8);
+                uint16_t colorAttrs = static_cast<uint16_t>(fgColor) | (uint16_t(bgColor) << 4);
                 Write(utf32Chars);
                 utf32Chars.clear();
                 OsSetConsoleTextAttribute(consoleOutputHandle, colorAttrs);
@@ -850,6 +866,11 @@ void TerminalFile::SetEcho(bool echo)
     Terminal::Instance().SetEcho(echo);
 }
 
+void TerminalFile::SendKey(char32_t key)
+{
+    Terminal::Instance().SendKey(key);
+}
+
 void TerminalFile::PushLines()
 {
     Terminal::Instance().PushLines();
@@ -881,14 +902,6 @@ void StopTerminal()
     if (Terminal::Initialized())
     {
         Terminal::Instance().Stop();
-    }
-}
-
-File* GetTerminalFile()
-{
-    if (Terminal::Initialized())
-    {
-        return Terminal::Instance().GetTerminalFile();
     }
 }
 

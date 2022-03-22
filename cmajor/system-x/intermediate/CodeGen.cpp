@@ -892,6 +892,7 @@ void EmitBinOpInst(BinaryInstruction& inst, CodeGenerator& codeGen)
                 machineInst = signedMachineInst;
                 break;
             }
+            case boolTypeId:
             case byteTypeId:
             case ushortTypeId:
             case uintTypeId:

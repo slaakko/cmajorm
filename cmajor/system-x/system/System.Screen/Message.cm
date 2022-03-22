@@ -1,0 +1,127 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+using System.Collections;
+
+namespace System.Screen
+{
+	public abstract class Message
+	{
+		public nothrow Message() : targetWindowHandle(-1)
+		{
+		}
+		public default virtual ~Message();
+		public static Message()
+		{
+			SetSize(cast<int>(sizeof(int) + sizeof(int)));
+		}
+		public static nothrow void SetId(int id_)
+		{
+			id = id_;
+		}
+		public static nothrow void SetSize(int size_)
+		{
+			size = size_;
+		}
+		public static nothrow int Id() 
+		{
+			return id;
+		}
+		public static nothrow int Size() 
+		{
+			return size;
+		}
+		public nothrow int TargetWindowHandle() const
+		{
+			return targetWindowHandle;
+		}
+		public nothrow void SetTargetWindowHandle(int targetWindowHandle_)
+		{
+			targetWindowHandle = targetWindowHandle_;
+		}
+		public virtual void Write(MemoryWriter& writer)
+		{
+			writer.Write(id);
+			writer.Write(targetWindowHandle);
+		}
+		public virtual void Read(MemoryReader& reader)
+		{
+			targetWindowHandle = reader.ReadInt();
+		}
+		public virtual bool Dispatch(Control* control)
+		{
+			return false;
+		}
+		private static int id;
+		private int targetWindowHandle;
+		private static int size;
+	}
+	
+	public abstract class MessageFactoryFunction
+	{
+		public abstract Message* CreateMessage();
+	}
+	
+	public class MessageFactory
+	{
+		static MessageFactory() : instance(new MessageFactory())
+		{
+		}
+		private MessageFactory()
+		{
+		}
+		public static MessageFactory& Instance() 
+		{
+			return *instance;
+		}
+		public void Register(int messageId, MessageFactoryFunction* factoryFunction)
+		{
+			factoryFunctionMap[messageId] = factoryFunction;
+			factoryFunctions.Add(UniquePtr<MessageFactoryFunction>(factoryFunction));
+		}
+		public Message* CreateMessage(int messageId)
+		{
+			Map<int, MessageFactoryFunction*>.ConstIterator it = factoryFunctionMap.CFind(messageId);
+			if (it != factoryFunctionMap.CEnd())
+			{
+				MessageFactoryFunction* factoryFunction = it->second;
+				Message* message = factoryFunction->CreateMessage();
+				return message;
+			}
+			else
+			{
+				throw Exception("message id '" + ToString(messageId) + "' not registered with message factory");
+			}
+		}
+		private static UniquePtr<MessageFactory> instance;
+		private Map<int, MessageFactoryFunction*> factoryFunctionMap;
+		private List<UniquePtr<MessageFactoryFunction>> factoryFunctions;
+	}
+	
+	public Message* ReadMessage(byte* messageData, int messageSize)
+	{
+		MemoryReader reader(messageData, messageSize);
+		int messageId = reader.ReadInt();
+		Message* message = MessageFactory.Instance().CreateMessage(messageId);
+		message->Read(reader);
+		return message;
+	}
+	
+	public class ConcreteMessageFactoryFunction<T> : MessageFactoryFunction
+	{
+		public override Message* CreateMessage()
+		{
+			T* message = new T();
+			return message;
+		}
+	}
+	
+	public void RegisterMessage<T>(int messageId) 
+	{
+		MessageFactory.Instance().Register(messageId, new ConcreteMessageFactoryFunction<T>());
+	}
+}

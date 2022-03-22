@@ -252,12 +252,12 @@ namespace System
 		IOCtl(fd, IOControlItem.set_cooked, null, 0);
 	}
 	
-	public nothrow int TermimalWindowWidth()
+	public nothrow int TerminalWindowWidth()
 	{
 		return IOCtl(Terminal.Descriptor(), IOControlItem.columns, null, 0);
 	}
 
-	public nothrow int TermimalWindowHeight()
+	public nothrow int TerminalWindowHeight()
 	{
 		return IOCtl(Terminal.Descriptor(), IOControlItem.rows, null, 0);
 	}

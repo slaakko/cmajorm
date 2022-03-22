@@ -1,0 +1,25 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Screen
+{
+    public class Window : ContainerControl
+    {
+		public nothrow Window() : base(), isMainWindow(false)
+		{
+		}
+		public nothrow bool IsMainWindow()
+		{
+			return isMainWindow;
+		}
+		public nothrow void SetMainWindow()
+		{
+			isMainWindow = true;
+		}
+        private bool isMainWindow;
+    }
+}

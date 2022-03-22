@@ -5,6 +5,7 @@
 
 #include <system-x/db/MainWindow.hpp>
 #include <system-x/db/AboutDialog.hpp>
+#include <system-x/guiterm/TerminalControl.hpp>
 #include <system-x/kernel/Load.hpp>
 #include <system-x/kernel/Kernel.hpp>
 #include <system-x/kernel/ProcessManager.hpp>
@@ -73,7 +74,7 @@ MainWindow::MainWindow(const std::string& filePath_) :
     observer(this), filePath(filePath_), args(), env(), machine(nullptr), process(nullptr), openFileMenuItem(nullptr), closeFileMenuItem(nullptr), exitMenuItem(nullptr), 
     codeView(nullptr), registerView(nullptr), dataView(nullptr), argsView(nullptr), envView(nullptr), heapView(nullptr), stackView(nullptr), logView(nullptr), 
     currentTopView(nullptr), currentBottomView(nullptr), waitingDebugger(false), startContinueMenuItem(nullptr), stopMenuItem(nullptr), resetMenuItem(nullptr), 
-    singleStepMenuItem(nullptr), stepOverMenuItem(nullptr), toggleBreakpointMenuItem(nullptr), fileOpen(false), console(nullptr)
+    singleStepMenuItem(nullptr), stepOverMenuItem(nullptr), toggleBreakpointMenuItem(nullptr), fileOpen(false), terminalControl(nullptr)
 {
     std::unique_ptr<MenuBar> menuBar(new MenuBar());
     std::unique_ptr<MenuItem> fileMenuItem(new MenuItem("&File"));
@@ -262,8 +263,8 @@ MainWindow::MainWindow(const std::string& filePath_) :
 
     SetState(DebuggingState::debuggerIdle);
 
-    consoleFile.reset(new cmsx::guicon::ConsoleFile());
-    cmsx::kernel::SetTerminalFiles(consoleFile.get(), consoleFile.get());
+    terminalFile.reset(new cmsx::guiterm::TerminalFile());
+    cmsx::kernel::SetTerminalFile(terminalFile.get());
 
     if (!filePath.empty())
     {
@@ -288,6 +289,30 @@ void MainWindow::NotifyDebuggerError()
     std::unique_lock<std::mutex> lock(mtx);
     SetState(DebuggingState::debuggerError);
     debuggingStoppedOrErrorVar.notify_one();
+}
+
+void MainWindow::OnKeyDown(KeyEventArgs& args)
+{
+    Window::OnKeyDown(args);
+    if (!args.handled)
+    {
+        if (terminalControl && terminalControl->IsActive())
+        {
+            terminalControl->HandleKeyDown(args);
+        }
+    }
+}
+
+void MainWindow::OnKeyPress(KeyPressEventArgs& args)
+{
+    Window::OnKeyPress(args);
+    if (!args.handled)
+    {
+        if (terminalControl && terminalControl->IsActive())
+        {
+            terminalControl->HandleKeyPress(args);
+        }
+    }
 }
 
 bool MainWindow::ProcessMessage(Message& msg)
@@ -339,75 +364,107 @@ void MainWindow::OnMouseWheel(MouseWheelEventArgs& args)
 
 void MainWindow::ToggleBreakpointClick()
 {
-    try
+    if (terminalControl->IsActive())
     {
-        debugger->ToggleBreakpoint(codeView->CurrentAddress());
-        codeView->Reset();
-        codeView->UpdateView(false);
+        KeyEventArgs args(Keys::f9);
+        terminalControl->HandleKeyDown(args);
     }
-    catch (const std::exception& ex)
+    else
     {
-        PrintError(ex.what());
+        try
+        {
+            debugger->ToggleBreakpoint(codeView->CurrentAddress());
+            codeView->Reset();
+            codeView->UpdateView(false);
+        }
+        catch (const std::exception& ex)
+        {
+            PrintError(ex.what());
+        }
     }
 }
 
 void MainWindow::SingleStepClick()
 {
-    try
+    if (terminalControl->IsActive())
     {
-        if (state == DebuggingState::debuggerWaitingForCommand)
-        {
-            SetState(DebuggingState::debuggerBusy);
-            debugger->SingleStep();
-        }
-        else
-        {
-            throw std::runtime_error("debugger not waiting for command");
-        }
+        KeyEventArgs args(Keys::f11);
+        terminalControl->HandleKeyDown(args);
     }
-    catch (const std::exception& ex)
+    else
     {
-        PrintError(ex.what());
+        try
+        {
+            if (state == DebuggingState::debuggerWaitingForCommand)
+            {
+                SetState(DebuggingState::debuggerBusy);
+                debugger->SingleStep();
+            }
+            else
+            {
+                throw std::runtime_error("debugger not waiting for command");
+            }
+        }
+        catch (const std::exception& ex)
+        {
+            PrintError(ex.what());
+        }
     }
 }
 
 void MainWindow::StepOverClick()
 {
-    try
+    if (terminalControl->IsActive())
     {
-        if (state == DebuggingState::debuggerWaitingForCommand)
-        {
-            SetState(DebuggingState::debuggerBusy);
-            debugger->StepOver();
-        }
-        else
-        {
-            throw std::runtime_error("debugger not waiting for command");
-        }
+        KeyEventArgs args(Keys::f12);
+        terminalControl->HandleKeyDown(args);
     }
-    catch (const std::exception& ex)
+    else
     {
-        PrintError(ex.what());
+        try
+        {
+            if (state == DebuggingState::debuggerWaitingForCommand)
+            {
+                SetState(DebuggingState::debuggerBusy);
+                debugger->StepOver();
+            }
+            else
+            {
+                throw std::runtime_error("debugger not waiting for command");
+            }
+        }
+        catch (const std::exception& ex)
+        {
+            PrintError(ex.what());
+        }
     }
 }
 
 void MainWindow::ContinueClick()
 {
-    try
+    if (terminalControl->IsActive())
     {
-        if (state == DebuggingState::debuggerWaitingForCommand)
-        {
-            SetState(DebuggingState::debuggerBusy);
-            debugger->Continue();
-        }
-        else
-        {
-            throw std::runtime_error("debugger not waiting for command");
-        }
+        KeyEventArgs args(Keys::f5);
+        terminalControl->HandleKeyDown(args);
     }
-    catch (const std::exception& ex)
+    else
     {
-        PrintError(ex.what());
+        try
+        {
+            if (state == DebuggingState::debuggerWaitingForCommand)
+            {
+                SetState(DebuggingState::debuggerBusy);
+                debugger->Continue();
+            }
+            else
+            {
+                throw std::runtime_error("debugger not waiting for command");
+            }
+        }
+        catch (const std::exception& ex)
+        {
+            PrintError(ex.what());
+        }
     }
 }
 
@@ -426,96 +483,136 @@ void MainWindow::AboutClick()
 
 void MainWindow::OpenFileClick()
 {
-    try
+    if (terminalControl->IsActive())
     {
-        std::vector<std::pair<std::string, std::string>> descriptionFilterPairs;
-        descriptionFilterPairs.push_back(std::make_pair("System X executable files (*.x)", "*.x"));
-        std::string initialDirectory = CmajorProjectsDir();
-        std::string filePath;
-        std::string currentDirectory;
-        std::vector<std::string> fileNames;
-        bool selected = OpenFileName(Handle(), descriptionFilterPairs, initialDirectory, std::string(), "x", 
-            OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST, filePath, currentDirectory, fileNames);
-        if (selected)
+        KeyEventArgs args(Keys::controlModifier | Keys::o);
+        terminalControl->HandleKeyDown(args);
+    }
+    else
+    {
+        try
+        {
+            std::vector<std::pair<std::string, std::string>> descriptionFilterPairs;
+            descriptionFilterPairs.push_back(std::make_pair("System X executable files (*.x)", "*.x"));
+            std::string initialDirectory = CmajorProjectsDir();
+            std::string filePath;
+            std::string currentDirectory;
+            std::vector<std::string> fileNames;
+            bool selected = OpenFileName(Handle(), descriptionFilterPairs, initialDirectory, std::string(), "x",
+                OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST, filePath, currentDirectory, fileNames);
+            if (selected)
+            {
+                waitingDebugger = true;
+                if (state == DebuggingState::debuggerWaitingForCommand)
+                {
+                    StopDebugging(true);
+                }
+                this->filePath = GetFullPath(filePath);
+                waitingDebugger = false;
+                LoadProcess();
+                fileOpen = true;
+            }
+        }
+        catch (const std::exception& ex)
+        {
+            waitingDebugger = false;
+            ShowErrorMessageBox(Handle(), ex.what());
+        }
+    }
+}
+
+void MainWindow::CloseFileClick()
+{
+    if (terminalControl->IsActive())
+    {
+        KeyEventArgs args(Keys::controlModifier | Keys::f4);
+        terminalControl->HandleKeyDown(args);
+    }
+    else
+    {
+        try
+        {
+            waitingDebugger = true;
+            StopDebugging(true);
+            waitingDebugger = false;
+            fileOpen = false;
+            SetState(DebuggingState::debuggerIdle);
+        }
+        catch (const std::exception& ex)
+        {
+            ShowErrorMessageBox(Handle(), ex.what());
+        }
+    }
+}
+
+void MainWindow::ResetClick()
+{
+    if (terminalControl->IsActive())
+    {
+        KeyEventArgs args(Keys::f4);
+        terminalControl->HandleKeyDown(args);
+    }
+    else
+    {
+        try
+        {
+            if (filePath.empty())
+            {
+                throw std::runtime_error("no executable file open");
+            }
+            waitingDebugger = true;
+            if (state == DebuggingState::debuggerWaitingForCommand || state == DebuggingState::debuggerExit)
+            {
+                StopDebugging(true);
+            }
+            waitingDebugger = false;
+            LoadProcess();
+        }
+        catch (const std::exception& ex)
+        {
+            waitingDebugger = false;
+            ShowErrorMessageBox(Handle(), ex.what());
+        }
+    }
+}
+
+void MainWindow::StopClick()
+{
+    if (terminalControl->IsActive())
+    {
+        KeyEventArgs args(Keys::shiftModifier | Keys::f5);
+        terminalControl->HandleKeyDown(args);
+    }
+    else
+    {
+        try
         {
             waitingDebugger = true;
             if (state == DebuggingState::debuggerWaitingForCommand)
             {
                 StopDebugging(true);
             }
-            this->filePath = GetFullPath(filePath);
             waitingDebugger = false;
-            LoadProcess();
-            fileOpen = true;
         }
-    }
-    catch (const std::exception& ex)
-    {
-        waitingDebugger = false;
-        ShowErrorMessageBox(Handle(), ex.what());
-    }
-}
-
-void MainWindow::CloseFileClick()
-{
-    try
-    {
-        waitingDebugger = true;
-        StopDebugging(true);
-        waitingDebugger = false;
-        fileOpen = false;
-        SetState(DebuggingState::debuggerIdle);
-    }
-    catch (const std::exception& ex)
-    {
-        ShowErrorMessageBox(Handle(), ex.what());
-    }
-}
-
-void MainWindow::ResetClick()
-{
-    try
-    {
-        if (filePath.empty())
+        catch (const std::exception& ex)
         {
-            throw std::runtime_error("no executable file open");
+            waitingDebugger = false;
+            ShowErrorMessageBox(Handle(), ex.what());
         }
-        waitingDebugger = true;
-        if (state == DebuggingState::debuggerWaitingForCommand || state == DebuggingState::debuggerExit)
-        {
-            StopDebugging(true);
-        }
-        waitingDebugger = false;
-        LoadProcess();
-    }
-    catch (const std::exception& ex)
-    {
-        waitingDebugger = false;
-        ShowErrorMessageBox(Handle(), ex.what());
-    }
-}
-
-void MainWindow::StopClick()
-{
-    try
-    {
-        waitingDebugger = true;
-        if (state == DebuggingState::debuggerWaitingForCommand)
-        {
-            StopDebugging(true);
-        }
-        waitingDebugger = false;
-    }
-    catch (const std::exception& ex)
-    {
-        waitingDebugger = false;
-        ShowErrorMessageBox(Handle(), ex.what());
     }
 }
 
 void MainWindow::ExitClick()
 {
-    Close();
+    if (terminalControl->IsActive())
+    {
+        KeyEventArgs args(Keys::altModifier | Keys::f4);
+        terminalControl->HandleKeyDown(args);
+    }
+    else
+    {
+        Close();
+    }
 }
 
 void MainWindow::ViewCodeClick()
@@ -662,73 +759,145 @@ void MainWindow::ViewLogClick()
 
 void MainWindow::NextLineClick()
 {
-    if (currentTopView)
+    if (terminalControl->IsActive())
     {
-        currentTopView->NextLine();
+        KeyEventArgs args(Keys::down);
+        terminalControl->HandleKeyDown(args);
+    }
+    else
+    {
+        if (currentTopView)
+        {
+            currentTopView->NextLine();
+        }
     }
 }
 
 void MainWindow::PrevLineClick()
 {
-    if (currentTopView)
+    if (terminalControl->IsActive())
     {
-        currentTopView->PrevLine();
+        KeyEventArgs args(Keys::up);
+        terminalControl->HandleKeyDown(args);
+    }
+    else
+    {
+        if (currentTopView)
+        {
+            currentTopView->PrevLine();
+        }
     }
 }
 
 void MainWindow::NextQuarterClick()
 {
-    if (currentTopView)
+    if (terminalControl->IsActive())
     {
-        currentTopView->NextQuarter();
+        KeyEventArgs args(Keys::f8);
+        terminalControl->HandleKeyDown(args);
+    }
+    else
+    {
+        if (currentTopView)
+        {
+            currentTopView->NextQuarter();
+        }
     }
 }
 
 void MainWindow::PrevQuarterClick()
 {
-    if (currentTopView)
+    if (terminalControl->IsActive())
     {
-        currentTopView->PrevQuarter();
+        KeyEventArgs args(Keys::f7);
+        terminalControl->HandleKeyDown(args);
+    }
+    else
+    {
+        if (currentTopView)
+        {
+            currentTopView->PrevQuarter();
+        }
     }
 }
 
 void MainWindow::NextPageClick()
 {
-    if (currentTopView)
+    if (terminalControl->IsActive())
     {
-        currentTopView->NextPage();
+        KeyEventArgs args(Keys::pageDown);
+        terminalControl->HandleKeyDown(args);
+    }
+    else
+    {
+        if (currentTopView)
+        {
+            currentTopView->NextPage();
+        }
     }
 }
 
 void MainWindow::PrevPageClick()
 {
-    if (currentTopView)
+    if (terminalControl->IsActive())
     {
-        currentTopView->PrevPage();
+        KeyEventArgs args(Keys::pageUp);
+        terminalControl->HandleKeyDown(args);
+    }
+    else
+    {
+        if (currentTopView)
+        {
+            currentTopView->PrevPage();
+        }
     }
 }
 
 void MainWindow::HomeClick()
 {
-    if (currentTopView)
+    if (terminalControl->IsActive())
     {
-        currentTopView->ToStart();
+        KeyEventArgs args(Keys::home);
+        terminalControl->HandleKeyDown(args);
+    }
+    else
+    {
+        if (currentTopView)
+        {
+            currentTopView->ToStart();
+        }
     }
 }
 
 void MainWindow::EndClick()
 {
-    if (currentTopView)
+    if (terminalControl->IsActive())
     {
-        currentTopView->ToEnd();
+        KeyEventArgs args(Keys::end);
+        terminalControl->HandleKeyDown(args);
+    }
+    else
+    {
+        if (currentTopView)
+        {
+            currentTopView->ToEnd();
+        }
     }
 }
 
 void MainWindow::PrevAddressClick()
 {
-    if (currentTopView == codeView)
+    if (terminalControl->IsActive())
     {
-        codeView->GotoPrevAddress();
+        KeyEventArgs args(Keys::left);
+        terminalControl->HandleKeyDown(args);
+    }
+    else
+    {
+        if (currentTopView == codeView)
+        {
+            codeView->GotoPrevAddress();
+        }
     }
 }
 
@@ -883,17 +1052,17 @@ void MainWindow::LoadProcess()
     }
     ViewCodeClick();
     ViewRegsClick();
-    if (!console)
+    if (!terminalControl)
     {
-        console = new cmajor::wing::Console(cmajor::wing::ConsoleCreateParams().Defaults());
-        console->SetFlag(ControlFlags::scrollSubject);
-        console->SetDoubleBuffered();
-        console->ConsoleInputReady().AddHandler(this, &MainWindow::ConsoleInputReady);
-        consoleFile->SetConsole(console);
-        cmajor::wing::ScrollableControl* scrollableConsole = new ScrollableControl(ScrollableControlCreateParams(console).SetDock(Dock::fill));
-        cmajor::wing::TabPage* consoleTabPage = new cmajor::wing::TabPage("Console", "console");
-        consoleTabPage->AddChild(scrollableConsole);
-        bottomTabControl->AddTabPage(consoleTabPage);
+        cmsx::guiterm::TerminalControlCreateParams createParams;
+        terminalControl = new cmsx::guiterm::TerminalControl(createParams);
+        terminalControl->SetFlag(ControlFlags::scrollSubject);
+        terminalControl->SetDoubleBuffered();
+        terminalFile->SetTerminalControl(terminalControl);
+        cmajor::wing::ScrollableControl* scrollableTerminal = new ScrollableControl(ScrollableControlCreateParams(terminalControl).SetDock(Dock::fill));
+        cmajor::wing::TabPage* terminalTabPage = new cmajor::wing::TabPage("Terminal", "terminal");
+        terminalTabPage->AddChild(scrollableTerminal);
+        bottomTabControl->AddTabPage(terminalTabPage);
     }
     ViewRegsClick();
     StartDebugging();
@@ -1252,10 +1421,6 @@ void MainWindow::SetState(DebuggingState state_)
             break;
         }
     }
-}
-
-void MainWindow::ConsoleInputReady()
-{
 }
 
 } // namespace cmsx::db

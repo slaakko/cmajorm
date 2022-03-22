@@ -1,0 +1,136 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Screen
+{
+    public class Point
+    {
+        public nothrow Point() : x(0), y(0)
+        {
+        }
+        public nothrow Point(int x_, int y_) : x(x_), y(y_)
+        {
+        }
+		public static nothrow Point Default() 
+		{
+			return Point(-1, -1);
+		}
+		public nothrow bool IsDefault() const
+		{
+			return x == -1 && y == -1;
+		}
+		public nothrow void Offset(int dx, int dy)
+		{
+			x = x + dx;
+			y = y + dy;
+		}
+        public int x;
+        public int y;
+    }
+    
+	public nothrow bool operator==(const Point& left, const Point& right)
+	{
+		return left.x == right.x && left.y == right.y;
+	}
+	
+    public class Size
+    {
+        public nothrow Size() : w(0), h(0)
+        {
+        }
+        public nothrow Size(int w_, int h_) : w(w_), h(h_)
+        {
+        }
+		public static nothrow Size Default()
+		{
+			return Size(-1, -1);
+		}
+		public nothrow bool IsDefault() const
+		{
+			return w == -1 && h == -1;
+		}
+        public int w;
+        public int h;
+    }
+	
+	public nothrow bool operator==(const Size& left, const Size& right)
+	{
+		return left.w == right.w && left.h == right.h;
+	}
+    
+    public class Rect
+    {
+        public nothrow Rect() : location(), size()
+        {
+        }
+        public nothrow Rect(const Point& location_, const Size& size_) : location(location_), size(size_)
+        {
+        }
+		public static nothrow Rect Default()
+		{
+			return Rect(Point.Default(), Size.Default());
+		}
+		public nothrow bool IsDefault() const
+		{
+			return location.IsDefault() && size.IsDefault();
+		}
+		public nothrow bool IsEmpty() const
+		{
+			return size.w == 0 && size.h == 0;
+		}
+        public nothrow inline int Left() const
+        {
+            return location.x;
+        }
+        public nothrow inline int Right() const
+        {
+            return location.x + size.w;
+        }
+        public nothrow inline int Top() const
+        {
+            return location.y;
+        }
+        public nothrow inline int Bottom() const
+        {
+            return location.y + size.h;
+        }
+        public nothrow inline bool Contains(const Point& p)
+        {
+            return p.x >= location.x && p.x < location.x + size.w && p.y >= location.y && p.y < location.y + size.h;
+        }
+        public nothrow inline void Inflate(int dx, int dy)
+        {
+            location.x = location.x - dx;
+            location.y = location.y - dy;
+            size.w = size.w + 2 * dx;
+            size.h = size.h + 2 * dy;
+        }
+        public nothrow inline void Offset(int dx, int dy)
+        {
+            location.Offset(dx, dy);
+        }
+        public nothrow bool IntersectsWith(const Rect& that) const
+        {
+            return Left() < that.Right() && Top() < that.Bottom() && Right() > that.Left() && Bottom() > that.Top();
+        }
+        public static nothrow Rect Union(const Rect& a, const Rect& b)
+        {
+            int right = Max(a.Right(), b.Right());
+            int bottom = Max(a.Bottom(), b.Bottom());
+            int left = Min(a.Left(), b.Left());
+            int top = Min(a.Top(), b.Top());
+            return Rect(Point(left, top), Size(right - left, bottom - top));
+        }
+        public Point location;
+        public Size size;
+    }
+	
+	public nothrow bool operator==(const Rect& left, const Rect& right)
+	{
+		return left.location == right.location && left.size == right.size;
+	}
+}

@@ -540,4 +540,70 @@ namespace System.Os
             ThrowSystemError();
         }
     }
+	
+	public void SendKey(uchar key)
+	{
+		int result = sendkey(key);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+	}
+	
+	public int MsgQ(const char* name)
+	{
+		int result = msgq(name);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+		return result;
+	}
+	
+	public void CloseMsgQ(int md)
+	{
+		int result = close_msgq(md);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+	}
+	
+	public void PutMsg(int md, byte* msgData, int msgSize)
+	{
+		int result = put_msg(md, msgData, msgSize);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+	}
+	
+	public int GetMsgQLength(int md)
+	{
+		int result = get_msgq_length(md);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+		return result;
+	}
+	
+	public int GetMsgSize(int md)
+	{
+		int result = get_msg_size(md);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+		return result;
+	}
+	
+	public void GetMsg(int md, byte* buffer)
+	{
+		int result = get_msg(md, buffer);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+	}
 }

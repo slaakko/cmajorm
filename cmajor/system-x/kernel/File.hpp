@@ -65,6 +65,7 @@ public:
     virtual void SetCooked();
     virtual void SetRaw();
     virtual void SetEcho(bool echo);
+    virtual void SendKey(char32_t key);
     virtual void PushLines();
     virtual void PopLines();
     virtual bool IsDirFile() const { return false; }
@@ -90,7 +91,8 @@ private:
     std::vector<File*> files;
 };
 
-CMSX_KERNEL_API void SetTerminalFiles(File* terminalOutputFile, File* terminalInputFile);
+CMSX_KERNEL_API void SetTerminalFile(File* terminalFile);
+CMSX_KERNEL_API File* GetTerminalFile();
 CMSX_KERNEL_API void WriteToTerminal(const std::string& text, cmsx::machine::Process* process);
 
 } // namespace cmsx::kernel

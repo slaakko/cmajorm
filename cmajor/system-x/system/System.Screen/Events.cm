@@ -1,0 +1,66 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Screen
+{
+	public class delegate void SelectEventHandler();
+
+    public class WriteScreenEventArgs
+    {
+        public nothrow WriteScreenEventArgs(const Rect& rect_) : rect(rect_)
+        {
+        }
+		public nothrow const Rect& GetRect() const
+		{
+			return rect;
+		}
+        private Rect rect;
+    }
+	
+	public class delegate void WriteScreenEventHandler(WriteScreenEventArgs& writeScreenEventArgs);
+	
+	public class KeyEventArgs
+	{
+		public nothrow KeyEventArgs(uchar key_) : key(key_), handled(false)
+		{
+		}
+		public nothrow uchar Key() const
+		{
+			return key;
+		}
+		public nothrow bool Handled() const
+		{
+			return handled;
+		}
+		public nothrow void SetHandled()
+		{
+			handled = true;
+		}
+		private uchar key;
+		private bool handled;
+	}
+	
+	public class delegate void KeyEventHandler(KeyEventArgs& keyEventArgs);
+	
+	public class CloseEventArgs
+	{
+		public nothrow CloseEventArgs() : cancel(false)
+		{
+		}
+		public nothrow bool Cancel() const
+		{
+			return cancel;
+		}
+		public nothrow void SetCancel()
+		{
+			cancel = true;
+		}
+		private bool cancel;
+	}
+	
+	public class delegate void CloseEventHandler(CloseEventArgs& closeEventArgs);
+}

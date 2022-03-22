@@ -4,6 +4,7 @@
 // =================================
 
 #include <system-x/db/MainWindow.hpp>
+#include <system-x/guiterm/Api.hpp>
 #include <wing/InitDone.hpp>
 #include <system-x/kernel/InitDone.hpp>
 #include <system-x/machine/InitDone.hpp>

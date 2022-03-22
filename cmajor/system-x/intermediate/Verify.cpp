@@ -598,8 +598,8 @@ void VerifierVisitor::Visit(ModInstruction& inst)
 void VerifierVisitor::Visit(AndInstruction& inst)
 {
     CheckBinaryInstructionTypes(inst);
-    CheckIntegerType(inst.Left()->GetType(), "left operand type", inst.GetSourcePos());
-    CheckIntegerType(inst.Right()->GetType(), "right operand type", inst.GetSourcePos());
+    CheckIntegerOrBooleanType(inst.Left()->GetType(), "left operand type", inst.GetSourcePos());
+    CheckIntegerOrBooleanType(inst.Right()->GetType(), "right operand type", inst.GetSourcePos());
     CheckBinaryInstuction(&inst);
     inst.AddUse();
     inst.SetIndex(index++);
@@ -608,8 +608,8 @@ void VerifierVisitor::Visit(AndInstruction& inst)
 void VerifierVisitor::Visit(OrInstruction& inst)
 {
     CheckBinaryInstructionTypes(inst);
-    CheckIntegerType(inst.Left()->GetType(), "left operand type", inst.GetSourcePos());
-    CheckIntegerType(inst.Right()->GetType(), "right operand type", inst.GetSourcePos());
+    CheckIntegerOrBooleanType(inst.Left()->GetType(), "left operand type", inst.GetSourcePos());
+    CheckIntegerOrBooleanType(inst.Right()->GetType(), "right operand type", inst.GetSourcePos());
     CheckBinaryInstuction(&inst);
     inst.AddUse();
     inst.SetIndex(index++);
@@ -618,8 +618,8 @@ void VerifierVisitor::Visit(OrInstruction& inst)
 void VerifierVisitor::Visit(XorInstruction& inst)
 {
     CheckBinaryInstructionTypes(inst);
-    CheckIntegerType(inst.Left()->GetType(), "left operand type", inst.GetSourcePos());
-    CheckIntegerType(inst.Right()->GetType(), "right operand type", inst.GetSourcePos());
+    CheckIntegerOrBooleanType(inst.Left()->GetType(), "left operand type", inst.GetSourcePos());
+    CheckIntegerOrBooleanType(inst.Right()->GetType(), "right operand type", inst.GetSourcePos());
     CheckBinaryInstuction(&inst);
     inst.AddUse();
     inst.SetIndex(index++);

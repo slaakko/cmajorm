@@ -1,0 +1,98 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+
+namespace System.Screen
+{
+	const int quitMessageId = 0;
+	const int keyPressedMessageId = 1;
+	const int writeScreenMessageId = 2;
+
+	public class QuitMessage : Message
+	{
+		static nothrow QuitMessage() : Message()
+		{
+			SetId(quitMessageId);
+			SetSize(cast<int>(Message.Size()));
+			RegisterMessage<QuitMessage>(Id());
+		}
+	}
+
+	public class KeyPressedMessage : Message
+	{
+		static nothrow KeyPressedMessage() : Message()
+		{
+			SetId(keyPressedMessageId);
+			SetSize(cast<int>(Message.Size() + sizeof(uchar)));
+			RegisterMessage<KeyPressedMessage>(Id());
+		}
+		public nothrow KeyPressedMessage(uchar key_) : key(key_)
+		{
+		}
+		public override void Write(MemoryWriter& writer)
+		{
+			base->Write(writer);
+			writer.Write(cast<int>(key));
+		}
+		public override void Read(MemoryReader& reader)
+		{
+			base->Read(reader);
+			key = cast<uchar>(reader.ReadInt());
+		}
+		public override bool Dispatch(Control* control)
+		{
+			return control->HandleKeyPressed(this);
+		}
+		public nothrow uchar Key() const
+		{
+			return key;
+		}
+		private uchar key;
+	}
+	
+	public class WriteScreenMessage : Message
+	{
+		static nothrow WriteScreenMessage() : Message()
+		{
+			SetId(writeScreenMessageId);
+			SetSize(cast<int>(Message.Size() + sizeof(Rect)));
+			RegisterMessage<WriteScreenMessage>(Id());
+		}
+		public nothrow WriteScreenMessage(const Rect& rect_) : rect(rect_)
+		{
+		}
+		public override void Write(MemoryWriter& writer)
+		{
+			base->Write(writer);
+			writer.Write(rect.location.x);
+			writer.Write(rect.location.y);
+			writer.Write(rect.size.w);
+			writer.Write(rect.size.h);
+		}
+		public override void Read(MemoryReader& reader)
+		{
+			base->Read(reader);
+			rect.location.x = reader.ReadInt();
+			rect.location.y = reader.ReadInt();
+			rect.size.w = reader.ReadInt();
+			rect.size.h = reader.ReadInt();
+		}
+		public override bool Dispatch(Control* control)
+		{
+			return control->HandleWriteScreen(this);
+		}
+		public nothrow const Rect& GetRect() const
+		{
+			return rect;
+		}
+		private Rect rect;
+	}
+	
+	new class ConcreteMessageFactoryFunction<QuitMessage>;
+	new class ConcreteMessageFactoryFunction<KeyPressedMessage>;
+	new class ConcreteMessageFactoryFunction<WriteScreenMessage>;
+}

@@ -1,0 +1,48 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Screen
+{
+    public class EmptyEventArgs
+    {
+    }
+    
+    public class Event<Handler, Args = EmptyEventArgs>
+    {
+        public nothrow void AddHandler(Handler handler)
+        {
+            if (Find(handlers.CBegin(), handlers.CEnd(), handler) == handlers.CEnd())
+            {
+                handlers.Add(handler);
+            }
+        }
+        public nothrow void RemoveHandler(Handler handler)
+        {
+            handlers.Remove(handler);
+        }
+        public nothrow const List<Handler>& Handlers() const
+        {
+            return handlers;
+        }
+        public void Fire() where Args is EmptyEventArgs
+        {
+            for (Handler handler : handlers)
+            {
+                handler();
+            }
+        }
+        public void Fire(Args& args)
+        {
+            for (Handler handler : handlers)
+            {
+                handler(args);
+            }
+        }
+        private List<Handler> handlers;
+    }
+}

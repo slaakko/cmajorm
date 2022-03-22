@@ -1,0 +1,124 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Screen
+{
+    public class Container
+    {
+        public nothrow Container(Component* parent_) : parent(parent_), firstChild(null), lastChild(null)
+        {
+        }
+        public ~Container()
+        {
+            Component* child = firstChild;
+            while (child != null)
+            {
+                Component* next = child->NextSibling();
+                delete child;
+                child = next;
+            }
+        }
+        public nothrow bool IsEmpty() const
+        {
+            return firstChild == null;
+        }
+        public nothrow Component* Parent() const
+        {
+            return parent;
+        }
+        public nothrow Component* FirstChild() const
+        {
+            return firstChild;
+        }
+        public nothrow Component* LastChild() const
+        {
+            return lastChild;
+        }
+        public nothrow void AddChild(Component* child)
+        {
+            Container* container = child->GetContainer();
+            if (container != null)
+            {
+                UniquePtr<Component> removedChild = container->RemoveChild(child);
+                child = removedChild.Release();
+            }
+            if (lastChild != null)
+            {
+                lastChild->LinkAfter(child);
+            }
+            if (firstChild == null)
+            {
+                firstChild = child;
+            }
+            child->SetContainer(this);
+            lastChild = child;
+        }
+        public nothrow UniquePtr<Component> RemoveChild(Component* child)
+        {
+            child->Unlink();
+            if (child == firstChild)
+            {
+                firstChild = child->NextSibling();
+            }
+            if (child == lastChild)
+            {
+                lastChild = child->PrevSibling();
+            }
+            child->SetContainer(null);
+            child->SetNextSibling(null);
+            child->SetPrevSibling(null);
+            return UniquePtr<Component>(child);
+        }
+        public nothrow void InsertBefore(Component* child, Component* before)
+        {
+            if (before == null)
+            {
+                AddChild(child);
+            }
+            else
+            {
+                Container* container = child->GetContainer();
+                if (container != null)
+                {
+                    UniquePtr<Component> removedChild = container->RemoveChild(child);
+                    child = removedChild.Release();
+                }
+                child->SetContainer(this);
+                if (firstChild == before)
+                {
+                    firstChild = child;
+                }
+                before->LinkBefore(child);
+            }
+        }
+        public nothrow void InsertAfter(Component* child, Component* after)
+        {
+            if (after == null)
+            {
+                AddChild(child);
+            }
+            else
+            {
+                Container* container = child->GetContainer();
+                if (container != null)
+                {
+                    UniquePtr<Component> removedChild = container->RemoveChild(child);
+                    child = removedChild.Release();
+                }
+                child->SetContainer(this);
+                after->LinkAfter(child);
+                if (after == lastChild)
+                {
+                    lastChild = child;
+                }
+            }
+        }
+        private Component* parent;
+        private Component* firstChild;
+        private Component* lastChild;
+    }
+}

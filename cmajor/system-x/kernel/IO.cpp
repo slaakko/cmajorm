@@ -795,4 +795,9 @@ void AddDirChangeNotification(Process* process, int64_t directoryPathsAddr)
     }
 }
 
+void SendKey(char32_t key)
+{
+    cmsx::kernel::GetTerminalFile()->SendKey(key);
+}
+
 } // namespace cmsx::kernel

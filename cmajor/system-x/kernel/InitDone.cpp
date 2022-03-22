@@ -26,6 +26,7 @@
 #include <system-x/kernel/INodeManager.hpp>
 #include <system-x/kernel/Pipe.hpp>
 #include <system-x/kernel/Terminal.hpp>
+#include <system-x/kernel/MsgQueue.hpp>
 
 namespace cmsx::kernel {
 
@@ -53,12 +54,14 @@ void Init(bool initTerminal)
     {
         InitTerminal();
     }
+    InitMsgQueue();
     InitKernel();
 }
 
 void Done()
 {
     DoneKernel();
+    DoneMsgQueue();
     DoneTerminal();
     DonePipe();
     DoneClock();
