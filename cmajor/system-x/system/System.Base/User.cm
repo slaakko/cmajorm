@@ -235,7 +235,7 @@ namespace System.Security
     {
         StreamReader reader = File.OpenRead("/etc/passwd");
         int lineNumber = 0;
-        while (!reader.Eof())
+        while (!reader.EndOfStream())
         {
             string line = reader.ReadLine();
             if (!line.IsEmpty() && !line.StartsWith("#"))
@@ -261,7 +261,7 @@ namespace System.Security
         Users users;
         StreamReader reader = File.OpenRead("/etc/passwd");
         int lineNumber = 0;
-        while (!reader.Eof())
+        while (!reader.EndOfStream())
         {
             string line = reader.ReadLine();
             if (!line.IsEmpty() && !line.StartsWith("#"))
@@ -290,7 +290,7 @@ namespace System.Security
     {
         StreamReader reader = File.OpenRead("/etc/group");
         int lineNumber = 0;
-        while (!reader.Eof())
+        while (!reader.EndOfStream())
         {
             string line = reader.ReadLine();
             if (!line.IsEmpty() && !line.StartsWith("#"))
@@ -316,7 +316,7 @@ namespace System.Security
         Groups groups;
         StreamReader reader = File.OpenRead("/etc/group");
         int lineNumber = 0;
-        while (!reader.Eof())
+        while (!reader.EndOfStream())
         {
             string line = reader.ReadLine();
             if (!line.IsEmpty() && !line.StartsWith("#"))
