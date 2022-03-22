@@ -44,7 +44,7 @@ void PrintHead(const List<string>& files, int lineCount)
         {
             for (int i = 0; i < lineCount; ++i)
             {
-                if (reader.Eof()) break;
+                if (reader.EndOfStream()) break;
                 string line = reader.ReadLine();
                 Console.WriteLine(line);
             }
@@ -52,7 +52,7 @@ void PrintHead(const List<string>& files, int lineCount)
         else
         {
             List<string> lines;
-            while (!reader.Eof())
+            while (!reader.EndOfStream())
             {
                 string line = reader.ReadLine();
                 lines.Add(line);

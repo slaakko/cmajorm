@@ -16,7 +16,7 @@ void ParseEnvironmentFile(const string& environmentFilePath)
 {
     StreamReader reader = File.OpenRead(environmentFilePath);
     int lineNumber = 1;
-    while (!reader.Eof())
+    while (!reader.EndOfStream())
     {
         string line = reader.ReadLine();
         if (!line.IsEmpty() && !line.StartsWith("#"))

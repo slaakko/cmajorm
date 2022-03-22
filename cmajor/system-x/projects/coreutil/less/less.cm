@@ -172,7 +172,7 @@ void ViewFiles(const List<string>& files)
                 reader = StreamReader(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(new FileStream(0)))));
             }
         }
-        while (!reader.Eof())
+        while (!reader.EndOfStream())
         {
             string line = reader.ReadLine();
             lines.Add(ToUtf32(line));

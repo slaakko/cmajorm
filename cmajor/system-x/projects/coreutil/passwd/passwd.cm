@@ -38,7 +38,7 @@ bool CheckPassword(int uid, const string& hash)
 {
     StreamReader reader = File.OpenRead("/etc/passwd_hash");
     int lineNumber = 0;
-    while (!reader.Eof())
+    while (!reader.EndOfStream())
     {
         string line = reader.ReadLine();
         if (!line.IsEmpty() && !line.StartsWith("#"))
