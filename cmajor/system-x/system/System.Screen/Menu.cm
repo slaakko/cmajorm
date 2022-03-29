@@ -10,18 +10,55 @@ namespace System.Screen
 {
     public class MenuControlCreateParams 
     {
-        public nothrow MenuControlCreateParams  () : 
+        public nothrow MenuControlCreateParams () : 
             controlCreateParams(), 
-            highlightColor(ConsoleColor.defaultColor)
+            highlightColor(ConsoleColor.defaultColor),
+			disabledColor(ConsoleColor.defaultColor),
+			focusedItemForeColor(ConsoleColor.defaultColor),
+			focusedItemBackColor(ConsoleColor.defaultColor),
+			gap(-1)
         {
         }
+		public nothrow MenuControlCreateParams& Defaults()
+		{
+			return *this;
+		}
+		public nothrow MenuControlCreateParams& HighlightColor(ConsoleColor highlightColor_)
+		{
+			highlightColor = highlightColor_;
+			return *this;
+		}
+		public nothrow MenuControlCreateParams& DisabledColor(ConsoleColor disabledColor_)
+		{
+			disabledColor = disabledColor_;
+			return *this;
+		}
+		public nothrow MenuControlCreateParams& FocusedItemForeColor(ConsoleColor focusedItemForeColor_)
+		{
+			focusedItemForeColor = focusedItemForeColor_;
+			return *this;
+		}
+		public nothrow MenuControlCreateParams& FocusedItemBackColor(ConsoleColor focusedItemBackColor_)
+		{
+			focusedItemBackColor = focusedItemBackColor_;
+			return *this;
+		}
         public ControlCreateParams controlCreateParams;
         public ConsoleColor highlightColor;
+		public ConsoleColor disabledColor;
+		public ConsoleColor focusedItemForeColor;
+		public ConsoleColor focusedItemBackColor;
+		public int gap;
+    }
+
+    public enum MenuControlFlags
+    {
+        none = 0, changed = 1 << 0, menuOpen = 1 << 1
     }
 
     public class MenuControl : Control
     {
-        public nothrow MenuControl(MenuControlCreateParams& createParams) : base(createParams.controlCreateParams)
+        public nothrow MenuControl(MenuControlCreateParams& createParams) : base(createParams.controlCreateParams), flags(MenuControlFlags.none)
         {
             if (createParams.highlightColor == ConsoleColor.defaultColor)
             {
@@ -31,22 +68,129 @@ namespace System.Screen
             {
                 highlightColor = createParams.highlightColor;
             }
+			if (createParams.disabledColor == ConsoleColor.defaultColor)
+			{
+				disabledColor = ConsoleColor.darkGray;
+			}
+			else
+			{
+				disabledColor = createParams.disabledColor;
+			}
+			if (createParams.focusedItemForeColor == ConsoleColor.defaultColor)
+			{
+				focusedItemForeColor = cast<ConsoleColor>(defaultFocusedControlForeColor);
+			}
+			else
+			{
+				focusedItemForeColor = createParams.focusedItemForeColor;
+			}
+			if (createParams.focusedItemBackColor == ConsoleColor.defaultColor)
+			{
+				focusedItemBackColor = cast<ConsoleColor>(defaultFocusedControlBackColor);
+			}
+			else
+			{
+				focusedItemBackColor = createParams.focusedItemBackColor;
+			}
+			if (createParams.gap == -1)
+			{
+				gap = 8;
+			}
+			else
+			{
+				gap = createParams.gap;
+			}
         }
+        public nothrow void SetChanged()
+        {
+            flags = cast<MenuControlFlags>(flags | MenuControlFlags.changed);
+        }
+        public nothrow bool IsChanged() const
+        {
+            return (flags & MenuControlFlags.changed) != MenuControlFlags.none;
+        }
+		public nothrow void ResetChanged()
+		{
+			flags = cast<MenuControlFlags>(flags & ~MenuControlFlags.changed);
+		}
+		public nothrow void SetOpen()
+		{
+			if (!IsOpen())
+			{
+				flags = cast<MenuControlFlags>(flags | MenuControlFlags.menuOpen);
+				Invalidate();
+			}
+		}
+		public nothrow void ResetOpen()
+		{
+			if (IsOpen())
+			{
+				focusedMenuItem = null;
+				flags = cast<MenuControlFlags>(flags & ~MenuControlFlags.menuOpen);
+				Application.Instance().MainWindow()->Invalidate();
+			}
+		}
+		public nothrow bool IsOpen() const
+		{
+			return (flags & MenuControlFlags.menuOpen) != MenuControlFlags.none;
+		}
         public nothrow ConsoleColor HighlightColor() const
         {
             return highlightColor;
         }
+		public nothrow ConsoleColor DisabledColor() const
+		{
+			return disabledColor;
+		}
+		public nothrow ConsoleColor FocusedItemForeColor() const
+		{
+			return focusedItemForeColor;
+		}
+		public nothrow ConsoleColor FocusedItemBackColor() const
+		{
+			return focusedItemBackColor;
+		}
+		public nothrow int Gap() const
+		{
+			return gap;
+		}
+		public nothrow MenuItem* OpenedMenuItem() const
+		{
+			return openedMenuItem;
+		}
+		public nothrow void SetOpenedMenuItem(MenuItem* openedMenuItem_)
+		{
+			openedMenuItem = openedMenuItem_;
+		}
+		public nothrow MenuItem* FocusedMenuItem() const
+		{
+			return focusedMenuItem;
+		}
+		public nothrow void SetFocusedMenuItem(MenuItem* focusedMenuItem_)
+		{
+			focusedMenuItem = focusedMenuItem_;
+		}
+		public override void OnGotFocus()
+		{
+			focusedMenuItem = null;
+		}
+		public override void OnLostFocus()
+		{
+			focusedMenuItem = null;
+		}
+        private MenuControlFlags flags;
         private ConsoleColor highlightColor;
-    }
-
-    public enum MenuBarFlags
-    {
-        none = 0, changed = 1 << 0
+		private ConsoleColor disabledColor;
+		private ConsoleColor focusedItemForeColor;
+		private ConsoleColor focusedItemBackColor;
+		private int gap;
+		private MenuItem* openedMenuItem;
+		private MenuItem* focusedMenuItem;
     }
 
     public class MenuBar : MenuControl
     {
-        public nothrow MenuBar(MenuControlCreateParams& createParams) : base(createParams), flags(MenuBarFlags.none)
+        public nothrow MenuBar(MenuControlCreateParams& createParams) : base(createParams), menuItems(this)
         {
             if (Location().IsDefault())
             {
@@ -66,24 +210,50 @@ namespace System.Screen
             }
             SetChanged();
         }
-        public nothrow void SetChanged()
-        {
-            flags = cast<MenuBarFlags>(flags | MenuBarFlags.changed);
-        }
-        public nothrow bool IsChanged() const
-        {
-            return (flags & MenuBarFlags.changed) != MenuBarFlags.none;
-        }
         public void AddMenuItem(MenuItem* menuItem)
         {
-            menuItem->SetMenuControl(this);
             menuItems.AddChild(menuItem);
+			menuItem->SetAccessKey();
         }
-        public override void OnKeyPressed(KeyEventArgs& args)
+		public override void OnKeyPressed(KeyEventArgs& args)
         {
             if (args.Handled()) return;
+			if (IsOpen() && args.Key() == keyEscape)
+			{
+				MenuItem* openedMenuItem = OpenedMenuItem();
+				if (openedMenuItem != null)
+				{
+					openedMenuItem->SetState(MenuItemState.closed);
+					MenuItem* parentMenuItem = openedMenuItem->ParentMenuItem();
+					if (parentMenuItem != null && !parentMenuItem->IsTopLevel())
+					{
+						SetOpenedMenuItem(parentMenuItem);
+					}
+					else
+					{
+						SetOpenedMenuItem(null);
+						ResetOpen();
+					}
+				}
+				else
+				{
+					ResetOpen();
+				}
+				SetFocusedMenuItem(null);
+				args.SetHandled();
+				return;
+			}
+			MenuItem* focusedMenuItem = FocusedMenuItem();
+			if (focusedMenuItem != null)
+			{
+				focusedMenuItem->OnKeyPressed(args);
+				if (args.Handled())
+				{
+					return;
+				}
+			}
             uchar key = args.Key();
-            if (key >= 'a' && key >= 'z')
+            if (key >= 'a' && key <= 'z')
             {
                 key = ToUpper(key);
             }
@@ -95,10 +265,13 @@ namespace System.Screen
                     MenuItem* menuItem = cast<MenuItem*>(child);
                     if (menuItem->IsEnabled())
                     {
-                        if (menuItem->AccessKey() == key)
+						if (menuItem->AccessKey() == key)
                         {
                             args.SetHandled();
+							SetOpen();
                             menuItem->SetState(MenuItemState.open);
+							SetFocusedMenuItem(menuItem->FirstChildItem());
+							Invalidate();
                             return;
                         }
                         else
@@ -116,10 +289,11 @@ namespace System.Screen
         }
         public override void OnWriteScreen(WriteScreenEventArgs& args)
         {
+			base->OnWriteScreen(args);
             Rect rect = args.GetRect();
             if (rect.IsDefault())
             {
-                rect = Rect(Location(), GetSize());
+                rect = GetRect();
             }
             Clear(rect, ForeColor(), BackColor());
             if (IsChanged())
@@ -127,6 +301,12 @@ namespace System.Screen
                 Measure();
             }
             WriteMenuItems();
+			MenuItem* focusedMenuItem = FocusedMenuItem();
+			if (focusedMenuItem != null)
+			{
+				Point location = focusedMenuItem->Location();
+				SetCursorPos(location.x + 1, location.y);
+			}
         }
         private void Measure()
         {
@@ -156,7 +336,6 @@ namespace System.Screen
                 child = child->NextSibling();
             }
         }
-        private MenuBarFlags flags;
         private Container menuItems;
     }
     
@@ -172,9 +351,8 @@ namespace System.Screen
     
     public class MenuItem : Component
     {
-        public nothrow MenuItem(const string& text_, uchar shortcut_) : state(MenuItemState.closed), flags(MenuItemFlags.none), text(ToUtf32(text_)), accessKey(), shortcut(shortcut_)
+        public nothrow MenuItem(const string& text_, uchar shortcut_) : state(MenuItemState.closed), flags(MenuItemFlags.none), text(ToUtf32(text_)), items(this), accessKey(), shortcut(shortcut_)
         {
-            SetAccessKey();
         }
         public nothrow MenuItem(const string& text_) : this(text_, uchar())
         {
@@ -205,21 +383,174 @@ namespace System.Screen
             if (state != state_)
             {
                 state = state_;
-                Application.Instance().MainWindow()->Invalidate(childRect);
             }
         }
         public nothrow bool IsTopLevel() const
         {
-            return GetContainer()->Parent() == null;
+            return ParentMenuItem() == null;
         }
+		public nothrow bool IsFocused() const
+		{
+			MenuControl* menuControl = GetMenuControl();
+			if (menuControl != null)
+			{
+				return menuControl->FocusedMenuItem() == this;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		public nothrow MenuItem* FirstChildItem() const
+		{
+			Component* child = items.FirstChild();
+			while (child != null)
+			{
+				if (child is MenuItem*)
+				{
+					return cast<MenuItem*>(child);
+				}
+				child = child->NextSibling();
+			}
+			return null;
+		}
+		public nothrow MenuItem* LastChildItem() const
+		{
+			Component* child = items.LastChild();
+			while (child != null)
+			{
+				if (child is MenuItem*)
+				{
+					return cast<MenuItem*>(child);
+				}
+				child = child->PrevSibling();
+			}
+			return null;
+		}
+		public nothrow MenuItem* NextMenuItem() const
+		{
+			Component* nextSibling = NextSibling();
+			while (nextSibling != null)
+			{
+				if (nextSibling is MenuItem*)
+				{
+					return cast<MenuItem*>(nextSibling);
+				}
+				nextSibling = nextSibling->NextSibling();
+			}
+			return null;
+		}
+		public nothrow MenuItem* PrevMenuItem() const
+		{
+			Component* prevSibling = PrevSibling();
+			while (prevSibling != null)
+			{
+				if (prevSibling is MenuItem*)
+				{
+					return cast<MenuItem*>(prevSibling);
+				}
+				prevSibling = prevSibling->PrevSibling();
+			}
+			return null;
+		}
         public nothrow bool HasChildItems() const
         {
             return !items.IsEmpty();
         }
-        public nothrow void SetMenuControl(MenuControl* menuControl_)
+        public void AddMenuItem(MenuItem* menuItem)
         {
-            menuControl = menuControl_;
+            items.AddChild(menuItem);
+			menuItem->SetAccessKey();
         }
+		public nothrow MenuItem* ParentMenuItem()
+		{
+			Container* container = GetContainer();
+			if (container != null)
+			{
+				Component* parent = container->Parent();
+				if (parent != null)
+				{
+					if (parent is MenuItem*)
+					{
+						return cast<MenuItem*>(parent);
+					}
+				}
+			}
+			return null;
+		}
+		public MenuControl* GetMenuControl()
+		{
+			Container* container = GetContainer();
+			if (container != null)
+			{
+				Component* parent = container->Parent();
+				if (parent is MenuControl*)
+				{
+					return cast<MenuControl*>(parent);
+				}
+				else if (parent is MenuItem*)
+				{
+					MenuItem* parentMenuItem = cast<MenuItem*>(parent);
+					return parentMenuItem->GetMenuControl();
+				}
+			}
+			else
+			{
+				throw Exception("menu control not found");
+			}
+		}
+		public nothrow const Rect& MenuBoxRect() const
+		{
+			return menuBoxRect;
+		}
+		public nothrow const Point& Location() const 
+		{
+			return location;
+		}
+		public void OnKeyPressed(KeyEventArgs& args)
+		{
+			MenuControl* menuControl = GetMenuControl();
+			if (IsFocused())
+			{
+				switch (args.Key())
+				{
+					case keyNewline:
+					{
+						args.SetHandled();
+						Select();
+						menuControl->SetFocusedMenuItem(null);
+						MenuItem* parentItem = ParentMenuItem();
+						if (parentItem != null)
+						{
+							Application.Instance().MainWindow()->Invalidate(parentItem->MenuBoxRect());
+						}
+						break;
+					}
+					case keyUp:
+					{
+						MenuItem* prevMenuItem = PrevMenuItem();
+						if (prevMenuItem != null)
+						{
+							menuControl->SetFocusedMenuItem(prevMenuItem);
+							args.SetHandled();
+							menuControl->Invalidate();
+						}
+						break;
+					}
+					case keyDown:
+					{
+						MenuItem* nextMenuItem = NextMenuItem();
+						if (nextMenuItem != null)
+						{
+							menuControl->SetFocusedMenuItem(nextMenuItem);
+							args.SetHandled();
+							menuControl->Invalidate();
+						}
+						break;
+					}
+				}
+			}
+		}
         public bool DispatchKey(uchar key)
         {
             Component* child = items.FirstChild();
@@ -232,28 +563,42 @@ namespace System.Screen
                     {
                         if (state == MenuItemState.open)
                         {
-                            if (menuItem->AccessKey() == key)
+                            if (menuItem->AccessKey() == ToUpper(key))
                             {
                                 if (menuItem->HasChildItems())
                                 {
                                     menuItem->SetState(MenuItemState.open);
+									MenuControl* menuControl = GetMenuControl();
+									menuControl->Invalidate();
                                     return true;
                                 }
                                 else
                                 {
                                     menuItem->Select();
+									Application.Instance().MainWindow()->Invalidate(menuBoxRect);
                                     return true;
                                 }
                             }
+							else if (menuItem->Shortcut() == key)
+							{
+								menuItem->Select();
+								Application.Instance().MainWindow()->Invalidate(menuBoxRect);
+								return true;
+							}
                         }
                         else if (menuItem->Shortcut() == key)
                         {
                             menuItem->Select();
+							Application.Instance().MainWindow()->Invalidate(menuBoxRect);
                             return true;
                         }
                         else
                         {
-                            return menuItem->DispatchKey(key);
+                            bool handled = menuItem->DispatchKey(key);
+							if (handled)
+							{
+								return true;
+							}
                         }
                     }
                 }
@@ -267,19 +612,14 @@ namespace System.Screen
         }
         public void Select()
         {
-            SetState(MenuItemState.closed);
+			MenuControl* menuControl = GetMenuControl();
+			menuControl->ResetOpen();
+			MenuItem* parent = ParentMenuItem();
+			if (parent != null)
+			{
+				parent->SetState(MenuItemState.closed);
+			}
             selectEvent.Fire();
-        }
-        public void WriteScreen()
-        {
-            if (IsTopLevel())
-            {
-                WriteTopLevel();
-            }
-            else
-            {
-                WriteChild();
-            }
         }
         public nothrow void Measure(Point& loc)
         {
@@ -305,6 +645,18 @@ namespace System.Screen
                 return cast<int>(text.Length());
             }
         }
+		public nothrow ustring ShortcutText() const
+		{
+			if (shortcut != '\0')
+			{
+				ustring shortcutText = ToUtf32(KeyName(shortcut));
+				return shortcutText;
+			}
+			else
+			{
+				return ustring();
+			}
+		}
         public nothrow uchar AccessKey() const
         {
             return accessKey;
@@ -332,35 +684,164 @@ namespace System.Screen
         {
             return shortcut;
         }
+        public void WriteScreen()
+        {
+            if (IsTopLevel())
+            {
+                WriteTopLevel();
+            }
+            else
+            {
+                WriteChild();
+            }
+        }
+		public nothrow Rect ItemRect() const
+		{
+			MenuItem* parent = ParentMenuItem();
+			Rect parentMenuBox = parent->MenuBoxRect();
+			Size sz(parentMenuBox.size.w - 2, 1);
+			return Rect(location, sz);
+		}
         private void MeasureTopLevel(Point& loc)
         {
             location = loc;
+			menuBoxRect.location.x = location.x - 1;
+			menuBoxRect.location.y = location.y + 1;
+			MeasureSize();
             loc.x = loc.x + TextLength() + 2;
+			MeasureChildren();
         }
+		private void MeasureChildren()
+		{
+			Point loc(location.x, location.y + 2);
+			Component* child = items.FirstChild();
+			while (child != null)
+			{
+				if (child is MenuItem*)
+				{
+					MenuItem* menuItem = cast<MenuItem*>(child);
+					menuItem->MeasureChild(loc);
+				}
+				child = child->NextSibling();
+			}
+		}
+		private void MeasureSize()
+		{
+			MenuControl* menuControl = GetMenuControl();
+			int numChildren = 0;
+			int maxTextLength = 0;
+			int maxShortcutLength = 0;
+			Component* child = items.FirstChild();
+			while (child != null)
+			{
+				if (child is MenuItem*)
+				{
+					MenuItem* menuItem = cast<MenuItem*>(child);
+					int textLength = menuItem->TextLength();
+					if (textLength > maxTextLength)
+					{
+						maxTextLength = textLength;
+					}
+					int shortcutTextLength = cast<int>(menuItem->ShortcutText().Length());
+					if (shortcutTextLength > maxShortcutLength)
+					{
+						maxShortcutLength = shortcutTextLength;
+					}
+					++numChildren;
+				}
+				child = child->NextSibling();
+			}
+			menuBoxRect.size = Size(maxTextLength + menuControl->Gap() + maxShortcutLength + 2, numChildren + 2);
+		}
         private void MeasureChild(Point& loc)
         {
+			location = loc;
+			loc.y = loc.y + 1;
         }
         private void WriteTopLevel()
         {
             WriteText();
+			if (state == MenuItemState.open)
+			{
+				WriteMenuBox();
+			}
         }
         private void WriteChild()
         {
-            WriteText();
+			if (IsFocused())
+			{
+				WriteFocused();
+			}
+			else
+			{
+				WriteText();
+				MenuItem* parent = ParentMenuItem();
+				Rect parentMenuBox = parent->MenuBoxRect();
+				ustring shortcutText = ShortcutText();
+				int x = cast<int>(parentMenuBox.Right() - 1 - shortcutText.Length());
+				int y = location.y;
+				SetCursorPos(x, y);
+				Terminal.Out() << shortcutText;
+				if (state == MenuItemState.open)
+				{
+					WriteMenuBox();
+				}
+			}
         }
+		private void WriteFocused()
+		{
+			MenuControl* menuControl = GetMenuControl();
+			Clear(ItemRect(), menuControl->FocusedItemForeColor(), menuControl->FocusedItemBackColor());
+			Terminal.Out() << SetColors(menuControl->FocusedItemForeColor(), menuControl->FocusedItemBackColor());
+			WriteText();
+			MenuItem* parent = ParentMenuItem();
+			Rect parentMenuBox = parent->MenuBoxRect();
+			ustring shortcutText = ShortcutText();
+			int x = cast<int>(parentMenuBox.Right() - 1 - shortcutText.Length());
+			int y = location.y;
+			SetCursorPos(x, y);
+			ConsoleColor textColor = menuControl->ForeColor();
+			if (IsDisabled())
+			{
+				textColor = menuControl->DisabledColor();
+			}
+			Terminal.Out() << SetColors(menuControl->FocusedItemForeColor(), menuControl->FocusedItemBackColor());
+			Terminal.Out() << shortcutText;
+		}
         private void WriteText()
         {
-            SetCursorPos(location.x, location.y);
+			MenuControl* menuControl = GetMenuControl();
+			ConsoleColor textColor = menuControl->ForeColor();
+			if (IsDisabled())
+			{
+				textColor = menuControl->DisabledColor();
+			}
+            SetCursorPos(location.x + 1, location.y);
             int ampPos = cast<int>(text.Find('&'));
+			bool isFocused = IsFocused();
             if (ampPos != -1)
             {
                 ustring prefix = text.Substring(0, ampPos);
+				if (!isFocused)
+				{	
+					Terminal.Out() << SetColors(textColor, menuControl->BackColor());
+				}
+				else
+				{
+					Terminal.Out() << SetColors(menuControl->FocusedItemForeColor(), menuControl->FocusedItemBackColor());
+				}
                 Terminal.Out() << prefix;
-                ustring highlightStr = text.Substring(ampPos + 1, 1);
-                Terminal.Out() << SetColors(menuControl->HighlightColor(), menuControl->BackColor());
-                Terminal.Out() << highlightStr;
-                Terminal.Out() << SetColors(menuControl->ForeColor(), menuControl->BackColor());
-                ustring suffix = text.Substring(0, ampPos + 2);
+				ustring highlightStr = text.Substring(ampPos + 1, 1);
+				if (!isFocused)
+				{
+					Terminal.Out() << SetColors(menuControl->HighlightColor(), menuControl->BackColor());
+				}
+				Terminal.Out() << highlightStr;
+				if (!isFocused)
+				{
+					Terminal.Out() << SetColors(textColor, menuControl->BackColor());
+				}
+                ustring suffix = text.Substring(ampPos + 2);
                 Terminal.Out() << suffix;
             }
             else
@@ -368,11 +849,25 @@ namespace System.Screen
                 Terminal.Out() << text;
             }
         }
+		private void WriteMenuBox()
+		{
+			MenuControl* menuControl = GetMenuControl();
+			WriteBox(menuBoxRect, menuControl->ForeColor(), menuControl->BackColor());
+			Component* child = items.FirstChild();
+			while (child != null)
+			{
+				if (child is MenuItem*)
+				{
+					MenuItem* menuItem = cast<MenuItem*>(child);
+					menuItem->WriteScreen();
+				}
+				child = child->NextSibling();
+			}
+		}
         private MenuItemState state;
         private MenuItemFlags flags;
-        private MenuControl* menuControl;
         private Point location;
-        private Rect childRect;
+        private Rect menuBoxRect;
         private ustring text;
         private Container items;
         private uchar accessKey;

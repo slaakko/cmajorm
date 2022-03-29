@@ -28,6 +28,10 @@ namespace System.Screen
             x = x + dx;
             y = y + dy;
         }
+		public nothrow string ToString() const
+		{
+			return "(" + ToString(x) + ", " + ToString(y) + ")";
+		}
         public int x;
         public int y;
     }
@@ -53,6 +57,10 @@ namespace System.Screen
         {
             return w == -1 && h == -1;
         }
+		public nothrow string ToString() const
+		{
+			return "(" + ToString(w) + ", " + ToString(h) + ")";
+		}
         public int w;
         public int h;
     }
@@ -125,6 +133,18 @@ namespace System.Screen
             int top = Min(a.Top(), b.Top());
             return Rect(Point(left, top), Size(right - left, bottom - top));
         }
+		public static nothrow Rect Intersection(const Rect& a, const Rect& b)
+		{
+			int right = Min(a.Right(), b.Right());
+			int bottom = Min(a.Bottom(), b.Bottom());
+			int left = Max(a.Left(), b.Left());
+			int top = Max(a.Top(), b.Top());
+			return Rect(Point(left, top), Size(right - left, bottom - top));
+		}
+		public string ToString() const
+		{
+			return "[" + location.ToString() + ", " + size.ToString() + "]";
+		}
         public Point location;
         public Size size;
     }

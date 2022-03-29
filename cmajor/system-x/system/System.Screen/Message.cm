@@ -11,30 +11,15 @@ namespace System.Screen
 {
     public abstract class Message
     {
-        public nothrow Message() : targetWindowHandle(-1)
-        {
-        }
+		public nothrow Message() : targetWindowHandle(-1)
+		{
+		}
         public default virtual ~Message();
-        public static Message()
-        {
-            SetSize(cast<int>(sizeof(int) + sizeof(int)));
-        }
-        public static nothrow void SetId(int id_)
-        {
-            id = id_;
-        }
-        public static nothrow void SetSize(int size_)
-        {
-            size = size_;
-        }
-        public static nothrow int Id() 
-        {
-            return id;
-        }
-        public static nothrow int Size() 
-        {
-            return size;
-        }
+		public abstract nothrow int Id() const;
+		public virtual nothrow int Size() const
+		{
+			return cast<int>(sizeof(int) + sizeof(int));
+		}
         public nothrow int TargetWindowHandle() const
         {
             return targetWindowHandle;
@@ -45,7 +30,7 @@ namespace System.Screen
         }
         public virtual void Write(MemoryWriter& writer)
         {
-            writer.Write(id);
+            writer.Write(Id());
             writer.Write(targetWindowHandle);
         }
         public virtual void Read(MemoryReader& reader)
@@ -56,9 +41,7 @@ namespace System.Screen
         {
             return false;
         }
-        private static int id;
         private int targetWindowHandle;
-        private static int size;
     }
     
     public abstract class MessageFactoryFunction

@@ -32,7 +32,7 @@ namespace System.Screen
         {
             return *instance;
         }
-        private Application() : msgQ(MsgQ("system.screen.msg_queue"))
+        private Application() : msgQ(MsgQ("system.screen.msg.queue")), menuBar(null), focusedControl(null)
         {
             SetRaw(Terminal.Descriptor());
             SetEcho(Terminal.Descriptor(), false);
@@ -41,6 +41,14 @@ namespace System.Screen
         {
             return mainWindow;
         }
+		public nothrow MenuBar* GetMenuBar() const
+		{
+			return menuBar;
+		}
+		public nothrow void SetMenuBar(MenuBar* menuBar_)
+		{
+			menuBar = menuBar_;
+		}
         public WindowManager& GetWindowManager() const
         {
             return windowManager;
@@ -49,6 +57,8 @@ namespace System.Screen
         {
             mainWindow = &mainWindow_;
             mainWindow->SetMainWindow();
+			mainWindow->SetLocation(Point(0, 0));
+			mainWindow->SetSize(Size(TerminalWindowWidth(), TerminalWindowHeight()));
             mainWindow->Invalidate();
             UniquePtr<Message> message = ReadMessage();
             while (!(message.Get() is QuitMessage*))
@@ -69,6 +79,26 @@ namespace System.Screen
                 message = ReadMessage();
             }
         }
+		public void RunDialog(Window* window)
+		{
+			WriteScreenMessage writeScreenMessage(Rect.Default());
+			mainWindow->HandleWriteScreen(&writeScreenMessage);
+            UniquePtr<Message> message = ReadMessage();
+            while (!(message.Get() is QuitMessage*))
+            {
+                bool handled = window->HandleMessage(message.Get());
+				if (handled)
+				{
+					if (window->GetDialogResult() != DialogResult.none)
+					{
+						WriteScreenMessage writeScreenMessage(window->GetRect());
+						mainWindow->HandleWriteScreen(&writeScreenMessage);
+						return;
+					}
+				}
+                message = ReadMessage();
+            }
+		}
         public void Exit()
         {
             QuitMessage quitMessage;
@@ -83,7 +113,7 @@ namespace System.Screen
             PutMsg(msgQ, msg.Get(), msgSize);
             SendKey(keyMsg);
         }
-        private UniquePtr<Message> ReadMessage()
+        public UniquePtr<Message> ReadMessage()
         {
             uchar key = ReadKey(Terminal.Descriptor());
             if (key == keyMsg)
@@ -96,6 +126,14 @@ namespace System.Screen
                 return keyPressedMessage;
             }
         }
+		public nothrow Control* FocusedControl() const
+		{
+			return focusedControl;
+		}
+		public nothrow void SetFocusedControl(Control* focusedControl_) 
+		{
+			focusedControl = focusedControl_;
+		}
         private UniquePtr<Message> GetMessage()
         {
             int qlen = GetMsgQLength(msgQ);
@@ -123,5 +161,7 @@ namespace System.Screen
         private Window* mainWindow;
         private WindowManager windowManager;
         private int msgQ;
+		private MenuBar* menuBar;
+		private Control* focusedControl;
     }
 }

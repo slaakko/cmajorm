@@ -20,6 +20,14 @@ HINSTANCE Instance()
     return instance;
 }
 
+void f()
+{
+    Rect r;
+    Rect a;
+    Rect b;
+    Rect::Intersect(r, a, b);
+}
+
 std::string WindowsErrorMessage(uint64_t errorCode)
 {
     char16_t buf[4096];

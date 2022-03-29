@@ -1,0 +1,1284 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Screen
+{
+	const int tabSize = 4;
+	
+	public class Selection
+	{
+		public nothrow Selection() : startLine(-1), startCol(-1), endLine(-1), endCol(-1)
+		{
+		}
+		public nothrow bool IsEmpty() const
+		{
+			return startLine == -1 && startCol == -1 && endLine == -1 && endCol == -1;
+		}
+		public nothrow void Reset()
+		{
+			startLine = -1;
+			startCol = -1;
+			endLine = -1;
+			endCol = -1;
+		}
+		public nothrow void SetStart(int startLine_, int startCol_)
+		{
+			startLine = startLine_;
+			startCol = startCol_;
+		}
+		public nothrow void SetEnd(int endLine_, int endCol_)
+		{
+			endLine = endLine_;
+			endCol = endCol_;
+		}
+		public nothrow string ToString() const
+		{
+			return "[(" + ToString(startLine) + ", " + ToString(startCol) + "), (" + ToString(endLine) + ", " + ToString(endCol) + ")]";
+		}
+		public int startLine;
+		public int startCol;
+		public int endLine;
+		public int endCol;
+	}
+
+	public class EditorCreateParams
+	{
+		public nothrow EditorCreateParams() :
+			controlCreateParams(), 
+			selectionForeColor(ConsoleColor.defaultColor), 
+			selectionBackColor(ConsoleColor.defaultColor)
+		{
+		}
+		public nothrow EditorCreateParams& Defaults() 
+		{
+			return *this;
+		}
+		public nothrow EditorCreateParams& SelectionForeColor(ConsoleColor selectionForeColor_)
+		{
+			selectionForeColor = selectionForeColor_;
+			return *this;
+		}
+		public nothrow EditorCreateParams& SelectionBackColor(ConsoleColor selectionBackColor_)
+		{
+			selectionBackColor = selectionBackColor_;
+			return *this;
+		}
+		public ControlCreateParams controlCreateParams;
+		public ConsoleColor selectionForeColor;
+		public ConsoleColor selectionBackColor;
+	}
+	
+	public enum EditorFlags
+	{
+		none = 0, dirty = 1 << 0
+	}
+	
+	public class Editor : Control
+	{
+		public nothrow Editor(EditorCreateParams& createParams) : 
+			base(createParams.controlCreateParams), flags(EditorFlags.none), xOffset(0), yOffset(0), caretLine(0), caretCol(0)
+		{
+			if (ForeColor() == ConsoleColor.defaultColor)
+			{
+				SetForeColor(ConsoleColor.gray);
+			}
+			if (BackColor() == ConsoleColor.defaultColor)
+			{
+				SetBackColor(ConsoleColor.darkBlue);
+			}
+			if (createParams.selectionForeColor == ConsoleColor.defaultColor)
+			{
+				selectionForeColor = ConsoleColor.black;
+			}
+			else
+			{
+				selectionForeColor = createParams.selectionForeColor;
+			}
+			if (createParams.selectionBackColor == ConsoleColor.defaultColor)
+			{
+				selectionBackColor = ConsoleColor.cyan;
+			}
+			else
+			{
+				selectionBackColor = createParams.selectionBackColor;
+			}
+			if (Location().IsDefault())
+			{
+				SetLocation(Point(0, 1));
+			}
+			if (GetSize().IsDefault())
+			{
+				SetSize(Size(TerminalWindowWidth(), TerminalWindowHeight() - 2));
+			}
+		}
+		public nothrow bool IsDirty() const 
+		{
+			return (flags & EditorFlags.dirty) != EditorFlags.none;
+		}
+		public nothrow void SetDirty()
+		{
+			flags = cast<EditorFlags>(flags | EditorFlags.dirty);
+		}
+		public nothrow void ResetDirty()
+		{
+			flags = cast<EditorFlags>(flags & ~EditorFlags.dirty);
+		}
+		public void SetLines(const List<string>& lines_)
+		{
+			lines.Clear();
+			for (const string& line : lines_)
+			{
+				lines.Add(ToUtf32(line));
+			}
+			Invalidate();
+			ResetDirty();
+		}
+        public override void OnWriteScreen(WriteScreenEventArgs& args)
+        {
+			base->OnWriteScreen(args);
+			Rect updateRect = GetRect();
+			if (!args.GetRect().IsDefault())
+			{
+				updateRect = Rect.Intersection(updateRect, args.GetRect());
+			}
+			if (updateRect.IsEmpty()) return;
+			Clear(updateRect, ForeColor(), BackColor());
+			if (selection.IsEmpty())
+			{
+				WriteScreenNoSelection(updateRect);
+			}
+			else
+			{
+				WriteScreenWithSelection(updateRect);
+			}
+			SetCursorPos();
+        }
+		
+		public override void OnKeyPressed(KeyEventArgs& args)
+		{
+			if (args.Handled()) return;
+			Rect updateRect;
+			int prevXOffset = xOffset;
+			int prevYOffset = yOffset;
+			uchar key = args.Key();
+			if (key >= ' ' && key < specialKeyStart)
+			{
+				args.SetHandled();
+				DeleteSelection();
+				while (caretLine >= lines.Count())
+				{
+					lines.Add(ustring());
+				}
+				ustring& line = lines[caretLine];
+				bool inserted = false;
+				if (caretCol < line.Length())
+				{
+					line.Insert(caretCol, key);
+					inserted = true;
+				}
+				else
+				{
+					line.Append(key);
+				}
+				Point start = ScreenPoint(caretCol, caretLine);
+				++caretCol;
+				Point end = ScreenPoint(caretCol, caretLine + 1);
+				if (inserted)
+				{
+					end = ScreenPoint(cast<int>(line.Length()), caretLine + 1);
+				}
+				updateRect = ScreenRect(start, end);
+				SetXOffset();
+				SetYOffset();
+				SetDirty();
+			}
+			else
+			{
+				switch (key)
+				{
+					case keyLeft:
+					{
+						args.SetHandled();
+						CursorLeft(false, true);
+						break;
+					}
+					case keyRight:
+					{
+						args.SetHandled();
+						CursorRight(false, true);
+						break;
+					}
+					case keyUp:
+					{
+						args.SetHandled();
+						CursorUp(false);
+						break;
+					}
+					case keyDown:
+					{
+						args.SetHandled();
+						CursorDown(false);
+						break;
+					}
+					case keyControlLeft:
+					{
+						args.SetHandled();
+						CursorPrevWord(false);
+						break;
+					}
+					case keyControlRight:
+					{
+						args.SetHandled();
+						CursorNextWord(false);
+						break;
+					}
+					case keyHome:
+					{
+						args.SetHandled();
+						CursorStartOfLine(false);
+						break;
+					}
+					case keyEnd:
+					{
+						args.SetHandled();
+						CursorEndOfLine(false);
+						break;
+					}
+					case keyPgUp:
+					{
+						args.SetHandled();
+						CursorPrevPage(false);
+						break;
+					}
+					case keyPgDown:
+					{
+						args.SetHandled();
+						CursorNextPage(false);
+						break;
+					}
+					case keyControlHome:
+					{
+						args.SetHandled();
+						CursorStartOfText(false);
+						break;
+					}
+					case keyControlEnd:
+					{
+						args.SetHandled();
+						CursorEndOfText(false);
+						break;
+					}
+					case keyNewline:
+					{
+						args.SetHandled();
+						Newline(updateRect);
+						break;
+					}
+					case keyTab:
+					{
+						args.SetHandled();
+						Tab(updateRect);
+						break;
+					}
+					case keyShiftTab:
+					{
+						args.SetHandled();
+						Untab(updateRect);
+						break;
+					}
+					case keyDel:
+					{
+						args.SetHandled();
+						if (selection.IsEmpty())
+						{
+							DeleteChar(updateRect);
+						}
+						else
+						{	
+							DeleteSelection();
+						}
+						break;
+					}
+					case keyBackspace:
+					{
+						args.SetHandled();
+						Backspace(updateRect);
+						break;
+					}
+					case keyShiftLeft:
+					{
+						args.SetHandled();
+						CursorLeft(true, true);
+						break;
+					}
+					case keyShiftRight:
+					{
+						args.SetHandled();
+						CursorRight(true, true);
+						break;
+					}
+					case keyShiftDown:
+					{
+						args.SetHandled();
+						CursorDown(true);
+						break;
+					}
+					case keyShiftUp:
+					{
+						args.SetHandled();
+						CursorUp(true);
+						break;
+					}
+					case keyShiftHome:
+					{
+						args.SetHandled();
+						CursorStartOfLine(true);
+						break;
+					}
+					case keyShiftEnd:
+					{
+						args.SetHandled();
+						CursorEndOfLine(true);
+						break;
+					}
+					case keyShiftPgUp:
+					{
+						args.SetHandled();
+						CursorPrevPage(true);
+						break;
+					}
+					case keyShiftPgDown:
+					{
+						args.SetHandled();
+						CursorNextPage(true);
+						break;
+					}
+					case keyControlShiftLeft:
+					{
+						args.SetHandled();
+						CursorPrevWord(true);
+						break;
+					}
+					case keyControlShiftRight:
+					{
+						args.SetHandled();
+						CursorNextWord(true);
+						break;
+					}
+					case keyControlShiftHome:
+					{
+						args.SetHandled();
+						CursorStartOfText(true);
+						break;
+					}
+					case keyControlShiftEnd:
+					{
+						args.SetHandled();
+						CursorEndOfText(true);
+						break;
+					}
+				}
+			}
+			if (xOffset != prevXOffset || yOffset != prevYOffset)
+			{
+				Invalidate();
+			}
+			else
+			{
+				Invalidate(updateRect);
+			}
+		}
+		private void WriteScreenNoSelection(const Rect& updateRect)
+		{
+			Terminal.Out() << SetColors(ForeColor(), BackColor());
+			for (int y = 0; y < updateRect.size.h; ++y)
+			{
+				ustring updateLine;
+				for (int x = 0; x < updateRect.size.w; ++x)
+				{
+					uchar c = CharAt(updateRect.location.x + x, updateRect.location.y + y);
+					if (c == '\0')
+					{
+						break;
+					}
+					updateLine.Append(c);
+				}
+				SetCursorPos(updateRect.location.x, updateRect.location.y + y);
+				Terminal.Out() << updateLine;
+			}
+		}
+		private void WriteScreenWithSelection(const Rect& updateRect)
+		{
+			MakeCanonicalSelection();
+			for (int y = 0; y < updateRect.size.h; ++y)
+			{
+				for (int x = 0; x < updateRect.size.w; ++x)
+				{
+					uchar c = CharAt(updateRect.location.x + x, updateRect.location.y + y);
+					if (c != '\0')
+					{
+						int line = 0;
+						int col = 0;
+						LineCol(updateRect.location.x + x, updateRect.location.y + y, line, col);
+						if (LineColInSelection(line, col))
+						{
+							Terminal.Out() << SetColors(selectionForeColor, selectionBackColor);
+						}
+						else
+						{
+							Terminal.Out() << SetColors(ForeColor(), BackColor());
+						}
+						SetCursorPos(updateRect.location.x + x, updateRect.location.y + y);
+						Terminal.Out() << c;
+					}
+				}
+			}
+		}
+		private void SetXOffset()
+		{
+			Size sz = GetSize();
+			while (caretCol - xOffset >= sz.w)
+			{
+				++xOffset;
+			}
+		}
+		private void SetYOffset()
+		{
+			Size sz = GetSize();
+			while (caretLine - yOffset >= sz.h)
+			{
+				++yOffset;
+			}
+		}
+		private void CursorStartOfText(bool extendSelection)
+		{
+			Point selectionStartExtensionPoint;
+			Point selectionEndExtensionPoint;
+			if (extendSelection)
+			{
+				if (selection.IsEmpty())
+				{
+					selection.SetStart(caretLine, caretCol);
+				}
+				selectionStartExtensionPoint = ScreenPoint(0, caretLine);
+			}
+			else
+			{
+				ResetSelection();
+			}
+			caretCol = 0;
+			caretLine = 0;
+			xOffset = 0;
+			yOffset = 0;
+			SetCursorPos();
+			if (extendSelection)
+			{
+				Size sz = GetSize();
+				selectionEndExtensionPoint = ScreenPoint(sz.w, 0);
+				selection.SetEnd(caretLine, caretCol);
+				Rect selectionUpdateRect = ScreenRect(selectionStartExtensionPoint, selectionEndExtensionPoint);
+				Invalidate(selectionUpdateRect);
+			}
+		}
+		private void CursorEndOfText(bool extendSelection)
+		{
+			Point selectionStartExtensionPoint;
+			Point selectionEndExtensionPoint;
+			if (extendSelection)
+			{
+				if (selection.IsEmpty())
+				{
+					selection.SetStart(caretLine, caretCol);
+				}
+				selectionStartExtensionPoint = ScreenPoint(0, caretLine);
+			}
+			else
+			{
+				ResetSelection();
+			}
+			caretLine = cast<int>(lines.Count());
+			caretCol = 0;
+			SetXOffset();
+			SetYOffset();
+			SetCursorPos();
+			if (extendSelection)
+			{
+				Size sz = GetSize();
+				selectionEndExtensionPoint = ScreenPoint(sz.w, caretLine + 1);
+				selection.SetEnd(caretLine, caretCol);
+				Rect selectionUpdateRect = ScreenRect(selectionStartExtensionPoint, selectionEndExtensionPoint);
+				Invalidate(selectionUpdateRect);
+			}
+		}
+		private void CursorPrevPage(bool extendSelection)
+		{
+			Point selectionStartExtensionPoint;
+			Point selectionEndExtensionPoint;
+			if (extendSelection)
+			{
+				if (selection.IsEmpty())
+				{
+					selection.SetStart(caretLine, caretCol);
+				}
+				selectionStartExtensionPoint = ScreenPoint(0, caretLine);
+			}
+			else
+			{
+				ResetSelection();
+			}
+			Size sz = GetSize();
+			if (yOffset >= sz.h)
+			{
+				caretCol = 0;
+				yOffset = yOffset - sz.h;
+				caretLine = caretLine - sz.h;
+				SetCursorPos();
+			}
+			else
+			{
+				CursorStartOfText(extendSelection);
+			}
+			if (extendSelection)
+			{
+				selectionEndExtensionPoint = ScreenPoint(sz.w, caretLine - sz.h);
+				selection.SetEnd(caretLine, caretCol);
+				Rect selectionUpdateRect = ScreenRect(selectionStartExtensionPoint, selectionEndExtensionPoint);
+				Invalidate(selectionUpdateRect);
+			}
+		}
+		private void CursorNextPage(bool extendSelection)
+		{
+			Point selectionStartExtensionPoint;
+			Point selectionEndExtensionPoint;
+			if (extendSelection)
+			{
+				if (selection.IsEmpty())
+				{
+					selection.SetStart(caretLine, caretCol);
+				}
+				selectionStartExtensionPoint = ScreenPoint(0, caretLine);
+			}
+			else
+			{
+				ResetSelection();
+			}
+			Size sz = GetSize();
+			if (caretLine + sz.h >= lines.Count())
+			{
+				CursorEndOfText(extendSelection);
+			}
+			else
+			{
+				caretLine = caretLine + sz.h;
+				yOffset = yOffset + sz.h;
+				caretCol = 0;
+				SetCursorPos();
+			}
+			if (extendSelection)
+			{
+				selectionEndExtensionPoint = ScreenPoint(sz.w, caretLine + sz.h);
+				selection.SetEnd(caretLine, caretCol);
+				Rect selectionUpdateRect = ScreenRect(selectionStartExtensionPoint, selectionEndExtensionPoint);
+				Invalidate(selectionUpdateRect);
+			}
+		}
+		private void CursorLeft(bool extendSelection, bool invalidate)
+		{
+			Point selectionStartExtensionPoint;
+			Point selectionEndExtensionPoint;
+			if (extendSelection)
+			{
+				if (selection.IsEmpty())
+				{
+					selection.SetStart(caretLine, caretCol);
+				}
+				selectionStartExtensionPoint = ScreenPoint(0, caretLine);
+			}
+			else
+			{
+				ResetSelection();
+			}
+			if (caretCol > 0)
+			{
+				--caretCol;
+				SetCursorPos();
+			}
+			else
+			{
+				if (caretLine > 0)
+				{
+					--caretLine;
+					ustring& line = lines[caretLine];
+					caretCol = cast<int>(line.Length());
+					SetXOffset();
+					SetCursorPos();
+				}
+			}
+			if (caretCol < xOffset)
+			{
+				--xOffset;
+			}
+			if (extendSelection)
+			{
+				Size sz = GetSize();
+				selectionEndExtensionPoint = ScreenPoint(sz.w, caretLine + 1);
+				selection.SetEnd(caretLine, caretCol);
+				Rect selectionUpdateRect = ScreenRect(selectionStartExtensionPoint, selectionEndExtensionPoint);
+				if (invalidate)
+				{
+					Invalidate(selectionUpdateRect);
+				}
+			}
+		}
+		private void CursorRight(bool extendSelection, bool invalidate)
+		{
+			Point selectionStartExtensionPoint;
+			Point selectionEndExtensionPoint;
+			if (caretLine >= lines.Count()) 
+			{
+				return;
+			}
+			if (extendSelection)
+			{
+				if (selection.IsEmpty())
+				{
+					selection.SetStart(caretLine, caretCol);
+				}
+				selectionStartExtensionPoint = ScreenPoint(0, caretLine);
+			}
+			else
+			{
+				ResetSelection();
+			}
+			ustring& line = lines[caretLine];
+			if (caretCol < line.Length())
+			{
+				++caretCol;
+			}
+			else 
+			{
+				if (caretLine < lines.Count())
+				{
+					++caretLine;
+					xOffset = 0;
+					caretCol = 0;
+				}
+			}
+			SetXOffset();
+			SetYOffset();
+			SetCursorPos();
+			if (extendSelection)
+			{
+				Size sz = GetSize();
+				selectionEndExtensionPoint = ScreenPoint(sz.w, caretLine + 1);
+				selection.SetEnd(caretLine, caretCol);
+				Rect selectionUpdateRect = ScreenRect(selectionStartExtensionPoint, selectionEndExtensionPoint);
+				if (invalidate)
+				{
+					Invalidate(selectionUpdateRect);
+				}
+			}
+		}
+		private void CursorUp(bool extendSelection)
+		{
+			Point selectionStartExtensionPoint;
+			Point selectionEndExtensionPoint;
+			if (caretLine > 0)
+			{
+				if (extendSelection)
+				{
+					if (selection.IsEmpty())
+					{
+						selection.SetStart(caretLine, caretCol);
+					}
+					selectionStartExtensionPoint = ScreenPoint(0, caretLine);
+				}
+				else
+				{
+					ResetSelection();
+				}
+				--caretLine;
+				ustring& line = lines[caretLine];
+				caretCol = Min(caretCol, cast<int>(line.Length()));
+				SetCursorPos();
+			}
+			if (caretLine < yOffset)
+			{
+				--yOffset;
+			}
+			if (extendSelection)
+			{
+				Size sz = GetSize();
+				selectionEndExtensionPoint = ScreenPoint(sz.w, caretLine - 1);
+				selection.SetEnd(caretLine, caretCol);
+				Rect selectionUpdateRect = ScreenRect(selectionStartExtensionPoint, selectionEndExtensionPoint);
+				Invalidate(selectionUpdateRect);
+			}
+		}
+		private void CursorDown(bool extendSelection)
+		{
+			Point selectionStartExtensionPoint;
+			Point selectionEndExtensionPoint;
+			if (caretLine < lines.Count())
+			{
+				if (extendSelection)
+				{
+					if (selection.IsEmpty())
+					{
+						selection.SetStart(caretLine, caretCol);
+					}
+					selectionStartExtensionPoint = ScreenPoint(0, caretLine);
+				}
+				else
+				{
+					ResetSelection();
+				}
+				++caretLine;
+				SetYOffset();
+				if (caretLine < lines.Count())
+				{
+					ustring& line = lines[caretLine];
+					caretCol = Min(caretCol, cast<int>(line.Length()));
+					SetCursorPos();
+				}
+				else
+				{
+					CursorEndOfText(extendSelection);
+				}
+			}
+			if (extendSelection)
+			{
+				Size sz = GetSize();
+				selectionEndExtensionPoint = ScreenPoint(sz.w, caretLine + 1);
+				selection.SetEnd(caretLine, caretCol);
+				Rect selectionUpdateRect = ScreenRect(selectionStartExtensionPoint, selectionEndExtensionPoint);
+				Invalidate(selectionUpdateRect);
+			}
+		}
+		private void CursorPrevWord(bool extendSelection)
+		{
+			Point selectionStartExtensionPoint;
+			Point selectionEndExtensionPoint;
+			if (extendSelection)
+			{
+				if (selection.IsEmpty())
+				{
+					selection.SetStart(caretLine, caretCol);
+				}
+				selectionStartExtensionPoint = ScreenPoint(0, caretLine);
+			}
+			else
+			{
+				ResetSelection();
+			}
+			CursorLeft(extendSelection, false);
+			uchar c = CharAtCursor();
+			while ((caretCol != 0 || caretLine != 0) && c == ' ')
+			{
+				CursorLeft(extendSelection, false);
+				c = CharAtCursor();
+			}
+			while ((caretCol != 0 || caretLine != 0) && c != ' ' && c != '\0')
+			{
+				CursorLeft(extendSelection, false);
+				c = CharAtCursor();
+			}
+			if ((caretCol != 0 || caretLine != 0) && c == ' ')
+			{
+				CursorRight(extendSelection, false);
+			}
+			if (extendSelection)
+			{
+				Size sz = GetSize();
+				selectionEndExtensionPoint = ScreenPoint(sz.w, caretLine + 1);
+				selection.SetEnd(caretLine, caretCol);
+				Rect selectionUpdateRect = ScreenRect(selectionStartExtensionPoint, selectionEndExtensionPoint);
+				Invalidate(selectionUpdateRect);
+			}
+		}
+		private void CursorNextWord(bool extendSelection)
+		{
+			Point selectionStartExtensionPoint;
+			Point selectionEndExtensionPoint;
+			if (extendSelection)
+			{
+				if (selection.IsEmpty())
+				{
+					selection.SetStart(caretLine, caretCol);
+				}
+				selectionStartExtensionPoint = ScreenPoint(0, caretLine);
+			}
+			else
+			{
+				ResetSelection();
+			}
+			CursorRight(extendSelection, false);
+			uchar c = CharAtCursor();
+			while (caretLine < lines.Count() && c != ' ' && c != '\0')
+			{
+				CursorRight(extendSelection, false);
+				c = CharAtCursor();
+			}
+			while (caretLine < lines.Count() && c == ' ')
+			{
+				CursorRight(extendSelection, false);
+				c = CharAtCursor();
+			}
+			if (extendSelection)
+			{
+				Size sz = GetSize();
+				selectionEndExtensionPoint = ScreenPoint(sz.w, caretLine + 1);
+				selection.SetEnd(caretLine, caretCol);
+				Rect selectionUpdateRect = ScreenRect(selectionStartExtensionPoint, selectionEndExtensionPoint);
+				Invalidate(selectionUpdateRect);
+			}
+		}
+		private void CursorStartOfLine(bool extendSelection)
+		{
+			Point selectionStartExtensionPoint;
+			Point selectionEndExtensionPoint;
+			if (extendSelection)
+			{
+				if (selection.IsEmpty())
+				{
+					selection.SetStart(caretLine, caretCol);
+				}
+				selectionStartExtensionPoint = ScreenPoint(0, caretLine);
+			}
+			else
+			{
+				ResetSelection();
+			}
+			caretCol = 0;
+			xOffset = 0;
+			SetCursorPos();
+			if (extendSelection)
+			{
+				Size sz = GetSize();
+				selectionEndExtensionPoint = ScreenPoint(sz.w, caretLine + 1);
+				selection.SetEnd(caretLine, caretCol);
+				Rect selectionUpdateRect = ScreenRect(selectionStartExtensionPoint, selectionEndExtensionPoint);
+				Invalidate(selectionUpdateRect);
+			}
+		}
+		private void CursorEndOfLine(bool extendSelection)
+		{
+			Point selectionStartExtensionPoint;
+			Point selectionEndExtensionPoint;
+			if (caretLine < lines.Count())
+			{
+				if (extendSelection)
+				{
+					if (selection.IsEmpty())
+					{
+						selection.SetStart(caretLine, caretCol);
+					}
+					selectionStartExtensionPoint = ScreenPoint(0, caretLine);
+				}
+				else
+				{
+					ResetSelection();
+				}
+				ustring& line = lines[caretLine];
+				caretCol = cast<int>(line.Length());
+				SetXOffset();
+				SetCursorPos();
+				if (extendSelection)
+				{
+					Size sz = GetSize();
+					selectionEndExtensionPoint = ScreenPoint(sz.w, caretLine + 1);
+					selection.SetEnd(caretLine, caretCol);
+					Rect selectionUpdateRect = ScreenRect(selectionStartExtensionPoint, selectionEndExtensionPoint);
+					Invalidate(selectionUpdateRect);
+				}
+			}
+		}
+		private void Newline(Rect& updateRect)
+		{
+			updateRect.location = ScreenPoint(0, caretLine);
+			while (caretLine >= lines.Count())
+			{
+				lines.Add(ustring());
+			}
+			ustring& line = lines[caretLine];
+			int numSpaces = 0;
+			for (uchar c : line)
+			{
+				if (c == ' ')
+				{
+					++numSpaces;
+				}
+				else
+				{
+					break;
+				}
+			}
+			if (caretCol < line.Length())
+			{
+				ustring splitLine = ustring(' ', numSpaces) + line.Substring(caretCol);
+				line.Remove(caretCol, line.Length() - caretCol);
+				if (caretLine < lines.Count())
+				{
+					lines.Insert(lines.Begin() + caretLine + 1, Rvalue(splitLine));
+				}
+				else
+				{
+					lines.Add(Rvalue(splitLine));
+				}
+			}
+			else
+			{
+				if (caretLine < lines.Count())
+				{
+					lines.Insert(lines.Begin() + caretLine + 1, ustring(' ', numSpaces));
+				}
+				else
+				{
+					lines.Add(ustring(' ', numSpaces));
+				}
+			}
+			Size sz = GetSize();
+			updateRect.size.w = sz.w + xOffset;
+			updateRect.size.h = sz.h - (caretLine - yOffset);
+			++caretLine;
+			xOffset = 0;
+			caretCol = numSpaces;
+			SetYOffset();
+			SetDirty();
+		}
+		private void Tab(Rect& updateRect)
+		{
+			if (!selection.IsEmpty())
+			{
+				IndentSelection(updateRect);
+			}
+			else
+			{
+				while (caretLine >= lines.Count())
+				{
+					lines.Add(ustring());
+				}
+				ustring& line = lines[caretLine];
+				int numSpaces = tabSize - (caretCol % tabSize);
+				if (caretCol < line.Length())
+				{
+					line.Insert(caretCol, ustring(' ', numSpaces));
+				}
+				else
+				{
+					line.Append(ustring(' ', numSpaces));
+				}
+				Point start = ScreenPoint(caretCol, caretLine);
+				caretCol = caretCol + numSpaces;
+				Point end = ScreenPoint(cast<int>(line.Length()), caretLine + 1);
+				updateRect = ScreenRect(start, end);
+				SetXOffset();
+				SetYOffset();
+				SetDirty();
+			}
+		}
+		private void Untab(Rect& updateRect)
+		{
+			if (!selection.IsEmpty())
+			{
+				UnindentSelection(updateRect);
+			}
+			else
+			{
+				if (caretLine < lines.Count())
+				{
+					if (caretCol >= tabSize)
+					{
+						ustring& line = lines[caretLine];
+						int numSpaces = tabSize - (caretCol % tabSize);
+						Point start = ScreenPoint(0, caretLine);
+						Point end = ScreenPoint(cast<int>(line.Length()), caretLine + 1);
+						updateRect = ScreenRect(start, end);
+						line.Remove(caretCol - numSpaces, numSpaces);
+						caretCol = caretCol - numSpaces;
+						SetXOffset();
+						SetYOffset();
+						SetCursorPos();
+						SetDirty();
+					}
+				}
+			}
+		}
+		private void IndentSelection(Rect& updateRect)
+		{
+			MakeCanonicalSelection();
+			ustring spaces(' ', tabSize);
+			for (int i = canonicalSelection.startLine; i < canonicalSelection.endLine; ++i)
+			{
+				ustring& line = lines[i];
+				line.Insert(0, spaces);
+			}
+			Point start = ScreenPoint(0, canonicalSelection.startLine);
+			Size sz = GetSize();
+			Point end = ScreenPoint(sz.w, canonicalSelection.endLine);
+			updateRect = ScreenRect(start, end);
+			SetDirty();
+		}
+		private void UnindentSelection(Rect& updateRect)
+		{
+			MakeCanonicalSelection();
+			ustring spaces(' ', tabSize);
+			for (int i = canonicalSelection.startLine; i < canonicalSelection.endLine; ++i)
+			{
+				ustring& line = lines[i];
+				if (line.StartsWith(spaces))
+				{
+					line.Remove(0, tabSize);
+				}
+			}
+			Point start = ScreenPoint(0, canonicalSelection.startLine);
+			Size sz = GetSize();
+			Point end = ScreenPoint(sz.w, canonicalSelection.endLine);
+			updateRect = ScreenRect(start, end);
+			SetDirty();
+		}
+		private void DeleteChar(Rect& updateRect)
+		{
+			if (caretLine >= lines.Count())
+			{
+				return;
+			}
+			ustring& line = lines[caretLine];
+			if (caretCol < line.Length())
+			{
+				line.Remove(caretCol, 1);
+				Point start = ScreenPoint(caretCol, caretLine);
+				Point end = ScreenPoint(cast<int>(line.Length() + 1), caretLine + 1);
+				updateRect = ScreenRect(start, end);
+			}
+			else if (caretLine < lines.Count() - 1)
+			{
+				line.Append(lines[caretLine + 1]);
+				TrimEnd(line);
+				lines.Remove(lines.Begin() + caretLine + 1);
+				updateRect.location = ScreenPoint(0, caretLine);
+				Size sz = GetSize();
+				updateRect.size.w = sz.w + xOffset;
+				updateRect.size.h = sz.h - (caretLine - yOffset);
+			}
+			if (caretLine < yOffset)
+			{
+				--yOffset;
+			}
+			SetXOffset();
+			SetYOffset();
+			SetCursorPos();
+			SetDirty();
+		}
+		private void Backspace(Rect& updateRect)
+		{
+			if (caretCol != 0 || caretLine != 0)
+			{
+				CursorLeft(false, true);
+				DeleteChar(updateRect);
+			}
+		}
+		private void DeleteSelection()
+		{
+			if (selection.IsEmpty()) return;
+			MakeCanonicalSelection();
+			if (canonicalSelection.startLine == canonicalSelection.endLine)
+			{
+				ustring& line = lines[canonicalSelection.startLine];
+				line.Remove(canonicalSelection.startCol, canonicalSelection.endCol - canonicalSelection.startCol);
+				caretCol = canonicalSelection.startCol;
+				Point start = ScreenPoint(0, canonicalSelection.startLine);
+				Size sz = GetSize();
+				Point end = ScreenPoint(sz.w, canonicalSelection.startLine + 1);
+				Rect selectionUpdateRect = ScreenRect(start, end);
+				Invalidate(selectionUpdateRect);
+				SetCursorPos();
+				selection.Reset();
+			}
+			else
+			{
+				int startLine = canonicalSelection.startLine;
+				int numLines = Max(cast<int>(0), canonicalSelection.endLine - startLine);
+				if (numLines > 0)
+				{
+					if (canonicalSelection.startCol != 0)
+					{
+						ustring& line = lines[startLine];
+						line.Remove(canonicalSelection.startCol, line.Length() - canonicalSelection.startCol);
+						++startLine;
+						--numLines;
+					}
+				}
+				while (numLines > 1)
+				{
+					lines.Remove(lines.Begin() + startLine);
+					--numLines;
+				}
+				if (numLines > 0)
+				{
+					if (canonicalSelection.endCol != 0)
+					{
+						ustring& line = lines[startLine];
+						line.Remove(0, canonicalSelection.endCol);
+					}
+					else
+					{
+						lines.Remove(lines.Begin() + startLine);
+					}
+				}
+				caretLine = canonicalSelection.startLine;
+				caretCol = canonicalSelection.startCol;
+				SetXOffset();
+				SetYOffset();
+				SetCursorPos();
+				Invalidate();
+				SetDirty();
+				selection.Reset();
+			}
+		}
+		private void TrimEnd(ustring& line)
+		{
+			while (!line.IsEmpty() && line[line.Length() - 1] == ' ')
+			{
+				line.Remove(line.Length() - 1, 1);
+			}
+		}
+		private Point ScreenPoint(int x, int y)
+		{
+			Point loc = Location();
+			int sx = loc.x + x - xOffset;
+			int sy = loc.y + y - yOffset;
+			return Point(sx, sy);
+		}
+		private Rect ScreenRect(const Point& start, const Point& end)
+		{
+			int minX = Min(start.x, end.x);
+			int minY = Min(start.y, end.y);
+			int maxX = Max(start.x, end.x);
+			int maxY = Max(start.y, end.y);
+			Point loc(minX, minY);
+			Size sz(maxX - minX, maxY - minY);
+			return Rect(loc, sz);
+		}
+		private void LineCol(int x, int y, int& line, int& col)
+		{
+			Point loc = Location();
+			line = yOffset + y - loc.y;
+			col = xOffset + x - loc.x;
+		}
+		private uchar CharAt(int x, int y)
+		{
+			Point loc = Location();
+			int line = yOffset + y - loc.y;
+			int col = xOffset + x - loc.x;
+			if (line < lines.Count())
+			{
+				const ustring& ln = lines[line];
+				if (col < ln.Length())
+				{
+					return ln[col];
+				}
+			}
+			return uchar('\0');
+		}
+		private uchar CharAtCursor()
+		{
+			if (caretLine < lines.Count())
+			{
+				const ustring& line = lines[caretLine];
+				if (caretCol < line.Length())
+				{
+					return line[caretCol];
+				}
+			}
+			return uchar('\0');
+		}
+		private void SetCursorPos()
+		{
+			Point cp = ScreenPoint(caretCol, caretLine);
+			Size sz = GetSize();
+			if (cp.x >= 0 && cp.x < sz.w && cp.y >= 0 && cp.y < sz.h)
+			{
+				SetControlCursorPos(cp);
+				SetCursorPos(cp.x, cp.y);
+			}
+		}
+		private void MakeCanonicalSelection()
+		{
+			canonicalSelection = selection;
+			if (canonicalSelection.startLine > canonicalSelection.endLine ||
+				canonicalSelection.startLine == canonicalSelection.endLine && 
+				canonicalSelection.startCol > canonicalSelection.endCol)
+			{
+				Swap(canonicalSelection.startLine, canonicalSelection.endLine);
+				Swap(canonicalSelection.startCol, canonicalSelection.endCol);
+			}
+		}
+		private bool LineColInSelection(int line, int col)
+		{
+			if (line > canonicalSelection.startLine && line < canonicalSelection.endLine)
+			{
+				return true;
+			}
+			else if (line == canonicalSelection.startLine)
+			{
+				if (canonicalSelection.endLine == canonicalSelection.startLine)
+				{
+					if (col >= canonicalSelection.startCol && col < canonicalSelection.endCol)
+					{
+						return true;
+					}
+				}
+				else if (col >= canonicalSelection.startCol)
+				{
+					return true;
+				}
+			}
+			else if (line == canonicalSelection.endLine)
+			{
+				if (col < canonicalSelection.endCol)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		private void ResetSelection()
+		{
+			if (selection.IsEmpty())
+			{
+				return;
+			}
+			MakeCanonicalSelection();
+			Point start = ScreenPoint(0, canonicalSelection.startLine);
+			Size sz = GetSize();
+			Point end = ScreenPoint(sz.w, canonicalSelection.endLine + 1);
+			Rect updateRect = ScreenRect(start, end);
+			Invalidate(updateRect);
+			selection.Reset();
+		}
+		private void WriteStatus(const string& status)
+		{
+			SetCursorPos(0, TerminalWindowHeight() - 1);
+			SetColors(selectionForeColor, selectionBackColor);
+			Terminal.Out() << status;
+		}
+		private EditorFlags flags;
+		private int xOffset;
+		private int yOffset;
+		private List<ustring> lines;
+		private int caretLine;
+		private int caretCol;
+		private Selection selection;
+		private Selection canonicalSelection;
+		private Rect selectionScreenRect;
+		private ConsoleColor selectionForeColor;
+		private ConsoleColor selectionBackColor;
+	}
+}
+

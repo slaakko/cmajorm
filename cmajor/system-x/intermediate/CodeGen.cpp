@@ -1102,7 +1102,7 @@ void EmitElemAddr(ElemAddrInstruction& inst, CodeGenerator& codeGen)
             machineMulInst = cmsx::machine::MULU;
         }
         cmsx::assembler::Instruction* mulInst = new cmsx::assembler::Instruction(machineMulInst);
-        mulInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regIX)));
+        mulInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regCX)));
         mulInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
         mulInst->AddOperand(indexReg);
         codeGen.Emit(mulInst);
@@ -1112,7 +1112,7 @@ void EmitElemAddr(ElemAddrInstruction& inst, CodeGenerator& codeGen)
         int64_t index = GetIndex(inst.Index(), codeGen);
         int64_t offset = GetOffset(inst.Ptr()->GetType(), index, codeGen);
         cmsx::assembler::Instruction* setInst = new cmsx::assembler::Instruction(cmsx::assembler::SET);
-        setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regIX)));
+        setInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regCX)));
         setInst->AddOperand(cmsx::assembler::MakeConstantExpr(offset));
         codeGen.Emit(setInst);
     }
@@ -1143,7 +1143,7 @@ void EmitElemAddr(ElemAddrInstruction& inst, CodeGenerator& codeGen)
         codeGen.Emit(primaryLdaInst);
         ldaInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regAX)));
     }
-    ldaInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regIX)));
+    ldaInst->AddOperand(MakeRegOperand(GetGlobalRegister(codeGen.Ctx(), cmsx::machine::regCX)));
     codeGen.Emit(ldaInst);
 }
 

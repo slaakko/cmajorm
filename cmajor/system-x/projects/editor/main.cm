@@ -5,39 +5,103 @@
 
 using System;
 using System.Screen;
+using System.Collections;
 
 public class MainWindow	: Window
 {
-	public MainWindow()
+	public MainWindow() : base(ControlCreateParams().Defaults())
 	{
-		MenuBar* menuBar = new MenuBar(MenuControlCreateParams().Defaults());
-		
+		InvalidateGuard guard(this);
+		menuBar = new MenuBar(MenuControlCreateParams().Defaults());
+		Application.Instance().SetMenuBar(menuBar);
+		MenuItem* fileMenuItem = new MenuItem("&File");
+		MenuItem* fileNewMenuItem = new MenuItem("&New", keyControlN);
+		fileNewMenuItem->SelectEvent().AddHandler(New);
+		fileMenuItem->AddMenuItem(fileNewMenuItem);
+		MenuItem* fileOpenMenuItem = new MenuItem("&Open...", keyControlO);
+		fileOpenMenuItem->SelectEvent().AddHandler(Open);
+		fileMenuItem->AddMenuItem(fileOpenMenuItem);
+		MenuItem* fileCloseMenuItem = new MenuItem("&Close", keyControlF4);
+		fileCloseMenuItem->SelectEvent().AddHandler(Close);
+		fileMenuItem->AddMenuItem(fileCloseMenuItem);
+		MenuItem* fileSaveMenuItem = new MenuItem("&Save", keyControlS);
+		fileSaveMenuItem->SelectEvent().AddHandler(Save);
+		fileMenuItem->AddMenuItem(fileSaveMenuItem);
+		MenuItem* fileExitMenuItem = new MenuItem("E&xit", keyAltX);
+		fileExitMenuItem->SelectEvent().AddHandler(Exit);
+		fileMenuItem->AddMenuItem(fileExitMenuItem);
+		menuBar->AddMenuItem(fileMenuItem);
 		AddChild(menuBar);
+		editor = new Editor(EditorCreateParams().Defaults());
+		AddChild(editor);
+		editor->SetFocus();
 	}
 	public override void OnKeyPressed(KeyEventArgs& args)
 	{
+		base->OnKeyPressed(args);
 		if (args.Handled()) return;
-		if (args.Key() == keyEscape)
-		{
-			args.SetHandled();
-			Exit();
-		}
 	}
-	public override void OnClose(CloseEventArgs& args)
+	public void LoadFile(const string& filePath)
 	{
-		Exit();
+		List<string> lines = File.ReadAllLines(filePath);
+		editor->SetLines(lines);
 	}
-	public void Exit()
+	private void New()
+	{
+		UniquePtr<MessageBox> messageBox = new MessageBox(MessageBoxCreateParams().Caption("New"));
+		messageBox->ShowDialog();
+		editor->SetFocus();
+	}
+	private void Open()
+	{
+		UniquePtr<MessageBox> messageBox = new MessageBox(MessageBoxCreateParams().Caption("Open"));
+		messageBox->ShowDialog();
+		editor->SetFocus();
+	}
+	private void Close()
+	{
+		UniquePtr<MessageBox> messageBox = new MessageBox(MessageBoxCreateParams().Caption("Close"));
+		messageBox->ShowDialog();
+		editor->SetFocus();
+	}
+	private void Save()
+	{
+		UniquePtr<MessageBox> messageBox = new MessageBox(MessageBoxCreateParams().Caption("Save").Buttons(cast<MessageBoxButtons>(MessageBoxButtons.yes | MessageBoxButtons.no | MessageBoxButtons.cancel)));
+		messageBox->ShowDialog();
+		editor->SetFocus();
+	}
+	private void Exit()
 	{
 		Application.Instance().Exit();
 	}
+	private MenuBar* menuBar;
+	private Editor* editor;
 }
 
 int main(int argc, const char** argv)
 {
 	try
 	{
+		List<string> files;
+		for (int i = 1; i < argc; ++i)
+		{
+			string arg = argv[i];
+			if (arg.StartsWith("--"))
+			{
+			}
+			else if (arg.StartsWith("-"))
+			{
+			}
+			else
+			{
+				files.Add(arg);
+			}
+		}
 		MainWindow mainWindow;
+		if (!files.IsEmpty())
+		{
+			mainWindow.LoadFile(files.Front());
+		}
 		Application.Instance().Run(mainWindow);
 	}
 	catch (const Exception& ex)

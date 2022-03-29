@@ -7,19 +7,202 @@ using System;
 
 namespace System.Screen
 {
+	public enum WindowFlags
+	{
+		none = 0, mainWindow = 1 << 0, showingDialog = 1 << 1
+	}
+	
+	public class ShowDialogGuard
+	{
+		public nothrow ShowDialogGuard(Window* window_) : window(window_)
+		{
+			window->SetShowingDialog();
+		}
+		public ~ShowDialogGuard()
+		{
+			window->ResetShowingDialog();
+		}
+		private Window* window;
+	}
+
     public class Window : ContainerControl
     {
-        public nothrow Window() : base(), isMainWindow(false)
+        public nothrow Window(ControlCreateParams& createParams) : base(createParams), flags(WindowFlags.none)
         {
         }
         public nothrow bool IsMainWindow()
         {
-            return isMainWindow;
+            return (flags & WindowFlags.mainWindow) != WindowFlags.none;
         }
         public nothrow void SetMainWindow()
         {
-            isMainWindow = true;
+            flags = cast<WindowFlags>(flags | WindowFlags.mainWindow);
         }
-        private bool isMainWindow;
+		public nothrow bool ShowingDialog() const
+		{
+			return (flags & WindowFlags.showingDialog) != WindowFlags.none;
+		}
+		public nothrow void SetShowingDialog() 
+		{
+			flags = cast<WindowFlags>(flags | WindowFlags.showingDialog);
+		}
+		public nothrow void ResetShowingDialog()
+		{
+			flags = cast<WindowFlags>(flags & ~WindowFlags.showingDialog);
+		}
+		public virtual nothrow Button* DefaultButton() const
+		{
+			return null;
+		}
+		public virtual nothrow Button* CancelButton() const
+		{
+			Component* child = Controls().FirstChild();
+			while (child != null)
+			{
+				if (child is Button*)
+				{
+					Button* button = cast<Button*>(child);
+					if (button->GetDialogResult() == DialogResult.cancel)
+					{
+						return button;
+					}
+				}
+				child = child->NextSibling();
+			}
+			return null;
+		}
+		public nothrow Control* FirstControl() const
+		{
+			Component* child = Controls().FirstChild();
+			while (child != null)
+			{
+				if (child is Control*)
+				{
+					return cast<Control*>(child);
+				}
+				child = child->NextSibling();
+			}
+			return null;
+		}
+		public nothrow Control* LastControl() const
+		{
+			Component* child = Controls().LastChild();
+			while (child != null)
+			{
+				if (child is Control*)
+				{
+					return cast<Control*>(child);
+				}
+				child = child->PrevSibling();
+			}
+			return null;
+		}
+		public nothrow Control* FirstFocusabledControl() const 
+		{
+			Control* control = FirstControl();
+			while (control != null)
+			{
+				if (control->CanFocus())
+				{
+					return control;
+				}
+				control = control->NextControl();
+			}
+			return null;
+		}
+		public nothrow Control* LastFocusableControl() const
+		{
+			Control* control = LastControl();
+			while (control != null)
+			{
+				if (control->CanFocus())
+				{
+					return control;
+				}
+				control = control->PrevControl();
+			}
+			return null;
+		}
+		public DialogResult ShowDialog()
+		{
+			ShowDialogGuard guard(this);
+			dialogResult = DialogResult.none;
+			Application.Instance().RunDialog(this);
+			return dialogResult;
+		}
+		public override void OnKeyPressed(KeyEventArgs& args)
+		{
+			if (ShowingDialog())
+			{
+				base->OnKeyPressed(args);
+				if (!args.Handled())
+				{
+					switch (args.Key())
+					{
+						case keyNewline:
+						{
+							Button* defaultButton = DefaultButton();
+							if (defaultButton != null && defaultButton->IsEnabled())
+							{
+								args.SetHandled();
+								defaultButton->OnPressed();
+							}
+							break;
+						}
+						case keyEscape:
+						{
+							Button* cancelButton = CancelButton();
+							if (cancelButton != null && cancelButton->IsEnabled())
+							{
+								args.SetHandled();
+								cancelButton->OnPressed();
+							}
+							break;
+						}
+						case keyTab:
+						{
+							Control* focusedControl = Application.Instance().FocusedControl();
+							if (focusedControl != null)
+							{
+								Control* nextFocusableControl = focusedControl->NextFocusableControl();
+								if (nextFocusableControl == null)
+								{
+									nextFocusableControl = FirstFocusabledControl();
+								}
+								if (nextFocusableControl != null)
+								{
+									nextFocusableControl->SetFocus();
+								}
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+		public override bool HandleWriteScreen(WriteScreenMessage* message)
+		{
+			bool handled = base->HandleWriteScreen(message);
+			if (handled)
+			{
+				Control* focusedControl = Application.Instance().FocusedControl();
+				if (focusedControl != null)
+				{
+					Point cursorPos = focusedControl->ControlCursorPos();
+					SetCursorPos(cursorPos.x, cursorPos.y);
+				}
+			}
+			return handled;
+		}
+		public nothrow DialogResult GetDialogResult() const
+		{
+			return dialogResult;
+		}
+		public nothrow void SetDialogResult(DialogResult dialogResult_)
+		{
+			dialogResult = dialogResult_;
+		}
+        private WindowFlags flags;
+		private DialogResult dialogResult;
     }
 }

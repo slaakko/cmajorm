@@ -14,21 +14,29 @@ namespace System.Screen
 
     public class QuitMessage : Message
     {
+		public override nothrow int Id() const
+		{
+			return quitMessageId;
+		}
         static nothrow QuitMessage() : Message()
         {
-            SetId(quitMessageId);
-            SetSize(cast<int>(Message.Size()));
-            RegisterMessage<QuitMessage>(Id());
+            RegisterMessage<QuitMessage>(quitMessageId);
         }
     }
 
     public class KeyPressedMessage : Message
     {
+		public override nothrow int Id() const
+		{
+			return keyPressedMessageId;
+		}
+		public override nothrow int Size() const
+		{
+			return cast<int>(base->Size() + sizeof(uchar));
+		}
         static nothrow KeyPressedMessage() : Message()
         {
-            SetId(keyPressedMessageId);
-            SetSize(cast<int>(Message.Size() + sizeof(uchar)));
-            RegisterMessage<KeyPressedMessage>(Id());
+            RegisterMessage<KeyPressedMessage>(keyPressedMessageId);
         }
         public nothrow KeyPressedMessage(uchar key_) : key(key_)
         {
@@ -56,11 +64,17 @@ namespace System.Screen
     
     public class WriteScreenMessage : Message
     {
+		public override nothrow int Id() const
+		{
+			return writeScreenMessageId;
+		}
+		public override nothrow int Size() const
+		{
+			return cast<int>(base->Size() + sizeof(Rect));
+		}
         static nothrow WriteScreenMessage() : Message()
         {
-            SetId(writeScreenMessageId);
-            SetSize(cast<int>(Message.Size() + sizeof(Rect)));
-            RegisterMessage<WriteScreenMessage>(Id());
+            RegisterMessage<WriteScreenMessage>(writeScreenMessageId);
         }
         public nothrow WriteScreenMessage(const Rect& rect_) : rect(rect_)
         {

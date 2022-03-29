@@ -332,26 +332,26 @@ char32_t OsReadConsoleInput(void* consoleInputHandle)
                     {
                         ctrl = true;
                     }
-                    else if (keyEventRecord->dwControlKeyState & SHIFT_PRESSED)
+                    if (keyEventRecord->dwControlKeyState & SHIFT_PRESSED)
                     {
                         shift = true;
                     }
-                    else if (keyEventRecord->dwControlKeyState & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))
+                    if (keyEventRecord->dwControlKeyState & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))
                     {
                         alt = true;
                     }
                     switch (keyEventRecord->wVirtualKeyCode)
                     {
                         case VK_BACK: ch = static_cast<char32_t>(keyBackspace); break;
-                        case VK_TAB: ch = static_cast<char32_t>(keyTab); break;
+                        case VK_TAB: if (ctrl) ch = static_cast<char32_t>(keyControlTab); else if (shift) ch = static_cast<char32_t>(keyShiftTab); else ch = static_cast<char32_t>(keyTab); break;
                         case VK_RETURN: ch = static_cast<char32_t>(keyNewLine); break;
                         case VK_ESCAPE: ch = static_cast<char32_t>(keyEscape); break;
                         case VK_PRIOR: if (ctrl) ch = static_cast<char32_t>(keyControlPgUp); else if (shift) ch = static_cast<char32_t>(keyShiftPgUp); else ch = static_cast<char32_t>(keyPgUp); break;
                         case VK_NEXT: if (ctrl) ch = static_cast<char32_t>(keyControlPgDown); else if (shift) ch = static_cast<char32_t>(keyShiftPgDown); else ch = static_cast<char32_t>(keyPgDown); break;
-                        case VK_END: if (ctrl) ch = static_cast<char32_t>(keyControlEnd); else if (shift) ch = static_cast<char32_t>(keyShiftEnd); else ch = static_cast<char32_t>(keyEnd); break;
-                        case VK_HOME: if (ctrl) ch = static_cast<char32_t>(keyControlHome); else if (shift) ch = static_cast<char32_t>(keyShiftHome); else ch = static_cast<char32_t>(keyHome); break;
-                        case VK_LEFT: if (ctrl) ch = static_cast<char32_t>(keyControlLeft); else if (shift) ch = static_cast<char32_t>(keyShiftLeft); else ch = static_cast<char32_t>(keyLeft); break;
-                        case VK_RIGHT: if (ctrl) ch = static_cast<char32_t>(keyControlRight); else if (shift) ch = static_cast<char32_t>(keyShiftRight); else ch = static_cast<char32_t>(keyRight); break;
+                        case VK_END: if (ctrl && shift) ch = static_cast<char32_t>(keyControlShiftEnd); else if (ctrl) ch = static_cast<char32_t>(keyControlEnd); else if (shift) ch = static_cast<char32_t>(keyShiftEnd); else ch = static_cast<char32_t>(keyEnd); break;
+                        case VK_HOME: if (ctrl && shift) ch = static_cast<char32_t>(keyControlShiftHome); else if (ctrl) ch = static_cast<char32_t>(keyControlHome); else if (shift) ch = static_cast<char32_t>(keyShiftHome); else ch = static_cast<char32_t>(keyHome); break;
+                        case VK_LEFT: if (ctrl && shift) ch = static_cast<char32_t>(keyControlShiftLeft); else if (ctrl) ch = static_cast<char32_t>(keyControlLeft); else if (shift) ch = static_cast<char32_t>(keyShiftLeft); else ch = static_cast<char32_t>(keyLeft); break;
+                        case VK_RIGHT: if (ctrl && shift) ch = static_cast<char32_t>(keyControlShiftRight); else if (ctrl) ch = static_cast<char32_t>(keyControlRight); else if (shift) ch = static_cast<char32_t>(keyShiftRight); else ch = static_cast<char32_t>(keyRight); break;
                         case VK_UP: if (ctrl) ch = static_cast<char32_t>(keyControlUp); else if (shift) ch = static_cast<char32_t>(keyShiftUp); else ch = static_cast<char32_t>(keyUp); break;
                         case VK_DOWN: if (ctrl) ch = static_cast<char32_t>(keyControlDown); else if (shift) ch = static_cast<char32_t>(keyShiftDown); else ch = static_cast<char32_t>(keyDown); break;
                         case VK_DELETE: if (ctrl) ch = static_cast<char32_t>(keyControlDel); else if (shift) ch = static_cast<char32_t>(keyShiftDel); else ch = static_cast<char32_t>(keyDel); break;

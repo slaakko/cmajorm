@@ -160,7 +160,14 @@ const int keyAltF10 = specialKeyStart + 102;
 const int keyAltF11 = specialKeyStart + 103;
 const int keyAltF12 = specialKeyStart + 104;
 
-const int specialKeyEnd = specialKeyStart + 105;
+const int keyControlShiftLeft = specialKeyStart + 105;
+const int keyControlShiftRight = specialKeyStart + 106;
+const int keyControlShiftHome = specialKeyStart + 107;
+const int keyControlShiftEnd = specialKeyStart + 108;
+const int keyControlTab = specialKeyStart + 109;
+const int keyShiftTab = specialKeyStart + 110;
+
+const int specialKeyEnd = specialKeyStart + 110;
 
 CMSX_KERNEL_API void* OsCreateHostFile(const char* filePath, bool randomAccess);
 CMSX_KERNEL_API void* OsOpenHostFile(const char* filePath, bool randomAccess);

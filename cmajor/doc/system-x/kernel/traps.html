@@ -465,6 +465,48 @@
 			address of a variable containing child kernel time in nanoseconds (pointer to ulong)</td>
 			<td>obtains execution statistics for the exited child processes of the current process</td>
 		</tr>
+		<tr>
+			<td><span class="kw">trap_sendkey</span></td>
+			<td>69</td>
+			<td>key (uchar)</td>
+			<td>simulates pressing a key, puts the key into the kernel key input buffer</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_msgq</span></td>
+			<td>70</td>
+			<td>name of the message queueu to create or open (pointer to string)</td>
+			<td>creates or opens a message queue, returns message queue descriptor, or -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_close_msgq</span></td>
+			<td>71</td>
+			<td>message queue descriptor (int)</td>
+			<td>closes a message queue, returns 0, or -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_put_msg</span></td>
+			<td>72</td>
+			<td>message queue descriptor (int), message data buffer (pointer), message size (int)</td>
+			<td>enqueues a message to the given message queue</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_get_msgq_length</span></td>
+			<td>73</td>
+			<td>message queue descriptor (int)</td>
+			<td>returns the length of the given message queue, or -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_get_msg_size</span></td>
+			<td>74</td>
+			<td>message queue descriptor (int)</td>
+			<td>returns the size of the message in front of the given message queue, or -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_get_msg</span></td>
+			<td>75</td>
+			<td>message queue descriptor (int), buffer address (pointer)</td>
+			<td>fetches and removes the message in front of the given message queue, returns 0, or -1 in case of error</td>
+		</tr>
 	</table>
 </body>
 </html>
