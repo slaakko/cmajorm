@@ -45,6 +45,50 @@ namespace System.Screen
 		public int endLine;
 		public int endCol;
 	}
+	
+	public class SelectionData
+	{
+		public nothrow SelectionData()
+		{
+		}
+		public nothrow bool IsEmpty() const
+		{
+			return lines.IsEmpty();
+		}
+		public void SetLines(const List<ustring>& lines_)
+		{
+			lines = lines_;
+		}
+		public nothrow const List<ustring>& Lines() const
+		{
+			return lines;
+		}
+		private List<ustring> lines;
+	}
+	
+	public class Clipboard
+	{
+		static Clipboard() : instance(new Clipboard())
+		{
+		}
+		private Clipboard()
+		{
+		}
+		public static Clipboard& Instance()
+		{
+			return *instance;
+		}
+		public nothrow bool IsEmpty() const
+		{
+			return selectionData.IsEmpty();
+		}
+		public nothrow SelectionData& GetSelectionData() 
+		{
+			return selectionData;
+		}
+		private static UniquePtr<Clipboard> instance;
+		private SelectionData selectionData;
+	}
 
 	public class EditorCreateParams
 	{
@@ -137,6 +181,41 @@ namespace System.Screen
 			}
 			Invalidate();
 			ResetDirty();
+		}
+		public void Copy()
+		{
+			if (selection.IsEmpty()) return;
+			MakeCanonicalSelection();
+			List<ustring> selectionLines;
+			for (int i = canonicalSelection.startLine; i <= canonicalSelection.endLine; ++i)
+			{
+				selectionLines.Add(lines[i]);
+			}
+			Clipboard.Instance().GetSelectionData().SetLines(selectionLines);
+		}
+		public void Cut()
+		{
+			if (selection.IsEmpty()) return;
+			Copy();
+			DeleteSelection();
+		}
+		public void Paste()
+		{
+			if (Clipboard.Instance().IsEmpty()) return;
+			const List<ustring>& selectionLines = Clipboard.Instance().GetSelectionData().Lines();
+			for (const ustring& line : selectionLines)
+			{
+				if (caretLine < lines.Count())
+				{
+					lines.Insert(lines.Begin() + caretLine, line);
+				}
+				else
+				{
+					lines.Add(line);
+				}
+			}
+			Invalidate();
+			SetDirty();
 		}
         public override void OnWriteScreen(WriteScreenEventArgs& args)
         {

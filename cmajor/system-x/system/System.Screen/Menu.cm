@@ -121,7 +121,7 @@ namespace System.Screen
 				Invalidate();
 			}
 		}
-		public nothrow void ResetOpen()
+		public virtual nothrow void ResetOpen()
 		{
 			if (IsOpen())
 			{
@@ -154,14 +154,6 @@ namespace System.Screen
 		{
 			return gap;
 		}
-		public nothrow MenuItem* OpenedMenuItem() const
-		{
-			return openedMenuItem;
-		}
-		public nothrow void SetOpenedMenuItem(MenuItem* openedMenuItem_)
-		{
-			openedMenuItem = openedMenuItem_;
-		}
 		public nothrow MenuItem* FocusedMenuItem() const
 		{
 			return focusedMenuItem;
@@ -184,7 +176,6 @@ namespace System.Screen
 		private ConsoleColor focusedItemForeColor;
 		private ConsoleColor focusedItemBackColor;
 		private int gap;
-		private MenuItem* openedMenuItem;
 		private MenuItem* focusedMenuItem;
     }
 
@@ -215,30 +206,26 @@ namespace System.Screen
             menuItems.AddChild(menuItem);
 			menuItem->SetAccessKey();
         }
+		public override nothrow void ResetOpen()
+		{
+			base->ResetOpen();
+			Component* child = menuItems.FirstChild();
+			while (child != null)
+			{
+				if (child is MenuItem*)
+				{
+					MenuItem* menuItem = cast<MenuItem*>(child);
+					menuItem->SetState(MenuItemState.closed);
+				}
+				child = child->NextSibling();
+			}
+		}
 		public override void OnKeyPressed(KeyEventArgs& args)
         {
             if (args.Handled()) return;
 			if (IsOpen() && args.Key() == keyEscape)
 			{
-				MenuItem* openedMenuItem = OpenedMenuItem();
-				if (openedMenuItem != null)
-				{
-					openedMenuItem->SetState(MenuItemState.closed);
-					MenuItem* parentMenuItem = openedMenuItem->ParentMenuItem();
-					if (parentMenuItem != null && !parentMenuItem->IsTopLevel())
-					{
-						SetOpenedMenuItem(parentMenuItem);
-					}
-					else
-					{
-						SetOpenedMenuItem(null);
-						ResetOpen();
-					}
-				}
-				else
-				{
-					ResetOpen();
-				}
+				ResetOpen();
 				SetFocusedMenuItem(null);
 				args.SetHandled();
 				return;
@@ -268,6 +255,7 @@ namespace System.Screen
 						if (menuItem->AccessKey() == key)
                         {
                             args.SetHandled();
+							ResetOpen();
 							SetOpen();
                             menuItem->SetState(MenuItemState.open);
 							SetFocusedMenuItem(menuItem->FirstChildItem());

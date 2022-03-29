@@ -31,6 +31,17 @@ public class MainWindow	: Window
 		fileExitMenuItem->SelectEvent().AddHandler(Exit);
 		fileMenuItem->AddMenuItem(fileExitMenuItem);
 		menuBar->AddMenuItem(fileMenuItem);
+		MenuItem* editMenuItem = new MenuItem("&Edit");
+		MenuItem* editCopyMenuItem = new MenuItem("&Copy", keyControlIns);
+		editCopyMenuItem->SelectEvent().AddHandler(Copy);
+		editMenuItem->AddMenuItem(editCopyMenuItem);
+		MenuItem* editCutMenuItem = new MenuItem("C&ut", keyShiftDel);
+		editCutMenuItem->SelectEvent().AddHandler(Cut);
+		editMenuItem->AddMenuItem(editCutMenuItem);
+		MenuItem* editPasteMenuItem = new MenuItem("&Paste", keyF8);
+		editPasteMenuItem->SelectEvent().AddHandler(Paste);
+		editMenuItem->AddMenuItem(editPasteMenuItem);
+		menuBar->AddMenuItem(editMenuItem);
 		AddChild(menuBar);
 		editor = new Editor(EditorCreateParams().Defaults());
 		AddChild(editor);
@@ -69,6 +80,18 @@ public class MainWindow	: Window
 		UniquePtr<MessageBox> messageBox = new MessageBox(MessageBoxCreateParams().Caption("Save").Buttons(cast<MessageBoxButtons>(MessageBoxButtons.yes | MessageBoxButtons.no | MessageBoxButtons.cancel)));
 		messageBox->ShowDialog();
 		editor->SetFocus();
+	}
+	private void Copy()
+	{
+		editor->Copy();
+	}
+	private void Cut()
+	{
+		editor->Cut();
+	}
+	private void Paste()
+	{
+		editor->Paste();
 	}
 	private void Exit()
 	{

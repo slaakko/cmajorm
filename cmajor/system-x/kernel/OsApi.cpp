@@ -355,6 +355,7 @@ char32_t OsReadConsoleInput(void* consoleInputHandle)
                         case VK_UP: if (ctrl) ch = static_cast<char32_t>(keyControlUp); else if (shift) ch = static_cast<char32_t>(keyShiftUp); else ch = static_cast<char32_t>(keyUp); break;
                         case VK_DOWN: if (ctrl) ch = static_cast<char32_t>(keyControlDown); else if (shift) ch = static_cast<char32_t>(keyShiftDown); else ch = static_cast<char32_t>(keyDown); break;
                         case VK_DELETE: if (ctrl) ch = static_cast<char32_t>(keyControlDel); else if (shift) ch = static_cast<char32_t>(keyShiftDel); else ch = static_cast<char32_t>(keyDel); break;
+                        case VK_INSERT: if (ctrl) ch = static_cast<char32_t>(keyControlIns); else if (shift) ch = static_cast<char32_t>(keyShiftlIns); else ch = static_cast<char32_t>(keyIns); break;
                         case VK_F1: if (ctrl) ch = static_cast<char32_t>(keyControlF1); else if (alt) ch = static_cast<char32_t>(keyAltF1); else ch = static_cast<char32_t>(keyF1); break;
                         case VK_F2: if (ctrl) ch = static_cast<char32_t>(keyControlF2); else if (alt) ch = static_cast<char32_t>(keyAltF2); else ch = static_cast<char32_t>(keyF2); break;
                         case VK_F3: if (ctrl) ch = static_cast<char32_t>(keyControlF3); else if (alt) ch = static_cast<char32_t>(keyAltF3); else ch = static_cast<char32_t>(keyF3); break;
