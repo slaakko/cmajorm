@@ -7,10 +7,17 @@
 #include <system-x/kernel/Process.hpp>
 #include <system-x/kernel/Scheduler.hpp>
 #include <system-x/kernel/EventManager.hpp>
+#include <system-x/kernel/MsgQueue.hpp>
+#include <system-x/kernel/IO.hpp>
+#include <system-x/kernel/OsApi.hpp>
 #include <system-x/machine/Machine.hpp>
 #include <algorithm>
 
 namespace cmsx::kernel {
+
+AlarmMsg::AlarmMsg(int32_t md_, const std::vector<uint8_t>& msgData_) : md(md_), msgData(msgData_)
+{
+}
 
 std::unique_ptr<Clock> Clock::instance;
 
@@ -57,7 +64,16 @@ void Clock::Tick()
     {
         Alarm alarm = alarms.front();
         alarms.erase(alarms.begin());
-        Wakeup(cmsx::machine::Event(cmsx::machine::EventKind::alarmEvent, alarm.id));
+        if (alarm.sleep)
+        {
+            Wakeup(cmsx::machine::Event(cmsx::machine::EventKind::alarmEvent, alarm.id));
+        }
+        else if (alarm.msg)
+        {
+            PutMsg(alarm.msg->md, alarm.msg->msgData);
+            delete alarm.msg;
+            SendKey(keyMsg);
+        }
     }
 }
 
@@ -77,8 +93,11 @@ void Clock::Schedule(Alarm& alarm)
     alarm.id = nextAlarmId++;
     alarms.push_back(alarm);
     std::sort(alarms.begin(), alarms.end(), AlarmEarlier());
-    Sleep(cmsx::machine::Event(cmsx::machine::EventKind::alarmEvent, alarm.id), alarm.process, lock);
-    lock.lock();
+    if (alarm.sleep)
+    {
+        Sleep(cmsx::machine::Event(cmsx::machine::EventKind::alarmEvent, alarm.id), alarm.process, lock);
+        lock.lock();
+    }
 }
 
 void InitClock()

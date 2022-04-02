@@ -27,6 +27,7 @@
 #include <system-x/kernel/Pipe.hpp>
 #include <system-x/kernel/Terminal.hpp>
 #include <system-x/kernel/MsgQueue.hpp>
+#include <system-x/kernel/Debug.hpp>
 
 namespace cmsx::kernel {
 
@@ -56,10 +57,12 @@ void Init(bool initTerminal)
     }
     InitMsgQueue();
     InitKernel();
+    InitDebug();
 }
 
 void Done()
 {
+    DoneDebug();
     DoneKernel();
     DoneMsgQueue();
     DoneTerminal();

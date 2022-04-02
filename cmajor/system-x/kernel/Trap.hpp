@@ -87,6 +87,11 @@ const uint8_t trap_put_msg = 72;
 const uint8_t trap_get_msgq_length = 73;
 const uint8_t trap_get_msg_size = 74;
 const uint8_t trap_get_msg = 75;
+const uint8_t trap_timer_msg = 76;
+const uint8_t trap_connect = 77;
+const uint8_t trap_get_debug_mode = 78;
+const uint8_t trap_set_debug_mode = 79;
+const uint8_t trap_write_debug_message = 80;
 
 class CMSX_KERNEL_API TrapHandler
 {

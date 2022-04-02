@@ -10,6 +10,7 @@
 #include <system-x/kernel/Pipe.hpp>
 #include <system-x/kernel/Terminal.hpp>
 #include <system-x/kernel/MsgQueue.hpp>
+#include <system-x/kernel/Socket.hpp>
 #include <system-x/machine/Processor.hpp>
 
 namespace cmsx::kernel {
@@ -784,6 +785,29 @@ uint64_t TrapGetMsgHandler::HandleTrap(cmsx::machine::Processor& processor)
     }
 }
 
+class TrapConnectHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_connect"; }
+};
+
+uint64_t TrapConnectHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int64_t nodeAddr = processor.Regs().Get(cmsx::machine::regAX);
+        int64_t serviceddr = processor.Regs().Get(cmsx::machine::regBX);
+        return Connect(process, nodeAddr, serviceddr);
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
 void InitIOTraps()
 {
     SetTrapHandler(trap_create, new TrapCreateHandler());
@@ -819,10 +843,12 @@ void InitIOTraps()
     SetTrapHandler(trap_get_msgq_length, new TrapGetMsgQLengthHandler());
     SetTrapHandler(trap_get_msg_size, new TrapGetMsgSizeHandler());
     SetTrapHandler(trap_get_msg, new TrapGetMsgHandler());
+    SetTrapHandler(trap_connect, new TrapConnectHandler());
 }
 
 void DoneIOTraps()
 {
+    SetTrapHandler(trap_connect, nullptr);
     SetTrapHandler(trap_get_msg, nullptr);
     SetTrapHandler(trap_get_msg_size, nullptr);
     SetTrapHandler(trap_get_msgq_length, nullptr);

@@ -14,7 +14,7 @@ namespace soulng { namespace util {
 class UTIL_API MemoryReader
 {
 public:
-    MemoryReader(uint8_t* ptr_, int64_t count_);
+    MemoryReader(const uint8_t* ptr_, int64_t count_);
     uint8_t ReadByte();
     int8_t ReadSByte();
     uint16_t ReadUShort();
@@ -25,8 +25,8 @@ public:
     int64_t ReadLong();
     DateTime ReadDateTime();
 private:
-    uint8_t* ptr;
-    uint8_t* pos;
+    const uint8_t* ptr;
+    const uint8_t* pos;
     int64_t count;
 };
 

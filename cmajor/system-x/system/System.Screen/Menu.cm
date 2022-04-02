@@ -183,6 +183,7 @@ namespace System.Screen
     {
         public nothrow MenuBar(MenuControlCreateParams& createParams) : base(createParams), menuItems(this)
         {
+			InvalidateGuard guard(this, false);
             if (Location().IsDefault())
             {
                 SetLocation(Point(0, 0));

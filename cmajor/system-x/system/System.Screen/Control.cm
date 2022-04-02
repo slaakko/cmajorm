@@ -9,15 +9,16 @@ namespace System.Screen
 {
 	public class InvalidateGuard
 	{
-		public nothrow InvalidateGuard(Control* control_) : control(control_)
+		public nothrow InvalidateGuard(Control* control_, bool invalidate_) : control(control_), invalidate(invalidate_)
 		{
-			control->BeginInvalidate();
+			control->BeginInvalidate(invalidate);
 		}
 		public ~InvalidateGuard()
 		{
-			control->EndInvalidate();
+			control->EndInvalidate(invalidate);
 		}
 		private Control* control;
+		private bool invalidate;
 	}
 
     public class ControlCreateParams
@@ -249,18 +250,32 @@ namespace System.Screen
 				Invalidate();
             }
         }
-		public nothrow void BeginInvalidate()
+		public nothrow void Timer(const Duration& duration, int timerId)
 		{
+			Application.Instance().Timer(duration, this, timerId);
+		}
+		public nothrow void BeginInvalidate(bool invalidate)
+		{
+			Control* parentControl = ParentControl();
+			if (parentControl != null && parentControl->InvalidateCount() > 0)
+			{
+				return;
+			}
 			if (invalidateCount == 0)
 			{
 				updateRect = Rect();
 			}
 			++invalidateCount;
 		}
-		public nothrow void EndInvalidate()
+		public nothrow void EndInvalidate(bool invalidate)
 		{
+			Control* parentControl = ParentControl();
+			if (parentControl != null && parentControl->InvalidateCount() > 0)
+			{
+				return;
+			}
 			--invalidateCount;
-			if (invalidateCount == 0)
+			if (invalidateCount == 0 && invalidate)
 			{
 				if (!updateRect.IsEmpty())
 				{
@@ -280,7 +295,7 @@ namespace System.Screen
         }
         public void Invalidate(const Rect& rect)
         {
-			InvalidateGuard guard(this);
+			InvalidateGuard guard(this, true);
 			Control* parentControl = ParentControl();
 			if (parentControl != null)
 			{
@@ -326,7 +341,7 @@ namespace System.Screen
 		{
 			return Application.Instance().FocusedControl() == this;
 		}
-		public nothrow void SetFocus()
+		public virtual void SetFocus()
 		{
 			Control* prevFocusedControl = Application.Instance().FocusedControl();
 			if (prevFocusedControl != this)
@@ -378,6 +393,12 @@ namespace System.Screen
             OnWriteScreen(args);
             return true;
         }
+		public virtual bool HandleTimerMessage(TimerMessage* message)
+		{
+			TimerEventArgs args(message->TimerId());
+			OnTimer(args);
+			return true;
+		}
         public virtual void OnLocationChanged()
         {
             locationChangedEvent.Fire();
@@ -410,6 +431,10 @@ namespace System.Screen
         {
             keyPressedEvent.Fire(args);
         }
+		public virtual void OnTimer(TimerEventArgs& args)
+		{
+			timerEvent.Fire(args);
+		}
 		public nothrow Event<ChangedEventHandler>& LocationChangedEvent() 
 		{
 			return locationChangedEvent;
@@ -442,6 +467,10 @@ namespace System.Screen
 		{
 			return keyPressedEvent;
 		}
+		public nothrow Event<TimerEventHandler, TimerEventArgs> TimerEvent()
+		{
+			return timerEvent;
+		}
 		private ControlFlags flags;
         private int handle;
         private Point location;
@@ -456,6 +485,7 @@ namespace System.Screen
 		private Event<FocusEventHandler> lostFocusEvent;
 		private Event<WriteScreenEventHandler, WriteScreenEventArgs> writeScreenEvent;
 		private Event<KeyEventHandler, KeyEventArgs> keyPressedEvent;
+		private Event<TimerEventHandler, TimerEventArgs> timerEvent;
 		private int invalidateCount;
 		private Rect updateRect;
 		private Point controlCursorPos;

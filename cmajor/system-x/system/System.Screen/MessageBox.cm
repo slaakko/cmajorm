@@ -48,7 +48,7 @@ namespace System.Screen
 	{
 		public nothrow MessageBox(MessageBoxCreateParams& createParams) : base(createParams.controlCreateParams), caption(createParams.caption), text(createParams.text), buttons(createParams.buttons)
 		{
-			InvalidateGuard guard(this);
+			InvalidateGuard guard(this, true);
 			bool setLoc = false;
 			if (Location().IsDefault())
 			{
@@ -125,6 +125,10 @@ namespace System.Screen
 			{
 				WriteCaption(u" " + ToUtf32(caption) + u" ");
 			}
+			if (!text.IsEmpty())
+			{
+				WriteText();
+			}
 			WriteChildren(args);
 		}
 		private void Measure(bool setLoc)
@@ -136,8 +140,8 @@ namespace System.Screen
 			SetSize(rect.size);
 			List<Control*> children;
 			float sw = MeasureChildWidth(sz.w, children);
-			textLines = SplitIntoLines(ToUtf32(text), sz.w);
-			sz.h = Max(sz.h, 2 + cast<int>(textLines.Count()));
+			textLines = SplitIntoLines(ToUtf32(text), sz.w - 4);
+			sz.h = Max(sz.h, 4 + cast<int>(textLines.Count()));
 			SetSize(sz);
 			if (setLoc)
 			{
@@ -197,6 +201,20 @@ namespace System.Screen
 			int y = loc.y;
 			SetCursorPos(x, y);
 			Terminal.Out() << captionStr;
+		}
+		private void WriteText()
+		{
+			Point loc = Location();
+			Size sz = GetSize();
+			int x = loc.x + 2;
+			int y = loc.y + 1;
+			for (const ustring& line : textLines)
+			{
+				int offset = Max(cast<int>(0), cast<int>((sz.w - 4 - line.Length()) / 2));
+				SetCursorPos(x + offset, y);
+				Terminal.Out() << line;
+				y = y + 1;
+			}
 		}
 		private void WriteChildren(WriteScreenEventArgs& args)
 		{

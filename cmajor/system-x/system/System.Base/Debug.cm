@@ -1,0 +1,23 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace System
+{
+	public const int debugTerminal = 1 << 1;
+	public const int debugApps = 1 << 2;
+	
+	public nothrow int GetDebugMode()
+	{
+		return get_debug_mode();
+	}
+	public nothrow void SetDebugMode(int debugMode)
+	{
+		set_debug_mode(debugMode);
+	}
+	public nothrow void WriteDebugMessage(const string& message)
+	{
+		write_debug_message(message.Chars());
+	}
+}

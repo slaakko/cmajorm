@@ -17,6 +17,7 @@
 #include <system-x/kernel/HostFs.hpp>
 #include <system-x/kernel/DevFs.hpp>
 #include <system-x/kernel/Terminal.hpp>
+#include <system-x/kernel/Debug.hpp>
 
 namespace cmsx::kernel {
 
@@ -113,6 +114,7 @@ void Kernel::SetMachine(cmsx::machine::Machine* machine_)
 
 void Kernel::Start()
 {
+    StartDebug();
     EventManager::Instance().Start();
     ProcessManager::Instance().Start();
     Scheduler::Instance().Start();
@@ -145,6 +147,7 @@ void Kernel::Stop()
     Scheduler::Instance().Stop();
     ProcessManager::Instance().Stop();
     EventManager::Instance().Stop();
+    StopDebug();
 }
 
 void Kernel::Sleep()

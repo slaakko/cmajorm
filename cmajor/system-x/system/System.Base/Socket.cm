@@ -1,0 +1,71 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.Os;
+
+namespace System
+{
+	public class Socket
+	{
+		public Socket(const string& node, const string& service) : socket(Connect(node.Chars(), service.Chars()))
+		{
+		}
+		public ~Socket()
+		{
+			close(socket);
+		}
+		public void Send(const byte* buffer, long count)
+		{
+			long bytesWritten = Write(socket, buffer, count);
+			count = count - bytesWritten;
+			while (count > 0)
+			{
+				buffer = buffer + bytesWritten;
+				bytesWritten = Write(socket, buffer, count);
+				count = count - bytesWritten;
+			}
+		}
+		public void Receive(byte* buffer, long count)
+		{
+			long bytesRead = Read(socket, buffer, count);
+			count = count - bytesRead;
+			while (count > 0)
+			{
+				buffer = buffer + bytesRead;
+				bytesRead = Read(socket, buffer, count);
+				count = count - bytesRead;
+			}
+		}
+		public void Write(const string& str)
+		{
+			int count = cast<int>(str.Length());
+			UniquePtr<byte> mem(cast<byte*>(MemAlloc(count + 4)));
+			MemoryWriter writer(mem.Get(), count + 4);
+			writer.Write(count);
+			for (int i = 0; i < count; ++i)
+			{
+				byte x = cast<byte>(str[i]);
+				writer.Write(x);
+			}
+			Send(mem.Get(), count + 4);
+		}
+		public string ReadStr()
+		{
+			byte[4] countBuf;
+			Receive(&countBuf[0], 4);
+			MemoryReader reader(&countBuf[0], 4);
+			int count = reader.ReadInt();
+			UniquePtr<byte> mem(cast<byte*>(MemAlloc(count)));
+			Receive(mem.Get(), count);
+			string s;
+			for (int i = 0; i < count; ++i)
+			{
+				s.Append(cast<char>(mem.Get()[i]));
+			}
+			return s;
+		}
+		private int socket;
+	}
+}

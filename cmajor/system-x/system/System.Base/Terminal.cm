@@ -8,18 +8,41 @@ using System.Os;
 
 namespace System
 {
+	public class TerminalState
+	{
+		static TerminalState() : instance(new TerminalState())
+		{
+		}
+		public static TerminalState& Instance()
+		{
+			return *instance;
+		}
+		private TerminalState() : tty(Open("/dev/tty", cast<OpenFlags>(OpenFlags.read | OpenFlags.write), 0))
+		{
+		}
+		public ~TerminalState()
+		{
+			Close(tty);
+		}
+		public nothrow int Descriptor() 
+		{
+			return tty;
+		}
+		private static UniquePtr<TerminalState> instance;
+        private int tty;
+	}
+	
     public static class Terminal
     {
         static nothrow Terminal() :
-            tty(Open("/dev/tty", cast<OpenFlags>(OpenFlags.read | OpenFlags.write), 0)),
-            in(SharedPtr<Stream>(new FileStream(tty))),
-            out(SharedPtr<Stream>(new FileStream(tty))),
-            err(SharedPtr<Stream>(new FileStream(tty)))
-        {
+            in(SharedPtr<Stream>(new FileStream(TerminalState.Instance().Descriptor()))),
+            out(SharedPtr<Stream>(new FileStream(TerminalState.Instance().Descriptor()))),
+            err(SharedPtr<Stream>(new FileStream(TerminalState.Instance().Descriptor())))
+		{
         }
         public static void Write(const char* s)
         {
-            out.Write(s);
+			out.Write(s);
         }
         public static void Write(const wchar* s)
         {
@@ -209,23 +232,22 @@ namespace System
         {
             return in.ReadToEnd();
         }
-        public static nothrow StreamReader& In() 
-        {
-            return in;
-        }
-        public static nothrow StreamWriter& Out()
-        {
-            return out;
-        }
-        public static nothrow StreamWriter& Error()
-        {
-            return err;
-        }
+		public static nothrow StreamReader& In()
+		{
+			return in;
+		}
+		public static nothrow StreamWriter& Out()
+		{
+			return out;
+		}
+		public static nothrow StreamWriter& Error()
+		{
+			return err;
+		}
 		public static nothrow int Descriptor() 
 		{
-			return tty;
+			return TerminalState.Instance().Descriptor();
 		}
-        private static int tty;
         private static StreamReader in;
         private static StreamWriter out;
         private static StreamWriter err;

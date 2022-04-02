@@ -7,6 +7,7 @@
 #include <system-x/kernel/Mount.hpp>
 #include <system-x/kernel/Error.hpp>
 #include <system-x/kernel/Terminal.hpp>
+#include <system-x/kernel/Debug.hpp>
 #include <soulng/util/Path.hpp>
 
 namespace cmsx::kernel {
@@ -55,7 +56,7 @@ INodePtr DevFilesystem::SearchDirectory(const std::string& name, INode* dirINode
         inode->SetOwnerAccess(access);
         inode->SetGroupAccess(access);
         inode->SetOtherAccess(access);
-        return inode;
+        return inodePtr;
     }
     else
     {

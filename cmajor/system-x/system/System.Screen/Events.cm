@@ -49,6 +49,20 @@ namespace System.Screen
     
     public class delegate void KeyEventHandler(KeyEventArgs& keyEventArgs);
     
+	public class delegate void TimerEventHandler(TimerEventArgs& args);
+
+	public class TimerEventArgs
+	{
+		public nothrow TimerEventArgs(int timerId_) : timerId(timerId_)
+		{
+		}
+		public nothrow int TimerId() const
+		{
+			return timerId;
+		}
+		private int timerId;
+	}
+
     public class CloseEventArgs
     {
         public nothrow CloseEventArgs() : cancel(false)

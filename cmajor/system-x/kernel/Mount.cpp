@@ -8,6 +8,7 @@
 #include <system-x/kernel/Fs.hpp>
 #include <system-x/kernel/HostFs.hpp>
 #include <system-x/kernel/Kernel.hpp>
+#include <system-x/kernel/Debug.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Util.hpp>
 

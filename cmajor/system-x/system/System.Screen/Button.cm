@@ -64,6 +64,7 @@ namespace System.Screen
 	{
 		public nothrow Button(ButtonCreateParams& createParams) : base(createParams.controlCreateParams), flags(ButtonFlags.none), text(createParams.text)
 		{
+			InvalidateGuard invalidateGuard(this, false);
 			if (createParams.controlCreateParams.foreColor == ConsoleColor.defaultColor)
 			{
 				SetForeColor(ConsoleColor.black);
@@ -108,6 +109,7 @@ namespace System.Screen
 			{
 				SetSize(Size(Max(cast<int>(10), cast<int>(text.Length() + 2)), cast<int>(1)));
 			}
+			SetAccessKey();
 		}
 		public nothrow bool IsDefault() const
 		{
@@ -183,17 +185,20 @@ namespace System.Screen
 		}
 		public override void OnKeyPressed(KeyEventArgs& args)
 		{
-			Window* window = GetWindow();
-			if (window != null)
+			if (IsEnabled())
 			{
-				switch (args.Key())
+				Window* window = GetWindow();
+				if (window != null)
 				{
-					case keyNewline:
-					case ' ':
+					switch (args.Key())
 					{
-						OnPressed();
-						args.SetHandled();
-						break;
+						case keyNewline:
+						case ' ':
+						{
+							OnPressed();
+							args.SetHandled();
+							break;
+						}
 					}
 				}
 			}
@@ -211,6 +216,22 @@ namespace System.Screen
 		{
 			return pressedEvent;
 		}
+        public nothrow uchar AccessKey() const
+        {
+            return accessKey;
+        }
+        public nothrow void SetAccessKey()
+        {
+            int ampPos = cast<int>(text.Find('&'));
+            if (ampPos != -1 && ampPos < text.Length() - 1)
+            {
+				accessKey = ToUpper(text[ampPos + 1]);
+            }
+            else
+            {
+                accessKey = '\0';
+            }
+        }
 		public static Button* OK() 
 		{
 			Button* okButton = new Button(ButtonCreateParams().Text("[ O&K ]"));
@@ -237,6 +258,7 @@ namespace System.Screen
 		}
 		private ButtonFlags flags;
 		private ustring text;
+		private uchar accessKey;
         private ConsoleColor highlightColor;
 		private ConsoleColor disabledColor;
 		private ConsoleColor focusedItemForeColor;

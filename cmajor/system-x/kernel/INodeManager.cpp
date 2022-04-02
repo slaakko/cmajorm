@@ -8,6 +8,9 @@
 #include <system-x/kernel/BlockManager.hpp>
 #include <system-x/kernel/Process.hpp>
 #include <system-x/kernel/DebugHelp.hpp>
+#include <system-x/kernel/Debug.hpp>
+#include <system-x/kernel/Fs.hpp>
+#include <system-x/kernel/Mount.hpp>
 #include <system-x/machine/Config.hpp>
 #include <system-x/machine/Event.hpp>
 #include <soulng/util/MemoryReader.hpp>
@@ -281,16 +284,14 @@ INodePtr::~INodePtr()
     if (inode)
     {
         PutINode(inode);
+        inode = nullptr;
     }
 }
 
-void INodePtr::Release()
+INodePtr& INodePtr::operator=(INodePtr&& that) noexcept
 {
-    if (inode)
-    {
-        PutINode(inode);
-        inode = nullptr;
-    }
+    std::swap(inode, that.inode);
+    return *this;
 }
 
 void INodePtr::SetINode(const INode& inode_)

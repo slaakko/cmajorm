@@ -127,6 +127,7 @@ namespace System.Screen
 		public nothrow Editor(EditorCreateParams& createParams) : 
 			base(createParams.controlCreateParams), flags(EditorFlags.none), xOffset(0), yOffset(0), caretLine(0), caretCol(0)
 		{
+			InvalidateGuard invalidateGuard(this, false);
 			if (ForeColor() == ConsoleColor.defaultColor)
 			{
 				SetForeColor(ConsoleColor.gray);
@@ -166,11 +167,19 @@ namespace System.Screen
 		}
 		public nothrow void SetDirty()
 		{
-			flags = cast<EditorFlags>(flags | EditorFlags.dirty);
+			if (!IsDirty())
+			{
+				flags = cast<EditorFlags>(flags | EditorFlags.dirty);
+				dirtyChangedEvent.Fire();
+			}
 		}
 		public nothrow void ResetDirty()
 		{
-			flags = cast<EditorFlags>(flags & ~EditorFlags.dirty);
+			if (IsDirty())
+			{
+				flags = cast<EditorFlags>(flags & ~EditorFlags.dirty);
+				dirtyChangedEvent.Fire();
+			}
 		}
 		public void SetLines(const List<string>& lines_)
 		{
@@ -179,8 +188,83 @@ namespace System.Screen
 			{
 				lines.Add(ToUtf32(line));
 			}
-			Invalidate();
+			CursorStartOfText(false);
 			ResetDirty();
+		}
+		public void AddLine(const string& line)
+		{
+			lines.Add(ToUtf32(line));
+			Invalidate();
+		}
+		public nothrow void SetFilePath(const string& filePath_)
+		{
+			if (filePath != filePath_)
+			{
+				filePath = filePath_;
+				filePathChangedEvent.Fire();
+			}
+		}
+		public nothrow const string& FilePath() const
+		{
+			return filePath;
+		}
+		public void SetCaretPos(int caretLine_, int caretCol_)
+		{
+			if (caretLine != caretLine_ || caretCol != caretCol_)
+			{
+				caretLine = caretLine_;
+				caretCol = caretCol_;
+				caretPosChangedEvent.Fire();
+			}
+		}
+		public nothrow int CaretLine() const
+		{
+			return caretLine;
+		}
+		public nothrow int CaretCol() const
+		{
+			return caretCol;
+		}
+		public void Clear()
+		{
+			lines.Clear();
+			CursorStartOfText(false);
+			SetStatusText("text cleared");
+			ResetDirty();
+		}
+		public void Save()
+		{
+			try
+			{
+				StreamWriter writer = File.CreateText(filePath);
+				for (const ustring& line : lines)
+				{
+					writer.WriteLine(line);
+				}
+				SetStatusText("text saved");
+				ResetDirty();
+			}
+			catch (const Exception& ex)
+			{
+				UniquePtr<MessageBox> messageBox = new MessageBox(MessageBoxCreateParams().Caption("Error").Text(ex.ToString()));
+				messageBox->ShowDialog();
+				SetFocus();
+			}
+		}
+		public void Load()
+		{
+			try
+			{
+				List<string> lines_ = File.ReadAllLines(filePath);
+				SetLines(lines_);
+				SetStatusText("text loaded");
+			}
+			catch (const Exception& ex)
+			{
+				UniquePtr<MessageBox> messageBox = new MessageBox(MessageBoxCreateParams().Caption("Error").Text(ex.ToString()));
+				messageBox->ShowDialog();
+				SetFocus();
+			}
 		}
 		public void Copy()
 		{
@@ -192,12 +276,14 @@ namespace System.Screen
 				selectionLines.Add(lines[i]);
 			}
 			Clipboard.Instance().GetSelectionData().SetLines(selectionLines);
+			SetStatusText("selection copied");
 		}
 		public void Cut()
 		{
 			if (selection.IsEmpty()) return;
 			Copy();
 			DeleteSelection();
+			SetStatusText("selection was cut");
 		}
 		public void Paste()
 		{
@@ -216,6 +302,49 @@ namespace System.Screen
 			}
 			Invalidate();
 			SetDirty();
+		}
+		public nothrow Event<ChangedEventHandler>& FilePathChangedEvent() 
+		{
+			return filePathChangedEvent;
+		}
+		public nothrow Event<ChangedEventHandler>& CaretPosChangedEvent() 
+		{
+			return caretPosChangedEvent;
+		}
+		public nothrow Event<ChangedEventHandler>& StatusTextChangedEvent() 
+		{
+			return statusTextChangedEvent;
+		}
+		public nothrow Event<ChangedEventHandler>& DirtyChangedEvent()
+		{
+			return dirtyChangedEvent;
+		}
+		public nothrow void SetStatusText(const string& statusText_)
+		{
+			if (statusText != statusText_)
+			{
+				statusText = statusText_;
+				statusTextChangedEvent.Fire();
+			}
+		}
+		public nothrow const string& StatusText() const
+		{
+			return statusText;
+		}
+		public override void SetFocus()
+		{
+			base->SetFocus();
+			SetCursorPos();
+		}
+		public void SetCursorPos()
+		{
+			Point cp = ScreenPoint(caretCol, caretLine);
+			Size sz = GetSize();
+			if (cp.x >= 0 && cp.x < sz.w && cp.y >= 0 && cp.y < sz.h)
+			{
+				SetControlCursorPos(cp);
+				SetCursorPos(cp.x, cp.y);
+			}
 		}
         public override void OnWriteScreen(WriteScreenEventArgs& args)
         {
@@ -265,7 +394,7 @@ namespace System.Screen
 					line.Append(key);
 				}
 				Point start = ScreenPoint(caretCol, caretLine);
-				++caretCol;
+				SetCaretPos(caretLine, caretCol + 1);
 				Point end = ScreenPoint(caretCol, caretLine + 1);
 				if (inserted)
 				{
@@ -550,8 +679,7 @@ namespace System.Screen
 			{
 				ResetSelection();
 			}
-			caretCol = 0;
-			caretLine = 0;
+			SetCaretPos(0, 0);
 			xOffset = 0;
 			yOffset = 0;
 			SetCursorPos();
@@ -580,8 +708,7 @@ namespace System.Screen
 			{
 				ResetSelection();
 			}
-			caretLine = cast<int>(lines.Count());
-			caretCol = 0;
+			SetCaretPos(cast<int>(lines.Count()), 0);
 			SetXOffset();
 			SetYOffset();
 			SetCursorPos();
@@ -613,9 +740,8 @@ namespace System.Screen
 			Size sz = GetSize();
 			if (yOffset >= sz.h)
 			{
-				caretCol = 0;
 				yOffset = yOffset - sz.h;
-				caretLine = caretLine - sz.h;
+				SetCaretPos(caretLine - sz.h, 0);
 				SetCursorPos();
 			}
 			else
@@ -653,9 +779,8 @@ namespace System.Screen
 			}
 			else
 			{
-				caretLine = caretLine + sz.h;
+				SetCaretPos(caretLine + sz.h, 0);
 				yOffset = yOffset + sz.h;
-				caretCol = 0;
 				SetCursorPos();
 			}
 			if (extendSelection)
@@ -684,16 +809,15 @@ namespace System.Screen
 			}
 			if (caretCol > 0)
 			{
-				--caretCol;
+				SetCaretPos(caretLine, caretCol - 1);
 				SetCursorPos();
 			}
 			else
 			{
 				if (caretLine > 0)
 				{
-					--caretLine;
-					ustring& line = lines[caretLine];
-					caretCol = cast<int>(line.Length());
+					ustring& line = lines[caretLine - 1];
+					SetCaretPos(caretLine - 1, cast<int>(line.Length()));
 					SetXOffset();
 					SetCursorPos();
 				}
@@ -737,15 +861,14 @@ namespace System.Screen
 			ustring& line = lines[caretLine];
 			if (caretCol < line.Length())
 			{
-				++caretCol;
+				SetCaretPos(caretLine, caretCol + 1);
 			}
 			else 
 			{
 				if (caretLine < lines.Count())
 				{
-					++caretLine;
+					SetCaretPos(caretLine + 1, 0);
 					xOffset = 0;
-					caretCol = 0;
 				}
 			}
 			SetXOffset();
@@ -781,9 +904,8 @@ namespace System.Screen
 				{
 					ResetSelection();
 				}
-				--caretLine;
+				SetCaretPos(caretLine - 1, Min(caretCol, cast<int>(line.Length())));
 				ustring& line = lines[caretLine];
-				caretCol = Min(caretCol, cast<int>(line.Length()));
 				SetCursorPos();
 			}
 			if (caretLine < yOffset)
@@ -817,12 +939,12 @@ namespace System.Screen
 				{
 					ResetSelection();
 				}
-				++caretLine;
+				SetCaretPos(caretLine + 1, caretCol);
 				SetYOffset();
 				if (caretLine < lines.Count())
 				{
 					ustring& line = lines[caretLine];
-					caretCol = Min(caretCol, cast<int>(line.Length()));
+					SetCaretPos(caretLine, Min(caretCol, cast<int>(line.Length())));
 					SetCursorPos();
 				}
 				else
@@ -933,7 +1055,7 @@ namespace System.Screen
 			{
 				ResetSelection();
 			}
-			caretCol = 0;
+			SetCaretPos(caretLine, 0);
 			xOffset = 0;
 			SetCursorPos();
 			if (extendSelection)
@@ -964,7 +1086,7 @@ namespace System.Screen
 					ResetSelection();
 				}
 				ustring& line = lines[caretLine];
-				caretCol = cast<int>(line.Length());
+				SetCaretPos(caretLine, cast<int>(line.Length()));
 				SetXOffset();
 				SetCursorPos();
 				if (extendSelection)
@@ -1024,9 +1146,8 @@ namespace System.Screen
 			Size sz = GetSize();
 			updateRect.size.w = sz.w + xOffset;
 			updateRect.size.h = sz.h - (caretLine - yOffset);
-			++caretLine;
+			SetCaretPos(caretLine + 1, numSpaces);
 			xOffset = 0;
-			caretCol = numSpaces;
 			SetYOffset();
 			SetDirty();
 		}
@@ -1053,7 +1174,7 @@ namespace System.Screen
 					line.Append(ustring(' ', numSpaces));
 				}
 				Point start = ScreenPoint(caretCol, caretLine);
-				caretCol = caretCol + numSpaces;
+				SetCaretPos(caretLine, caretCol + numSpaces);
 				Point end = ScreenPoint(cast<int>(line.Length()), caretLine + 1);
 				updateRect = ScreenRect(start, end);
 				SetXOffset();
@@ -1079,7 +1200,7 @@ namespace System.Screen
 						Point end = ScreenPoint(cast<int>(line.Length()), caretLine + 1);
 						updateRect = ScreenRect(start, end);
 						line.Remove(caretCol - numSpaces, numSpaces);
-						caretCol = caretCol - numSpaces;
+						SetCaretPos(caretLine, caretCol - numSpaces);
 						SetXOffset();
 						SetYOffset();
 						SetCursorPos();
@@ -1170,7 +1291,7 @@ namespace System.Screen
 			{
 				ustring& line = lines[canonicalSelection.startLine];
 				line.Remove(canonicalSelection.startCol, canonicalSelection.endCol - canonicalSelection.startCol);
-				caretCol = canonicalSelection.startCol;
+				SetCaretPos(caretLine, canonicalSelection.startCol);
 				Point start = ScreenPoint(0, canonicalSelection.startLine);
 				Size sz = GetSize();
 				Point end = ScreenPoint(sz.w, canonicalSelection.startLine + 1);
@@ -1210,8 +1331,7 @@ namespace System.Screen
 						lines.Remove(lines.Begin() + startLine);
 					}
 				}
-				caretLine = canonicalSelection.startLine;
-				caretCol = canonicalSelection.startCol;
+				SetCaretPos(canonicalSelection.startLine, canonicalSelection.startCol);
 				SetXOffset();
 				SetYOffset();
 				SetCursorPos();
@@ -1277,16 +1397,6 @@ namespace System.Screen
 			}
 			return uchar('\0');
 		}
-		private void SetCursorPos()
-		{
-			Point cp = ScreenPoint(caretCol, caretLine);
-			Size sz = GetSize();
-			if (cp.x >= 0 && cp.x < sz.w && cp.y >= 0 && cp.y < sz.h)
-			{
-				SetControlCursorPos(cp);
-				SetCursorPos(cp.x, cp.y);
-			}
-		}
 		private void MakeCanonicalSelection()
 		{
 			canonicalSelection = selection;
@@ -1341,23 +1451,23 @@ namespace System.Screen
 			Invalidate(updateRect);
 			selection.Reset();
 		}
-		private void WriteStatus(const string& status)
-		{
-			SetCursorPos(0, TerminalWindowHeight() - 1);
-			SetColors(selectionForeColor, selectionBackColor);
-			Terminal.Out() << status;
-		}
 		private EditorFlags flags;
 		private int xOffset;
 		private int yOffset;
 		private List<ustring> lines;
+		private string filePath;
 		private int caretLine;
 		private int caretCol;
+		private string statusText;
 		private Selection selection;
 		private Selection canonicalSelection;
 		private Rect selectionScreenRect;
 		private ConsoleColor selectionForeColor;
 		private ConsoleColor selectionBackColor;
+		private Event<ChangedEventHandler> filePathChangedEvent;
+		private Event<ChangedEventHandler> caretPosChangedEvent;
+		private Event<ChangedEventHandler> statusTextChangedEvent;
+		private Event<ChangedEventHandler> dirtyChangedEvent;
 	}
 }
 

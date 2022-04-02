@@ -9,6 +9,7 @@
 #include <system-x/kernel/Mount.hpp>
 #include <system-x/kernel/BlockFile.hpp>
 #include <system-x/kernel/ProcessManager.hpp>
+#include <system-x/kernel/Debug.hpp>
 #include <soulng/util/MemoryReader.hpp>
 #include <soulng/util/MemoryWriter.hpp>
 #include <soulng/util/Path.hpp>
@@ -747,7 +748,9 @@ INodePtr SearchDirectory(const std::string& name, INode* dirINode, const std::st
             {
                 if (directoryEntry.Name() == name)
                 {
-                    return ReadINode(MakeINodeKey(fs->Id(), inodeNumber), process);
+                    INodeKey key(fs->Id(), inodeNumber);
+                    INodePtr inodePtr = ReadINode(key, process);
+                    return inodePtr;
                 }
             }
         }

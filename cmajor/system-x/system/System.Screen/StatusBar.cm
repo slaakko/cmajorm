@@ -7,15 +7,189 @@ using System;
 
 namespace System.Screen
 {
+	public abstract class StatusBarItem : Component
+	{
+		public virtual void Measure(Point& loc, bool afterSpring) {}
+		public virtual void WriteScreen() {}
+		public nothrow void SetStatusBar(StatusBar* statusBar_)
+		{
+			statusBar = statusBar_;
+		}
+		public nothrow StatusBar* GetStatusBar() const
+		{
+			return statusBar;
+		}
+		private StatusBar* statusBar;
+	}
+	
+	public class StatusBarTextItem : StatusBarItem
+	{
+		public StatusBarTextItem(const string& text_) : text(ToUtf32(text_)), minWidth(0)
+		{
+		}
+		public nothrow int MinWidth() const
+		{
+			return minWidth;
+		}
+		public nothrow void SetMinWidth(int minWidth_) 
+		{
+			minWidth = minWidth_;
+		}
+		public void SetText(const string& text_)
+		{
+			text = ToUtf32(text_);
+			StatusBar* statusBar = GetStatusBar();
+			statusBar->SetChanged();
+			statusBar->Invalidate();
+		}
+		public override void Measure(Point& loc, bool afterSpring)
+		{
+			location = loc;
+			int width = Max(minWidth, cast<int>(text.Length()));
+			if (afterSpring)
+			{
+				location.x = location.x - width;
+				loc = location;
+				loc.x = loc.x - 1;
+			}
+			else
+			{
+				loc.x = loc.x + width + 1;
+			}
+		}
+		public override void WriteScreen()
+		{
+			SetCursorPos(location.x, location.y);
+			Terminal.Out() << text;
+		}
+		private Point location;
+		private int minWidth;
+		private ustring text;
+	}
+
+	public class StatusBarSpringItem : StatusBarItem
+	{
+	}
+
 	public class StatusBarCreateParams
 	{
+		public nothrow StatusBarCreateParams() : controlCreateParams()
+		{
+		}
+		public nothrow StatusBarCreateParams& Defaults() 
+		{
+			return *this;
+		}
 		public ControlCreateParams controlCreateParams;
 	}
 	
-	public class StatusBar : Control
+	public enum StatusBarFlags 
+	{
+		none = 0, changed = 1 << 0
+	}
+	
+	public class StatusBar : ContainerControl
 	{
 		public nothrow StatusBar(StatusBarCreateParams& createParams) : base(createParams.controlCreateParams)
 		{
+			InvalidateGuard guard(this, false);
+			if (Location().IsDefault())
+			{
+				SetLocation(Point(0, TerminalWindowHeight() - 1));
+			}
+			if (GetSize().IsDefault())
+			{
+				SetSize(Size(TerminalWindowWidth(), 1));
+			}
+			if (ForeColor() == ConsoleColor.defaultColor)
+			{
+				SetForeColor(ConsoleColor.black);
+			}
+			if (BackColor() == ConsoleColor.defaultColor)
+			{
+				SetBackColor(ConsoleColor.gray);
+			}
+			SetChanged();
 		}
+		public nothrow bool IsChanged() const
+		{
+			return (flags & StatusBarFlags.changed) != StatusBarFlags.none;
+		}
+		public nothrow void SetChanged()
+		{
+			flags = cast<StatusBarFlags>(flags | StatusBarFlags.changed);
+		}
+		public nothrow void ResetChanged()
+		{
+			flags = cast<StatusBarFlags>(flags & ~StatusBarFlags.changed);
+		}
+		public void AddItem(StatusBarItem* item)
+		{
+			item->SetStatusBar(this);
+			Controls().AddChild(item);
+		}
+		public override void OnWriteScreen(WriteScreenEventArgs& args)
+		{
+			Control* focusedControl = Application.Instance().FocusedControl();
+			base->OnWriteScreen(args);
+            Rect rect = args.GetRect();
+            if (rect.IsDefault())
+            {
+                rect = GetRect();
+            }
+            Clear(rect, ForeColor(), BackColor());
+			if (IsChanged())
+			{
+				Measure();
+			}
+			Component* child = Controls().FirstChild();
+			while (child != null)
+			{
+				if (child is StatusBarItem*)
+				{
+					StatusBarItem* item = cast<StatusBarItem*>(child);
+					item->WriteScreen();
+				}
+				child = child->NextSibling();
+			}
+			focusedControl->SetFocus();
+		}
+		private void Measure()
+		{
+			Point loc = Location();
+			loc.x = loc.x + 1;
+			Component* child = Controls().FirstChild();
+			while (child != null)
+			{
+				if (child is StatusBarSpringItem*)
+				{
+					break;
+				}
+				else if (child is StatusBarItem*)
+				{
+					StatusBarItem* item = cast<StatusBarItem*>(child);
+					item->Measure(loc, false);
+				}
+				child = child->NextSibling();
+			}
+			Size sz = GetSize();
+			loc = Location();
+			loc.x = loc.x + sz.w - 1;
+			child = Controls().LastChild();
+			while (child != null)
+			{
+				if (child is StatusBarSpringItem*)
+				{
+					break;
+				}
+				else if (child is StatusBarItem*)
+				{
+					StatusBarItem* item = cast<StatusBarItem*>(child);
+					item->Measure(loc, true);
+				}
+				child = child->PrevSibling();
+			}
+		}
+		private StatusBarFlags flags;
 	}
 }

@@ -57,8 +57,17 @@ namespace System.Screen
 		List<ustring> lines;
 		List<ustring> words = text.Split(' ');
 		ustring line;
+		bool first = true;
 		for (const ustring& word : words)
 		{
+			if (first)
+			{
+				first = false;
+			}
+			else
+			{
+				line.Append(' ');
+			}
 			if (line.Length() + word.Length() > width)
 			{
 				lines.Add(line);

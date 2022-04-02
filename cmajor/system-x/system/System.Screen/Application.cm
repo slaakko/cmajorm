@@ -126,6 +126,16 @@ namespace System.Screen
                 return keyPressedMessage;
             }
         }
+		public void Timer(const Duration& duration, Control* control, int timerId)
+		{
+			TimerMessage message(timerId);
+			message.SetTargetWindowHandle(control->Handle());
+            int msgSize = message.Size();
+            UniquePtr<byte> msg(cast<byte*>(MemAlloc(msgSize)));
+			MemoryWriter writer(msg.Get(), msgSize);
+			message.Write(writer);
+			TimerMsg(duration, msgQ, msg.Get(), msgSize);
+		}
 		public nothrow Control* FocusedControl() const
 		{
 			return focusedControl;

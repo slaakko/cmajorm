@@ -6,6 +6,7 @@
 #include <system-x/kernel/Terminal.hpp>
 #include <system-x/kernel/OsApi.hpp>
 #include <system-x/kernel/EventManager.hpp>
+#include <system-x/kernel/Debug.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <memory>
 #include <list>
@@ -125,6 +126,10 @@ void Terminal::Start()
 {
     terminalThread = std::thread(RunTerminal);
     started = true;
+    if ((GetDebugMode() & debugTerminalMode) != 0)
+    {
+        DebugWrite("terminal started");
+    }
 }
 
 void Terminal::Stop()
@@ -142,6 +147,10 @@ void Terminal::Stop()
         Wakeup(terminalInputEvent);
     }
     terminalThread.join();
+    if ((GetDebugMode() & debugTerminalMode) != 0)
+    {
+        DebugWrite("terminal stopped");
+    }
 }
 
 void Terminal::Run()
@@ -163,6 +172,10 @@ void Terminal::GetTerminalInput()
     char32_t ch = OsReadConsoleInput(consoleInputHandle);
     if (ch)
     {
+        if ((GetDebugMode() & debugTerminalMode) != 0)
+        {
+            DebugWrite("read.key(" + OsKeyName(ch) + ")");
+        }
         terminalInputQueue.push_back(ch);
         terminalInputReady = true;
         terminalEventVar.notify_one();
@@ -171,6 +184,10 @@ void Terminal::GetTerminalInput()
 
 void Terminal::SendKey(char32_t key)
 {
+    if ((GetDebugMode() & debugTerminalMode) != 0)
+    {
+        DebugWrite("send.key(" + OsKeyName(key) + ")");
+    }
     terminalInputQueue.push_back(key);
     terminalInputReady = true;
     terminalEventVar.notify_one();
@@ -178,7 +195,15 @@ void Terminal::SendKey(char32_t key)
 
 void Terminal::PushLines()
 {
+    if ((GetDebugMode() & debugTerminalMode) != 0)
+    {
+        DebugWrite("> push.lines: " + std::to_string(lines.size()));
+    }
     linesStack.push(std::move(lines));
+    if ((GetDebugMode() & debugTerminalMode) != 0)
+    {
+        DebugWrite("< push.lines");
+    }
 }
 
 void Terminal::PopLines()
@@ -186,7 +211,23 @@ void Terminal::PopLines()
     if (!linesStack.empty())
     {
         lines = std::move(linesStack.top());
+        lineIndex = lines.size();
+        if ((GetDebugMode() & debugTerminalMode) != 0)
+        {
+            DebugWrite("> pop.lines: " + std::to_string(lines.size()) + ", line index=" + std::to_string(lineIndex));
+        }
         linesStack.pop();
+    }
+    else
+    {
+        if ((GetDebugMode() & debugTerminalMode) != 0)
+        {
+            DebugWrite("> pop.lines: lines stack is empty");
+        }
+    }
+    if ((GetDebugMode() & debugTerminalMode) != 0)
+    {
+        DebugWrite("< pop.lines");
     }
 }
 
@@ -854,16 +895,28 @@ void TerminalFile::SetCursorPos(int32_t cursorX, int32_t cursorY)
 void TerminalFile::SetCooked()
 {
     Terminal::Instance().SetCooked();
+    if ((GetDebugMode() & debugTerminalMode) != 0)
+    {
+        DebugWrite("cooked");
+    }
 }
 
 void TerminalFile::SetRaw()
 {
     Terminal::Instance().SetRaw();
+    if ((GetDebugMode() & debugTerminalMode) != 0)
+    {
+        DebugWrite("raw");
+    }
 }
 
 void TerminalFile::SetEcho(bool echo)
 {
     Terminal::Instance().SetEcho(echo);
+    if ((GetDebugMode() & debugTerminalMode) != 0)
+    {
+        DebugWrite("echo=" + std::to_string(echo));
+    }
 }
 
 void TerminalFile::SendKey(char32_t key)

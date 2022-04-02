@@ -13,11 +13,14 @@
 #include <system-x/machine/InitDone.hpp>
 #include <system-x/kernel/InitDone.hpp>
 #include <system-x/kernel/OsApi.hpp>
+#include <system-x/kernel/Debug.hpp>
 #include <system-x/machine/Config.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Time.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <soulng/util/Util.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <stdexcept>
 
@@ -55,6 +58,8 @@ void PrintHelp()
     std::cout << "  Print help and exit." << std::endl;
     std::cout << "--verbose | -v" << std::endl;
     std::cout << "  Be verbose." << std::endl;
+    std::cout << "--debug=MODE | -d=MODE" << std::endl;
+    std::cout << "  Set debug mode to MODE (default mode is 0=no kernel debugging)." << std::endl;
 }
 
 std::string SearchBin(const std::string& fileName)
@@ -101,40 +106,86 @@ int main(int argc, const char** argv)
             std::string arg = argv[i];
             if (!programFileSeen && arg.starts_with("--"))
             {
-                if (arg == "--help")
+                if (arg.find('=') != std::string::npos)
                 {
-                    PrintHelp();
-                    return 1;
-                }
-                else if (arg == "--verbose")
-                {
-                    verbose = true;
+                    std::vector<std::string> components = Split(arg, '=');
+                    if (components.size() == 2)
+                    {
+                        if (components[0] == "--debug")
+                        {
+                            int debugMode = boost::lexical_cast<int>(components[1]);
+                            cmsx::kernel::SetDebugMode(debugMode);
+                        }
+                        else
+                        {
+                            throw std::runtime_error("unknown option '" + arg + "'");
+                        }
+                    }
+                    else
+                    {
+                        throw std::runtime_error("unknown option '" + arg + "'");
+                    }
                 }
                 else
                 {
-                    throw std::runtime_error("unknown option '" + arg + "'");
+                    if (arg == "--help")
+                    {
+                        PrintHelp();
+                        return 1;
+                    }
+                    else if (arg == "--verbose")
+                    {
+                        verbose = true;
+                    }
+                    else
+                    {
+                        throw std::runtime_error("unknown option '" + arg + "'");
+                    }
                 }
             }
             else if (!programFileSeen && arg.starts_with("-"))
             {
                 std::string options = arg.substr(1);
-                for (char o : options)
+                if (arg.find('=') != std::string::npos)
                 {
-                    switch (o)
+                    std::vector<std::string> components = Split(arg, '=');
+                    if (components.size() == 2)
                     {
-                        case 'h':
+                        if (components[0] == "-d")
                         {
-                            PrintHelp();
-                            return 1;
+                            int debugMode = boost::lexical_cast<int>(components[1]);
+                            cmsx::kernel::SetDebugMode(debugMode);
                         }
-                        case 'v':
+                        else
                         {
-                            verbose = true;
-                            break;
+                            throw std::runtime_error("unknown option '" + arg + "'");
                         }
-                        default:
+                    }
+                    else
+                    {
+                        throw std::runtime_error("unknown option '" + arg + "'");
+                    }
+                }
+                else
+                {
+                    for (char o : options)
+                    {
+                        switch (o)
                         {
-                            throw std::runtime_error("unknown option '-" + std::string(1, o) + "'");
+                            case 'h':
+                            {
+                                PrintHelp();
+                                return 1;
+                            }
+                            case 'v':
+                            {
+                                verbose = true;
+                                break;
+                            }
+                            default:
+                            {
+                                throw std::runtime_error("unknown option '-" + std::string(1, o) + "'");
+                            }
                         }
                     }
                 }

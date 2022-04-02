@@ -4,24 +4,17 @@
 // =================================
 
 #include <system-x/kernel/MsgQueue.hpp>
+#include <system-x/kernel/DebugMsg.hpp>
 #include <system-x/kernel/Process.hpp>
 #include <system-x/kernel/Error.hpp>
 #include <system-x/kernel/IO.hpp>
+#include <system-x/kernel/Debug.hpp>
 #include <system-x/machine/Machine.hpp>
 #include <system-x/machine/Processor.hpp>
 #include <memory>
 #include <list>
 
 namespace cmsx::kernel {
-
-class Msg
-{
-public:
-    Msg(const std::vector<uint8_t>& data_);
-    const std::vector<uint8_t>& Data() const { return data; }
-private:
-    std::vector<uint8_t> data;
-};
 
 Msg::Msg(const std::vector<uint8_t>& data_) : data(data_)
 {
@@ -39,6 +32,7 @@ public:
     void IncrementReferenceCount() { ++referenceCount; }
     void DecrementReferenceCount() { --referenceCount; }
     int32_t ReferenceCount() const { return referenceCount; }
+    const std::string& Name() const { return name; }
 private:
     int32_t referenceCount;
     std::string name;
@@ -52,12 +46,20 @@ MsgQueue::MsgQueue(const std::string& name_) : name(name_), queue(), referenceCo
 void MsgQueue::Put(const Msg& msg)
 {
     queue.push_back(msg);
+    if ((GetDebugMode() & debugMsgQueueMode) != 0)
+    {
+        DebugWrite(GetMsgStr(msg) + " put to '" + Name() + "'");
+    }
 }
 
 Msg MsgQueue::Get()
 {
     Msg msg = queue.front();
     queue.pop_front();
+    if ((GetDebugMode() & debugMsgQueueMode) != 0)
+    {
+        DebugWrite(GetMsgStr(msg) + " get from '" + Name() + "'");
+    }
     return msg;
 }
 
@@ -96,12 +98,20 @@ int32_t MsgQueues::Open(const std::string& name)
         int32_t md = it->second;
         MsgQueue* queue = Get(md);
         queue->IncrementReferenceCount();
+        if ((GetDebugMode() & debugMsgQueueMode) != 0)
+        {
+            DebugWrite("message queue '" + name + "' opened");
+        }
         return md;
     }
     int32_t md = queues.size();
     queueMap[name] = md;
     MsgQueue* queue = new MsgQueue(name);
     queues.push_back(std::unique_ptr<MsgQueue>(queue));
+    if ((GetDebugMode() & debugMsgQueueMode) != 0)
+    {
+        DebugWrite("message queue '" + name + "' created");
+    }
     return md;
 }
 
@@ -129,7 +139,12 @@ void MsgQueues::Delete(int32_t md)
 {
     if (md >= 0 && md < queues.size())
     {
-        return queues[md].reset();
+        if ((GetDebugMode() & debugMsgQueueMode) != 0)
+        {
+            DebugWrite("message queue '" + queues[md]->Name() + "' deleted");
+        }
+        queueMap.erase(queues[md]->Name());
+        queues[md].reset();
     }
     else
     {
@@ -151,6 +166,10 @@ int32_t MsgQ(Process* process, int64_t nameAddr)
 void CloseMsgQ(Process* process, int32_t md)
 {
     MsgQueue* queue = MsgQueues::Instance().Get(md);
+    if ((GetDebugMode() & debugMsgQueueMode) != 0)
+    {
+        DebugWrite("closing message queue '" + queue->Name() + "'");
+    }
     queue->DecrementReferenceCount();
     if (queue->ReferenceCount() == 0)
     {
@@ -158,16 +177,21 @@ void CloseMsgQ(Process* process, int32_t md)
     }
 }
 
+void PutMsg(int32_t md, const std::vector<std::uint8_t>& msgData)
+{
+    MsgQueue* queue = MsgQueues::Instance().Get(md);
+    queue->Put(Msg(msgData));
+}
+
 void PutMsg(Process* process, int32_t md, int64_t msgDataAddr, int32_t msgSize)
 {
     if (msgSize == 0)
     {
-        throw SystemError(EPARAM, "message is empty");;
+        throw SystemError(EPARAM, "message is empty");
     }
-    MsgQueue* queue = MsgQueues::Instance().Get(md);
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::vector<uint8_t> data = ReadProcessMemory(process, msgDataAddr, msgSize);
-    queue->Put(Msg(data));
+    PutMsg(md, data);
 }
 
 int32_t GetMsgQueueLength(Process* process, int32_t md)

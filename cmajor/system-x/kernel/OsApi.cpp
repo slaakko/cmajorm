@@ -18,6 +18,165 @@ using namespace soulng::util;
 
 const uint32_t fixedDriveType = DRIVE_FIXED;
 
+std::string OsKeyName(int key)
+{
+    switch (key)
+    {
+        case keyBackspace: return "<backspace>";
+        case keyTab: return "<tab>";
+        case keyNewLine: return "<newline>";
+        case keyControlA: return "<ctrl-A>";
+        case keyControlB: return "<ctrl-B>";
+        case keyControlC: return "<ctrl-C>";
+        case keyControlD: return "<ctrl-D>";
+        case keyControlE: return "<ctrl-E>";
+        case keyControlF: return "<ctrl-F>";
+        case keyControlG: return "<ctrl-G>";
+        case keyControlK: return "<ctrl-K>";
+        case keyControlL: return "<ctrl-L>";
+        case keyControlM: return "<ctrl-M>";
+        case keyControlN: return "<ctrl-N>";
+        case keyControlO: return "<ctrl-O>";
+        case keyControlQ: return "<ctrl-Q>";
+        case keyControlR: return "<ctrl-R>";
+        case keyControlS: return "<ctrl-S>";
+        case keyControlT: return "<ctrl-T>";
+        case keyControlU: return "<ctrl-U>";
+        case keyControlV: return "<ctrl-V>";
+        case keyControlW: return "<ctrl-W>";
+        case keyControlX: return "<ctrl-X>";
+        case keyControlY: return "<ctrl-Y>";
+        case keyControlZ: return "<ctrl-Z>";
+        case keyEscape: return "<escape>";
+        case keyFS: return "<fs>";
+        case keyGS: return "<gs>";
+        case keyRS: return "<rs>";
+        case keyUS: return "<us>";
+        case keyDown: return "<down>";
+        case keyUp: return "<up>";
+        case keyLeft: return "<left>";
+        case keyRight: return "<right>";
+        case keyHome: return "<home>";
+        case keyMsg: return "<msg>";
+        case keyF1: return "<f1>";
+        case keyF2: return "<f2>";
+        case keyF3: return "<f3>";
+        case keyF4: return "<f4>";
+        case keyF5: return "<f5>";
+        case keyF6: return "<f6>";
+        case keyF7: return "<f7>";
+        case keyF8: return "<f8>";
+        case keyF9: return "<f9>";
+        case keyF10: return "<f10>";
+        case keyF11: return "<f11>";
+        case keyF12: return "<f12>";
+        case keyDel: return "<del>";
+        case keyIns: return "<ins>";
+        case keyPgDown: return "<pgdown>";
+        case keyPgUp: return "<pgup>";
+        case keyPrint: return "<print>";
+        case keyEnd: return "<end>";
+        case keyShiftDel: return "<shift-del>";
+        case keyShiftEnd: return "<shift-end>";
+        case keyShiftHome: return "<shift-home>";
+        case keyShiftLeft: return "<shift-left>";
+        case keyShiftRight: return "<shift-right>";
+        case keyResize: return "<shift-resize>";
+        case keyShiftUp: return "<shift-up>";
+        case keyShiftDown: return "<shift-down>";
+        case keyControlUp: return "<ctrl-up>";
+        case keyControlDown: return "<ctrl-down>";
+        case keyControlLeft: return "<ctrl-left>";
+        case keyControlRight: return "<ctrl-right>";
+        case keyControlPgUp: return "<ctrl-pgup>";
+        case keyControlPgDown: return "<ctrl-pgdown>";
+        case keyControlHome: return "<ctrl-home>";
+        case keyControlEnd: return "<ctrl-end>";
+        case keyControlDel: return "<ctrl-del>";
+        case keyControlF1: return "<ctrl-f1>";
+        case keyControlF2: return "<ctrl-f2>";
+        case keyControlF3: return "<ctrl-f3>";
+        case keyControlF4: return "<ctrl-f4>";
+        case keyControlF5: return "<ctrl-f5>";
+        case keyControlF6: return "<ctrl-f6>";
+        case keyControlF7: return "<ctrl-f7>";
+        case keyControlF8: return "<ctrl-f8>";
+        case keyControlF9: return "<ctrl-f9>";
+        case keyControlF10: return "<ctrl-f10>";
+        case keyControlF11: return "<ctrl-f11>";
+        case keyControlF12: return "<ctrl-f12>";
+        case keyShiftPgUp: return "<shift-pgup>";
+        case keyShiftPgDown: return "<shift-pgdown>";
+        case keyShiftF1: return "<shift-f1>";
+        case keyShiftF2: return "<shift-f2>";
+        case keyShiftF3: return "<shift-f3>";
+        case keyShiftF4: return "<shift-f4>";
+        case keyShiftF5: return "<shift-f5>";
+        case keyShiftF6: return "<shift-f6>";
+        case keyShiftF7: return "<shift-f7>";
+        case keyShiftF8: return "<shift-f8>";
+        case keyShiftF9: return "<shift-f9>";
+        case keyShiftF10: return "<shift-f10>";
+        case keyShiftF11: return "<shift-f11>";
+        case keyShiftF12: return "<shift-f12>";
+        case keyAltA: return "<alt-A>";
+        case keyAltB: return "<alt-B>";
+        case keyAltC: return "<alt-C>";
+        case keyAltD: return "<alt-D>";
+        case keyAltE: return "<alt-E>";
+        case keyAltF: return "<alt-F>";
+        case keyAltG: return "<alt-G>";
+        case keyAltH: return "<alt-H>";
+        case keyAltI: return "<alt-I>";
+        case keyAltJ: return "<alt-J>";
+        case keyAltK: return "<alt-K>";
+        case keyAltL: return "<alt-L>";
+        case keyAltM: return "<alt-M>";
+        case keyAltN: return "<alt-N>";
+        case keyAltO: return "<alt-O>";
+        case keyAltP: return "<alt-P>";
+        case keyAltQ: return "<alt-Q>";
+        case keyAltR: return "<alt-R>";
+        case keyAltS: return "<alt-S>";
+        case keyAltT: return "<alt-T>";
+        case keyAltU: return "<alt-U>";
+        case keyAltV: return "<alt-V>";
+        case keyAltW: return "<alt-W>";
+        case keyAltX: return "<alt-X>";
+        case keyAltY: return "<alt-Y>";
+        case keyAltZ: return "<alt-Z>";
+        case keyAltF1: return "<alt-f1>";
+        case keyAltF2: return "<alt-f2>";
+        case keyAltF3: return "<alt-f3>";
+        case keyAltF4: return "<alt-f4>";
+        case keyAltF5: return "<alt-f5>";
+        case keyAltF6: return "<alt-f6>";
+        case keyAltF7: return "<alt-f7>";
+        case keyAltF8: return "<alt-f8>";
+        case keyAltF9: return "<alt-f9>";
+        case keyAltF10: return "<alt-f10>";
+        case keyAltF11: return "<alt-f11>";
+        case keyAltF12: return "<alt-f12>";
+        case keyControlShiftLeft: return "<ctrl-shift-left>";
+        case keyControlShiftRight: return "<ctrl-shift-right>";
+        case keyControlShiftHome: return "<ctrl-shift-home>";
+        case keyControlShiftEnd: return "<ctrl-shift-end>";
+        case keyControlTab: return "<ctrl-tab>";
+        case keyShiftTab: return "<shift-tab>";
+        case keyControlIns: return "<ctrl-ins>";
+        case keyShiftIns: return "<shift-ins>";
+        case ' ': return "<key-space>";
+        default:
+        {
+            if (key > ' ' && key < specialKeyStart)
+            {
+                return "<key-" + ToUtf8(std::u32string(1, key)) + ">";
+            }
+            return "<unknown-key>";
+        }
+    }
+}
+
 void* OsCreateHostFile(const char* filePath, bool randomAccess)
 {
     DWORD accessFlag = FILE_FLAG_SEQUENTIAL_SCAN;
@@ -355,7 +514,7 @@ char32_t OsReadConsoleInput(void* consoleInputHandle)
                         case VK_UP: if (ctrl) ch = static_cast<char32_t>(keyControlUp); else if (shift) ch = static_cast<char32_t>(keyShiftUp); else ch = static_cast<char32_t>(keyUp); break;
                         case VK_DOWN: if (ctrl) ch = static_cast<char32_t>(keyControlDown); else if (shift) ch = static_cast<char32_t>(keyShiftDown); else ch = static_cast<char32_t>(keyDown); break;
                         case VK_DELETE: if (ctrl) ch = static_cast<char32_t>(keyControlDel); else if (shift) ch = static_cast<char32_t>(keyShiftDel); else ch = static_cast<char32_t>(keyDel); break;
-                        case VK_INSERT: if (ctrl) ch = static_cast<char32_t>(keyControlIns); else if (shift) ch = static_cast<char32_t>(keyShiftlIns); else ch = static_cast<char32_t>(keyIns); break;
+                        case VK_INSERT: if (ctrl) ch = static_cast<char32_t>(keyControlIns); else if (shift) ch = static_cast<char32_t>(keyShiftIns); else ch = static_cast<char32_t>(keyIns); break;
                         case VK_F1: if (ctrl) ch = static_cast<char32_t>(keyControlF1); else if (alt) ch = static_cast<char32_t>(keyAltF1); else ch = static_cast<char32_t>(keyF1); break;
                         case VK_F2: if (ctrl) ch = static_cast<char32_t>(keyControlF2); else if (alt) ch = static_cast<char32_t>(keyAltF2); else ch = static_cast<char32_t>(keyF2); break;
                         case VK_F3: if (ctrl) ch = static_cast<char32_t>(keyControlF3); else if (alt) ch = static_cast<char32_t>(keyAltF3); else ch = static_cast<char32_t>(keyF3); break;

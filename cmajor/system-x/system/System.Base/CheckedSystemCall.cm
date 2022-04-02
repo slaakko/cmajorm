@@ -606,4 +606,23 @@ namespace System.Os
 			ThrowSystemError();
 		}
 	}
+	
+	public void TimerMsg(const Duration& duration, int md, byte* msgData, int msgSize)
+	{
+		int result = timer_msg(duration.Rep(), md, msgData, msgSize);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+	}
+	
+	public int Connect(const char* node, const char* service)
+	{
+		int result = connect(node, service);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+		return result;
+	}
 }

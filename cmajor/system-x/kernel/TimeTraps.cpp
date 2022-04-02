@@ -8,6 +8,7 @@
 #include <system-x/kernel/Process.hpp>
 #include <system-x/kernel/Clock.hpp>
 #include <system-x/kernel/Time.hpp>
+#include <system-x/kernel/IO.hpp>
 #include <system-x/machine/Processor.hpp>
 #include <ctime>
 
@@ -50,7 +51,39 @@ uint64_t TrapSleepHandler::HandleTrap(cmsx::machine::Processor& processor)
         std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
         std::chrono::steady_clock::duration duration(static_cast<int64_t>(processor.Regs().Get(cmsx::machine::regAX)));
         std::chrono::steady_clock::time_point dueTime = now + duration;
-        Alarm alarm(process, dueTime);
+        Alarm alarm(process, dueTime, true, nullptr);
+        Clock::Instance().Schedule(alarm);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapTimerMsgHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_timer_msg"; }
+};
+
+uint64_t TrapTimerMsgHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+        std::chrono::steady_clock::duration duration(static_cast<int64_t>(processor.Regs().Get(cmsx::machine::regAX)));
+        std::chrono::steady_clock::time_point dueTime = now + duration;
+        int32_t md = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regBX));
+        int64_t msgDataAddr = static_cast<int64_t>(processor.Regs().Get(cmsx::machine::regCX));
+        int32_t msgSize = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regDX));
+        cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
+        std::vector<uint8_t> data = ReadProcessMemory(process, msgDataAddr, msgSize);
+        AlarmMsg* msg = new AlarmMsg(md, data);
+        Alarm alarm(process, dueTime, false, msg);
         Clock::Instance().Schedule(alarm);
         return 0;
     }
@@ -232,10 +265,12 @@ void InitTimeTraps()
     SetTrapHandler(trap_current_date_time, new TrapCurrentDateTimeHandler());
     SetTrapHandler(trap_times, new TrapTimesHandler());
     SetTrapHandler(trap_child_times, new TrapChildTimesHandler());
+    SetTrapHandler(trap_timer_msg, new TrapTimerMsgHandler());
 }
 
 void DoneTimeTraps()
 {
+    SetTrapHandler(trap_timer_msg, nullptr);
     SetTrapHandler(trap_child_times, nullptr);
     SetTrapHandler(trap_times, nullptr);
     SetTrapHandler(trap_current_date_time, nullptr);

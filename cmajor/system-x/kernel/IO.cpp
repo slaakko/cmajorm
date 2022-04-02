@@ -11,6 +11,7 @@
 #include <system-x/kernel/Fs.hpp>
 #include <system-x/kernel/BlockFile.hpp>
 #include <system-x/kernel/DirFile.hpp>
+#include <system-x/kernel/Debug.hpp>
 #include <system-x/machine/Machine.hpp>
 #include <system-x/machine/Processor.hpp>
 #include <soulng/util/MemoryReader.hpp>
@@ -145,7 +146,8 @@ int32_t Open(Process* process, int64_t pathAddr, int32_t flags, int32_t mode)
     }
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::string path = ReadString(process, pathAddr, mem);
-    return Open(process, path, flags, mode);
+    int32_t fd = Open(process, path, flags, mode);
+    return fd;
 }
 
 int32_t Open(Process* process, const std::string& path, int32_t flags, int32_t mode)

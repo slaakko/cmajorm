@@ -21,32 +21,32 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{12402fc4-2bfe-4a33-9f95-c66fb255fc48}</ProjectGuid>
-    <RootNamespace>os</RootNamespace>
+    <ProjectGuid>{587ab888-5600-4275-bc59-b257eedbc94a}</ProjectGuid>
+    <RootNamespace>cmlog</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -59,48 +59,45 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\config\build.props" />
+    <Import Project="..\config\build.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\config\build.props" />
+    <Import Project="..\config\build.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\config\build.props" />
+    <Import Project="..\config\build.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\config\build.props" />
+    <Import Project="..\config\build.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>kernel</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>kernel</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>cmsx_kerneld</TargetName>
+    <TargetName>cmlogd</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>cmsx_kernel</TargetName>
+    <TargetName>cmlog</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;OS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableUAC>false</EnableUAC>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -109,32 +106,30 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;OS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableUAC>false</EnableUAC>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;CMSX_KERNEL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..;../..;$(BOOST_INCLUDE_DIR)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4018;4141;4146;4244;4267;4291;4624;4996;4251;4275</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>../..;..;$(BOOST_INCLUDE_DIR)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996;4251;4275</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>$(OutDir);$(BOOST_LIB_DIR)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -144,115 +139,28 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;CMSX_KERNEL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..;../..;$(BOOST_INCLUDE_DIR)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4018;4141;4146;4244;4267;4291;4624;4996;4251;4275</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>../..;..;$(BOOST_INCLUDE_DIR)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996;4251;4275</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>$(OutDir);$(BOOST_LIB_DIR)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Api.hpp" />
-    <ClInclude Include="BlockFile.hpp" />
-    <ClInclude Include="BlockManager.hpp" />
-    <ClInclude Include="Clock.hpp" />
-    <ClInclude Include="Compression.hpp" />
-    <ClInclude Include="Debug.hpp" />
-    <ClInclude Include="DebugHelp.hpp" />
-    <ClInclude Include="DebugMsg.hpp" />
-    <ClInclude Include="DevFs.hpp" />
-    <ClInclude Include="DirFile.hpp" />
-    <ClInclude Include="Error.hpp" />
-    <ClInclude Include="EventManager.hpp" />
-    <ClInclude Include="ExceptionHandling.hpp" />
-    <ClInclude Include="ExceptionHandlingTraps.hpp" />
-    <ClInclude Include="File.hpp" />
-    <ClInclude Include="Fs.hpp" />
-    <ClInclude Include="Heap.hpp" />
-    <ClInclude Include="HostFileManager.hpp" />
-    <ClInclude Include="HostFs.hpp" />
-    <ClInclude Include="InitDone.hpp" />
-    <ClInclude Include="INodeManager.hpp" />
-    <ClInclude Include="IO.hpp" />
-    <ClInclude Include="IOManager.hpp" />
-    <ClInclude Include="IOTraps.hpp" />
-    <ClInclude Include="Kernel.hpp" />
-    <ClInclude Include="Load.hpp" />
-    <ClInclude Include="MathTraps.hpp" />
-    <ClInclude Include="MemoryTraps.hpp" />
-    <ClInclude Include="Mount.hpp" />
-    <ClInclude Include="MsgQueue.hpp" />
-    <ClInclude Include="OsApi.hpp" />
-    <ClInclude Include="Pipe.hpp" />
-    <ClInclude Include="Process.hpp" />
-    <ClInclude Include="ProcessManagementTraps.hpp" />
-    <ClInclude Include="ProcessManager.hpp" />
-    <ClInclude Include="Region.hpp" />
-    <ClInclude Include="Resource.hpp" />
-    <ClInclude Include="RootFs.hpp" />
-    <ClInclude Include="Scheduler.hpp" />
-    <ClInclude Include="Socket.hpp" />
-    <ClInclude Include="Terminal.hpp" />
-    <ClInclude Include="Time.hpp" />
-    <ClInclude Include="TimeTraps.hpp" />
-    <ClInclude Include="Trap.hpp" />
-    <ClInclude Include="TrapExit.hpp" />
-    <ClInclude Include="TrapRandom.hpp" />
+    <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="LogServer.cpp" />
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BlockFile.cpp" />
-    <ClCompile Include="BlockManager.cpp" />
-    <ClCompile Include="Clock.cpp" />
-    <ClCompile Include="Compression.cpp" />
-    <ClCompile Include="Debug.cpp" />
-    <ClCompile Include="DebugHelp.cpp" />
-    <ClCompile Include="DebugMsg.cpp" />
-    <ClCompile Include="DevFs.cpp" />
-    <ClCompile Include="DirFile.cpp" />
-    <ClCompile Include="Error.cpp" />
-    <ClCompile Include="EventManager.cpp" />
-    <ClCompile Include="ExceptionHandling.cpp" />
-    <ClCompile Include="ExceptionHandlingTraps.cpp" />
-    <ClCompile Include="File.cpp" />
-    <ClCompile Include="Fs.cpp" />
-    <ClCompile Include="Heap.cpp" />
-    <ClCompile Include="HostFileManager.cpp" />
-    <ClCompile Include="HostFs.cpp" />
-    <ClCompile Include="InitDone.cpp" />
-    <ClCompile Include="INodeManager.cpp" />
-    <ClCompile Include="IO.cpp" />
-    <ClCompile Include="IOManager.cpp" />
-    <ClCompile Include="IOTraps.cpp" />
-    <ClCompile Include="Kernel.cpp" />
-    <ClCompile Include="Load.cpp" />
-    <ClCompile Include="MathTraps.cpp" />
-    <ClCompile Include="MemoryTraps.cpp" />
-    <ClCompile Include="Mount.cpp" />
-    <ClCompile Include="MsgQueue.cpp" />
-    <ClCompile Include="OsApi.cpp" />
-    <ClCompile Include="Pipe.cpp" />
-    <ClCompile Include="Process.cpp" />
-    <ClCompile Include="ProcessManagementTraps.cpp" />
-    <ClCompile Include="ProcessManager.cpp" />
-    <ClCompile Include="Region.cpp" />
-    <ClCompile Include="Resource.cpp" />
-    <ClCompile Include="RootFs.cpp" />
-    <ClCompile Include="Scheduler.cpp" />
-    <ClCompile Include="Socket.cpp" />
-    <ClCompile Include="Terminal.cpp" />
-    <ClCompile Include="Time.cpp" />
-    <ClCompile Include="TimeTraps.cpp" />
-    <ClCompile Include="Trap.cpp" />
-    <ClCompile Include="TrapExit.cpp" />
-    <ClCompile Include="TrapRandom.cpp" />
+    <ClInclude Include="LogServer.hpp" />
+    <ClInclude Include="Logger.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

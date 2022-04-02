@@ -12,6 +12,7 @@
 #include <system-x/kernel/DirFile.hpp>
 #include <system-x/kernel/OsApi.hpp>
 #include <system-x/kernel/DebugHelp.hpp>
+#include <system-x/kernel/Debug.hpp>
 #include <system-x/kernel/Process.hpp>
 #include <system-x/machine/Config.hpp>
 #include <soulng/util/Path.hpp>
@@ -222,7 +223,8 @@ File* RootFilesystem::Open(const std::string& path, INode* dirINode, int32_t fla
     Filesystem* fs = GetFs(dirINodePtr.Get()->Key().fsNumber);
     if (fs != this)
     {
-        return fs->Open(fileName, dirINodePtr.Get(), flags, mode, process);
+        File* file = fs->Open(fileName, dirINodePtr.Get(), flags, mode, process);
+        return file;
     }
     INodePtr fileINode = cmsx::kernel::SearchDirectory(fileName, dirINodePtr.Get(), dirPath, this, process);
     OpenFlags openFlags = static_cast<OpenFlags>(flags);

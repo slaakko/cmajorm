@@ -81,6 +81,7 @@ struct CMSX_KERNEL_API INodeKey
     INodeKey() : fsNumber(-1), inodeNumber(-1) {}
     INodeKey(int32_t fsNumber_, int32_t inodeNumber_) : fsNumber(fsNumber_), inodeNumber(inodeNumber_) {}
     bool IsDefault() const { return fsNumber == -1 && inodeNumber == -1; }
+    std::string ToString() const { return "inode key=" + std::to_string(fsNumber) + ":" + std::to_string(inodeNumber); }
     int32_t fsNumber;
     int32_t inodeNumber;
 };
@@ -207,19 +208,14 @@ private:
 class CMSX_KERNEL_API INodePtr
 {
 public:
-    INodePtr(INode* inode_) noexcept : inode(inode_) {}
+    explicit INodePtr(INode* inode_) noexcept : inode(inode_) {}
     ~INodePtr();
     INodePtr(const INodePtr&) = delete;
     INodePtr& operator=(const INodePtr&) = delete;
     INodePtr(INodePtr&& that) noexcept : inode(that.inode) { that.inode = nullptr; }
-    INodePtr& operator=(INodePtr&& that) noexcept
-    {
-        std::swap(inode, that.inode);
-        return *this;
-    }
+    INodePtr& operator=(INodePtr&& that) noexcept;
     INode* Get() { return inode; }
     void SetINode(const INode& inode_);
-    void Release();
 private:
     INode* inode;
 };

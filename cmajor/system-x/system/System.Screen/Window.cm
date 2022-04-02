@@ -177,6 +177,28 @@ namespace System.Screen
 							break;
 						}
 					}
+					if (!args.Handled())
+					{
+						uchar key = ToUpper(args.Key());
+						Component* child = Controls().FirstChild();
+						while (child != null)
+						{
+							if (child is Button*)
+							{
+								Button* button = cast<Button*>(child);
+								if (button->IsEnabled())
+								{
+									if (button->AccessKey() == key)
+									{
+										args.SetHandled();
+										button->OnPressed();
+										return;
+									}
+								}
+							}
+							child = child->NextSibling();
+						}
+					}
 				}
 			}
 		}

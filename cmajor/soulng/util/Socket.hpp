@@ -23,7 +23,7 @@ UTIL_API int64_t AcceptSocket(int64_t socketHandle);
 UTIL_API void CloseSocket(int64_t socketHandle);
 UTIL_API void ShutdownSocket(int64_t socketHandle, ShutdownMode mode);
 UTIL_API int64_t ConnectSocket(const std::string& node, const std::string& service);
-UTIL_API int SendSocket(int64_t socketHandle, uint8_t* buf, int len, int flags);
+UTIL_API int SendSocket(int64_t socketHandle, const uint8_t* buf, int len, int flags);
 UTIL_API int ReceiveSocket(int64_t socketHandle, uint8_t* buf, int len, int flags);
 UTIL_API void InitSocket();
 UTIL_API void DoneSocket();

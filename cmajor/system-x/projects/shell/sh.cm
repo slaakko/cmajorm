@@ -48,6 +48,22 @@ string GetLine(ShellEnvironment& environment)
 {
     PrintPrompt(environment);
     string line = Terminal.ReadLine();
+	if (!line.IsEmpty())
+	{
+		ustring s = ToUtf32(line);
+		if (!s.IsEmpty() && s[0] == keyMsg)
+		{
+			ustring t;
+			for (uchar c : s)
+			{
+				if (c != keyMsg)
+				{
+					t.Append(c);
+				}
+			}
+			line = ToUtf8(t);
+		}
+	}
     return line;
 }
 

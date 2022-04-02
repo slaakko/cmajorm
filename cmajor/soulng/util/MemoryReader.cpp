@@ -8,7 +8,7 @@
 
 namespace soulng { namespace util {
 
-MemoryReader::MemoryReader(uint8_t* ptr_, int64_t count_) : ptr(ptr_), pos(ptr), count(count_)
+MemoryReader::MemoryReader(const uint8_t* ptr_, int64_t count_) : ptr(ptr_), pos(ptr), count(count_)
 {
 }
 
