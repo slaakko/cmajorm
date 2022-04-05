@@ -186,7 +186,6 @@ void Terminal::SendKey(char32_t key)
 {
     if ((GetDebugMode() & debugTerminalMode) != 0)
     {
-        DebugWrite("send.key(" + OsKeyName(key) + ")");
     }
     terminalInputQueue.push_back(key);
     terminalInputReady = true;
@@ -794,7 +793,40 @@ std::vector<uint8_t> Terminal::Read(int64_t count, cmsx::machine::Process* proce
         }
         else
         {
-            int64_t n = std::min(int64_t(terminalInputBuffer.size()), count);
+            int64_t m = int64_t(terminalInputBuffer.size());
+            if (mode == TerminalMode::cooked && m >= 3)
+            {
+                bool keyMsgRead = false;
+                Utf8ToUtf32Engine readEngine;
+                for (auto it = terminalInputBuffer.cbegin(); it != terminalInputBuffer.cend(); ++it)
+                {
+                    readEngine.Put(*it);
+                    if (readEngine.ResulReady())
+                    {
+                        if (readEngine.Result() == keyMsg)
+                        {
+                            keyMsgRead = true;
+                            break;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+                if (keyMsgRead)
+                {
+                    if ((GetDebugMode() & debugTerminalMode) != 0)
+                    {
+                        DebugWrite("key.msg.read mode=cooked");
+                    }
+                    terminalInputBuffer.pop_front();
+                    terminalInputBuffer.pop_front();
+                    terminalInputBuffer.pop_front();
+                    continue;
+                }
+            }
+            int64_t n = std::min(m, count);
             for (int64_t i = 0; i < n; ++i)
             {
                 uint8_t x = terminalInputBuffer.front();

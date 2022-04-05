@@ -22,7 +22,7 @@ public class MainWindow	: Window
 		fileOpenMenuItem->SelectEvent().AddHandler(Open);
 		fileMenuItem->AddMenuItem(fileOpenMenuItem);
 		MenuItem* fileCloseMenuItem = new MenuItem("&Close", keyControlF4);
-		fileCloseMenuItem->SelectEvent().AddHandler(Close);
+		fileCloseMenuItem->SelectEvent().AddHandler(DoClose);
 		fileMenuItem->AddMenuItem(fileCloseMenuItem);
 		MenuItem* fileSaveMenuItem = new MenuItem("&Save", keyControlS);
 		fileSaveMenuItem->SelectEvent().AddHandler(Save);
@@ -91,17 +91,34 @@ public class MainWindow	: Window
 	}
 	private void New()
 	{
-		UniquePtr<MessageBox> messageBox = new MessageBox(MessageBoxCreateParams().Caption("New"));
-		messageBox->ShowDialog();
+		if (Close())
+		{
+			editor->Clear();
+		}
 		editor->SetFocus();
 	}
 	private void Open()
 	{
-		UniquePtr<MessageBox> messageBox = new MessageBox(MessageBoxCreateParams().Caption("Open"));
-		messageBox->ShowDialog();
+		FileDialog dialog(FileDialogCreateParams().SetKind(FileDialogKind.openDialog).SetRequireFileExists(true));
+		if (dialog.ShowDialog() == DialogResult.ok)
+		{
+			string filePath = dialog.FilePath();
+			if (File.Exists(filePath))
+			{
+				if (Close())
+				{
+					editor->SetFilePath(filePath);
+					editor->Load();
+				}
+			}
+		}
 		editor->SetFocus();
 	}
-	private void Close()
+	private void DoClose()
+	{
+		Close();
+	}
+	private bool Close()
 	{
 		if (editor->IsDirty())
 		{
@@ -112,18 +129,17 @@ public class MainWindow	: Window
 			{
 				Save();
 			}
-			else if (result == DialogResult.no)
-			{
-				editor->SetFocus();
-				editor->Clear();
-				return;
-			}
 			else if (result == DialogResult.cancel)
 			{
 				editor->SetFocus();
-				return;
+				return false;
 			}
 		}
+		editor->SetFilePath(string());
+		editor->Clear();
+		editor->SetFocus();
+		editor->Invalidate();
+		return true;
 	}
 	private void Save()
 	{
@@ -138,8 +154,13 @@ public class MainWindow	: Window
 	}
 	private void SaveAs()
 	{
-		UniquePtr<MessageBox> messageBox = new MessageBox(MessageBoxCreateParams().Caption("Save as"));
-		messageBox->ShowDialog();
+		FileDialog dialog(FileDialogCreateParams().SetKind(FileDialogKind.saveDialog));
+		if (dialog.ShowDialog() == DialogResult.ok)
+		{
+			string filePath = dialog.FilePath();
+			editor->SetFilePath(filePath);
+			editor->Save();
+		}
 		editor->SetFocus();
 	}
 	private void EditorFilePathChanged()
@@ -184,7 +205,10 @@ public class MainWindow	: Window
 	}
 	private void Exit()
 	{
-		Application.Instance().Exit();
+		if (Close())
+		{
+			Application.Instance().Exit();
+		}
 	}
 	private MenuBar* menuBar;
 	private Editor* editor;

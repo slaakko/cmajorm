@@ -23,6 +23,10 @@ namespace System.Screen
                 Terminal.Out() << ResetColors();
                 ClearScreen(TerminalWindowWidth(), TerminalWindowHeight());
                 SetCursorPos(0, 0);
+				if ((GetDebugMode() & debugMsgQ) != 0)
+				{
+					WriteDebugMessage("application closed");
+				}
             }
             catch (const Exception& ex)
             {

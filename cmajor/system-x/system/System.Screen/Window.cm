@@ -145,7 +145,7 @@ namespace System.Screen
 							if (defaultButton != null && defaultButton->IsEnabled())
 							{
 								args.SetHandled();
-								defaultButton->OnPressed();
+								defaultButton->Press();
 							}
 							break;
 						}
@@ -155,7 +155,7 @@ namespace System.Screen
 							if (cancelButton != null && cancelButton->IsEnabled())
 							{
 								args.SetHandled();
-								cancelButton->OnPressed();
+								cancelButton->Press();
 							}
 							break;
 						}
@@ -176,6 +176,23 @@ namespace System.Screen
 							}
 							break;
 						}
+						case keyShiftTab:
+						{
+							Control* focusedControl = Application.Instance().FocusedControl();
+							if (focusedControl != null)
+							{
+								Control* prevFocusableControl = focusedControl->PrevFocusableControl();
+								if (prevFocusableControl == null)
+								{
+									prevFocusableControl = LastFocusableControl();
+								}
+								if (prevFocusableControl != null)
+								{
+									prevFocusableControl->SetFocus();
+								}
+							}
+							break;
+						}
 					}
 					if (!args.Handled())
 					{
@@ -191,7 +208,7 @@ namespace System.Screen
 									if (button->AccessKey() == key)
 									{
 										args.SetHandled();
-										button->OnPressed();
+										button->Press();
 										return;
 									}
 								}

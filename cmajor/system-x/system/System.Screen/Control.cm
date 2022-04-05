@@ -92,11 +92,21 @@ namespace System.Screen
         }
         public nothrow void SetDisabled()
         {
-            flags = cast<ControlFlags>(flags | ControlFlags.disabled);
+			if (!IsDisabled())
+			{
+				flags = cast<ControlFlags>(flags | ControlFlags.disabled);
+				OnEnabledChanged();
+				Invalidate();
+			}
         }
         public nothrow void SetEnabled()
         {
-            flags = cast<ControlFlags>(flags & ~ControlFlags.disabled);
+			if (IsDisabled())
+			{
+				flags = cast<ControlFlags>(flags & ~ControlFlags.disabled);
+				OnEnabledChanged();
+				Invalidate();
+			}
         }
         public nothrow bool IsDisabled() const
         {
@@ -415,6 +425,10 @@ namespace System.Screen
         {
             backColorChangedEvent.Fire();
         }
+		public virtual void OnEnabledChanged()
+		{
+			enabledChangedEvent.Fire();
+		}
 		public virtual void OnGotFocus()
 		{
 			gotFocusEvent.Fire();
@@ -451,6 +465,10 @@ namespace System.Screen
 		{
 			return backColorChangedEvent;
 		}
+		public nothrow Event<ChangedEventHandler>& EnabledChangedEvent() 
+		{
+			return enabledChangedEvent;
+		}
 		public nothrow Event<FocusEventHandler>& GotFocusEvent() 
 		{
 			return gotFocusEvent;
@@ -481,6 +499,7 @@ namespace System.Screen
 		private Event<ChangedEventHandler> sizeChangedEvent;
 		private Event<ChangedEventHandler> foreColorChangedEvent;
 		private Event<ChangedEventHandler> backColorChangedEvent;
+		private Event<ChangedEventHandler> enabledChangedEvent;
 		private Event<FocusEventHandler> gotFocusEvent;
 		private Event<FocusEventHandler> lostFocusEvent;
 		private Event<WriteScreenEventHandler, WriteScreenEventArgs> writeScreenEvent;

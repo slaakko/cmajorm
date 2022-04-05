@@ -1,0 +1,285 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Screen
+{
+	public class TextBoxCreateParams
+	{
+		public nothrow TextBoxCreateParams() : controlCreateParams(), focusedForeColor(ConsoleColor.defaultColor), focusedBackColor(ConsoleColor.defaultColor)
+		{
+		}
+		public TextBoxCreateParams& Defaults() 
+		{
+			return *this;
+		}
+		public nothrow TextBoxCreateParams& SetLocation(const Point& loc)
+		{
+			controlCreateParams.SetLocation(loc);
+			return *this;
+		}
+		public nothrow TextBoxCreateParams& SetSize(const Size& size_)
+		{
+			controlCreateParams.SetSize(size_);
+			return *this;
+		}
+        public nothrow TextBoxCreateParams& SetForeColor(ConsoleColor foreColor_)
+        {
+            controlCreateParams.SetForeColor(foreColor_);
+            return *this;
+        }
+        public nothrow TextBoxCreateParams& SetBackColor(ConsoleColor backColor_)
+        {
+            controlCreateParams.SetBackColor(backColor_);
+            return *this;
+        }
+		public nothrow TextBoxCreateParams& SetText(const string& text_)
+		{
+			text = ToUtf32(text_);
+			return *this;
+		}
+		public nothrow TextBoxCreateParams& SetFocusedForeColor(ConsoleColor focusedForeColor_)
+		{
+			focusedForeColor = focusedForeColor_;
+			return *this;
+		}
+		public nothrow TextBoxCreateParams& SetFocusedBackColor(ConsoleColor focusedBackColor_)
+		{
+			focusedBackColor = focusedBackColor_;
+			return *this;
+		}
+		public ControlCreateParams controlCreateParams;
+		public ustring text;
+		public ConsoleColor focusedForeColor;
+		public ConsoleColor focusedBackColor;
+	}
+	
+	public class TextBox : Control
+	{
+		public nothrow TextBox(TextBoxCreateParams& createParams) : 
+			base(createParams.controlCreateParams), 
+			text(),
+			pos(0),
+			focusedForeColor(createParams.focusedForeColor), 
+			focusedBackColor(createParams.focusedBackColor)
+		{
+			InvalidateGuard invalidateGuard(this, false);
+			if (ForeColor() == ConsoleColor.defaultColor)
+			{
+				SetForeColor(ConsoleColor.gray);
+			}
+			if (BackColor() == ConsoleColor.defaultColor)
+			{
+				SetBackColor(ConsoleColor.black);
+			}
+			if (focusedForeColor == ConsoleColor.defaultColor)
+			{
+				focusedForeColor = ConsoleColor.white;
+			}
+			if (focusedBackColor == ConsoleColor.defaultColor)
+			{
+				focusedBackColor = ConsoleColor.darkBlue;
+			}
+			SetCursorPos();
+		}
+		public void SetText(const ustring& text_)
+		{
+			if (text != text_)
+			{
+				text = text_;
+				OnTextChanged();
+				Invalidate();
+			}
+		}
+		public void SetText(const string& text_)
+		{
+			SetText(ToUtf32(text_));
+		}
+		public nothrow const ustring& Text() const
+		{
+			return text;
+		}
+		public override void OnWriteScreen(WriteScreenEventArgs& args)
+		{
+			base->OnWriteScreen(args);
+			Rect rect = GetRect();
+			ConsoleColor foreColor = ForeColor();
+			ConsoleColor backColor = BackColor();
+			if (IsFocused())
+			{
+				foreColor = focusedForeColor;
+				backColor = focusedBackColor;
+			}
+			Clear(rect, foreColor, backColor);
+			Point cp = Location();
+			SetCursorPos(cp.x, cp.y);
+			if (text.Length() < rect.size.w)
+			{
+				Terminal.Out() << text;
+			}
+			else
+			{
+				int start = Max(cast<int>(0), cast<int>(pos - rect.size.w));
+				ustring txt = text.Substring(start, rect.size.w);
+				Terminal.Out() << txt;
+			}
+			SetCursorPos();
+		}
+		public override void OnKeyPressed(KeyEventArgs& args)
+		{
+			base->OnKeyPressed(args);
+			if (IsEnabled() && !args.Handled())
+			{
+				uchar key = args.Key();
+				switch (key)
+				{
+					case keyNewline:
+					{
+						args.SetHandled();
+						OnTextEntered();
+						break;
+					}
+					case keyDel:
+					{
+						args.SetHandled();
+						DeleteChar();
+						break;
+					}
+					case keyBackspace:
+					{
+						args.SetHandled();
+						if (pos > 0)
+						{
+							CursorLeft();
+							DeleteChar();
+						}
+						break;
+					}
+					case keyLeft:
+					{
+						args.SetHandled();
+						CursorLeft();
+						break;
+					}
+					case keyRight:
+					{
+						args.SetHandled();
+						CursorRight();
+						break;
+					}
+					case keyHome:
+					{
+						args.SetHandled();
+						CursorToStart();
+						break;
+					}
+					case keyEnd:
+					{
+						args.SetHandled();
+						CursorToEnd();
+						break;
+					}
+					default:
+					{
+						if (key >= ' ' && key < specialKeyStart)
+						{
+							args.SetHandled();
+							InsertChar(key);
+						}
+						break;
+					}
+				}
+			}
+		}
+		public virtual void OnTextChanged()
+		{
+			textChangedEvent.Fire();
+		}
+		public virtual void OnTextEntered()
+		{
+			textEnteredEvent.Fire();
+		}
+		public nothrow Event<ChangedEventHandler>& TextChangedEvent() 
+		{
+			return textChangedEvent;
+		}
+		public nothrow Event<SelectEventHandler>& TextEnteredEvent()
+		{
+			return textEnteredEvent;
+		}
+		private void CursorLeft()
+		{
+			if (pos > 0)
+			{
+				--pos;
+				SetCursorPos();
+			}
+		}
+		private void CursorRight()
+		{
+			if (pos < text.Length())
+			{
+				++pos;
+				SetCursorPos();
+			}
+		}
+		private void CursorToStart()
+		{
+			if (pos != 0)
+			{
+				pos = 0;
+				SetCursorPos();
+			}
+		}
+		private void CursorToEnd()
+		{
+			if (pos != text.Length())
+			{
+				pos = cast<int>(text.Length());
+				SetCursorPos();
+			}
+		}
+		private void DeleteChar()
+		{
+			if (pos < text.Length())
+			{
+				text.Remove(pos, 1);
+				OnTextChanged();
+				Invalidate();
+			}
+		}
+		private void InsertChar(uchar ch)
+		{
+			if (pos < text.Length())
+			{
+				text.Insert(pos, ch);
+				++pos;
+				OnTextChanged();
+				Invalidate();
+			}
+			else
+			{
+				text.Append(ch);
+				++pos;
+				OnTextChanged();
+				Invalidate();
+			}
+		}
+		private void SetCursorPos()
+		{
+			Point cp = Location();
+			cp.x = cp.x + pos;
+			SetControlCursorPos(cp);
+			SetCursorPos(cp.x, cp.y);
+		}
+		private ustring text;
+		private int pos;
+		private Event<ChangedEventHandler> textChangedEvent;
+		private Event<SelectEventHandler> textEnteredEvent;
+		private ConsoleColor focusedForeColor;
+		private ConsoleColor focusedBackColor;
+	}
+}

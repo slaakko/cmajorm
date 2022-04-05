@@ -131,6 +131,13 @@ namespace System.Screen
 		{
 			dialogResult = dialogResult_;
 		}
+		public void Press()
+		{
+			if (IsEnabled())
+			{
+				OnPressed();
+			}
+		}
 		public int TextLength() const
 		{
 			int ampPos = cast<int>(text.Find('&'));
@@ -155,31 +162,42 @@ namespace System.Screen
 			Point cursorPos(location.x + (sz.w - TextLength()) / 2, location.y);
 			SetControlCursorPos(cursorPos);
 			SetCursorPos(cursorPos.x, cursorPos.y);
+			ConsoleColor foreColor = ForeColor();
+			ConsoleColor hiliteColor = highlightColor;
+			if (!isFocused)
+			{
+				if (IsDisabled())
+				{
+					foreColor = disabledColor;
+					hiliteColor = disabledColor;
+				}
+				Terminal.Out() << SetColors(foreColor, BackColor());
+			}
 			int ampPos = cast<int>(text.Find('&'));
 			if (ampPos != -1)
 			{
 				if (!isFocused)
 				{
-					Terminal.Out() << SetColors(ForeColor(), BackColor());
+					Terminal.Out() << SetColors(foreColor, BackColor());
 				}
 				ustring prefix = text.Substring(0, ampPos);
 				Terminal.Out() << prefix;
 				ustring highlightStr = text.Substring(ampPos + 1, 1);
 				if (!isFocused)
 				{
-					Terminal.Out() << SetColors(highlightColor, BackColor());
+					Terminal.Out() << SetColors(hiliteColor, BackColor());
 				}
 				Terminal.Out() << highlightStr;
 				if (!isFocused)
 				{
-					Terminal.Out() << SetColors(ForeColor(), BackColor());
+					Terminal.Out() << SetColors(foreColor, BackColor());
 				}
 				ustring suffix = text.Substring(ampPos + 2);
 				Terminal.Out() << suffix;
 			}
 			else
 			{
-				Terminal.Out() << SetColors(ForeColor(), BackColor());
+				Terminal.Out() << SetColors(foreColor, BackColor());
 				Terminal.Out() << text;
 			}
 		}
@@ -195,7 +213,7 @@ namespace System.Screen
 						case keyNewline:
 						case ' ':
 						{
-							OnPressed();
+							Press();
 							args.SetHandled();
 							break;
 						}

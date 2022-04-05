@@ -1,0 +1,403 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+
+namespace System.Screen
+{
+	public enum FileDialogKind
+	{
+		openDialog, saveDialog
+	}
+
+	public const uchar folderSymbol = cast<uchar>(0x1F5C0);
+	public const uchar emptyDocumentSymbol = cast<uchar>(0x1F5CB);
+
+	public class DirectoryItem
+	{
+		public nothrow DirectoryItem(const DirectoryEntry& entry_, const FileStatus& status_) : entry(entry_), status(status_)
+		{
+		}
+		public DirectoryEntry entry;
+		public FileStatus status;
+	}
+
+	public class DirectoryItemLess : Rel<DirectoryItem>
+	{
+		public nothrow bool operator()(const DirectoryItem& left, const DirectoryItem& right) const
+		{
+			if (left.status.fileType == FileType.directory)
+			{
+				if (right.status.fileType == FileType.directory)
+				{
+					return left.entry.name < right.entry.name;
+				}
+				else
+				{
+					return true;
+				}
+			}
+			else if (left.status.fileType == FileType.regular)
+			{
+				if (right.status.fileType == FileType.directory)
+				{
+					return false;
+				}
+				else if (right.status.fileType == FileType.regular)
+				{
+					return left.entry.name < right.entry.name;
+				}
+				else
+				{
+					return true;
+				}
+			}
+			else if (left.status.fileType == FileType.fifo)
+			{
+				if (right.status.fileType == FileType.directory)
+				{
+					return false;
+				}
+				else if (right.status.fileType == FileType.regular)
+				{
+					return false;
+				}
+				else
+				{
+					return left.entry.name < right.entry.name;
+				}
+			}
+			return false;
+		}
+	}
+	
+	public DirectoryItem MakeItem(const string& directory, const DirectoryEntry& entry)
+	{
+		string path = Path.Combine(directory, entry.name);
+		FileStatus status;
+		Stat(path.Chars(), status);
+		return DirectoryItem(entry, status);
+	}
+	
+	public class FileDialogCreateParams
+	{
+		public nothrow FileDialogCreateParams(): controlCreateParams(), kind(FileDialogKind.openDialog), caption(), directory(GetCurrentWorkingDirectory()), requireFileExists(false)
+		{
+		}
+		public nothrow FileDialogCreateParams& Defaults()
+		{
+			return *this;
+		}
+		public nothrow FileDialogCreateParams& SetKind(FileDialogKind kind_)
+		{
+			kind = kind_;
+			return *this;
+		}
+		public nothrow FileDialogCreateParams& SetCaption(const string& caption_)
+		{
+			caption = caption_;
+			return *this;
+		}
+		public nothrow FileDialogCreateParams& SetDirectory(const string& directory_)
+		{
+			directory = directory_;
+			return *this;
+		}
+		public nothrow FileDialogCreateParams& SetRequireFileExists(bool requireFileExists_)
+		{
+			requireFileExists = requireFileExists_;
+			return *this;
+		}
+		public ControlCreateParams controlCreateParams;
+		public FileDialogKind kind;
+		public string caption;
+		public string directory;
+		public bool requireFileExists;
+	}
+
+	public class FileDialog : Window
+	{
+		public nothrow FileDialog(FileDialogCreateParams& createParams) : 
+			base(createParams.controlCreateParams), 
+			kind(createParams.kind), 
+			caption(createParams.caption), 
+			directory(createParams.directory),
+			requireFileExists(createParams.requireFileExists)
+		{
+			InvalidateGuard guard(this, true);
+			if (caption.IsEmpty())
+			{
+				switch (kind)
+				{	
+					case FileDialogKind.openDialog:
+					{
+						caption = "Open File";
+						break;
+					}
+					case FileDialogKind.saveDialog:
+					{
+						caption = "Save File";
+						break;
+					}
+				}
+			}
+			bool setLoc = false;
+			if (Location().IsDefault())
+			{
+				SetLocation(Point(0, 0));
+				setLoc = true;
+			}
+			if (GetSize().IsDefault())
+			{
+				SetSize(Size(60, 20));
+			}
+			if (ForeColor() == ConsoleColor.defaultColor)
+			{
+				SetForeColor(ConsoleColor.black);
+			}
+			if (BackColor() == ConsoleColor.defaultColor)
+			{
+				SetBackColor(ConsoleColor.gray);
+			}
+			Measure(setLoc);
+			Point loc = Location();
+			Size sz = GetSize();
+			Label* label = new Label(LabelCreateParams().SetLocation(Point(loc.x + 2, loc.y + 1)).SetText("Directory:"));
+			AddChild(label);
+			directoryLabel = new Label(LabelCreateParams().SetLocation(Point(loc.x + 2, loc.y + 2)).SetText(directory));
+			AddChild(directoryLabel);
+			listBox = new ListBox(ListBoxCreateParams().SetLocation(Point(loc.x + 2, loc.y + 4)).SetSize(Size(sz.w - 4, 13)));
+			listBox->SelectedIndexChangedEvent().AddHandler(ListBoxSelectedIndexChanged);
+			listBox->ItemSelectedEvent().AddHandler(ListBoxItemSelected);
+			AddChild(listBox);
+			textBox = new TextBox(TextBoxCreateParams().SetLocation(Point(loc.x + 2, loc.y + 18)).SetSize(Size(sz.w - 4, 1)));
+			textBox->TextChangedEvent().AddHandler(TextBoxTextChanged);
+			textBox->TextEnteredEvent().AddHandler(TextBoxTextEntered);
+			AddChild(textBox);
+			string buttonText;
+			switch (kind)
+			{
+				case FileDialogKind.openDialog:
+				{
+					buttonText = "[ &Open ]";
+					break;
+				}
+				case FileDialogKind.saveDialog:
+				{
+					buttonText = "[ &Save ]";
+					break;
+				}
+			}
+			defaultButton = new Button(ButtonCreateParams().Text(buttonText));
+			defaultButton->SetDialogResult(DialogResult.ok);
+			defaultButton->SetDefault();
+			AddChild(defaultButton);
+			Button* cancelButton = Button.Cancel();
+			AddChild(cancelButton);
+			cancelButton->SetLocation(Point(loc.x + sz.w - cancelButton->GetSize().w - 1, loc.y + sz.h - 2));
+			defaultButton->SetLocation(Point(cancelButton->Location().x - defaultButton->GetSize().w - 1, cancelButton->Location().y));
+			MakeListBoxContent();
+			Control* firstFocusableControl = FirstFocusabledControl();
+			if (firstFocusableControl != null)
+			{
+				firstFocusableControl->SetFocus();
+			}
+			SetDefaultButtonStatus();
+		}
+		public string FilePath() const
+		{
+			if (!textBox->Text().IsEmpty())
+			{
+				return Path.Combine(directory, ToUtf8(textBox->Text()));
+			}
+			else if (listBox->SelectedIndex() >= 0 && listBox->SelectedIndex() < listBox->ItemCount())
+			{
+				if (items[listBox->SelectedIndex()].status.fileType == FileType.regular)
+				{
+					return Path.Combine(directory, items[listBox->SelectedIndex()].entry.name);
+				}
+			}
+			return string();
+		}
+		public override void OnWriteScreen(WriteScreenEventArgs& args)
+		{
+			base->OnWriteScreen(args);
+			Rect rect = GetRect();
+			WriteBox(rect, ForeColor(), BackColor());
+			if (!caption.IsEmpty())
+			{
+				WriteCaption(u" " + ToUtf32(caption) + u" ");
+			}
+		}
+		private void ListBoxItemSelected()
+		{
+			if (items[listBox->SelectedIndex()].status.fileType == FileType.directory)
+			{
+				directory = GetFullPath(Path.Combine(directory, items[listBox->SelectedIndex()].entry.name));
+				directoryLabel->SetText(directory);
+				MakeListBoxContent();
+				Invalidate();
+			}
+			else if (items[listBox->SelectedIndex()].status.fileType == FileType.regular)
+			{
+				SetDefaultButtonStatus();
+				defaultButton->Press();
+			}
+		}
+		private void ListBoxSelectedIndexChanged()
+		{
+			if (requireFileExists)
+			{
+				if (items[listBox->SelectedIndex()].status.fileType == FileType.directory)
+				{
+					defaultButton->SetEnabled();
+				}
+				else if (items[listBox->SelectedIndex()].status.fileType == FileType.regular)
+				{
+					SetDefaultButtonStatus();
+				}
+				else if (items[listBox->SelectedIndex()].status.fileType == FileType.fifo)
+				{
+					defaultButton->SetDisabled();
+				}
+			}
+		}
+		private void TextBoxTextChanged()
+		{
+			if (!textBox->Text().IsEmpty())
+			{
+				SetDefaultButtonStatus();
+			}
+			else
+			{
+				defaultButton->SetDisabled();
+			}
+		}
+		private void TextBoxTextEntered()
+		{
+			if (!textBox->Text().IsEmpty())
+			{
+				SetDefaultButtonStatus();
+				defaultButton->Press();
+			}
+		}
+		private void SetDefaultButtonStatus()
+		{
+			if (requireFileExists)
+			{
+				string filePath = FilePath();
+				if (!filePath.IsEmpty() && File.Exists(filePath))
+				{
+					defaultButton->SetEnabled();
+				}
+				else
+				{
+					defaultButton->SetDisabled();
+				}
+			}
+		}
+		private void Measure(bool setLoc)
+		{
+			Rect rect = GetRect();
+			rect.Inflate(1, 1);
+			SetLocation(rect.location);
+			SetSize(rect.size);
+			Size sz = GetSize();
+			if (setLoc)
+			{
+				int x = Max(cast<int>(0), (TerminalWindowWidth() - sz.w) / 2);
+				int y = Max(cast<int>(0), (TerminalWindowHeight() - sz.h) / 2);
+				SetLocation(Point(x, y));
+			}
+		}
+		private void WriteCaption(const ustring& captionStr)
+		{
+			Point loc = Location();
+			Size sz = GetSize();
+			int offset = Max(cast<int>(0), cast<int>(sz.w - captionStr.Length()));
+			int x = loc.x + offset / 2;
+			int y = loc.y;
+			SetCursorPos(x, y);
+			Terminal.Out() << captionStr;
+		}
+		private void MakeListBoxContent()
+		{
+			ReadDirectory();
+			SortItems();
+			AddItemsToListBox();
+		}
+		private void AddItemsToListBox()
+		{
+			listBox->Clear();
+			Size sz = listBox->GetSize();
+			int width = sz.w;
+			for (const DirectoryItem& item : items)
+			{
+				ustring itemStr;
+				if (item.status.fileType == FileType.directory)
+				{
+					itemStr.Append(' ').Append(folderSymbol).Append(' ');
+				}
+				else if (item.status.fileType == FileType.regular)
+				{
+					itemStr.Append(' ').Append(emptyDocumentSymbol).Append(' ');
+				}
+				else if (item.status.fileType == FileType.fifo)
+				{
+					itemStr.Append(' ').Append(emptyDocumentSymbol).Append(' ');
+				}
+				ustring entryName = ToUtf32(item.entry.name);
+				int entryWidth = width - 3;
+				itemStr.Append(entryName.Substring(0, entryWidth));
+				int spaceWidth = Max(cast<int>(0), cast<int>(entryWidth - entryName.Length()));
+				if (spaceWidth > 0)
+				{
+					itemStr.Append(ustring(' ', spaceWidth));
+				}
+				listBox->AddItem(itemStr);
+			}
+			listBox->SetSelectedIndex(0);
+		}
+		private void ReadDirectory()
+		{
+			items.Clear();
+			DirectoryReader reader(directory);
+			DirectoryEntry entry;
+			while (reader.Read(entry))
+			{
+				if (entry.IsDot())
+				{
+					continue;
+				}
+				else if (entry.IsDotDot())
+				{
+					if (directory != "/")
+					{
+						items.Add(MakeItem(directory, entry));
+					}
+				}
+				else
+				{
+					items.Add(MakeItem(directory, entry));
+				}
+			}
+		}
+		private void SortItems()
+		{
+			Sort(items.Begin(), items.End(), DirectoryItemLess());
+		}
+		private FileDialogKind kind;
+		private string caption;
+		private string directory;
+		private Label* directoryLabel;
+		private ListBox* listBox;
+		private TextBox* textBox;
+		private Button* defaultButton;
+		private List<DirectoryItem> items;
+		private bool requireFileExists;
+	}
+}
