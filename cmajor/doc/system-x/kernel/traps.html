@@ -453,7 +453,7 @@
 			<td>returns 1 if watched directories have been changed (new or removed files), 0 if no changes have occurred, returns -1 in case of error</td>
 		</tr>
 		<tr>
-			<td><span class="kw">clear_directories_changed</span></td>
+			<td><span class="kw">trap_clear_directories_changed</span></td>
 			<td>67</td>
 			<td>-</td>
 			<td>resets the 'directories changed' flag from the current process, returns -1 in case of error</td>
@@ -466,22 +466,22 @@
 			<td>obtains execution statistics for the exited child processes of the current process</td>
 		</tr>
 		<tr>
-			<td><span class="kw">trap_sendkey</span></td>
-			<td>69</td>
-			<td>key (uchar)</td>
-			<td>simulates pressing a key, puts the key into the kernel key input buffer</td>
-		</tr>
-		<tr>
 			<td><span class="kw">trap_msgq</span></td>
-			<td>70</td>
+			<td>69</td>
 			<td>name of the message queueu to create or open (pointer to string)</td>
 			<td>creates or opens a message queue, returns message queue descriptor, or -1 in case of error</td>
 		</tr>
 		<tr>
 			<td><span class="kw">trap_close_msgq</span></td>
-			<td>71</td>
+			<td>70</td>
 			<td>message queue descriptor (int)</td>
 			<td>closes a message queue, returns 0, or -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_wait_msg</span></td>
+			<td>71</td>
+			<td>message queue descriptor (int)</td>
+			<td>waits until message queue is not empty, returns 0, or -1 in case of error</td>
 		</tr>
 		<tr>
 			<td><span class="kw">trap_put_msg</span></td>
@@ -506,6 +506,48 @@
 			<td>75</td>
 			<td>message queue descriptor (int), buffer address (pointer)</td>
 			<td>fetches and removes the message in front of the given message queue, returns 0, or -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_bind_terminal</span></td>
+			<td>76</td>
+			<td>message queue descriptor (int)</td>
+			<td>binds terminal input system to the given message queue, returns 0, or -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_unbind_terminal</span></td>
+			<td>77</td>
+			<td>-</td>
+			<td>unbinds terminal input system from message queues, returns 0, or -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_timer_msg</span></td>
+			<td>78</td>
+			<td>duration in nanoseconds (long), message queue descriptor (int), message data (pointer), message size (int)</td>
+			<td>generates given message until duration nanoseconds have been elapsed and puts the message to the given message queue, returns 0, or -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_connect</span></td>
+			<td>79</td>
+			<td>node (pointer to string), service (pointer to strign)</td>
+			<td>connects to the given node address and service (or port number) and returns a connected socket descriptor</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_get_debug_mode</span></td>
+			<td>80</td>
+			<td>-</td>
+			<td>returns current kernel debug mode (0 is the default=no kernel debugging enabled), or -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_set_debug_mode</span></td>
+			<td>81</td>
+			<td>mode (int)</td>
+			<td>sets the kernel debug mode to the given mode value, returns 0, or -1 in case of error</td>
+		</tr>
+		<tr>
+			<td><span class="kw">trap_write_debug_message</span></td>
+			<td>82</td>
+			<td>debug messsage (pointer to string)
+			<td>writes a debug message, returns 0, or -1 in case of error (debug messsages show up in a 'cmlog' command line process if it is started and kernel debugging is enabled)</td>
 		</tr>
 	</table>
 </body>

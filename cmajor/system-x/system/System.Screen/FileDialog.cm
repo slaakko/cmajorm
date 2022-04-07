@@ -226,21 +226,30 @@ namespace System.Screen
         public override void OnWriteScreen(WriteScreenEventArgs& args)
         {
             base->OnWriteScreen(args);
-            Rect rect = GetRect();
-            WriteBox(rect, ForeColor(), BackColor());
-            if (!caption.IsEmpty())
+            Rect updateRect = GetRect();
+			bool isDefault = args.GetRect().IsDefault();
+            if (!isDefault)
             {
-                WriteCaption(u" " + ToUtf32(caption) + u" ");
+                updateRect = Rect.Intersection(updateRect, args.GetRect());
             }
+            if (updateRect.IsEmpty()) return;
+			if (isDefault)
+			{
+				WriteBox(updateRect, ForeColor(), BackColor());
+				if (!caption.IsEmpty())
+				{
+					WriteCaption(u" " + ToUtf32(caption) + u" ");
+				}
+			}
         }
         private void ListBoxItemSelected()
         {
             if (items[listBox->SelectedIndex()].status.fileType == FileType.directory)
             {
+				InvalidateGuard guard(listBox, true);
                 directory = GetFullPath(Path.Combine(directory, items[listBox->SelectedIndex()].entry.name));
                 directoryLabel->SetText(directory);
                 MakeListBoxContent();
-                Invalidate();
             }
             else if (items[listBox->SelectedIndex()].status.fileType == FileType.regular)
             {

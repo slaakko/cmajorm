@@ -556,10 +556,10 @@ void INodeManager::InsertIntoHashQueue(INode* inode)
 
 void INodeManager::RemoveFromFreeList(INodeHashQueueEntry* entry)
 {
-    if (entry->it != freeList.end())
+    if (entry->it != INodeFreeList::iterator())
     {
         freeList.erase(entry->it);
-        entry->it = freeList.end();
+        entry->it = INodeFreeList::iterator();
     }
 }
 
@@ -569,9 +569,7 @@ void INodeManager::PutINodeToFreeList(INode* inode)
     INodeHashQueueEntry* entry = GetINodeFromHashQueue(inode->Key());
     if (entry)
     {
-        INodeFreeList::iterator it = freeList.end();
-        --it;
-        entry->it = it;
+        entry->it = --freeList.end();
     }
 }
 

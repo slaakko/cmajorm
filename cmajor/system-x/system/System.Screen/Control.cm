@@ -96,7 +96,7 @@ namespace System.Screen
             {
                 flags = cast<ControlFlags>(flags | ControlFlags.disabled);
                 OnEnabledChanged();
-                Invalidate();
+                Invalidate(GetRect());
             }
         }
         public nothrow void SetEnabled()
@@ -105,7 +105,7 @@ namespace System.Screen
             {
                 flags = cast<ControlFlags>(flags & ~ControlFlags.disabled);
                 OnEnabledChanged();
-                Invalidate();
+                Invalidate(GetRect());
             }
         }
         public nothrow bool IsDisabled() const
@@ -306,22 +306,6 @@ namespace System.Screen
         public void Invalidate(const Rect& rect)
         {
             InvalidateGuard guard(this, true);
-            Control* parentControl = ParentControl();
-            if (parentControl != null)
-            {
-                if (parentControl->InvalidateCount() > 0)
-                {
-                    if (rect.IsDefault())
-                    {
-                        parentControl->Invalidate(GetRect());
-                    }
-                    else
-                    {
-                        parentControl->Invalidate(rect);
-                    }
-                    return;
-                }
-            }
             if (updateRect.IsEmpty())
             {
                 updateRect = rect;
@@ -351,6 +335,10 @@ namespace System.Screen
         {
             return Application.Instance().FocusedControl() == this;
         }
+		public nothrow virtual Rect FocusRect() const
+		{
+			return GetRect();
+		}
         public virtual void SetFocus()
         {
             Control* prevFocusedControl = Application.Instance().FocusedControl();
@@ -362,11 +350,11 @@ namespace System.Screen
                 }
                 Application.Instance().SetFocusedControl(this);
                 OnGotFocus();
-                Window* window = GetWindow();
-                if (window != null)
-                {
-                    window->Invalidate();
-                }
+				if (prevFocusedControl != null)
+				{
+					prevFocusedControl->Invalidate(prevFocusedControl->FocusRect());
+				}
+				Invalidate(FocusRect());
             }
         }
         public virtual bool HandleMessage(Message* message)

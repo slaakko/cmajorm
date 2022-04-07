@@ -78,13 +78,13 @@ namespace System.Screen
             ustring t = ToUtf32(text_);
             if (text != t)
             {
+				InvalidateGuard guard(this, true);
                 text = t;
                 if (autoSize)
                 {
                     SetSize(Size(cast<int>(text.Length()), 1));
                 }
                 OnTextChanged();
-                Invalidate();
             }
         }
         public virtual void OnTextChanged()
