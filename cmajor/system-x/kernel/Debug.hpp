@@ -10,8 +10,9 @@
 
 namespace cmsx::kernel {
 
-const int debugMsgQueueMode = 1 << 0; // 1
-const int debugTerminalMode = 1 << 1; // 2
+const int debugSystemErrorMode = 1 << 0;    // 1
+const int debugTerminalMode = 1 << 1;       // 2
+const int debugMsgQueueMode = 1 << 2;       // 4
 
 CMSX_KERNEL_API void SetDebugMode(int debugMode);
 CMSX_KERNEL_API int GetDebugMode();

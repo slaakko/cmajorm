@@ -7,25 +7,25 @@ using System;
 
 namespace System.Screen
 {
-	public class LabelCreateParams
-	{
-		public nothrow LabelCreateParams() : controlCreateParams(), autoSize(true), text()
-		{
-		}
-		public nothrow LabelCreateParams& Defaults()
-		{
-			return *this;
-		}
-		public nothrow LabelCreateParams& SetLocation(const Point& loc)
-		{
-			controlCreateParams.SetLocation(loc);
-			return *this;
-		}
-		public nothrow LabelCreateParams& SetSize(const Size& size_)
-		{
-			controlCreateParams.SetSize(size_);
-			return *this;
-		}
+    public class LabelCreateParams
+    {
+        public nothrow LabelCreateParams() : controlCreateParams(), autoSize(true), text()
+        {
+        }
+        public nothrow LabelCreateParams& Defaults()
+        {
+            return *this;
+        }
+        public nothrow LabelCreateParams& SetLocation(const Point& loc)
+        {
+            controlCreateParams.SetLocation(loc);
+            return *this;
+        }
+        public nothrow LabelCreateParams& SetSize(const Size& size_)
+        {
+            controlCreateParams.SetSize(size_);
+            return *this;
+        }
         public nothrow LabelCreateParams& SetForeColor(ConsoleColor foreColor_)
         {
             controlCreateParams.SetForeColor(foreColor_);
@@ -36,74 +36,74 @@ namespace System.Screen
             controlCreateParams.SetBackColor(backColor_);
             return *this;
         }
-		public nothrow LabelCreateParams& SetText(const string& text_)
-		{
-			text = ToUtf32(text_);
-			return *this;
-		}
-		public nothrow LabelCreateParams& SetAutoSize(bool autoSize_)
-		{
-			autoSize = autoSize_;
-			return *this;
-		}
-		public ControlCreateParams controlCreateParams;
-		public ustring text;
-		public bool autoSize;
-	}
-	
-	public class Label : Control
-	{
-		public nothrow Label(LabelCreateParams& createParams) : base(createParams.controlCreateParams), autoSize(createParams.autoSize), text(createParams.text)
-		{
-			InvalidateGuard invalidateGuard(this, false);
-			if (autoSize)
-			{
-				SetSize(Size(cast<int>(text.Length()), 1));
-			}
-			if (ForeColor() == ConsoleColor.defaultColor)
-			{
-				SetForeColor(ConsoleColor.black);
-			}
-			if (BackColor() == ConsoleColor.defaultColor)
-			{
-				SetBackColor(ConsoleColor.gray);
-			}
-		}
-		public nothrow override bool CanFocus() const
-		{
-			return false;
-		}
-		public void SetText(const string& text_)
-		{
-			ustring t = ToUtf32(text_);
-			if (text != t)
-			{
-				text = t;
-				if (autoSize)
-				{
-					SetSize(Size(cast<int>(text.Length()), 1));
-				}
-				OnTextChanged();
-				Invalidate();
-			}
-		}
-		public virtual void OnTextChanged()
-		{
-			textChangedEvent.Fire();
-		}
+        public nothrow LabelCreateParams& SetText(const string& text_)
+        {
+            text = ToUtf32(text_);
+            return *this;
+        }
+        public nothrow LabelCreateParams& SetAutoSize(bool autoSize_)
+        {
+            autoSize = autoSize_;
+            return *this;
+        }
+        public ControlCreateParams controlCreateParams;
+        public ustring text;
+        public bool autoSize;
+    }
+    
+    public class Label : Control
+    {
+        public nothrow Label(LabelCreateParams& createParams) : base(createParams.controlCreateParams), autoSize(createParams.autoSize), text(createParams.text)
+        {
+            InvalidateGuard invalidateGuard(this, false);
+            if (autoSize)
+            {
+                SetSize(Size(cast<int>(text.Length()), 1));
+            }
+            if (ForeColor() == ConsoleColor.defaultColor)
+            {
+                SetForeColor(ConsoleColor.black);
+            }
+            if (BackColor() == ConsoleColor.defaultColor)
+            {
+                SetBackColor(ConsoleColor.gray);
+            }
+        }
+        public nothrow override bool CanFocus() const
+        {
+            return false;
+        }
+        public void SetText(const string& text_)
+        {
+            ustring t = ToUtf32(text_);
+            if (text != t)
+            {
+                text = t;
+                if (autoSize)
+                {
+                    SetSize(Size(cast<int>(text.Length()), 1));
+                }
+                OnTextChanged();
+                Invalidate();
+            }
+        }
+        public virtual void OnTextChanged()
+        {
+            textChangedEvent.Fire();
+        }
         public override void OnWriteScreen(WriteScreenEventArgs& args)
         {
             base->OnWriteScreen(args);
-			Point loc = Location();
-			SetCursorPos(loc.x, loc.y);
-			Terminal.Out() << SetColors(ForeColor(), BackColor()) << text;
+            Point loc = Location();
+            SetCursorPos(loc.x, loc.y);
+            Terminal.Out() << SetColors(ForeColor(), BackColor()) << text;
         }
-		public nothrow Event<ChangedEventHandler>& TextChangedEvent() 
-		{
-			return textChangedEvent;
-		}
-		private bool autoSize;
-		private ustring text;
-		private Event<ChangedEventHandler> textChangedEvent;
-	}
+        public nothrow Event<ChangedEventHandler>& TextChangedEvent() 
+        {
+            return textChangedEvent;
+        }
+        private bool autoSize;
+        private ustring text;
+        private Event<ChangedEventHandler> textChangedEvent;
+    }
 }

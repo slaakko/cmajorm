@@ -378,7 +378,7 @@ int64_t PipeOutputFile::Write(const std::vector<uint8_t>& buffer, cmsx::machine:
         {
             if (pipe->ReaderCount() == 0)
             {
-                throw SystemError(EFAIL, "pipe " + std::to_string(pipe->Id()) + " has no readers");
+                throw SystemError(EFAIL, "pipe " + std::to_string(pipe->Id()) + " has no readers", __FUNCTION__);
             }
             else
             {
@@ -406,11 +406,11 @@ void MakePipe(cmsx::kernel::Process* process, int64_t readerFdAddr, int64_t writ
 #endif
     if (readerFdAddr == 0)
     {
-        throw SystemError(EPARAM, "pipe reader fd is null");
+        throw SystemError(EPARAM, "pipe reader fd is null", __FUNCTION__);
     }
     if (writerFdAddr == 0)
     {
-        throw SystemError(EPARAM, "pipe writer fd is null");
+        throw SystemError(EPARAM, "pipe writer fd is null", __FUNCTION__);
     }
     ProcessFileTable& processFileTable = process->GetFileTable();
     Pipe* pipe = new Pipe(PipeDevice::Instance().GetNextPipeId());

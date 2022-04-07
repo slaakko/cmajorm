@@ -65,12 +65,12 @@ void SoftwareInterruptHandler::HandleInterrupt(cmsx::machine::Processor& process
         }
         else
         {
-            throw SystemError(ENOTFOUND, "no handler for TRAP #" + ToHexString(trapY));
+            throw SystemError(ENOTFOUND, "no handler for TRAP #" + ToHexString(trapY), __FUNCTION__);
         }
     }
     else
     {
-        throw SystemError(EFAIL, "invalid TRAP #" + ToHexString(trap));
+        throw SystemError(EFAIL, "invalid TRAP #" + ToHexString(trap), __FUNCTION__);
     }
 }
 

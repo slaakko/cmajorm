@@ -104,7 +104,7 @@ void CheckAccess(Access access, int32_t euid, int32_t egid, INode* inode, const 
     {
         return;
     }
-    throw SystemError(EPERMISSION, message + ": permission denied");
+    throw SystemError(EPERMISSION, message + ": permission denied", __FUNCTION__);
 }
 
 INode::INode() :
@@ -194,7 +194,7 @@ int32_t INode::GetDirectBlockNumber(int32_t index) const
     }
     else
     {
-        throw SystemError(EFAIL, "invalid direct block number index ");
+        throw SystemError(EFAIL, "invalid direct block number index", __FUNCTION__);
     }
 }
 
@@ -206,7 +206,7 @@ void INode::SetDirectBlockNumber(int32_t blockNumber, int32_t index)
     }
     else
     {
-        throw SystemError(EFAIL, "invalid direct block number index ");
+        throw SystemError(EFAIL, "invalid direct block number index", __FUNCTION__);
     }
 }
 
@@ -637,7 +637,7 @@ INodePtr GetINode(INodeKey inodeKey, cmsx::machine::Process* process)
         {
             if (inodeManager.IsFreeListEmpty())
             {
-                throw SystemError(ELIMITEXCEEDED, "no cached inodes available");
+                throw SystemError(ELIMITEXCEEDED, "no cached inodes available", __FUNCTION__);
             }
             else
             {

@@ -5,51 +5,51 @@
 
 namespace System
 {
-	public class LogClient
-	{
-		static LogClient() : instance(new LogClient())
-		{
-		}
-		private LogClient() : port(55000), connected(false), socket(null)
-		{
-		}
-		public static LogClient& Instance()
-		{
-			return *instance;
-		}
-		public nothrow void SetPort(int port_)
-		{
-			port = port_;
-		}
-		public nothrow int Port() const
-		{
-			return port;
-		}
-		public nothrow bool Connected() const
-		{
-			return connected;
-		}
-		public void Connect()
-		{
-			connected = true;
-			socket.Reset(new Socket("127.0.0.1", ToString(port)));
-		}
-		public void CloseConnection()
-		{
-			connected = false;
-			socket.Reset();
-		}
-		public void Write(const string& str)
-		{
-			if (!connected)
-			{
-				Connect();
-			}
-			socket->Write(str);
-		}
-		private static UniquePtr<LogClient> instance;
-		private int port;
-		private bool connected;
-		private UniquePtr<Socket> socket;
-	}
+    public class LogClient
+    {
+        static LogClient() : instance(new LogClient())
+        {
+        }
+        private LogClient() : port(55000), connected(false), socket(null)
+        {
+        }
+        public static LogClient& Instance()
+        {
+            return *instance;
+        }
+        public nothrow void SetPort(int port_)
+        {
+            port = port_;
+        }
+        public nothrow int Port() const
+        {
+            return port;
+        }
+        public nothrow bool Connected() const
+        {
+            return connected;
+        }
+        public void Connect()
+        {
+            connected = true;
+            socket.Reset(new Socket("127.0.0.1", ToString(port)));
+        }
+        public void CloseConnection()
+        {
+            connected = false;
+            socket.Reset();
+        }
+        public void Write(const string& str)
+        {
+            if (!connected)
+            {
+                Connect();
+            }
+            socket->Write(str);
+        }
+        private static UniquePtr<LogClient> instance;
+        private int port;
+        private bool connected;
+        private UniquePtr<Socket> socket;
+    }
 }

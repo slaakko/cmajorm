@@ -33,7 +33,7 @@ public:
     virtual void MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process, int32_t mode) = 0;
     virtual std::string GetHostFilePath(int32_t inodeNumber, cmsx::machine::Process* process) = 0;
     virtual INodePtr ReadINode(INodeKey inodeKey, cmsx::machine::Process* process) = 0;
-    virtual void ClearProcessData(cmsx::machine::Process* process) = 0;
+    virtual std::string INodeToPath(INodeKey inodeKey, cmsx::machine::Process* process) = 0;
 private:
     int32_t id;
 };

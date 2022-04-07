@@ -250,11 +250,6 @@ void TerminalControl::SetEcho(bool echo_)
     echo = echo_;
 }
 
-void TerminalControl::SendKey(char32_t key)
-{
-    HandleInputChar(key);
-}
-
 std::vector<uint8_t> TerminalControl::ReadInput(int64_t count)
 {
     Activate();

@@ -7,233 +7,233 @@ using System;
 
 namespace System.Screen
 {
-	public class ButtonCreateParams
-	{
-		public nothrow ButtonCreateParams() : 
-			controlCreateParams(),
-			text(),
+    public class ButtonCreateParams
+    {
+        public nothrow ButtonCreateParams() : 
+            controlCreateParams(),
+            text(),
             highlightColor(ConsoleColor.defaultColor),
-			disabledColor(ConsoleColor.defaultColor),
-			focusedItemForeColor(ConsoleColor.defaultColor),
-			focusedItemBackColor(ConsoleColor.defaultColor)
-		{
-		}
-		public nothrow ButtonCreateParams& Defaults() 
-		{
-			return *this;
-		}
-		public nothrow ButtonCreateParams& Text(const string& text_)
-		{
-			text = ToUtf32(text_);
-			return *this;
-		}
-		public nothrow ButtonCreateParams& HighlightColor(ConsoleColor highlightColor_)
-		{
-			highlightColor = highlightColor_;
-			return *this;
-		}
-		public nothrow ButtonCreateParams& DisabledColor(ConsoleColor disabledColor_)
-		{
-			disabledColor = disabledColor_;
-			return *this;
-		}
-		public nothrow ButtonCreateParams& FocusedItemForeColor(ConsoleColor focusedItemForeColor_)
-		{
-			focusedItemForeColor = focusedItemForeColor_;
-			return *this;
-		}
-		public nothrow ButtonCreateParams& FocusedItemBackColor(ConsoleColor focusedItemBackColor_)
-		{
-			focusedItemBackColor = focusedItemBackColor_;
-			return *this;
-		}
-		public ControlCreateParams controlCreateParams;
-		public ustring text;
+            disabledColor(ConsoleColor.defaultColor),
+            focusedItemForeColor(ConsoleColor.defaultColor),
+            focusedItemBackColor(ConsoleColor.defaultColor)
+        {
+        }
+        public nothrow ButtonCreateParams& Defaults() 
+        {
+            return *this;
+        }
+        public nothrow ButtonCreateParams& Text(const string& text_)
+        {
+            text = ToUtf32(text_);
+            return *this;
+        }
+        public nothrow ButtonCreateParams& HighlightColor(ConsoleColor highlightColor_)
+        {
+            highlightColor = highlightColor_;
+            return *this;
+        }
+        public nothrow ButtonCreateParams& DisabledColor(ConsoleColor disabledColor_)
+        {
+            disabledColor = disabledColor_;
+            return *this;
+        }
+        public nothrow ButtonCreateParams& FocusedItemForeColor(ConsoleColor focusedItemForeColor_)
+        {
+            focusedItemForeColor = focusedItemForeColor_;
+            return *this;
+        }
+        public nothrow ButtonCreateParams& FocusedItemBackColor(ConsoleColor focusedItemBackColor_)
+        {
+            focusedItemBackColor = focusedItemBackColor_;
+            return *this;
+        }
+        public ControlCreateParams controlCreateParams;
+        public ustring text;
         public ConsoleColor highlightColor;
-		public ConsoleColor disabledColor;
-		public ConsoleColor focusedItemForeColor;
-		public ConsoleColor focusedItemBackColor;
-	}
-	
-	public enum ButtonFlags 
-	{
-		none = 0, defaultButton = 1 << 0
-	}
+        public ConsoleColor disabledColor;
+        public ConsoleColor focusedItemForeColor;
+        public ConsoleColor focusedItemBackColor;
+    }
+    
+    public enum ButtonFlags 
+    {
+        none = 0, defaultButton = 1 << 0
+    }
 
-	public class Button : Control
-	{
-		public nothrow Button(ButtonCreateParams& createParams) : base(createParams.controlCreateParams), flags(ButtonFlags.none), text(createParams.text)
-		{
-			InvalidateGuard invalidateGuard(this, false);
-			if (createParams.controlCreateParams.foreColor == ConsoleColor.defaultColor)
-			{
-				SetForeColor(ConsoleColor.black);
-			}
-			if (createParams.controlCreateParams.backColor == ConsoleColor.defaultColor)
-			{
-				SetBackColor(ConsoleColor.gray);
-			}
-			if (createParams.highlightColor == ConsoleColor.defaultColor)
-			{
-				highlightColor = ConsoleColor.red;
-			}
-			else
-			{
-				highlightColor = createParams.highlightColor;
-			}
-			if (createParams.disabledColor == ConsoleColor.defaultColor)
-			{
-				disabledColor = ConsoleColor.darkGray;
-			}
-			else
-			{
-				disabledColor = createParams.disabledColor;
-			}
-			if (createParams.focusedItemForeColor == ConsoleColor.defaultColor)
-			{
-				focusedItemForeColor = cast<ConsoleColor>(defaultFocusedControlForeColor);
-			}
-			else
-			{
-				focusedItemForeColor = createParams.focusedItemForeColor;
-			}
-			if (createParams.focusedItemBackColor == ConsoleColor.defaultColor)
-			{
-				focusedItemBackColor = cast<ConsoleColor>(defaultFocusedControlBackColor);
-			}
-			else
-			{
-				focusedItemBackColor = createParams.focusedItemBackColor;
-			}
-			if (GetSize().IsDefault())
-			{
-				SetSize(Size(Max(cast<int>(10), cast<int>(text.Length() + 2)), cast<int>(1)));
-			}
-			SetAccessKey();
-		}
-		public nothrow bool IsDefault() const
-		{
-			return (flags & ButtonFlags.defaultButton) != ButtonFlags.none;
-		}
-		public nothrow void SetDefault()
-		{
-			flags = cast<ButtonFlags>(flags | ButtonFlags.defaultButton);
-		}
-		public nothrow void ResetDefault()
-		{
-			flags = cast<ButtonFlags>(flags & ~ButtonFlags.defaultButton);
-		}
-		public nothrow DialogResult GetDialogResult() const
-		{
-			return dialogResult;
-		}
-		public nothrow void SetDialogResult(DialogResult dialogResult_)
-		{
-			dialogResult = dialogResult_;
-		}
-		public void Press()
-		{
-			if (IsEnabled())
-			{
-				OnPressed();
-			}
-		}
-		public int TextLength() const
-		{
-			int ampPos = cast<int>(text.Find('&'));
-			if (ampPos != -1)
-			{
-				return cast<int>(text.Length() - 1);
-			}
-			else
-			{
-				return cast<int>(text.Length());
-			}
-		}
-		public override void OnWriteScreen(WriteScreenEventArgs& args)
-		{
-			bool isFocused = IsFocused();
-			if (isFocused)
-			{
-				Terminal.Out() << SetColors(focusedItemForeColor, focusedItemBackColor);
-			}
-			Point location = Location();
-			Size sz = GetSize();
-			Point cursorPos(location.x + (sz.w - TextLength()) / 2, location.y);
-			SetControlCursorPos(cursorPos);
-			SetCursorPos(cursorPos.x, cursorPos.y);
-			ConsoleColor foreColor = ForeColor();
-			ConsoleColor hiliteColor = highlightColor;
-			if (!isFocused)
-			{
-				if (IsDisabled())
-				{
-					foreColor = disabledColor;
-					hiliteColor = disabledColor;
-				}
-				Terminal.Out() << SetColors(foreColor, BackColor());
-			}
-			int ampPos = cast<int>(text.Find('&'));
-			if (ampPos != -1)
-			{
-				if (!isFocused)
-				{
-					Terminal.Out() << SetColors(foreColor, BackColor());
-				}
-				ustring prefix = text.Substring(0, ampPos);
-				Terminal.Out() << prefix;
-				ustring highlightStr = text.Substring(ampPos + 1, 1);
-				if (!isFocused)
-				{
-					Terminal.Out() << SetColors(hiliteColor, BackColor());
-				}
-				Terminal.Out() << highlightStr;
-				if (!isFocused)
-				{
-					Terminal.Out() << SetColors(foreColor, BackColor());
-				}
-				ustring suffix = text.Substring(ampPos + 2);
-				Terminal.Out() << suffix;
-			}
-			else
-			{
-				Terminal.Out() << SetColors(foreColor, BackColor());
-				Terminal.Out() << text;
-			}
-		}
-		public override void OnKeyPressed(KeyEventArgs& args)
-		{
-			if (IsEnabled())
-			{
-				Window* window = GetWindow();
-				if (window != null)
-				{
-					switch (args.Key())
-					{
-						case keyNewline:
-						case ' ':
-						{
-							Press();
-							args.SetHandled();
-							break;
-						}
-					}
-				}
-			}
-		}
-		public virtual void OnPressed()
-		{
-			Window* window = GetWindow();
-			if (window != null)
-			{
-				window->SetDialogResult(dialogResult);
-			}
-			pressedEvent.Fire();
-		}
-		public Event<PressedEventHandler>& PressedEvent() 
-		{
-			return pressedEvent;
-		}
+    public class Button : Control
+    {
+        public nothrow Button(ButtonCreateParams& createParams) : base(createParams.controlCreateParams), flags(ButtonFlags.none), text(createParams.text)
+        {
+            InvalidateGuard invalidateGuard(this, false);
+            if (createParams.controlCreateParams.foreColor == ConsoleColor.defaultColor)
+            {
+                SetForeColor(ConsoleColor.black);
+            }
+            if (createParams.controlCreateParams.backColor == ConsoleColor.defaultColor)
+            {
+                SetBackColor(ConsoleColor.gray);
+            }
+            if (createParams.highlightColor == ConsoleColor.defaultColor)
+            {
+                highlightColor = ConsoleColor.red;
+            }
+            else
+            {
+                highlightColor = createParams.highlightColor;
+            }
+            if (createParams.disabledColor == ConsoleColor.defaultColor)
+            {
+                disabledColor = ConsoleColor.darkGray;
+            }
+            else
+            {
+                disabledColor = createParams.disabledColor;
+            }
+            if (createParams.focusedItemForeColor == ConsoleColor.defaultColor)
+            {
+                focusedItemForeColor = cast<ConsoleColor>(defaultFocusedControlForeColor);
+            }
+            else
+            {
+                focusedItemForeColor = createParams.focusedItemForeColor;
+            }
+            if (createParams.focusedItemBackColor == ConsoleColor.defaultColor)
+            {
+                focusedItemBackColor = cast<ConsoleColor>(defaultFocusedControlBackColor);
+            }
+            else
+            {
+                focusedItemBackColor = createParams.focusedItemBackColor;
+            }
+            if (GetSize().IsDefault())
+            {
+                SetSize(Size(Max(cast<int>(10), cast<int>(text.Length() + 2)), cast<int>(1)));
+            }
+            SetAccessKey();
+        }
+        public nothrow bool IsDefault() const
+        {
+            return (flags & ButtonFlags.defaultButton) != ButtonFlags.none;
+        }
+        public nothrow void SetDefault()
+        {
+            flags = cast<ButtonFlags>(flags | ButtonFlags.defaultButton);
+        }
+        public nothrow void ResetDefault()
+        {
+            flags = cast<ButtonFlags>(flags & ~ButtonFlags.defaultButton);
+        }
+        public nothrow DialogResult GetDialogResult() const
+        {
+            return dialogResult;
+        }
+        public nothrow void SetDialogResult(DialogResult dialogResult_)
+        {
+            dialogResult = dialogResult_;
+        }
+        public void Press()
+        {
+            if (IsEnabled())
+            {
+                OnPressed();
+            }
+        }
+        public int TextLength() const
+        {
+            int ampPos = cast<int>(text.Find('&'));
+            if (ampPos != -1)
+            {
+                return cast<int>(text.Length() - 1);
+            }
+            else
+            {
+                return cast<int>(text.Length());
+            }
+        }
+        public override void OnWriteScreen(WriteScreenEventArgs& args)
+        {
+            bool isFocused = IsFocused();
+            if (isFocused)
+            {
+                Terminal.Out() << SetColors(focusedItemForeColor, focusedItemBackColor);
+            }
+            Point location = Location();
+            Size sz = GetSize();
+            Point cursorPos(location.x + (sz.w - TextLength()) / 2, location.y);
+            SetControlCursorPos(cursorPos);
+            SetCursorPos(cursorPos.x, cursorPos.y);
+            ConsoleColor foreColor = ForeColor();
+            ConsoleColor hiliteColor = highlightColor;
+            if (!isFocused)
+            {
+                if (IsDisabled())
+                {
+                    foreColor = disabledColor;
+                    hiliteColor = disabledColor;
+                }
+                Terminal.Out() << SetColors(foreColor, BackColor());
+            }
+            int ampPos = cast<int>(text.Find('&'));
+            if (ampPos != -1)
+            {
+                if (!isFocused)
+                {
+                    Terminal.Out() << SetColors(foreColor, BackColor());
+                }
+                ustring prefix = text.Substring(0, ampPos);
+                Terminal.Out() << prefix;
+                ustring highlightStr = text.Substring(ampPos + 1, 1);
+                if (!isFocused)
+                {
+                    Terminal.Out() << SetColors(hiliteColor, BackColor());
+                }
+                Terminal.Out() << highlightStr;
+                if (!isFocused)
+                {
+                    Terminal.Out() << SetColors(foreColor, BackColor());
+                }
+                ustring suffix = text.Substring(ampPos + 2);
+                Terminal.Out() << suffix;
+            }
+            else
+            {
+                Terminal.Out() << SetColors(foreColor, BackColor());
+                Terminal.Out() << text;
+            }
+        }
+        public override void OnKeyPressed(KeyEventArgs& args)
+        {
+            if (IsEnabled())
+            {
+                Window* window = GetWindow();
+                if (window != null)
+                {
+                    switch (args.Key())
+                    {
+                        case keyNewline:
+                        case ' ':
+                        {
+                            Press();
+                            args.SetHandled();
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        public virtual void OnPressed()
+        {
+            Window* window = GetWindow();
+            if (window != null)
+            {
+                window->SetDialogResult(dialogResult);
+            }
+            pressedEvent.Fire();
+        }
+        public Event<PressedEventHandler>& PressedEvent() 
+        {
+            return pressedEvent;
+        }
         public nothrow uchar AccessKey() const
         {
             return accessKey;
@@ -243,45 +243,45 @@ namespace System.Screen
             int ampPos = cast<int>(text.Find('&'));
             if (ampPos != -1 && ampPos < text.Length() - 1)
             {
-				accessKey = ToUpper(text[ampPos + 1]);
+                accessKey = ToUpper(text[ampPos + 1]);
             }
             else
             {
                 accessKey = '\0';
             }
         }
-		public static Button* OK() 
-		{
-			Button* okButton = new Button(ButtonCreateParams().Text("[ O&K ]"));
-			okButton->SetDialogResult(DialogResult.ok);
-			return okButton;
-		}
-		public static Button* Cancel()
-		{
-			Button* cancelButton = new Button(ButtonCreateParams().Text("[ &Cancel ]"));
-			cancelButton->SetDialogResult(DialogResult.cancel);
-			return cancelButton;
-		}
-		public static Button* Yes()
-		{
-			Button* yesButton = new Button(ButtonCreateParams().Text("[ &Yes ]"));
-			yesButton->SetDialogResult(DialogResult.yes);
-			return yesButton;
-		}
-		public static Button* No()
-		{
-			Button* noButton = new Button(ButtonCreateParams().Text("[ &No ]"));
-			noButton->SetDialogResult(dialogResult.no);
-			return noButton;
-		}
-		private ButtonFlags flags;
-		private ustring text;
-		private uchar accessKey;
+        public static Button* OK() 
+        {
+            Button* okButton = new Button(ButtonCreateParams().Text("[ O&K ]"));
+            okButton->SetDialogResult(DialogResult.ok);
+            return okButton;
+        }
+        public static Button* Cancel()
+        {
+            Button* cancelButton = new Button(ButtonCreateParams().Text("[ &Cancel ]"));
+            cancelButton->SetDialogResult(DialogResult.cancel);
+            return cancelButton;
+        }
+        public static Button* Yes()
+        {
+            Button* yesButton = new Button(ButtonCreateParams().Text("[ &Yes ]"));
+            yesButton->SetDialogResult(DialogResult.yes);
+            return yesButton;
+        }
+        public static Button* No()
+        {
+            Button* noButton = new Button(ButtonCreateParams().Text("[ &No ]"));
+            noButton->SetDialogResult(dialogResult.no);
+            return noButton;
+        }
+        private ButtonFlags flags;
+        private ustring text;
+        private uchar accessKey;
         private ConsoleColor highlightColor;
-		private ConsoleColor disabledColor;
-		private ConsoleColor focusedItemForeColor;
-		private ConsoleColor focusedItemBackColor;
-		private DialogResult dialogResult;
-		private Event<PressedEventHandler> pressedEvent;
-	}
+        private ConsoleColor disabledColor;
+        private ConsoleColor focusedItemForeColor;
+        private ConsoleColor focusedItemBackColor;
+        private DialogResult dialogResult;
+        private Event<PressedEventHandler> pressedEvent;
+    }
 }

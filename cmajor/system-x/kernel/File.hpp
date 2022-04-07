@@ -65,7 +65,6 @@ public:
     virtual void SetCooked();
     virtual void SetRaw();
     virtual void SetEcho(bool echo);
-    virtual void SendKey(char32_t key);
     virtual void PushLines();
     virtual void PopLines();
     virtual bool IsDirFile() const { return false; }
@@ -73,6 +72,8 @@ public:
     virtual int64_t Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process);
     virtual int64_t Seek(int64_t offset, Origin whence, cmsx::machine::Process* process);
     virtual int64_t Tell(cmsx::machine::Process* process);
+    virtual void Bind(int32_t md);
+    virtual void Unbind();
 private:
     std::string name;
 };

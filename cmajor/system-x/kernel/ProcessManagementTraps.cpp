@@ -74,7 +74,7 @@ uint64_t TrapWaitHandler::HandleTrap(cmsx::machine::Processor& processor)
         int64_t childExitCodeAddress = processor.Regs().Get(cmsx::machine::regAX);
         if (childExitCodeAddress == 0)
         { 
-            throw SystemError(EPARAM, "child exit code pointer is null");
+            throw SystemError(EPARAM, "child exit code pointer is null", __FUNCTION__);
         }
         return Wait(process, childExitCodeAddress);
     }
@@ -121,7 +121,7 @@ uint64_t TrapGetHostNameHandler::HandleTrap(cmsx::machine::Processor& processor)
         int64_t bufferAddress = processor.Regs().Get(cmsx::machine::regAX);
         if (bufferAddress == 0)
         {
-            throw SystemError(EPARAM, "buffer is null");
+            throw SystemError(EPARAM, "buffer is null", __FUNCTION__);
         }
         int64_t bufferSize = processor.Regs().Get(cmsx::machine::regBX);
         std::string computerName = OsGetComputerName();
@@ -137,7 +137,7 @@ uint64_t TrapGetHostNameHandler::HandleTrap(cmsx::machine::Processor& processor)
         }
         else
         {
-            throw SystemError(EPARAM, "buffer too small");
+            throw SystemError(EPARAM, "buffer too small", __FUNCTION__);
         }
         return 0;
     }
@@ -163,7 +163,7 @@ uint64_t TrapGetUserNameHandler::HandleTrap(cmsx::machine::Processor& processor)
         int64_t bufferAddress = processor.Regs().Get(cmsx::machine::regAX);
         if (bufferAddress == 0)
         {
-            throw SystemError(EPARAM, "buffer is null");
+            throw SystemError(EPARAM, "buffer is null", __FUNCTION__);
         }
         int64_t bufferSize = processor.Regs().Get(cmsx::machine::regBX);
         std::string userName = OsGetUserName();
@@ -179,7 +179,7 @@ uint64_t TrapGetUserNameHandler::HandleTrap(cmsx::machine::Processor& processor)
         }
         else
         {
-            throw SystemError(EPARAM, "buffer too small");
+            throw SystemError(EPARAM, "buffer too small", __FUNCTION__);
         }
         return 0;
     }

@@ -20,14 +20,6 @@ MountTable::MountTable(cmsx::machine::Machine* machine_) : machine(machine_), ne
 {
 }
 
-void MountTable::ClearProcessData(cmsx::machine::Process* process)
-{
-    for (auto& fs : filesystems)
-    {
-        fs->ClearProcessData(process);
-    }
-}
-
 void MountTable::MapDrive(const std::string& drive, const std::string& mountedPath)
 {
     driveMap[drive] = mountedPath;
@@ -68,7 +60,7 @@ void MountTable::AddFilesystem(Filesystem* filesystem)
     Filesystem* prev = GetFilesystem(filesystem->Id());
     if (prev)
     {
-        throw SystemError(EFAIL, "file system " + std::to_string(filesystem->Id()) + " already mounted");
+        throw SystemError(EFAIL, "file system " + std::to_string(filesystem->Id()) + " already mounted", __FUNCTION__);
     }
     filesystems.push_back(std::unique_ptr<Filesystem>(filesystem));
     filesystemMap[filesystem->Id()] = filesystem;
@@ -105,7 +97,7 @@ void MountHostDir(const std::string& hostPath, const std::string& dirPath, cmsx:
     std::string absoluteHostPath = GetFullPath(hostPath);
     if (!PathExists(absoluteHostPath))
     {
-        throw SystemError(EPARAM, "could not mount: host path '" + absoluteHostPath + "' not found");
+        throw SystemError(EPARAM, "could not mount: host path '" + absoluteHostPath + "' not found", __FUNCTION__);
     }
     INodePtr dirINode = PathToINode(dirPath, fs, process, PathToINodeFlags::ignoreMountPoint);
     if (!dirINode.Get())

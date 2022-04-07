@@ -55,11 +55,6 @@ void TerminalFile::SetEcho(bool echo)
     terminalControl->SetEcho(echo);
 }
 
-void TerminalFile::SendKey(char32_t key)
-{
-    terminalControl->SendKey(key);
-}
-
 void TerminalFile::PushLines()
 {
     terminalControl->PushLines();

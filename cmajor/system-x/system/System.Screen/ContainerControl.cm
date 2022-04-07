@@ -26,7 +26,7 @@ namespace System.Screen
         }
         public override bool HandleWriteScreen(WriteScreenMessage* message)
         {
-			bool messageRectIsDefault = message->GetRect().IsDefault();
+            bool messageRectIsDefault = message->GetRect().IsDefault();
             WriteScreenEventArgs args(message->GetRect());
             OnWriteScreen(args);
             Component* child = controls.FirstChild();
@@ -35,23 +35,23 @@ namespace System.Screen
                 if (child is Control*)
                 {
                     Control* controlChild = cast<Control*>(child);
-					if (messageRectIsDefault)
-					{
-						controlChild->OnWriteScreen(args);
-					}
-					else if (controlChild->GetRect().IntersectsWith(message->GetRect()))
-					{
-						controlChild->OnWriteScreen(args);
-					}
+                    if (messageRectIsDefault)
+                    {
+                        controlChild->OnWriteScreen(args);
+                    }
+                    else if (controlChild->GetRect().IntersectsWith(message->GetRect()))
+                    {
+                        controlChild->OnWriteScreen(args);
+                    }
                 }
                 child = child->NextSibling();
             }
             return true;
         }
-		public nothrow Container& Controls() 
-		{
-			return controls;
-		}
+        public nothrow Container& Controls() 
+        {
+            return controls;
+        }
         private Container controls;
     }
 }

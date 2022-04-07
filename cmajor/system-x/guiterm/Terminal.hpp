@@ -38,7 +38,6 @@ public:
     void SetCooked() override;
     void SetRaw() override;
     void SetEcho(bool echo) override;
-    void SendKey(char32_t key) override;
     void PushLines() override;
     void PopLines() override;
     std::vector<uint8_t> Read(int64_t count, cmsx::machine::Process* process) override;

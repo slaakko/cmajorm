@@ -79,12 +79,12 @@ uint64_t TrapAllocateMemoryPagesHandler::HandleTrap(cmsx::machine::Processor& pr
             }
             else
             {
-                throw SystemError(ELIMITEXCEEDED, "out of memory");
+                throw SystemError(ELIMITEXCEEDED, "out of memory", __FUNCTION__);
             }
         }
         else
         {
-            throw SystemError(EPARAM, "invalid number of pages");
+            throw SystemError(EPARAM, "invalid number of pages", __FUNCTION__);
         }
     }
     catch (const SystemError& error)

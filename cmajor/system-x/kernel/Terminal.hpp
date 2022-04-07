@@ -32,12 +32,13 @@ public:
     void SetCooked() override;
     void SetRaw() override;
     void SetEcho(bool echo) override;
-    void SendKey(char32_t key) override;
     void PushLines() override;
     void PopLines() override;
     bool IsDirFile() const override { return false; }
     std::vector<uint8_t> Read(int64_t count, cmsx::machine::Process* process) override;
     int64_t Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process) override;
+    void Bind(int32_t md) override;
+    void Unbind() override;
 };
 
 CMSX_KERNEL_API void SetTerminalMachine(cmsx::machine::Machine* machine);

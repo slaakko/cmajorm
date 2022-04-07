@@ -155,7 +155,7 @@ void Process::SetUID(int32_t uid_)
     }
     else
     {
-        throw SystemError(EPERMISSION, "unauthorized");
+        throw SystemError(EPERMISSION, "unauthorized", __FUNCTION__);
     }
 }
 
@@ -181,7 +181,7 @@ void Process::SetGID(int32_t gid_)
     }
     else
     {
-        throw SystemError(EPERMISSION, "unauthorized");
+        throw SystemError(EPERMISSION, "unauthorized", __FUNCTION__);
     }
 }
 
@@ -228,7 +228,6 @@ void Process::Exit(uint8_t exitCode_)
     functionTable.reset();
     fileTable.CloseFiles(this);
     RemoveDirChangeNotifications(id);
-    Kernel::Instance().ClearProcessData(this);
     Process* parent = Parent();
     if (parent)
     {
@@ -489,7 +488,7 @@ int32_t Wait(Process* parent, int64_t childExitCodeAddress)
         }
         child = child->NextSibling();
     }
-    throw SystemError(ENOCHILD, "no child in zombie state");
+    throw SystemError(ENOCHILD, "no child in zombie state", __FUNCTION__);
 }
 
 void Exec(Process* process, int64_t filePathAddress, int64_t argvAddress, int64_t envpAddress)
@@ -502,7 +501,7 @@ void Exec(Process* process, int64_t filePathAddress, int64_t argvAddress, int64_
     INode* inode = inodePtr.Get();
     if (!inode)
     {
-        throw SystemError(ENOTFOUND, "could not execute: path '" + filePath + "' not found");
+        throw SystemError(ENOTFOUND, "could not execute: path '" + filePath + "' not found", __FUNCTION__);
     }
     if (!filePath.starts_with("/mnt/sx/bin"))
     {

@@ -112,15 +112,15 @@ uint64_t TrapCurrentDateHandler::HandleTrap(cmsx::machine::Processor& processor)
         uint64_t cx = processor.Regs().Get(cmsx::machine::regCX);
         if (ax == 0)
         {
-            throw SystemError(EPARAM, "year pointer is null");
+            throw SystemError(EPARAM, "year pointer is null", __FUNCTION__);
         }
         if (bx == 0)
         {
-            throw SystemError(EPARAM, "month pointer is null");
+            throw SystemError(EPARAM, "month pointer is null", __FUNCTION__);
         }
         if (cx == 0)
         {
-            throw SystemError(EPARAM, "day pointer is null");
+            throw SystemError(EPARAM, "day pointer is null", __FUNCTION__);
         }
         cmsx::machine::Memory& mem = processor.GetMachine()->Mem();
         WriteDate(currentDate, ax, bx, cx, process->RV(),mem);
@@ -152,19 +152,19 @@ uint64_t TrapCurrentDateTimeHandler::HandleTrap(cmsx::machine::Processor& proces
         uint64_t dx = processor.Regs().Get(cmsx::machine::regDX);
         if (ax == 0)
         {
-            throw SystemError(EPARAM, "year pointer is null");
+            throw SystemError(EPARAM, "year pointer is null", __FUNCTION__);
         }
         if (bx == 0)
         {
-            throw SystemError(EPARAM, "month pointer is null");
+            throw SystemError(EPARAM, "month pointer is null", __FUNCTION__);
         }
         if (cx == 0)
         {
-            throw SystemError(EPARAM, "day pointer is null");
+            throw SystemError(EPARAM, "day pointer is null", __FUNCTION__);
         }
         if (dx == 0)
         {
-            throw SystemError(EPARAM, "seconds pointer is null");
+            throw SystemError(EPARAM, "seconds pointer is null", __FUNCTION__);
         }
         cmsx::machine::Memory& mem = processor.GetMachine()->Mem();
         WriteDateTime(currentDateTime, ax, bx, cx, dx, process->RV(), mem);
@@ -194,15 +194,15 @@ uint64_t TrapTimesHandler::HandleTrap(cmsx::machine::Processor& processor)
         uint64_t cx = processor.Regs().Get(cmsx::machine::regCX);
         if (ax == 0)
         {
-            throw SystemError(EPARAM, "user time pointer is null");
+            throw SystemError(EPARAM, "user time pointer is null", __FUNCTION__);
         }
         if (bx == 0)
         {
-            throw SystemError(EPARAM, "sleep time pointer is null");
+            throw SystemError(EPARAM, "sleep time pointer is null", __FUNCTION__);
         }
         if (cx == 0)
         {
-            throw SystemError(EPARAM, "system time pointer is null");
+            throw SystemError(EPARAM, "system time pointer is null", __FUNCTION__);
         }
         cmsx::machine::Memory& mem = processor.GetMachine()->Mem();
         mem.WriteOcta(process->RV(), ax, process->UserTime().count(), cmsx::machine::Protection::write);
@@ -234,15 +234,15 @@ uint64_t TrapChildTimesHandler::HandleTrap(cmsx::machine::Processor& processor)
         uint64_t cx = processor.Regs().Get(cmsx::machine::regCX);
         if (ax == 0)
         {
-            throw SystemError(EPARAM, "child user time pointer is null");
+            throw SystemError(EPARAM, "child user time pointer is null", __FUNCTION__);
         }
         if (bx == 0)
         {
-            throw SystemError(EPARAM, "child sleep time pointer is null");
+            throw SystemError(EPARAM, "child sleep time pointer is null", __FUNCTION__);
         }
         if (cx == 0)
         {
-            throw SystemError(EPARAM, "child system time pointer is null");
+            throw SystemError(EPARAM, "child system time pointer is null", __FUNCTION__);
         }
         cmsx::machine::Memory& mem = processor.GetMachine()->Mem();
         mem.WriteOcta(process->RV(), ax, process->ChildUserTime().count(), cmsx::machine::Protection::write);

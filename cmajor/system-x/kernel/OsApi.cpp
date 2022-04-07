@@ -609,7 +609,7 @@ char32_t OsReadConsoleInput(void* consoleInputHandle)
 
 void OsGetConsoleScreenBufferInfo(void* consoleOutputHandle, int32_t* cursorPosX, int32_t* cursorPosY, int32_t* screenSizeX, int32_t* screenSizeY, uint16_t* attrs)
 {
-    if (!cursorPosX || !cursorPosY || !screenSizeX || !screenSizeY || !attrs) return throw SystemError(EPARAM, "invalid parameter");
+    if (!cursorPosX || !cursorPosY || !screenSizeX || !screenSizeY || !attrs) throw SystemError(EPARAM, "invalid parameter", __FUNCTION__);
     CONSOLE_SCREEN_BUFFER_INFO consoleScreenBufferInfo;
     bool retVal = GetConsoleScreenBufferInfo(consoleOutputHandle, &consoleScreenBufferInfo);
     if (!retVal) ThrowLastHostError(std::string());

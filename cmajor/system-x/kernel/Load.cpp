@@ -180,12 +180,12 @@ void Load(Process* process, cmsx::object::BinaryFile* binaryFile,
         }
         else
         {
-            throw SystemError(ENOTFOUND, "error loading file '" + process->FilePath() + "': 'Main' entry point not found");
+            throw SystemError(ENOTFOUND, "error loading file '" + process->FilePath() + "': 'Main' entry point not found", __FUNCTION__);
         }
     }
     else
     {
-        throw SystemError(EFAIL, "error loading file '" + process->FilePath() + "': executable file expected");
+        throw SystemError(EFAIL, "error loading file '" + process->FilePath() + "': executable file expected", __FUNCTION__);
     }
 }
 

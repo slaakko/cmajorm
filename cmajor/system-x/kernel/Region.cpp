@@ -56,7 +56,7 @@ void RegionTable::AddRegion(const Region& region)
     {
         if (reg.Id() == region.Id())
         {
-            throw SystemError(EALREADYEXISTS, "region '" + RegionIdStr(region.Id()) + "' already exists");
+            throw SystemError(EALREADYEXISTS, "region '" + RegionIdStr(region.Id()) + "' already exists", __FUNCTION__);
        }
     }
     regions.push_back(region);

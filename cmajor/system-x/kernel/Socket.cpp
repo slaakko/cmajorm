@@ -49,7 +49,7 @@ void Socket::Close(cmsx::kernel::Process* process)
     }
     catch (const std::runtime_error& ex)
     {
-        throw SystemError(ESOCKET, ex.what());
+        throw SystemError(ESOCKET, ex.what(), __FUNCTION__);
     }
 }
 
@@ -68,7 +68,7 @@ std::vector<uint8_t> Socket::Read(int64_t count, cmsx::machine::Process* process
     }
     catch (const std::runtime_error& ex)
     {
-        throw SystemError(ESOCKET, ex.what());
+        throw SystemError(ESOCKET, ex.what(), __FUNCTION__);
     }
 }
 
@@ -81,7 +81,7 @@ int64_t Socket::Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process
     }
     catch (const std::runtime_error& ex)
     {
-        throw SystemError(ESOCKET, ex.what());
+        throw SystemError(ESOCKET, ex.what(), __FUNCTION__);
     }
 }
 
@@ -89,11 +89,11 @@ int32_t Connect(Process* process, int64_t nodeAddr, int64_t serviceAddr)
 {
     if (nodeAddr == 0)
     {
-        throw SystemError(EPARAM, "node is null");
+        throw SystemError(EPARAM, "node is null", __FUNCTION__);
     }
     if (serviceAddr == 0)
     {
-        throw SystemError(EPARAM, "service is null");
+        throw SystemError(EPARAM, "service is null", __FUNCTION__);
     }
     try
     {
@@ -105,7 +105,7 @@ int32_t Connect(Process* process, int64_t nodeAddr, int64_t serviceAddr)
     }
     catch (const std::runtime_error& ex)
     {
-        throw SystemError(ESOCKET, ex.what());
+        throw SystemError(ESOCKET, ex.what(), __FUNCTION__);
     }
 }
 

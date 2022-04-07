@@ -138,7 +138,7 @@ void IOManager::HandleRequest(IORequest* request)
         HostFile* hostFile = GetHostFile(request->HostFileId());
         if (!hostFile)
         {
-            throw SystemError(EFAIL, "host file id " + std::to_string(request->HostFileId()) + " not found");
+            throw SystemError(EFAIL, "host file id " + std::to_string(request->HostFileId()) + " not found", __FUNCTION__);
         }
         if (!hostFile->IsOpened())
         {
@@ -234,7 +234,7 @@ void IOManager::RemoveIfExists(HostFile* hostFile)
         boost::filesystem::remove(hostFile->FilePath(), ec);
         if (ec)
         {
-            throw SystemError(EFAIL, soulng::util::PlatformStringToUtf8(ec.message()));
+            throw SystemError(EFAIL, soulng::util::PlatformStringToUtf8(ec.message()), __FUNCTION__);
         }
     }
 }

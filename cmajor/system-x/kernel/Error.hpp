@@ -33,7 +33,7 @@ class CMSX_KERNEL_API SystemError : public std::runtime_error
 {
 public:
     SystemError();
-    SystemError(int errorCode_, const std::string& message_);
+    SystemError(int errorCode_, const std::string& message_, const std::string& function_);
     int ErrorCode() const { return errorCode; }
     int64_t HostErrorCode() const { return hostErrorCode; }
     void SetHostErrorCode(int32_t hostErrorCode_) { hostErrorCode = hostErrorCode_; }
@@ -42,6 +42,7 @@ private:
     int errorCode;
     int64_t hostErrorCode;
     std::string message;
+    std::string function;
 };
 
 CMSX_KERNEL_API void ThrowLastHostError(const std::string& filePath);

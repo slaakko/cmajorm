@@ -70,9 +70,15 @@ void Clock::Tick()
         }
         else if (alarm.msg)
         {
-            PutMsg(alarm.msg->md, alarm.msg->msgData);
-            delete alarm.msg;
-            SendKey(keyMsg);
+            if (IsMsgQOpen(alarm.msg->md))
+            {
+                PutMsg(alarm.msg->md, alarm.msg->msgData);
+                delete alarm.msg;
+            }
+            else
+            {
+                delete alarm.msg;
+            }
         }
     }
 }

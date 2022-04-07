@@ -12,18 +12,38 @@
 
 namespace cmsx::kernel {
 
+class DevFilesystemDirFile : public DirFile
+{
+public:
+    DevFilesystemDirFile();
+    void Close(cmsx::kernel::Process* process) override;
+    int32_t Read(DirectoryEntry& dirEntry, cmsx::machine::Process* process) override;
+};
+
+DevFilesystemDirFile::DevFilesystemDirFile() : DirFile("/dev")
+{
+}
+
+void DevFilesystemDirFile::Close(cmsx::kernel::Process* process)
+{
+}
+
+int32_t DevFilesystemDirFile::Read(DirectoryEntry& dirEntry, cmsx::machine::Process* process)
+{
+    return 0;
+}
+
 DevFilesystem::DevFilesystem() : Filesystem(devFSNumber), machine(nullptr), mountPoint(), devINodeKey(devFSNumber, 0)
 {
 }
 
 void DevFilesystem::Initialize()
 {
-    // todo
 }
 
 File* DevFilesystem::Create(const std::string& path, INode* dirINode, int32_t mode, cmsx::machine::Process* process)
 {
-    throw SystemError(EFAIL, "device filesystem: cannot create '" + path + "'");
+    throw SystemError(EFAIL, "device filesystem: cannot create '" + path + "'", __FUNCTION__);
 }
 
 File* DevFilesystem::Open(const std::string& path, INode* dirINode, int32_t flags, int32_t mode, cmsx::machine::Process* process)
@@ -34,7 +54,7 @@ File* DevFilesystem::Open(const std::string& path, INode* dirINode, int32_t flag
     }
     else
     {
-        throw SystemError(ENOTFOUND, "device filesystem: path '" + path + "' not found");
+        throw SystemError(ENOTFOUND, "device filesystem: path '" + path + "' not found", __FUNCTION__);
     }
 }
 
@@ -58,6 +78,10 @@ INodePtr DevFilesystem::SearchDirectory(const std::string& name, INode* dirINode
         inode->SetOtherAccess(access);
         return inodePtr;
     }
+    else if (dirINode->Key() == devINodeKey)
+    {
+        return ReadINode(devINodeKey, process);
+    }
     else
     {
         return INodePtr(nullptr);
@@ -66,37 +90,64 @@ INodePtr DevFilesystem::SearchDirectory(const std::string& name, INode* dirINode
 
 void DevFilesystem::Stat(INode* inode, cmsx::machine::Process* process)
 {
-    // todo
 }
 
 BlockFile* DevFilesystem::HostFile() const 
 {
-    throw SystemError(EFAIL, "device filesystem does not provide a host file");
+    throw SystemError(EFAIL, "device filesystem does not provide a host file", __FUNCTION__);
 }
 
 DirFile* DevFilesystem::OpenDir(const std::string& path, INode* dirINode, cmsx::machine::Process* process)
 {
-    throw SystemError(EFAIL, "device filesystem does not provide directories");
+    if (!devDirFile)
+    {
+        devDirFile.reset(new DevFilesystemDirFile());
+    }
+    return devDirFile.get();
 }
 
 void DevFilesystem::MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process, int32_t mode)
 {
-    throw SystemError(EFAIL, "device filesystem does not provide directories");
+    throw SystemError(EFAIL, "device filesystem does not provide directories", __FUNCTION__);
 }
 
 INodePtr DevFilesystem::ReadINode(INodeKey inodeKey, cmsx::machine::Process* process)
 {
-    return INodePtr(nullptr); // todo
+    if (inodeKey == devINodeKey)
+    {
+        INodePtr inodePtr = GetINode(inodeKey, process);
+        INode* inode = inodePtr.Get();
+        cmsx::kernel::Access access = static_cast<cmsx::kernel::Access>(cmsx::kernel::Access::read | kernel::Access::write | cmsx::kernel::Access::execute);
+        inode->SetOwnerAccess(access);
+        inode->SetGroupAccess(access);
+        inode->SetOtherAccess(access);
+        inode->SetNLinks(1);
+        return inodePtr;
+    }
+    else
+    {
+        return INodePtr(nullptr);
+    }
+}
+
+std::string DevFilesystem::INodeToPath(INodeKey inodeKey, cmsx::machine::Process* process)
+{
+    if (inodeKey == devINodeKey)
+    {
+        std::string inodePath = ".";
+        Filesystem* rootFs = GetFs(mountPoint.fsNumber);
+        std::string mountPointPath = rootFs->INodeToPath(mountPoint, process);
+        return GetFullPath(Path::Combine(mountPointPath, inodePath));
+    }
+    else
+    {
+        throw SystemError(EFAIL, "invalid device filesystem inode key", __FUNCTION__);
+    }
 }
 
 std::string DevFilesystem::GetHostFilePath(int32_t inodeNumber, cmsx::machine::Process* process)
 {
     return std::string();
-}
-
-void DevFilesystem::ClearProcessData(cmsx::machine::Process* process)
-{
-    // todo
 }
 
 } // namespace cmsx::kernel

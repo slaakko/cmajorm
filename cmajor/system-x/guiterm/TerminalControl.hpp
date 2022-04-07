@@ -74,7 +74,6 @@ public:
     void SetCooked();
     void SetRaw();
     void SetEcho(bool echo_);
-    void SendKey(char32_t key);
     std::vector<uint8_t> ReadInput(int64_t count);
     void ScrollToCursor();
     void ScrollToLine(int lineIndex);

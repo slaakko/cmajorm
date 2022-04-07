@@ -11,16 +11,16 @@ namespace System.Screen
 {
     public abstract class Message
     {
-		public nothrow Message() : targetWindowHandle(-1)
-		{
-		}
+        public nothrow Message() : targetWindowHandle(-1)
+        {
+        }
         public default virtual ~Message();
-		public abstract nothrow int Id() const;
-		public virtual nothrow int Size() const
-		{
-			return cast<int>(sizeof(int) + sizeof(int));
-		}
-		public abstract nothrow string Name() const;
+        public abstract nothrow int Id() const;
+        public virtual nothrow int Size() const
+        {
+            return cast<int>(sizeof(int) + sizeof(int));
+        }
+        public abstract nothrow string Name() const;
         public nothrow int TargetWindowHandle() const
         {
             return targetWindowHandle;

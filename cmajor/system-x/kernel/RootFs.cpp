@@ -142,7 +142,7 @@ int32_t RootFilesystemDirFile::Read(DirectoryEntry& dirEntry, cmsx::machine::Pro
     INode* dirINode = dirINodePtr.Get();
     if (dirINode->GetFileType() != FileType::directory)
     {
-        throw SystemError(EFAIL, "not a directory inode");
+        throw SystemError(EFAIL, "not a directory inode", __FUNCTION__);
     }
     int32_t blockNumber = MapBlockNumber(logicalBlockNumber, dirINode, fs, process);
     while (blockNumber != -1)
@@ -200,7 +200,7 @@ File* RootFilesystem::Open(const std::string& path, INode* dirINode, int32_t fla
 {
     if (path.empty() || path == "/")
     {
-        throw SystemError(EPARAM, "could not open: path '" + path + "' not valid");
+        throw SystemError(EPARAM, "could not open: path '" + path + "' not valid", __FUNCTION__);
     }
     std::string dirPath = Path::GetDirectoryName(path);
     if (dirPath.empty())
@@ -218,7 +218,7 @@ File* RootFilesystem::Open(const std::string& path, INode* dirINode, int32_t fla
     INodePtr dirINodePtr = PathToINode(dirPath, this, process);
     if (!dirINodePtr.Get())
     {
-        throw SystemError(EFAIL, "could not open: directory '" + dirPath + "' not found");
+        throw SystemError(EFAIL, "could not open: directory '" + dirPath + "' not found", __FUNCTION__);
     }
     Filesystem* fs = GetFs(dirINodePtr.Get()->Key().fsNumber);
     if (fs != this)
@@ -247,7 +247,7 @@ File* RootFilesystem::Open(const std::string& path, INode* dirINode, int32_t fla
         {
             if (!truncated)
             {
-                throw SystemError(EALREADYEXISTS, "could not open: path '" + path + "' already exists");
+                throw SystemError(EALREADYEXISTS, "could not open: path '" + path + "' already exists", __FUNCTION__);
             }
         }
         else
@@ -275,7 +275,7 @@ File* RootFilesystem::Open(const std::string& path, INode* dirINode, int32_t fla
     }
     if (!fileINode.Get())
     {
-        throw SystemError(ENOTFOUND, "could not open: path '" + path + "' not found");
+        throw SystemError(ENOTFOUND, "could not open: path '" + path + "' not found", __FUNCTION__);
     }
     if ((openFlags & OpenFlags::read) != OpenFlags::none)
     {
@@ -376,8 +376,46 @@ INodePtr RootFilesystem::ReadINode(INodeKey inodeKey, cmsx::machine::Process* pr
     return cmsx::kernel::ReadINode(inodeKey, process);
 }
 
-void RootFilesystem::ClearProcessData(cmsx::machine::Process* process)
+std::string RootFilesystem::INodeToPath(INodeKey inodeKey, cmsx::machine::Process* process)
 {
+    INodePtr dirINodePtr = ReadINode(inodeKey, process);
+    if (dirINodePtr.Get())
+    {
+        INodePtr parentDirINodePtr = cmsx::kernel::SearchDirectory("..", dirINodePtr.Get(), "..", this, process);
+        if (parentDirINodePtr.Get())
+        {
+            std::string path;
+            while (dirINodePtr.Get()->Key() != parentDirINodePtr.Get()->Key())
+            {
+                DirectoryEntry entry = GetDirectoryEntry(parentDirINodePtr.Get(), dirINodePtr.Get()->Key().inodeNumber, this, process);
+                if (!entry.IsFree())
+                {
+                    path = Path::Combine(entry.Name(), path);
+                }
+                else
+                {
+                    throw SystemError(EFAIL, "parent directory entry not found", __FUNCTION__);
+                }
+                INodePtr grandParentDirINodePtr = cmsx::kernel::SearchDirectory("..", parentDirINodePtr.Get(), "..", this, process);
+                if (!grandParentDirINodePtr.Get())
+                {
+                    throw SystemError(EFAIL, "grand parent directory not found", __FUNCTION__);
+                }
+                dirINodePtr = std::move(parentDirINodePtr);
+                parentDirINodePtr = std::move(grandParentDirINodePtr);
+            }
+            path = Path::Combine("/", path);
+            return path;
+        }
+        else
+        {
+            throw SystemError(EFAIL, "parent directory not found from current directory", __FUNCTION__);
+        }
+    }
+    else
+    {
+        throw SystemError(EFAIL, "current directory not found from process", __FUNCTION__);
+    }
 }
 
 std::string RootFsHostFilePath()
@@ -464,7 +502,7 @@ void MakeRootDirectory(cmsx::machine::Process* process, int32_t mode)
     ReadSuperBlock(superBlock, rootFs, process);
     if (superBlock.INodeNumberOfRootDirectory() != -1)
     {
-        throw SystemError(EFAIL, "root directory of root filesystem already created");
+        throw SystemError(EFAIL, "root directory of root filesystem already created", __FUNCTION__);
     }
     INodePtr rootDirINodePtr = AllocateINode(rootFSNumber, process);
     INode* rootDirINode = rootDirINodePtr.Get();
@@ -533,7 +571,7 @@ void MakeRootFs(RootFilesystem& rootFs)
     if (ec)
     {
         std::string errorMessage = soulng::util::PlatformStringToUtf8(ec.message());
-        throw SystemError(EFAIL, errorMessage);
+        throw SystemError(EFAIL, errorMessage, __FUNCTION__);
     }
     cmsx::machine::Process* kernelProcess = Kernel::Instance().GetKernelProcess();
     SuperBlock superBlock;

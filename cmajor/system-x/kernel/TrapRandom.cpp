@@ -32,7 +32,7 @@ uint64_t TrapRandomSeedHandler::HandleTrap(cmsx::machine::Processor& processor)
         }
         else
         {
-            throw SystemError(EFAIL, "rand_s failed");
+            throw SystemError(EFAIL, "rand_s failed", __FUNCTION__);
         }
     }
     catch (const SystemError& error)

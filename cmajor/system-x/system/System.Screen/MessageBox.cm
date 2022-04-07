@@ -8,231 +8,231 @@ using System.Collections;
 
 namespace System.Screen
 {
-	public enum MessageBoxButtons
-	{
-		none = 0, ok = 1 << 0, cancel = 1 << 1, yes = 1 << 2, no = 1 << 3
-	}
+    public enum MessageBoxButtons
+    {
+        none = 0, ok = 1 << 0, cancel = 1 << 1, yes = 1 << 2, no = 1 << 3
+    }
 
-	public class MessageBoxCreateParams
-	{
-		public nothrow MessageBoxCreateParams() : 
-			controlCreateParams()
-		{
-		}
-		public nothrow MessageBoxCreateParams& Defaults() 
-		{
-			return *this;
-		}
-		public nothrow MessageBoxCreateParams& Caption(const string& caption_)
-		{
-			caption = caption_;
-			return *this;
-		}
-		public nothrow MessageBoxCreateParams& Text(const string& text_)
-		{
-			text = text_;
-			return *this;
-		}
-		public nothrow MessageBoxCreateParams& Buttons(MessageBoxButtons buttons_)
-		{
-			buttons = buttons_;
-			return *this;
-		}
-		public ControlCreateParams controlCreateParams;
-		public string caption;
-		public string text;
-		public MessageBoxButtons buttons;
-	}
+    public class MessageBoxCreateParams
+    {
+        public nothrow MessageBoxCreateParams() : 
+            controlCreateParams()
+        {
+        }
+        public nothrow MessageBoxCreateParams& Defaults() 
+        {
+            return *this;
+        }
+        public nothrow MessageBoxCreateParams& Caption(const string& caption_)
+        {
+            caption = caption_;
+            return *this;
+        }
+        public nothrow MessageBoxCreateParams& Text(const string& text_)
+        {
+            text = text_;
+            return *this;
+        }
+        public nothrow MessageBoxCreateParams& Buttons(MessageBoxButtons buttons_)
+        {
+            buttons = buttons_;
+            return *this;
+        }
+        public ControlCreateParams controlCreateParams;
+        public string caption;
+        public string text;
+        public MessageBoxButtons buttons;
+    }
 
-	public class MessageBox : Window
-	{
-		public nothrow MessageBox(MessageBoxCreateParams& createParams) : base(createParams.controlCreateParams), caption(createParams.caption), text(createParams.text), buttons(createParams.buttons)
-		{
-			InvalidateGuard guard(this, true);
-			bool setLoc = false;
-			if (Location().IsDefault())
-			{
-				SetLocation(Point(0, 0));
-				setLoc = true;
-			}
-			if (GetSize().IsDefault())
-			{
-				SetSize(Size(40, 4));
-			}
-			if (ForeColor() == ConsoleColor.defaultColor)
-			{
-				SetForeColor(ConsoleColor.black);
-			}
-			if (BackColor() == ConsoleColor.defaultColor)
-			{
-				SetBackColor(ConsoleColor.cyan);
-			}
-			if (buttons == MessageBoxButtons.none)
-			{
-				buttons = MessageBoxButtons.ok;
-			}
-			if ((buttons & MessageBoxButtons.ok) != MessageBoxButtons.none)
-			{
-				Button* okButton = Button.OK();
-				okButton->SetDefault();
-				AddChild(okButton);
-			}
-			if ((buttons & MessageBoxButtons.yes) != MessageBoxButtons.none)
-			{
-				Button* yesButton = Button.Yes();
-				AddChild(yesButton);
-			}
-			if ((buttons & MessageBoxButtons.no) != MessageBoxButtons.none)
-			{
-				Button* noButton = Button.No();
-				AddChild(noButton);
-			}
-			if ((buttons & MessageBoxButtons.cancel) != MessageBoxButtons.none)
-			{
-				Button* cancelButton = Button.Cancel();
-				AddChild(cancelButton);
-			}
-			Measure(setLoc);
-			Control* firstFocusableControl = FirstFocusabledControl();
-			if (firstFocusableControl != null)
-			{
-				firstFocusableControl->SetFocus();
-			}
-		}
-		public override nothrow Button* DefaultButton() const
-		{
-			Component* child = Controls().FirstChild();
-			while (child != null)
-			{
-				if (child is Button*)
-				{
-					Button* button = cast<Button*>(child);
-					if (button->IsDefault())
-					{
-						return button;
-					}
-				}
-				child = child->NextSibling();
-			}
-			return null;
-		}
-		public override void OnWriteScreen(WriteScreenEventArgs& args)
-		{
-			base->OnWriteScreen(args);
-			Rect rect = GetRect();
-            WriteBox(rect, ForeColor(), BackColor());
-			if (!caption.IsEmpty())
-			{
-				WriteCaption(u" " + ToUtf32(caption) + u" ");
-			}
-			if (!text.IsEmpty())
-			{
-				WriteText();
-			}
-			WriteChildren(args);
-		}
-		private void Measure(bool setLoc)
-		{
-			Size sz = GetSize();
+    public class MessageBox : Window
+    {
+        public nothrow MessageBox(MessageBoxCreateParams& createParams) : base(createParams.controlCreateParams), caption(createParams.caption), text(createParams.text), buttons(createParams.buttons)
+        {
+            InvalidateGuard guard(this, true);
+            bool setLoc = false;
+            if (Location().IsDefault())
+            {
+                SetLocation(Point(0, 0));
+                setLoc = true;
+            }
+            if (GetSize().IsDefault())
+            {
+                SetSize(Size(40, 4));
+            }
+            if (ForeColor() == ConsoleColor.defaultColor)
+            {
+                SetForeColor(ConsoleColor.black);
+            }
+            if (BackColor() == ConsoleColor.defaultColor)
+            {
+                SetBackColor(ConsoleColor.cyan);
+            }
+            if (buttons == MessageBoxButtons.none)
+            {
+                buttons = MessageBoxButtons.ok;
+            }
+            if ((buttons & MessageBoxButtons.ok) != MessageBoxButtons.none)
+            {
+                Button* okButton = Button.OK();
+                okButton->SetDefault();
+                AddChild(okButton);
+            }
+            if ((buttons & MessageBoxButtons.yes) != MessageBoxButtons.none)
+            {
+                Button* yesButton = Button.Yes();
+                AddChild(yesButton);
+            }
+            if ((buttons & MessageBoxButtons.no) != MessageBoxButtons.none)
+            {
+                Button* noButton = Button.No();
+                AddChild(noButton);
+            }
+            if ((buttons & MessageBoxButtons.cancel) != MessageBoxButtons.none)
+            {
+                Button* cancelButton = Button.Cancel();
+                AddChild(cancelButton);
+            }
+            Measure(setLoc);
+            Control* firstFocusableControl = FirstFocusabledControl();
+            if (firstFocusableControl != null)
+            {
+                firstFocusableControl->SetFocus();
+            }
+        }
+        public override nothrow Button* DefaultButton() const
+        {
+            Component* child = Controls().FirstChild();
+            while (child != null)
+            {
+                if (child is Button*)
+                {
+                    Button* button = cast<Button*>(child);
+                    if (button->IsDefault())
+                    {
+                        return button;
+                    }
+                }
+                child = child->NextSibling();
+            }
+            return null;
+        }
+        public override void OnWriteScreen(WriteScreenEventArgs& args)
+        {
+            base->OnWriteScreen(args);
             Rect rect = GetRect();
-			rect.Inflate(1, 1);
-			SetLocation(rect.location);
-			SetSize(rect.size);
-			List<Control*> children;
-			float sw = MeasureChildWidth(sz.w, children);
-			textLines = SplitIntoLines(ToUtf32(text), sz.w - 4);
-			sz.h = Max(sz.h, 4 + cast<int>(textLines.Count()));
-			SetSize(sz);
-			if (setLoc)
-			{
-				int x = Max(cast<int>(0), (TerminalWindowWidth() - sz.w) / 2);
-				int y = Max(cast<int>(0), (TerminalWindowHeight() - sz.h) / 2);
-				SetLocation(Point(x, y));
-			}
-			SetChildLocations(sw, sz.h - 1, children);
-		}
-		private float MeasureChildWidth(int& width, List<Control*>& children)
-		{
-			Component* child = Controls().FirstChild();
-			while (child != null)
-			{
-				if (child is Control*)
-				{
-					Control* control = cast<Control*>(child);
-					children.Add(control);
-				}
-				child = child->NextSibling();
-			}
-			int w = 0;
-			for (Control* control : children)
-			{
-				Size sz = control->GetSize();
-				w = w + sz.w;
-			}
-			if (width < w)
-			{
-				width = w;
-			}
-			float sw = (cast<float>(width) - cast<float>(w)) / (children.Count() + 1);
-			return sw;
-		}
-		private void SetChildLocations(float sw, int height, List<Control*>& children)
-		{
-			Point loc = Location();
-			loc.x = loc.x + cast<int>(sw);
-			if (children.Count() > 1)
-			{
-				loc.x = loc.x + 1;
-			}
-			loc.y = loc.y + height - 1;
-			for (Control* child : children)
-			{
-				child->SetLocation(loc);
-				Size sz = child->GetSize();
-				loc.x = loc.x + sz.w + cast<int>(sw);
-			}
-		}
-		private void WriteCaption(const ustring& captionStr)
-		{
-			Point loc = Location();
-			Size sz = GetSize();
-			int offset = Max(cast<int>(0), cast<int>(sz.w - captionStr.Length()));
-			int x = loc.x + offset / 2;
-			int y = loc.y;
-			SetCursorPos(x, y);
-			Terminal.Out() << captionStr;
-		}
-		private void WriteText()
-		{
-			Point loc = Location();
-			Size sz = GetSize();
-			int x = loc.x + 2;
-			int y = loc.y + 1;
-			for (const ustring& line : textLines)
-			{
-				int offset = Max(cast<int>(0), cast<int>((sz.w - 4 - line.Length()) / 2));
-				SetCursorPos(x + offset, y);
-				Terminal.Out() << line;
-				y = y + 1;
-			}
-		}
-		private void WriteChildren(WriteScreenEventArgs& args)
-		{
-			Component* child = Controls().FirstChild();
-			while (child != null)
-			{
-				if (child is Control*)
-				{
-					Control* control = cast<Control*>(child);
-					control->OnWriteScreen(args);
-				}
-				child = child->NextSibling();
-			}
-		}
-		private string caption;
-		private string text;
-		private List<ustring> textLines;
-		private MessageBoxButtons buttons;
-		
-	}
+            WriteBox(rect, ForeColor(), BackColor());
+            if (!caption.IsEmpty())
+            {
+                WriteCaption(u" " + ToUtf32(caption) + u" ");
+            }
+            if (!text.IsEmpty())
+            {
+                WriteText();
+            }
+            WriteChildren(args);
+        }
+        private void Measure(bool setLoc)
+        {
+            Size sz = GetSize();
+            Rect rect = GetRect();
+            rect.Inflate(1, 1);
+            SetLocation(rect.location);
+            SetSize(rect.size);
+            List<Control*> children;
+            float sw = MeasureChildWidth(sz.w, children);
+            textLines = SplitIntoLines(ToUtf32(text), sz.w - 4);
+            sz.h = Max(sz.h, 4 + cast<int>(textLines.Count()));
+            SetSize(sz);
+            if (setLoc)
+            {
+                int x = Max(cast<int>(0), (TerminalWindowWidth() - sz.w) / 2);
+                int y = Max(cast<int>(0), (TerminalWindowHeight() - sz.h) / 2);
+                SetLocation(Point(x, y));
+            }
+            SetChildLocations(sw, sz.h - 1, children);
+        }
+        private float MeasureChildWidth(int& width, List<Control*>& children)
+        {
+            Component* child = Controls().FirstChild();
+            while (child != null)
+            {
+                if (child is Control*)
+                {
+                    Control* control = cast<Control*>(child);
+                    children.Add(control);
+                }
+                child = child->NextSibling();
+            }
+            int w = 0;
+            for (Control* control : children)
+            {
+                Size sz = control->GetSize();
+                w = w + sz.w;
+            }
+            if (width < w)
+            {
+                width = w;
+            }
+            float sw = (cast<float>(width) - cast<float>(w)) / (children.Count() + 1);
+            return sw;
+        }
+        private void SetChildLocations(float sw, int height, List<Control*>& children)
+        {
+            Point loc = Location();
+            loc.x = loc.x + cast<int>(sw);
+            if (children.Count() > 1)
+            {
+                loc.x = loc.x + 1;
+            }
+            loc.y = loc.y + height - 1;
+            for (Control* child : children)
+            {
+                child->SetLocation(loc);
+                Size sz = child->GetSize();
+                loc.x = loc.x + sz.w + cast<int>(sw);
+            }
+        }
+        private void WriteCaption(const ustring& captionStr)
+        {
+            Point loc = Location();
+            Size sz = GetSize();
+            int offset = Max(cast<int>(0), cast<int>(sz.w - captionStr.Length()));
+            int x = loc.x + offset / 2;
+            int y = loc.y;
+            SetCursorPos(x, y);
+            Terminal.Out() << captionStr;
+        }
+        private void WriteText()
+        {
+            Point loc = Location();
+            Size sz = GetSize();
+            int x = loc.x + 2;
+            int y = loc.y + 1;
+            for (const ustring& line : textLines)
+            {
+                int offset = Max(cast<int>(0), cast<int>((sz.w - 4 - line.Length()) / 2));
+                SetCursorPos(x + offset, y);
+                Terminal.Out() << line;
+                y = y + 1;
+            }
+        }
+        private void WriteChildren(WriteScreenEventArgs& args)
+        {
+            Component* child = Controls().FirstChild();
+            while (child != null)
+            {
+                if (child is Control*)
+                {
+                    Control* control = cast<Control*>(child);
+                    control->OnWriteScreen(args);
+                }
+                child = child->NextSibling();
+            }
+        }
+        private string caption;
+        private string text;
+        private List<ustring> textLines;
+        private MessageBoxButtons buttons;
+        
+    }
 }

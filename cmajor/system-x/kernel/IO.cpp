@@ -12,6 +12,7 @@
 #include <system-x/kernel/BlockFile.hpp>
 #include <system-x/kernel/DirFile.hpp>
 #include <system-x/kernel/Debug.hpp>
+#include <system-x/kernel/MsgQueue.hpp>
 #include <system-x/machine/Machine.hpp>
 #include <system-x/machine/Processor.hpp>
 #include <soulng/util/MemoryReader.hpp>
@@ -50,7 +51,7 @@ std::vector<uint8_t> ReadProcessMemory(Process* process, int64_t addr, int64_t c
         }
         catch (const std::exception& ex)
         {
-            throw SystemError(EMEMORYACCESS, ex.what());
+            throw SystemError(EMEMORYACCESS, ex.what(), __FUNCTION__);
         }
     }
     return buffer;
@@ -69,7 +70,7 @@ void WriteProcessMemory(Process* process, int64_t addr, const std::vector<uint8_
         }
         catch (const std::exception& ex)
         {
-            throw SystemError(EMEMORYACCESS, ex.what());
+            throw SystemError(EMEMORYACCESS, ex.what(), __FUNCTION__);
         }
     }
 }
@@ -123,7 +124,7 @@ int32_t Create(Process* process, int64_t pathAddr, int32_t mode)
 {
     if (pathAddr == 0)
     {
-        throw SystemError(EPARAM, "path is null");
+        throw SystemError(EPARAM, "path is null", __FUNCTION__);
     }
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::string path = ReadString(process, pathAddr, mem);
@@ -133,7 +134,7 @@ int32_t Create(Process* process, int64_t pathAddr, int32_t mode)
     int32_t fd = fileTable.AddFile(file);
     if (fd == -1)
     {
-        throw SystemError(ELIMITEXCEEDED, "maximum number of open files exceeded");
+        throw SystemError(ELIMITEXCEEDED, "maximum number of open files exceeded", __FUNCTION__);
     }
     return fd;
 }
@@ -142,7 +143,7 @@ int32_t Open(Process* process, int64_t pathAddr, int32_t flags, int32_t mode)
 {
     if (pathAddr == 0)
     {
-        throw SystemError(EPARAM, "path is null");
+        throw SystemError(EPARAM, "path is null", __FUNCTION__);
     }
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::string path = ReadString(process, pathAddr, mem);
@@ -158,7 +159,7 @@ int32_t Open(Process* process, const std::string& path, int32_t flags, int32_t m
     int32_t fd = fileTable.AddFile(file);
     if (fd == -1)
     {
-        throw SystemError(ELIMITEXCEEDED, "maximum number of open files exceeded");
+        throw SystemError(ELIMITEXCEEDED, "maximum number of open files exceeded", __FUNCTION__);
     }
     return fd;
 }
@@ -173,11 +174,11 @@ int64_t Write(Process* process, int32_t fd, int64_t bufferAddr, int64_t count)
 {
     if (bufferAddr == 0)
     {
-        throw SystemError(EPARAM, "buffer is null");
+        throw SystemError(EPARAM, "buffer is null", __FUNCTION__);
     }
     if (count < 0)
     {
-        throw SystemError(EPARAM, "count is negative");
+        throw SystemError(EPARAM, "count is negative", __FUNCTION__);
     }
     ProcessFileTable& fileTable = process->GetFileTable();
     File* file = fileTable.GetFile(fd);
@@ -189,11 +190,11 @@ int64_t Read(Process* process, int32_t fd, int64_t bufferAddr, int64_t count)
 {
     if (bufferAddr == 0)
     {
-        throw SystemError(EPARAM, "buffer is null");
+        throw SystemError(EPARAM, "buffer is null", __FUNCTION__);
     }
     if (count < 0)
     {
-        throw SystemError(EPARAM, "count is negative");
+        throw SystemError(EPARAM, "count is negative", __FUNCTION__);
     }
     ProcessFileTable& fileTable = process->GetFileTable();
     File* file = fileTable.GetFile(fd);
@@ -282,7 +283,7 @@ int32_t IOCtl(Process* process, int32_t fd, int32_t item, int64_t argAddr, int64
         }
         default:
         {
-            throw SystemError(EPARAM, "unknown ioctl item");
+            throw SystemError(EPARAM, "unknown ioctl item", __FUNCTION__);
         }
     }
     return 0;
@@ -292,7 +293,7 @@ void Unlink(Process* process, int64_t pathAddr)
 {
     if (pathAddr == 0)
     {
-        throw SystemError(EPARAM, "path is null");
+        throw SystemError(EPARAM, "path is null", __FUNCTION__);
     }
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::string path = ReadString(process, pathAddr, mem);
@@ -311,7 +312,7 @@ void Unlink(Process* process, int64_t pathAddr)
     INodePtr dirINode = PathToINode(dirName, GetFs(rootFSNumber), process);
     if (!dirINode.Get())
     {
-        throw SystemError(EFAIL, "could not unlink: directory '" + dirName + "' not found");
+        throw SystemError(EFAIL, "could not unlink: directory '" + dirName + "' not found", __FUNCTION__);
     }
     CheckAccess(Access::write, process->EUID(), process->EGID(), dirINode.Get(), "could not open directory '" + dirName + "' for writing");
     std::string fileName = Path::GetFileName(path);
@@ -336,15 +337,15 @@ void Stat(Process* process, int64_t pathAddr, int64_t statBufAddr, int32_t statB
 {
     if (pathAddr == 0)
     {
-        throw SystemError(EPARAM, "path is null");
+        throw SystemError(EPARAM, "path is null", __FUNCTION__);
     }
     if (statBufAddr == 0)
     {
-        throw SystemError(EPARAM, "stat buffer is null");
+        throw SystemError(EPARAM, "stat buffer is null", __FUNCTION__);
     }
     if (statBufSize < INode::StatBufSize())
     {
-        throw SystemError(EPARAM, "stat buffer too small");
+        throw SystemError(EPARAM, "stat buffer too small", __FUNCTION__);
     }
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::string path = ReadString(process, pathAddr, mem);
@@ -352,7 +353,7 @@ void Stat(Process* process, int64_t pathAddr, int64_t statBufAddr, int32_t statB
     INodePtr inode = PathToINode(path, GetFs(rootFSNumber), process, PathToINodeFlags::stat);
     if (!inode.Get())
     {
-        throw SystemError(ENOTFOUND, "path '" + path + "' not found");
+        throw SystemError(ENOTFOUND, "path '" + path + "' not found", __FUNCTION__);
     }
     std::vector<uint8_t> statBuffer(statBufSize, 0);
     MemoryWriter writer(statBuffer.data(), statBufSize);
@@ -362,11 +363,38 @@ void Stat(Process* process, int64_t pathAddr, int64_t statBufAddr, int32_t statB
     }
     catch (const std::exception& ex)
     {
-        throw SystemError(EPARAM, "memory writer exception: " + std::string(ex.what()));
+        throw SystemError(EPARAM, "memory writer exception: " + std::string(ex.what()), __FUNCTION__);
     }
     WriteProcessMemory(process, statBufAddr, statBuffer);
 }
 
+void GetCWD(Process* process, int64_t bufAddr, int64_t bufSize)
+{
+    if (bufAddr == 0)
+    {
+        throw SystemError(EPARAM, "path buffer is null", __FUNCTION__);
+    }
+    if (bufSize <= 1)
+    {
+        throw SystemError(EPARAM, "invalid buffer size", __FUNCTION__);
+    }
+    INodeKey cwdINodeKey = ToINodeKey(process->GetINodeKeyOfWorkingDir());
+    Filesystem* fs = GetFs(cwdINodeKey.fsNumber);
+    std::string cwd = fs->INodeToPath(cwdINodeKey, process);
+    std::vector<uint8_t> buffer;
+    for (int64_t i = 0; i < bufSize - 1; ++i)
+    {
+        if (i >= cwd.length())
+        {
+            break;
+        }
+        buffer.push_back(static_cast<uint8_t>(cwd[i]));
+    }
+    buffer.push_back(0);
+    WriteProcessMemory(process, bufAddr, buffer);
+}
+
+/*
 void GetCWD(Process* process, int64_t bufAddr, int64_t bufSize)
 {
     if (bufAddr == 0)
@@ -432,12 +460,13 @@ void GetCWD(Process* process, int64_t bufAddr, int64_t bufSize)
         throw SystemError(EFAIL, "current directory not found from process");
     }
 }
+*/
 
 void ChDir(Process* process, int64_t pathAddr)
 {
     if (pathAddr == 0)
     {
-        throw SystemError(EPARAM, "path is null");
+        throw SystemError(EPARAM, "path is null", __FUNCTION__);
     }
     Filesystem* fs = GetFs(rootFSNumber);
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
@@ -450,7 +479,7 @@ void ChDir(Process* process, int64_t pathAddr)
     }
     else
     {
-        throw SystemError(ENOTFOUND, "path '" + path + "' not found");
+        throw SystemError(ENOTFOUND, "path '" + path + "' not found", __FUNCTION__);
     }
 }
 
@@ -458,14 +487,14 @@ void MkDir(Process* process, int64_t pathAddr, int32_t mode)
 {
     if (pathAddr == 0)
     {
-        throw SystemError(EPARAM, "path is null");
+        throw SystemError(EPARAM, "path is null", __FUNCTION__);
     }
     Filesystem* fs = GetFs(rootFSNumber);
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::string path = ReadString(process, pathAddr, mem);
     if (DirectoryExists(path, fs, process))
     {
-        throw SystemError(EALREADYEXISTS, "directory path '" + path + "' already exists");
+        throw SystemError(EALREADYEXISTS, "directory path '" + path + "' already exists", __FUNCTION__);
     }
     std::string parentPath = Path::GetDirectoryName(path);
     if (parentPath.empty())
@@ -490,7 +519,7 @@ void MkDir(Process* process, int64_t pathAddr, int32_t mode)
     }
     else
     {
-        throw SystemError(ENOTFOUND, "directory path '" + parentPath + "' not found");
+        throw SystemError(ENOTFOUND, "directory path '" + parentPath + "' not found", __FUNCTION__);
     }
 }
 
@@ -498,7 +527,7 @@ int32_t OpenDir(Process* process, int64_t pathAddr)
 {
     if (pathAddr == 0)
     {
-        throw SystemError(EPARAM, "path is null");
+        throw SystemError(EPARAM, "path is null", __FUNCTION__);
     }
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::string path = ReadString(process, pathAddr, mem);
@@ -514,13 +543,13 @@ int32_t OpenDir(Process* process, int64_t pathAddr)
         int32_t dd = fileTable.AddFile(dirFile);
         if (dd == -1)
         {
-            throw SystemError(ELIMITEXCEEDED, "maximum number of open files exceeded");
+            throw SystemError(ELIMITEXCEEDED, "maximum number of open files exceeded", __FUNCTION__);
         }
         return dd;
     }
     else
     {
-        throw SystemError(ENOTFOUND, "path '" + path + "' not found");
+        throw SystemError(ENOTFOUND, "path '" + path + "' not found", __FUNCTION__);
     }
     return 0;
 }
@@ -535,11 +564,11 @@ int32_t ReadDir(Process* process, int32_t dfd, int64_t dirEntryBufAddr, int64_t 
 {
     if (dirEntryBufAddr == 0)
     {
-        throw SystemError(EPARAM, "directory entry buffer is null");
+        throw SystemError(EPARAM, "directory entry buffer is null", __FUNCTION__);
     }
     if (dirEntryBufSize < DirectoryEntry::Size())
     {
-        throw SystemError(EPARAM, "invalid directory entry buffer size");
+        throw SystemError(EPARAM, "invalid directory entry buffer size", __FUNCTION__);
     }
     ProcessFileTable& fileTable = process->GetFileTable();
     File* file = fileTable.GetFile(dfd);
@@ -571,7 +600,7 @@ int32_t ReadDir(Process* process, int32_t dfd, int64_t dirEntryBufAddr, int64_t 
     }
     else
     {
-        throw SystemError(EBADF, "invalid directory file descriptor");
+        throw SystemError(EBADF, "invalid directory file descriptor", __FUNCTION__);
     }
 }
 
@@ -579,15 +608,15 @@ void UTime(Process* process, int64_t pathAddr, int64_t timeBufAddr, int64_t time
 {
     if (pathAddr == 0)
     {
-        throw SystemError(EPARAM, "path is null");
+        throw SystemError(EPARAM, "path is null", __FUNCTION__);
     }
     if (timeBufAddr == 0)
     {
-        throw SystemError(EPARAM, "time buffer is null");
+        throw SystemError(EPARAM, "time buffer is null", __FUNCTION__);
     }
     if (timeBufSize < 16)
     {
-        throw SystemError(EPARAM, "invalid time buffer size");
+        throw SystemError(EPARAM, "invalid time buffer size", __FUNCTION__);
     }
     std::vector<uint8_t> times = ReadProcessMemory(process, timeBufAddr, std::min(static_cast<int64_t>(16), timeBufSize));
     Filesystem* fs = GetFs(rootFSNumber);
@@ -607,7 +636,7 @@ void UTime(Process* process, int64_t pathAddr, int64_t timeBufAddr, int64_t time
     }
     else
     {
-        throw SystemError(ENOTFOUND, "path '" + path + "' not found");
+        throw SystemError(ENOTFOUND, "path '" + path + "' not found", __FUNCTION__);
     }
 }
 
@@ -634,7 +663,7 @@ void ChMod(Process* process, int64_t pathAddr, int32_t mode)
 {
     if (pathAddr == 0)
     {
-        throw SystemError(EPARAM, "path is null");
+        throw SystemError(EPARAM, "path is null", __FUNCTION__);
     }
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::string path = ReadString(process, pathAddr, mem);
@@ -651,12 +680,12 @@ void ChMod(Process* process, int64_t pathAddr, int32_t mode)
         }
         else
         {
-            throw SystemError(EPERMISSION, "unauthorized");
+            throw SystemError(EPERMISSION, "unauthorized", __FUNCTION__);
         }
     }
     else
     {
-        throw SystemError(ENOTFOUND, "path '" + path + "' not found");
+        throw SystemError(ENOTFOUND, "path '" + path + "' not found", __FUNCTION__);
     }
 }
 
@@ -664,11 +693,11 @@ void ChOwn(Process* process, int64_t pathAddr, int32_t uid, int32_t gid)
 {
     if (process->EUID() != 0)
     {
-        throw SystemError(EPERMISSION, "unauthorized");
+        throw SystemError(EPERMISSION, "unauthorized", __FUNCTION__);
     }
     if (pathAddr == 0)
     {
-        throw SystemError(EPARAM, "path is null");
+        throw SystemError(EPARAM, "path is null", __FUNCTION__);
     }
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::string path = ReadString(process, pathAddr, mem);
@@ -684,7 +713,7 @@ void ChOwn(Process* process, int64_t pathAddr, int32_t uid, int32_t gid)
     }
     else
     {
-        throw SystemError(ENOTFOUND, "path '" + path + "' not found");
+        throw SystemError(ENOTFOUND, "path '" + path + "' not found", __FUNCTION__);
     }
 }
 
@@ -692,11 +721,11 @@ void Rename(Process* process, int64_t sourcePathAddr, int64_t targetPathAddr)
 {
     if (sourcePathAddr == 0)
     {
-        throw SystemError(EPARAM, "source path is null");
+        throw SystemError(EPARAM, "source path is null", __FUNCTION__);
     }
     if (targetPathAddr == 0)
     {
-        throw SystemError(EPARAM, "target path is null");
+        throw SystemError(EPARAM, "target path is null", __FUNCTION__);
     }
     Filesystem* fs = GetFs(rootFSNumber);
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
@@ -756,23 +785,23 @@ void Rename(Process* process, int64_t sourcePathAddr, int64_t targetPathAddr)
                     }
                     else
                     {
-                        throw SystemError(ENOTFOUND, "file name '" + Path::GetFileName(sourcePath) + "' not found from directory '" + sourceDirPath + "'");
+                        throw SystemError(ENOTFOUND, "file name '" + Path::GetFileName(sourcePath) + "' not found from directory '" + sourceDirPath + "'", __FUNCTION__);
                     }
                 }
                 else
                 {
-                    throw SystemError(EFAIL, "cannot rename across filesystems");
+                    throw SystemError(EFAIL, "cannot rename across filesystems", __FUNCTION__);
                 }
             }
         }
         else
         {
-            throw SystemError(ENOTFOUND, "target directory '" + targetDirPath + "' not found");
+            throw SystemError(ENOTFOUND, "target directory '" + targetDirPath + "' not found", __FUNCTION__);
         }
     }
     else
     {
-        throw SystemError(ENOTFOUND, "source directory '" + sourceDirPath + "' not found");
+        throw SystemError(ENOTFOUND, "source directory '" + sourceDirPath + "' not found", __FUNCTION__);
     }
 }
 
@@ -780,7 +809,7 @@ void AddDirChangeNotification(Process* process, int64_t directoryPathsAddr)
 {
     if (directoryPathsAddr == 0)
     {
-        throw SystemError(EPARAM, "directory path is null");
+        throw SystemError(EPARAM, "directory path is null", __FUNCTION__);
     }
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::string directoryPaths = ReadString(process, directoryPathsAddr, mem);
@@ -797,9 +826,23 @@ void AddDirChangeNotification(Process* process, int64_t directoryPathsAddr)
     }
 }
 
-void SendKey(char32_t key)
+void BindTerminal(Process* process, int32_t md)
 {
-    cmsx::kernel::GetTerminalFile()->SendKey(key);
+    if (IsMsgQOpen(md))
+    {
+        File* terminalFile = GetTerminalFile();
+        terminalFile->Bind(md);
+    }
+    else
+    {
+        throw SystemError(EPARAM, "cannot bind terminal to message queue: message queue " + std::to_string(md) + " not open", __FUNCTION__);
+    }
+}
+
+void UnbindTerminal(Process* process)
+{
+    File* terminalFile = GetTerminalFile();
+    terminalFile->Unbind();
 }
 
 } // namespace cmsx::kernel

@@ -30,7 +30,6 @@ public:
     Filesystem* GetFilesystem(int32_t fsNumber) const;
     Filesystem* GetMountedFilesystem(INodeKey mountPoint) const;
     int32_t NextFileSystemId() { return nextFileSystemId++; }
-    void ClearProcessData(cmsx::machine::Process* process);
     void MapDrive(const std::string& drive, const std::string& mountedPath);
     std::string GetMappedDrivePrefix(std::string& driveStr) const;
     std::string MapPath(const std::string& windowsFilePath) const;

@@ -27,12 +27,12 @@ uint64_t TrapThrowHandler::HandleTrap(cmsx::machine::Processor& processor)
         uint64_t exceptionAddress = processor.Regs().Get(cmsx::machine::regAX);
         if (exceptionAddress == 0)
         {
-            throw SystemError(EPARAM, "exception is null");
+            throw SystemError(EPARAM, "exception is null", __FUNCTION__);
         }
         uint64_t exceptionClassId = processor.Regs().Get(cmsx::machine::regBX);
         if (exceptionClassId == 0)
         {
-            throw SystemError(EPARAM, "exception class id is 0");
+            throw SystemError(EPARAM, "exception class id is 0", __FUNCTION__);
         }
         uint64_t setPC = 0;
         uint64_t setFP = 0;
@@ -64,7 +64,7 @@ uint64_t TrapCatchHandler::HandleTrap(cmsx::machine::Processor& processor)
     {
         if (process->CurrentExceptionAddress() == 0)
         {
-            throw SystemError(EFAIL, "current exception not set");
+            throw SystemError(EFAIL, "current exception not set", __FUNCTION__);
         }
         return process->CurrentExceptionAddress();
     }
@@ -118,12 +118,12 @@ uint64_t TrapStackTraceHandler::HandleTrap(cmsx::machine::Processor& processor)
         uint64_t bufferAddress = processor.Regs().Get(cmsx::machine::regAX);
         if (bufferAddress == 0)
         {
-            throw SystemError(EPARAM, "buffer is null");
+            throw SystemError(EPARAM, "buffer is null", __FUNCTION__);
         }
         int64_t count = processor.Regs().Get(cmsx::machine::regBX);
         if (count <= 0)
         {
-            throw SystemError(EPARAM, "count is nonpositive");
+            throw SystemError(EPARAM, "count is nonpositive", __FUNCTION__);
         }
         std::string stackTrace = GetStackTrace(process);
         std::vector<std::uint8_t> buffer = MakeStringBuffer(stackTrace, count);
@@ -153,13 +153,13 @@ uint64_t TrapGetSystemErrorHandler::HandleTrap(cmsx::machine::Processor& process
         uint64_t errorCodeAddress = processor.Regs().Get(cmsx::machine::regAX);
         if (errorCodeAddress == 0)
         {
-            throw SystemError(EPARAM, "error code pointer is null");
+            throw SystemError(EPARAM, "error code pointer is null", __FUNCTION__);
         }
         processor.GetMachine()->Mem().WriteTetra(process->RV(), errorCodeAddress, systemError.ErrorCode(), cmsx::machine::Protection::write);
         uint64_t bufferAddress = processor.Regs().Get(cmsx::machine::regBX);
         if (bufferAddress == 0)
         {
-            throw SystemError(EPARAM, "buffer pointer is null");
+            throw SystemError(EPARAM, "buffer pointer is null", __FUNCTION__);
         }
         uint64_t bufferSize = processor.Regs().Get(cmsx::machine::regCX);
         std::vector<uint8_t> messageBuffer = MakeStringBuffer(systemError.Message(), bufferSize);

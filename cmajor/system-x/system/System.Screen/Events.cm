@@ -8,9 +8,9 @@ using System;
 namespace System.Screen
 {
     public class delegate void SelectEventHandler();
-	public class delegate void ChangedEventHandler();
-	public class delegate void FocusEventHandler();
-	public class delegate void PressedEventHandler();
+    public class delegate void ChangedEventHandler();
+    public class delegate void FocusEventHandler();
+    public class delegate void PressedEventHandler();
 
     public class WriteScreenEventArgs
     {
@@ -49,19 +49,19 @@ namespace System.Screen
     
     public class delegate void KeyEventHandler(KeyEventArgs& keyEventArgs);
     
-	public class delegate void TimerEventHandler(TimerEventArgs& args);
+    public class delegate void TimerEventHandler(TimerEventArgs& args);
 
-	public class TimerEventArgs
-	{
-		public nothrow TimerEventArgs(int timerId_) : timerId(timerId_)
-		{
-		}
-		public nothrow int TimerId() const
-		{
-			return timerId;
-		}
-		private int timerId;
-	}
+    public class TimerEventArgs
+    {
+        public nothrow TimerEventArgs(int timerId_) : timerId(timerId_)
+        {
+        }
+        public nothrow int TimerId() const
+        {
+            return timerId;
+        }
+        private int timerId;
+    }
 
     public class CloseEventArgs
     {

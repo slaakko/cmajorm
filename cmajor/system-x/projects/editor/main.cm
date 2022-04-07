@@ -7,258 +7,258 @@ using System;
 using System.Screen;
 using System.Collections;
 
-public class MainWindow	: Window
+public class MainWindow : Window
 {
-	public MainWindow() : base(ControlCreateParams().Defaults())
-	{
-		InvalidateGuard guard(this, false);
-		menuBar = new MenuBar(MenuControlCreateParams().Defaults());
-		Application.Instance().SetMenuBar(menuBar);
-		MenuItem* fileMenuItem = new MenuItem("&File");
-		MenuItem* fileNewMenuItem = new MenuItem("&New", keyControlN);
-		fileNewMenuItem->SelectEvent().AddHandler(New);
-		fileMenuItem->AddMenuItem(fileNewMenuItem);
-		MenuItem* fileOpenMenuItem = new MenuItem("&Open...", keyControlO);
-		fileOpenMenuItem->SelectEvent().AddHandler(Open);
-		fileMenuItem->AddMenuItem(fileOpenMenuItem);
-		MenuItem* fileCloseMenuItem = new MenuItem("&Close", keyControlF4);
-		fileCloseMenuItem->SelectEvent().AddHandler(DoClose);
-		fileMenuItem->AddMenuItem(fileCloseMenuItem);
-		MenuItem* fileSaveMenuItem = new MenuItem("&Save", keyControlS);
-		fileSaveMenuItem->SelectEvent().AddHandler(Save);
-		fileMenuItem->AddMenuItem(fileSaveMenuItem);
-		MenuItem* fileSaveAsMenuItem = new MenuItem("Save &As...", keyControlA);
-		fileSaveAsMenuItem->SelectEvent().AddHandler(SaveAs);
-		fileMenuItem->AddMenuItem(fileSaveAsMenuItem);
-		MenuItem* fileExitMenuItem = new MenuItem("E&xit", keyAltX);
-		fileExitMenuItem->SelectEvent().AddHandler(Exit);
-		fileMenuItem->AddMenuItem(fileExitMenuItem);
-		menuBar->AddMenuItem(fileMenuItem);
-		MenuItem* editMenuItem = new MenuItem("&Edit");
-		MenuItem* editCopyMenuItem = new MenuItem("&Copy", keyControlIns);
-		editCopyMenuItem->SelectEvent().AddHandler(Copy);
-		editMenuItem->AddMenuItem(editCopyMenuItem);
-		MenuItem* editCutMenuItem = new MenuItem("C&ut", keyShiftDel);
-		editCutMenuItem->SelectEvent().AddHandler(Cut);
-		editMenuItem->AddMenuItem(editCutMenuItem);
-		MenuItem* editPasteMenuItem = new MenuItem("&Paste", keyF8);
-		editPasteMenuItem->SelectEvent().AddHandler(Paste);
-		editMenuItem->AddMenuItem(editPasteMenuItem);
-		menuBar->AddMenuItem(editMenuItem);
-		AddChild(menuBar);
-		editor = new Editor(EditorCreateParams().Defaults());
-		editor->FilePathChangedEvent().AddHandler(EditorFilePathChanged);
-		editor->CaretPosChangedEvent().AddHandler(EditorCaretPosChanged);
-		editor->StatusTextChangedEvent().AddHandler(EditorStatusTextChanged);
-		editor->DirtyChangedEvent().AddHandler(EditorDirtyChanged);
-		AddChild(editor);
-		editor->SetFocus();
-		StatusBar* statusBar = new StatusBar(StatusBarCreateParams().Defaults());
-		dirtyStatusBarItem = new StatusBarTextItem(string());
-		dirtyStatusBarItem->SetMinWidth(3);
-		statusBar->AddItem(dirtyStatusBarItem);
-		filePathStatusBarItem = new StatusBarTextItem(string());
-		statusBar->AddItem(filePathStatusBarItem);
-		statusTextStatusBarItem = new StatusBarTextItem(string());
-		statusBar->AddItem(statusTextStatusBarItem);
-		StatusBarSpringItem* springItem = new StatusBarSpringItem();
-		statusBar->AddItem(springItem);
-		lineStatusBarItem = new StatusBarTextItem(string());
-		lineStatusBarItem->SetMinWidth(11); 
-		statusBar->AddItem(lineStatusBarItem);
-		columnStatusBarItem = new StatusBarTextItem(string());
-		columnStatusBarItem->SetMinWidth(10);
-		statusBar->AddItem(columnStatusBarItem);
-		AddChild(statusBar);
-	}
-	public override void OnKeyPressed(KeyEventArgs& args)
-	{
-		base->OnKeyPressed(args);
-		if (args.Handled()) return;
-	}
-	public override void OnTimer(TimerEventArgs& args)
-	{
-		base->OnTimer(args);
-		editor->SetStatusText(string());
-	}
-	public void SetLines(const List<string>& lines)
-	{
-		editor->SetLines(lines);
-	}
-	public void SetFilePath(const string& filePath)
-	{
-		editor->SetFilePath(GetFullPath(filePath));
-	}
-	private void New()
-	{
-		if (Close())
-		{
-			editor->Clear();
-		}
-		editor->SetFocus();
-	}
-	private void Open()
-	{
-		FileDialog dialog(FileDialogCreateParams().SetKind(FileDialogKind.openDialog).SetRequireFileExists(true));
-		if (dialog.ShowDialog() == DialogResult.ok)
-		{
-			string filePath = dialog.FilePath();
-			if (File.Exists(filePath))
-			{
-				if (Close())
-				{
-					editor->SetFilePath(filePath);
-					editor->Load();
-				}
-			}
-		}
-		editor->SetFocus();
-	}
-	private void DoClose()
-	{
-		Close();
-	}
-	private bool Close()
-	{
-		if (editor->IsDirty())
-		{
-			UniquePtr<MessageBox> messageBox = new MessageBox(MessageBoxCreateParams().Caption("Save?").Text("Text modified. Save changes?").
-			Buttons(cast<MessageBoxButtons>(MessageBoxButtons.yes | MessageBoxButtons.no | MessageBoxButtons.cancel)));
-			DialogResult result = messageBox->ShowDialog();
-			if (result == DialogResult.yes)
-			{
-				Save();
-			}
-			else if (result == DialogResult.cancel)
-			{
-				editor->SetFocus();
-				return false;
-			}
-		}
-		editor->SetFilePath(string());
-		editor->Clear();
-		editor->SetFocus();
-		editor->Invalidate();
-		return true;
-	}
-	private void Save()
-	{
-		if (!editor->FilePath().IsEmpty())
-		{
-			editor->Save();
-		}
-		else
-		{
-			SaveAs();
-		}
-	}
-	private void SaveAs()
-	{
-		FileDialog dialog(FileDialogCreateParams().SetKind(FileDialogKind.saveDialog));
-		if (dialog.ShowDialog() == DialogResult.ok)
-		{
-			string filePath = dialog.FilePath();
-			editor->SetFilePath(filePath);
-			editor->Save();
-		}
-		editor->SetFocus();
-	}
-	private void EditorFilePathChanged()
-	{
-		filePathStatusBarItem->SetText(editor->FilePath());
-	}
-	private void EditorCaretPosChanged()
-	{
-		lineStatusBarItem->SetText("Line: " + ToString(editor->CaretLine() + 1));
-		columnStatusBarItem->SetText("Col: " + ToString(editor->CaretCol() + 1));
-	}
-	private void EditorStatusTextChanged()
-	{
-		statusTextStatusBarItem->SetText(editor->StatusText());
-		if (!editor->StatusText().IsEmpty())
-		{
-			Timer(Duration.FromSeconds(3), 0);
-		}
-	}
-	private void EditorDirtyChanged()
-	{
-		if (editor->IsDirty())
-		{
-			dirtyStatusBarItem->SetText("(*)");
-		}
-		else
-		{
-			dirtyStatusBarItem->SetText(string());
-		}
-	}
-	private void Copy()
-	{
-		editor->Copy();
-	}
-	private void Cut()
-	{
-		editor->Cut();
-	}
-	private void Paste()
-	{
-		editor->Paste();
-	}
-	private void Exit()
-	{
-		if (Close())
-		{
-			Application.Instance().Exit();
-		}
-	}
-	private MenuBar* menuBar;
-	private Editor* editor;
-	private StatusBar* statusBar;
-	private StatusBarTextItem* dirtyStatusBarItem;
-	private StatusBarTextItem* filePathStatusBarItem;
-	private StatusBarTextItem* statusTextStatusBarItem;
-	private StatusBarTextItem* lineStatusBarItem;
-	private StatusBarTextItem* columnStatusBarItem;
+    public MainWindow() : base(ControlCreateParams().Defaults())
+    {
+        InvalidateGuard guard(this, false);
+        menuBar = new MenuBar(MenuControlCreateParams().Defaults());
+        Application.Instance().SetMenuBar(menuBar);
+        MenuItem* fileMenuItem = new MenuItem("&File");
+        MenuItem* fileNewMenuItem = new MenuItem("&New", keyControlN);
+        fileNewMenuItem->SelectEvent().AddHandler(New);
+        fileMenuItem->AddMenuItem(fileNewMenuItem);
+        MenuItem* fileOpenMenuItem = new MenuItem("&Open...", keyControlO);
+        fileOpenMenuItem->SelectEvent().AddHandler(Open);
+        fileMenuItem->AddMenuItem(fileOpenMenuItem);
+        MenuItem* fileCloseMenuItem = new MenuItem("&Close", keyControlF4);
+        fileCloseMenuItem->SelectEvent().AddHandler(DoClose);
+        fileMenuItem->AddMenuItem(fileCloseMenuItem);
+        MenuItem* fileSaveMenuItem = new MenuItem("&Save", keyControlS);
+        fileSaveMenuItem->SelectEvent().AddHandler(Save);
+        fileMenuItem->AddMenuItem(fileSaveMenuItem);
+        MenuItem* fileSaveAsMenuItem = new MenuItem("Save &As...", keyControlA);
+        fileSaveAsMenuItem->SelectEvent().AddHandler(SaveAs);
+        fileMenuItem->AddMenuItem(fileSaveAsMenuItem);
+        MenuItem* fileExitMenuItem = new MenuItem("E&xit", keyAltX);
+        fileExitMenuItem->SelectEvent().AddHandler(Exit);
+        fileMenuItem->AddMenuItem(fileExitMenuItem);
+        menuBar->AddMenuItem(fileMenuItem);
+        MenuItem* editMenuItem = new MenuItem("&Edit");
+        MenuItem* editCopyMenuItem = new MenuItem("&Copy", keyControlIns);
+        editCopyMenuItem->SelectEvent().AddHandler(Copy);
+        editMenuItem->AddMenuItem(editCopyMenuItem);
+        MenuItem* editCutMenuItem = new MenuItem("C&ut", keyShiftDel);
+        editCutMenuItem->SelectEvent().AddHandler(Cut);
+        editMenuItem->AddMenuItem(editCutMenuItem);
+        MenuItem* editPasteMenuItem = new MenuItem("&Paste", keyF8);
+        editPasteMenuItem->SelectEvent().AddHandler(Paste);
+        editMenuItem->AddMenuItem(editPasteMenuItem);
+        menuBar->AddMenuItem(editMenuItem);
+        AddChild(menuBar);
+        editor = new Editor(EditorCreateParams().Defaults());
+        editor->FilePathChangedEvent().AddHandler(EditorFilePathChanged);
+        editor->CaretPosChangedEvent().AddHandler(EditorCaretPosChanged);
+        editor->StatusTextChangedEvent().AddHandler(EditorStatusTextChanged);
+        editor->DirtyChangedEvent().AddHandler(EditorDirtyChanged);
+        AddChild(editor);
+        editor->SetFocus();
+        StatusBar* statusBar = new StatusBar(StatusBarCreateParams().Defaults());
+        dirtyStatusBarItem = new StatusBarTextItem(string());
+        dirtyStatusBarItem->SetMinWidth(3);
+        statusBar->AddItem(dirtyStatusBarItem);
+        filePathStatusBarItem = new StatusBarTextItem(string());
+        statusBar->AddItem(filePathStatusBarItem);
+        statusTextStatusBarItem = new StatusBarTextItem(string());
+        statusBar->AddItem(statusTextStatusBarItem);
+        StatusBarSpringItem* springItem = new StatusBarSpringItem();
+        statusBar->AddItem(springItem);
+        lineStatusBarItem = new StatusBarTextItem(string());
+        lineStatusBarItem->SetMinWidth(11); 
+        statusBar->AddItem(lineStatusBarItem);
+        columnStatusBarItem = new StatusBarTextItem(string());
+        columnStatusBarItem->SetMinWidth(10);
+        statusBar->AddItem(columnStatusBarItem);
+        AddChild(statusBar);
+    }
+    public override void OnKeyPressed(KeyEventArgs& args)
+    {
+        base->OnKeyPressed(args);
+        if (args.Handled()) return;
+    }
+    public override void OnTimer(TimerEventArgs& args)
+    {
+        base->OnTimer(args);
+        editor->SetStatusText(string());
+    }
+    public void SetLines(const List<string>& lines)
+    {
+        editor->SetLines(lines);
+    }
+    public void SetFilePath(const string& filePath)
+    {
+        editor->SetFilePath(GetFullPath(filePath));
+    }
+    private void New()
+    {
+        if (Close())
+        {
+            editor->Clear();
+        }
+        editor->SetFocus();
+    }
+    private void Open()
+    {
+        FileDialog dialog(FileDialogCreateParams().SetKind(FileDialogKind.openDialog).SetRequireFileExists(true));
+        if (dialog.ShowDialog() == DialogResult.ok)
+        {
+            string filePath = dialog.FilePath();
+            if (File.Exists(filePath))
+            {
+                if (Close())
+                {
+                    editor->SetFilePath(filePath);
+                    editor->Load();
+                }
+            }
+        }
+        editor->SetFocus();
+    }
+    private void DoClose()
+    {
+        Close();
+    }
+    private bool Close()
+    {
+        if (editor->IsDirty())
+        {
+            UniquePtr<MessageBox> messageBox = new MessageBox(MessageBoxCreateParams().Caption("Save?").Text("Text modified. Save changes?").
+            Buttons(cast<MessageBoxButtons>(MessageBoxButtons.yes | MessageBoxButtons.no | MessageBoxButtons.cancel)));
+            DialogResult result = messageBox->ShowDialog();
+            if (result == DialogResult.yes)
+            {
+                Save();
+            }
+            else if (result == DialogResult.cancel)
+            {
+                editor->SetFocus();
+                return false;
+            }
+        }
+        editor->SetFilePath(string());
+        editor->Clear();
+        editor->SetFocus();
+        editor->Invalidate();
+        return true;
+    }
+    private void Save()
+    {
+        if (!editor->FilePath().IsEmpty())
+        {
+            editor->Save();
+        }
+        else
+        {
+            SaveAs();
+        }
+    }
+    private void SaveAs()
+    {
+        FileDialog dialog(FileDialogCreateParams().SetKind(FileDialogKind.saveDialog));
+        if (dialog.ShowDialog() == DialogResult.ok)
+        {
+            string filePath = dialog.FilePath();
+            editor->SetFilePath(filePath);
+            editor->Save();
+        }
+        editor->SetFocus();
+    }
+    private void EditorFilePathChanged()
+    {
+        filePathStatusBarItem->SetText(editor->FilePath());
+    }
+    private void EditorCaretPosChanged()
+    {
+        lineStatusBarItem->SetText("Line: " + ToString(editor->CaretLine() + 1));
+        columnStatusBarItem->SetText("Col: " + ToString(editor->CaretCol() + 1));
+    }
+    private void EditorStatusTextChanged()
+    {
+        statusTextStatusBarItem->SetText(editor->StatusText());
+        if (!editor->StatusText().IsEmpty())
+        {
+            Timer(Duration.FromSeconds(3), 0);
+        }
+    }
+    private void EditorDirtyChanged()
+    {
+        if (editor->IsDirty())
+        {
+            dirtyStatusBarItem->SetText("(*)");
+        }
+        else
+        {
+            dirtyStatusBarItem->SetText(string());
+        }
+    }
+    private void Copy()
+    {
+        editor->Copy();
+    }
+    private void Cut()
+    {
+        editor->Cut();
+    }
+    private void Paste()
+    {
+        editor->Paste();
+    }
+    private void Exit()
+    {
+        if (Close())
+        {
+            Application.Instance().Exit();
+        }
+    }
+    private MenuBar* menuBar;
+    private Editor* editor;
+    private StatusBar* statusBar;
+    private StatusBarTextItem* dirtyStatusBarItem;
+    private StatusBarTextItem* filePathStatusBarItem;
+    private StatusBarTextItem* statusTextStatusBarItem;
+    private StatusBarTextItem* lineStatusBarItem;
+    private StatusBarTextItem* columnStatusBarItem;
 }
 
 int main(int argc, const char** argv)
 {
-	try
-	{
-		List<string> files;
-		for (int i = 1; i < argc; ++i)
-		{
-			string arg = argv[i];
-			if (arg.StartsWith("--"))
-			{
-			}
-			else if (arg.StartsWith("-"))
-			{
-			}
-			else
-			{
-				files.Add(arg);
-			}
-		}
-		List<string> lines;
-		if (!files.IsEmpty())
-		{
-			if (File.Exists(files.Front()))
-			{
-				lines = File.ReadAllLines(files.Front());
-			}
-		}
-		MainWindow mainWindow;
-		if (!files.IsEmpty())
-		{
-			mainWindow.SetFilePath(files.Front());
-			mainWindow.SetLines(lines);
-		}
-		Application.Instance().Run(mainWindow);
-	}
-	catch (const Exception& ex)
-	{
-		Terminal.Error() << ex.ToString() << endl();
-		return 1;
-	}
-	return 0;
+    try
+    {
+        List<string> files;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("--"))
+            {
+            }
+            else if (arg.StartsWith("-"))
+            {
+            }
+            else
+            {
+                files.Add(arg);
+            }
+        }
+        List<string> lines;
+        if (!files.IsEmpty())
+        {
+            if (File.Exists(files.Front()))
+            {
+                lines = File.ReadAllLines(files.Front());
+            }
+        }
+        MainWindow mainWindow;
+        if (!files.IsEmpty())
+        {
+            mainWindow.SetFilePath(files.Front());
+            mainWindow.SetLines(lines);
+        }
+        Application.Instance().Run(mainWindow);
+    }
+    catch (const Exception& ex)
+    {
+        Terminal.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
 }

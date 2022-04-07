@@ -8,41 +8,41 @@ using System.Os;
 
 namespace System
 {
-	public class TerminalState
-	{
-		static TerminalState() : instance(new TerminalState())
-		{
-		}
-		public static TerminalState& Instance()
-		{
-			return *instance;
-		}
-		private TerminalState() : tty(Open("/dev/tty", cast<OpenFlags>(OpenFlags.read | OpenFlags.write), 0))
-		{
-		}
-		public ~TerminalState()
-		{
-			Close(tty);
-		}
-		public nothrow int Descriptor() 
-		{
-			return tty;
-		}
-		private static UniquePtr<TerminalState> instance;
+    public class TerminalState
+    {
+        static TerminalState() : instance(new TerminalState())
+        {
+        }
+        public static TerminalState& Instance()
+        {
+            return *instance;
+        }
+        private TerminalState() : tty(Open("/dev/tty", cast<OpenFlags>(OpenFlags.read | OpenFlags.write), 0))
+        {
+        }
+        public ~TerminalState()
+        {
+            Close(tty);
+        }
+        public nothrow int Descriptor() 
+        {
+            return tty;
+        }
+        private static UniquePtr<TerminalState> instance;
         private int tty;
-	}
-	
+    }
+    
     public static class Terminal
     {
         static nothrow Terminal() :
             in(SharedPtr<Stream>(new FileStream(TerminalState.Instance().Descriptor()))),
             out(SharedPtr<Stream>(new FileStream(TerminalState.Instance().Descriptor()))),
             err(SharedPtr<Stream>(new FileStream(TerminalState.Instance().Descriptor())))
-		{
+        {
         }
         public static void Write(const char* s)
         {
-			out.Write(s);
+            out.Write(s);
         }
         public static void Write(const wchar* s)
         {
@@ -232,97 +232,97 @@ namespace System
         {
             return in.ReadToEnd();
         }
-		public static nothrow StreamReader& In()
-		{
-			return in;
-		}
-		public static nothrow StreamWriter& Out()
-		{
-			return out;
-		}
-		public static nothrow StreamWriter& Error()
-		{
-			return err;
-		}
-		public static nothrow int Descriptor() 
-		{
-			return TerminalState.Instance().Descriptor();
-		}
+        public static nothrow StreamReader& In()
+        {
+            return in;
+        }
+        public static nothrow StreamWriter& Out()
+        {
+            return out;
+        }
+        public static nothrow StreamWriter& Error()
+        {
+            return err;
+        }
+        public static nothrow int Descriptor() 
+        {
+            return TerminalState.Instance().Descriptor();
+        }
         private static StreamReader in;
         private static StreamWriter out;
         private static StreamWriter err;
     }
-	
-	public nothrow bool IsConsole(int fd)
-	{
-		return IOCtl(fd, IOControlItem.isConsole, null, 0) == 1;
-	}
-	
+    
+    public nothrow bool IsConsole(int fd)
+    {
+        return IOCtl(fd, IOControlItem.isConsole, null, 0) == 1;
+    }
+    
     public void SetEcho(int fd, bool value)
     {
         byte arg = cast<byte>(value);
         IOCtl(fd, IOControlItem.set_echo, &arg, 1);
     }
-	
-	public void SetRaw(int fd)
-	{
-		IOCtl(fd, IOControlItem.set_raw, null, 0);
-	}
+    
+    public void SetRaw(int fd)
+    {
+        IOCtl(fd, IOControlItem.set_raw, null, 0);
+    }
 
-	public void SetCooked(int fd)
-	{
-		IOCtl(fd, IOControlItem.set_cooked, null, 0);
-	}
-	
-	public nothrow int TerminalWindowWidth()
-	{
-		return IOCtl(Terminal.Descriptor(), IOControlItem.columns, null, 0);
-	}
+    public void SetCooked(int fd)
+    {
+        IOCtl(fd, IOControlItem.set_cooked, null, 0);
+    }
+    
+    public nothrow int TerminalWindowWidth()
+    {
+        return IOCtl(Terminal.Descriptor(), IOControlItem.columns, null, 0);
+    }
 
-	public nothrow int TerminalWindowHeight()
-	{
-		return IOCtl(Terminal.Descriptor(), IOControlItem.rows, null, 0);
-	}
-	
-	public nothrow int CursorX() 
-	{
-		return IOCtl(Terminal.Descriptor(), IOControlItem.cursor_x, null, 0);
-	}
+    public nothrow int TerminalWindowHeight()
+    {
+        return IOCtl(Terminal.Descriptor(), IOControlItem.rows, null, 0);
+    }
+    
+    public nothrow int CursorX() 
+    {
+        return IOCtl(Terminal.Descriptor(), IOControlItem.cursor_x, null, 0);
+    }
 
-	public nothrow int CursorY() 
-	{
-		return IOCtl(Terminal.Descriptor(), IOControlItem.cursor_y, null, 0);
-	}
+    public nothrow int CursorY() 
+    {
+        return IOCtl(Terminal.Descriptor(), IOControlItem.cursor_y, null, 0);
+    }
 
-	public nothrow void SetCursorPos(int x, int y)
-	{
-		byte[8] args;
-		MemoryWriter writer(&args[0], 8);
-		writer.Write(x);
-		writer.Write(y);
-		IOCtl(Terminal.Descriptor(), IOControlItem.set_cursor_pos, &args[0], 8);
-	}
+    public nothrow void SetCursorPos(int x, int y)
+    {
+        byte[8] args;
+        MemoryWriter writer(&args[0], 8);
+        writer.Write(x);
+        writer.Write(y);
+        IOCtl(Terminal.Descriptor(), IOControlItem.set_cursor_pos, &args[0], 8);
+    }
 
-	public void ClearScreen(int screenWidth, int screenHeight)
-	{
-		int cursorX = CursorX();
-		int cursorY = CursorY();
-		ustring line(' ', screenWidth);
-		for (int i = 0; i < screenHeight; ++i)
-		{
-			SetCursorPos(0, i);
-			Terminal.Out() << line;
-		}
-		SetCursorPos(cursorX, cursorY);
-	}
-	
-	public void PushLines()
-	{
-		IOCtl(Terminal.Descriptor(), IOControlItem.push_lines, null, 0);
-	}
-	
-	public void PopLines()
-	{
-		IOCtl(Terminal.Descriptor(), IOControlItem.pop_lines, null, 0);
-	}
+    public void ClearScreen(int screenWidth, int screenHeight)
+    {
+        int cursorX = CursorX();
+        int cursorY = CursorY();
+        ustring line(' ', screenWidth);
+        for (int i = 0; i < screenHeight; ++i)
+        {
+            SetCursorPos(0, i);
+            Terminal.Out() << line;
+        }
+        SetCursorPos(cursorX, cursorY);
+    }
+    
+    public void PushLines()
+    {
+        IOCtl(Terminal.Descriptor(), IOControlItem.push_lines, null, 0);
+    }
+    
+    public void PopLines()
+    {
+        IOCtl(Terminal.Descriptor(), IOControlItem.pop_lines, null, 0);
+    }
 }

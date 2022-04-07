@@ -7,7 +7,13 @@
 #include <system-x/kernel/OsApi.hpp>
 #include <system-x/kernel/EventManager.hpp>
 #include <system-x/kernel/Debug.hpp>
+#include <system-x/kernel/Fs.hpp>
+#include <system-x/kernel/Mount.hpp>
+#include <system-x/kernel/MsgQueue.hpp>
+#include <system-x/kernel/Kernel.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <soulng/util/TextUtils.hpp>
+#include <soulng/util/MemoryWriter.hpp>
 #include <memory>
 #include <list>
 #include <thread>
@@ -48,10 +54,11 @@ public:
     std::vector<uint8_t> Read(int64_t count, cmsx::machine::Process* process);
     int64_t Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process);
     void SetMachine(cmsx::machine::Machine* machine_) { machine = machine_; }
-    void SendKey(char32_t key);
     void Start();
     void Stop();
     void Run();
+    void Bind(int32_t md_);
+    void Unbind();
     ~Terminal();
 private:
     Terminal();
@@ -78,6 +85,7 @@ private:
     void ClearUpdateLine();
     void UpdateLine();
     void UpdateCursorPos();
+    void PutKeyPressedMessage(char32_t ch);
     cmsx::machine::Machine* machine;
     static std::unique_ptr<Terminal> instance;
     static bool initialized;
@@ -106,13 +114,16 @@ private:
     std::condition_variable_any terminalEventVar;
     bool started;
     bool stopped;
-    Utf8ToUtf32Engine utfEngine;
+    Utf8ToUtf32Engine writeEngine;
+    Utf8ToUtf32Engine readEngine;
     std::vector<std::u32string> lines;
     std::stack<std::vector<std::u32string>> linesStack;
     std::u32string line;
     int pos;
     int lineIndex;
     bool eof;
+    bool readStartChar;
+    int32_t boundMd;
 };
 
 bool Terminal::initialized = false;
@@ -163,8 +174,22 @@ void Terminal::Run()
         if (exiting || machine->Exiting()) return;
         char32_t ch = terminalInputQueue.front();
         terminalInputQueue.pop_front();
+        if ((GetDebugMode() & debugTerminalMode) != 0)
+        {
+            DebugWrite("terminal.input.key(" + OsKeyName(static_cast<int>(ch)) + ")");
+        }
         HandleInputChar(ch);
     }
+}
+
+void Terminal::Bind(int32_t md)
+{
+    boundMd = md;
+}
+
+void Terminal::Unbind()
+{
+    boundMd = -1;
 }
 
 void Terminal::GetTerminalInput()
@@ -172,24 +197,21 @@ void Terminal::GetTerminalInput()
     char32_t ch = OsReadConsoleInput(consoleInputHandle);
     if (ch)
     {
-        if ((GetDebugMode() & debugTerminalMode) != 0)
+        if (boundMd != -1)
         {
-            DebugWrite("read.key(" + OsKeyName(ch) + ")");
+            PutKeyPressedMessage(ch);
         }
-        terminalInputQueue.push_back(ch);
-        terminalInputReady = true;
-        terminalEventVar.notify_one();
+        else
+        {
+            if ((GetDebugMode() & debugTerminalMode) != 0)
+            {
+                DebugWrite("read.key(" + OsKeyName(ch) + ")");
+            }
+            terminalInputQueue.push_back(ch);
+            terminalInputReady = true;
+            terminalEventVar.notify_one();
+        }
     }
-}
-
-void Terminal::SendKey(char32_t key)
-{
-    if ((GetDebugMode() & debugTerminalMode) != 0)
-    {
-    }
-    terminalInputQueue.push_back(key);
-    terminalInputReady = true;
-    terminalEventVar.notify_one();
 }
 
 void Terminal::PushLines()
@@ -271,7 +293,9 @@ Terminal::Terminal() :
     stopped(false),
     pos(0),
     lineIndex(0),
-    eof(false)
+    eof(false),
+    readStartChar(true),
+    boundMd(-1)
 {
     GetScreenBufferInfo();
     defaultAttrs = attrs;
@@ -337,9 +361,15 @@ void Terminal::HandleInputChar(char32_t ch)
             for (char c : chars)
             {
                 terminalInputBuffer.push_back(static_cast<uint8_t>(c));
+                if ((GetDebugMode() & debugTerminalMode) != 0)
+                {
+                    DebugWrite("terminal.put.input.buffer(" + ToHexString(static_cast<uint8_t>(c)) + ")");
+                }
             }
         }
+        DebugWrite("> terminal.input.wakeup");
         Wakeup(terminalInputEvent);
+        DebugWrite("< terminal.input.wakeup");
     }
     else if (mode == TerminalMode::cooked)
     {
@@ -794,44 +824,25 @@ std::vector<uint8_t> Terminal::Read(int64_t count, cmsx::machine::Process* proce
         else
         {
             int64_t m = int64_t(terminalInputBuffer.size());
-            if (mode == TerminalMode::cooked && m >= 3)
-            {
-                bool keyMsgRead = false;
-                Utf8ToUtf32Engine readEngine;
-                for (auto it = terminalInputBuffer.cbegin(); it != terminalInputBuffer.cend(); ++it)
-                {
-                    readEngine.Put(*it);
-                    if (readEngine.ResulReady())
-                    {
-                        if (readEngine.Result() == keyMsg)
-                        {
-                            keyMsgRead = true;
-                            break;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-                if (keyMsgRead)
-                {
-                    if ((GetDebugMode() & debugTerminalMode) != 0)
-                    {
-                        DebugWrite("key.msg.read mode=cooked");
-                    }
-                    terminalInputBuffer.pop_front();
-                    terminalInputBuffer.pop_front();
-                    terminalInputBuffer.pop_front();
-                    continue;
-                }
-            }
             int64_t n = std::min(m, count);
             for (int64_t i = 0; i < n; ++i)
             {
                 uint8_t x = terminalInputBuffer.front();
                 terminalInputBuffer.pop_front();
                 bytes.push_back(x);
+                if ((GetDebugMode() & debugTerminalMode) != 0)
+                {
+                    DebugWrite("terminal.read.byte(" + ToHexString(x) + ")");
+                }
+                readEngine.Put(x);
+                if (readEngine.ResulReady())
+                {
+                    char32_t ch = readEngine.Result();
+                    if ((GetDebugMode() & debugTerminalMode) != 0)
+                    {
+                        DebugWrite("terminal.read.key(" + OsKeyName(static_cast<int>(ch)) + ")");
+                    }
+                }
             }
             return bytes;
         }
@@ -853,10 +864,10 @@ int64_t Terminal::Write(const std::vector<uint8_t>& buffer, cmsx::machine::Proce
     std::u32string utf32Chars;
     for (uint8_t x : buffer)
     {
-        utfEngine.Put(x);
-        if (utfEngine.ResulReady())
+        writeEngine.Put(x);
+        if (writeEngine.ResulReady())
         {
-            char32_t ch = utfEngine.Result();
+            char32_t ch = writeEngine.Result();
             if (ch < static_cast<char32_t>(0x100000u))
             {
                 utf32Chars.append(1, ch);
@@ -883,6 +894,26 @@ int64_t Terminal::Write(const std::vector<uint8_t>& buffer, cmsx::machine::Proce
     outputEndCursorPosX = cursorPosX;
     outputEndCursorPosY = cursorPosY;
     return buffer.size();
+}
+
+const int keyPressedMessageId = 1;
+
+void Terminal::PutKeyPressedMessage(char32_t ch)
+{
+    if ((GetDebugMode() & debugTerminalMode) != 0)
+    {
+        DebugWrite("> terminal.put.key.pressed(" + OsKeyName(static_cast<int>(ch)) + ")");
+    }
+    std::vector<std::uint8_t> keyPressedMessageData(8 + 4);
+    MemoryWriter writer(keyPressedMessageData.data(), 8 + 4);
+    writer.Write(keyPressedMessageId);
+    writer.Write(static_cast<int32_t>(-1)); // no window
+    writer.Write(static_cast<int32_t>(ch));
+    PutMsg(boundMd, keyPressedMessageData);
+    if ((GetDebugMode() & debugTerminalMode) != 0)
+    {
+        DebugWrite("< terminal.put.key.pressed(" + OsKeyName(static_cast<int>(ch)) + ")");
+    }
 }
 
 TerminalFile::TerminalFile() : File("TERMINAL")
@@ -951,11 +982,6 @@ void TerminalFile::SetEcho(bool echo)
     }
 }
 
-void TerminalFile::SendKey(char32_t key)
-{
-    Terminal::Instance().SendKey(key);
-}
-
 void TerminalFile::PushLines()
 {
     Terminal::Instance().PushLines();
@@ -964,6 +990,16 @@ void TerminalFile::PushLines()
 void TerminalFile::PopLines()
 {
     Terminal::Instance().PopLines();
+}
+
+void TerminalFile::Bind(int32_t md)
+{
+    Terminal::Instance().Bind(md);
+}
+
+void TerminalFile::Unbind()
+{
+    Terminal::Instance().Unbind();
 }
 
 void SetTerminalMachine(cmsx::machine::Machine* machine)

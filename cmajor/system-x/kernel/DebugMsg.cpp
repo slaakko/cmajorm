@@ -53,10 +53,21 @@ std::string KeyPressedMessageParams(MemoryReader& reader)
 std::string WriteScreenMessageParams(MemoryReader& reader)
 {
     std::string params;
-    params.append(".x=").append(std::to_string(reader.ReadInt()));
-    params.append(".y=").append(std::to_string(reader.ReadInt()));
-    params.append(".w=").append(std::to_string(reader.ReadInt()));
-    params.append(".h=").append(std::to_string(reader.ReadInt()));
+    int32_t x = reader.ReadInt();
+    int32_t y = reader.ReadInt();
+    int32_t w = reader.ReadInt();
+    int32_t h = reader.ReadInt();
+    if (x == -1 && y == -1 && w == -1 && h == -1)
+    {
+        params.append(".default");
+    }
+    else
+    {
+        params.append(".x=").append(std::to_string(x));
+        params.append(".y=").append(std::to_string(y));
+        params.append(".w=").append(std::to_string(w));
+        params.append(".h=").append(std::to_string(h));
+    }
     return params;
 }
 
@@ -71,7 +82,14 @@ std::string MsgContentStr(int msgId, MemoryReader& reader)
 {
     std::string contentStr;
     int targetWindowHandle = reader.ReadInt();
-    contentStr.append("window=").append(std::to_string(targetWindowHandle));
+    if (targetWindowHandle == -1)
+    {
+        contentStr.append("window=all");
+    }
+    else
+    {
+        contentStr.append("window=").append(std::to_string(targetWindowHandle));
+    }
     switch (msgId)
     {
         case keyPressedMessageId:

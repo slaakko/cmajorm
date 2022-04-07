@@ -27,7 +27,7 @@ int32_t OpenResource(Process* process, uint64_t resourceNameAddr)
 {
     if (resourceNameAddr == 0)
     {
-        throw SystemError(EPARAM, "resource name is null");
+        throw SystemError(EPARAM, "resource name is null", __FUNCTION__);
     }
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::string resourceName = ReadString(process, resourceNameAddr, mem);
@@ -44,7 +44,7 @@ int32_t OpenResource(Process* process, uint64_t resourceNameAddr)
     }
     else
     {
-        throw SystemError(ENOTFOUND, "resource '" + resourceName + "' not found");
+        throw SystemError(ENOTFOUND, "resource '" + resourceName + "' not found", __FUNCTION__);
     }
 }
 
@@ -67,7 +67,7 @@ int64_t GetResourceSize(Process* process, int32_t rd)
     }
     else
     {
-        throw SystemError(EBADF, std::to_string(rd) + " is not a resource descriptor");
+        throw SystemError(EBADF, std::to_string(rd) + " is not a resource descriptor", __FUNCTION__);
     }
 }
 
@@ -82,7 +82,7 @@ void ReadResource(Process* process, int32_t rd, int64_t offset, int64_t length, 
     }
     else
     {
-        throw SystemError(EBADF, std::to_string(rd) + " is not a resource descriptor");
+        throw SystemError(EBADF, std::to_string(rd) + " is not a resource descriptor", __FUNCTION__);
     }
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     if (offset != 0)

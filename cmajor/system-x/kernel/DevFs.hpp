@@ -6,6 +6,7 @@
 #ifndef CMSX_KERNEL_DEV_FS_INCLUDED
 #define CMSX_KERNEL_DEV_FS_INCLUDED
 #include <system-x/kernel/Fs.hpp>
+#include <system-x/kernel/DirFile.hpp>
 
 namespace cmsx::kernel {
 
@@ -26,11 +27,12 @@ public:
     void MkDir(INode* parentDirINode, const std::string& dirName, cmsx::machine::Process* process, int32_t mode) override;
     std::string GetHostFilePath(int32_t inodeNumber, cmsx::machine::Process* process) override;
     INodePtr ReadINode(INodeKey inodeKey, cmsx::machine::Process* process) override;
-    void ClearProcessData(cmsx::machine::Process* process) override;
+    std::string INodeToPath(INodeKey inodeKey, cmsx::machine::Process* process) override;
 private:
     cmsx::machine::Machine* machine;
     INodeKey mountPoint;
     INodeKey devINodeKey;
+    std::unique_ptr<DirFile> devDirFile;
 };
 
 } // namespace cmsx::kernel

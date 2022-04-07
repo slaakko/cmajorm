@@ -80,18 +80,20 @@ const uint8_t trap_remove_dir_change_notifications = 65;
 const uint8_t trap_directories_changed = 66;
 const uint8_t trap_clear_directories_changed = 67;
 const uint8_t trap_child_times = 68;
-const uint8_t trap_sendkey = 69;
-const uint8_t trap_msgq = 70;
-const uint8_t trap_close_msgq = 71;
+const uint8_t trap_msgq = 69;
+const uint8_t trap_close_msgq = 70;
+const uint8_t trap_wait_msg = 71;
 const uint8_t trap_put_msg = 72;
 const uint8_t trap_get_msgq_length = 73;
 const uint8_t trap_get_msg_size = 74;
 const uint8_t trap_get_msg = 75;
-const uint8_t trap_timer_msg = 76;
-const uint8_t trap_connect = 77;
-const uint8_t trap_get_debug_mode = 78;
-const uint8_t trap_set_debug_mode = 79;
-const uint8_t trap_write_debug_message = 80;
+const uint8_t trap_bind_terminal = 76;
+const uint8_t trap_unbind_terminal = 77;
+const uint8_t trap_timer_msg = 78;
+const uint8_t trap_connect = 79;
+const uint8_t trap_get_debug_mode = 80;
+const uint8_t trap_set_debug_mode = 81;
+const uint8_t trap_write_debug_message = 82;
 
 class CMSX_KERNEL_API TrapHandler
 {

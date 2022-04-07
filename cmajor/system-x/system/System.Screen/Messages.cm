@@ -11,18 +11,18 @@ namespace System.Screen
     const int quitMessageId = 0;
     const int keyPressedMessageId = 1;
     const int writeScreenMessageId = 2;
-	const int timerMessageId = 3;
+    const int timerMessageId = 3;
 
     public class QuitMessage : Message
     {
-		public override nothrow int Id() const
-		{
-			return quitMessageId;
-		}
-		public override nothrow string Name() const
-		{
-			return "quit"; 
-		}
+        public override nothrow int Id() const
+        {
+            return quitMessageId;
+        }
+        public override nothrow string Name() const
+        {
+            return "quit"; 
+        }
         static nothrow QuitMessage() : Message()
         {
             RegisterMessage<QuitMessage>(quitMessageId);
@@ -31,18 +31,18 @@ namespace System.Screen
 
     public class KeyPressedMessage : Message
     {
-		public override nothrow int Id() const
-		{
-			return keyPressedMessageId;
-		}
-		public override nothrow int Size() const
-		{
-			return cast<int>(base->Size() + sizeof(uchar));
-		}
-		public override nothrow string Name() const
-		{
-			return "keyPressed"; 
-		}
+        public override nothrow int Id() const
+        {
+            return keyPressedMessageId;
+        }
+        public override nothrow int Size() const
+        {
+            return cast<int>(base->Size() + sizeof(uchar));
+        }
+        public override nothrow string Name() const
+        {
+            return "keyPressed"; 
+        }
         static nothrow KeyPressedMessage() : Message()
         {
             RegisterMessage<KeyPressedMessage>(keyPressedMessageId);
@@ -73,18 +73,18 @@ namespace System.Screen
     
     public class WriteScreenMessage : Message
     {
-		public override nothrow int Id() const
-		{
-			return writeScreenMessageId;
-		}
-		public override nothrow int Size() const
-		{
-			return cast<int>(base->Size() + sizeof(Rect));
-		}
-		public override nothrow string Name() const
-		{
-			return "writeScreen"; 
-		}
+        public override nothrow int Id() const
+        {
+            return writeScreenMessageId;
+        }
+        public override nothrow int Size() const
+        {
+            return cast<int>(base->Size() + sizeof(Rect));
+        }
+        public override nothrow string Name() const
+        {
+            return "writeScreen"; 
+        }
         static nothrow WriteScreenMessage() : Message()
         {
             RegisterMessage<WriteScreenMessage>(writeScreenMessageId);
@@ -118,51 +118,51 @@ namespace System.Screen
         }
         private Rect rect;
     }
-	
-	public class TimerMessage : Message
-	{
-		public override nothrow int Id() const
-		{
-			return timerMessageId;
-		}
-		public override nothrow int Size() const
-		{
-			return cast<int>(base->Size() + sizeof(int));
-		}
-		public override nothrow string Name() const
-		{
-			return "timer"; 
-		}
-		static nothrow TimerMessage() : Message()
-		{
-			RegisterMessage<TimerMessage>(timerMessageId);
-		}
-		public nothrow TimerMessage(int timerId_) : timerId(timerId_)
-		{
-		}
-		public override void Write(MemoryWriter& writer)
-		{
-			base->Write(writer);
-			writer.Write(timerId);
-		}
-		public override void Read(MemoryReader& reader)
-		{
-			base->Read(reader);
-			timerId = reader.ReadInt();
-		}
-		public override bool Dispatch(Control* control)
-		{
-			return control->HandleTimerMessage(this);
-		}
-		public nothrow int TimerId() const
-		{
-			return timerId;
-		}
-		private int timerId;
-	}
+    
+    public class TimerMessage : Message
+    {
+        public override nothrow int Id() const
+        {
+            return timerMessageId;
+        }
+        public override nothrow int Size() const
+        {
+            return cast<int>(base->Size() + sizeof(int));
+        }
+        public override nothrow string Name() const
+        {
+            return "timer"; 
+        }
+        static nothrow TimerMessage() : Message()
+        {
+            RegisterMessage<TimerMessage>(timerMessageId);
+        }
+        public nothrow TimerMessage(int timerId_) : timerId(timerId_)
+        {
+        }
+        public override void Write(MemoryWriter& writer)
+        {
+            base->Write(writer);
+            writer.Write(timerId);
+        }
+        public override void Read(MemoryReader& reader)
+        {
+            base->Read(reader);
+            timerId = reader.ReadInt();
+        }
+        public override bool Dispatch(Control* control)
+        {
+            return control->HandleTimerMessage(this);
+        }
+        public nothrow int TimerId() const
+        {
+            return timerId;
+        }
+        private int timerId;
+    }
     
     new class ConcreteMessageFactoryFunction<QuitMessage>;
     new class ConcreteMessageFactoryFunction<KeyPressedMessage>;
     new class ConcreteMessageFactoryFunction<WriteScreenMessage>;
-	new class ConcreteMessageFactoryFunction<TimerMessage>;
+    new class ConcreteMessageFactoryFunction<TimerMessage>;
 }

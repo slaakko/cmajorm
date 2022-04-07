@@ -130,7 +130,7 @@ int32_t BlockNumberBlock::GetBlockNumber(int index) const
     }
     else
     {
-        throw SystemError(EFAIL, "invalid block number index");
+        throw SystemError(EFAIL, "invalid block number index", __FUNCTION__);
     }
 }
 
@@ -142,7 +142,7 @@ void BlockNumberBlock::SetBlockNumber(int32_t blockNumber, int index)
     }
     else
     {
-        throw SystemError(EFAIL, "invalid block number index");
+        throw SystemError(EFAIL, "invalid block number index", __FUNCTION__);
     }
 }
 
@@ -248,7 +248,7 @@ void DirectoryEntry::SetName(const std::string& name_)
 {
     if (name_.length() > MaxNameLength())
     {
-        throw SystemError(EFAIL, "name too long");
+        throw SystemError(EFAIL, "name too long", __FUNCTION__);
     }
     name = name_;
 }
@@ -296,7 +296,7 @@ void DirectoryBlock::AddEntry(const DirectoryEntry& entry)
 {
     if (IsFull())
     {
-        throw SystemError(EFAIL, "too many directory entries in directory block");
+        throw SystemError(EFAIL, "too many directory entries in directory block", __FUNCTION__);
     }
     entries.push_back(entry);
 }
@@ -430,7 +430,7 @@ int32_t GetFreeBlockNumber(int32_t fsNumber, cmsx::machine::Process* process)
         WriteSuperBlock(superBlock, fs, process);
     }
     while (blockNumberBlockNumber != startBlockNumberBlockNumber);
-    throw SystemError(EFAIL, "out of free blocks in filesystem " + std::to_string(fsNumber));
+    throw SystemError(EFAIL, "out of free blocks in filesystem " + std::to_string(fsNumber), __FUNCTION__);
 }
 
 void PutFreeBlockNumber(int32_t fsNumber, int32_t freeBlockNumber, cmsx::machine::Process* process)
@@ -458,7 +458,7 @@ void PutFreeBlockNumber(int32_t fsNumber, int32_t freeBlockNumber, cmsx::machine
         WriteSuperBlock(superBlock, fs, process);
     }
     while (blockNumberBlockNumber != startBlockNumberBlockNumber);
-    throw SystemError(EFAIL, "free block number list in filesystem " + std::to_string(fsNumber) + " is full");
+    throw SystemError(EFAIL, "free block number list in filesystem " + std::to_string(fsNumber) + " is full", __FUNCTION__);
 }
 
 INodePtr AllocateINode(int32_t fsNumber, cmsx::machine::Process* process)
@@ -468,7 +468,7 @@ INodePtr AllocateINode(int32_t fsNumber, cmsx::machine::Process* process)
     ReadSuperBlock(superBlock, fs, process);
     if (superBlock.CurrentNumberOfFiles() == superBlock.NumINodes())
     {
-        throw SystemError(EFAIL, "filesystem " + std::to_string(fsNumber) + " is out of inodes (maximum number of files is " + std::to_string(superBlock.NumINodes()) + ")");
+        throw SystemError(EFAIL, "filesystem " + std::to_string(fsNumber) + " is out of inodes (maximum number of files is " + std::to_string(superBlock.NumINodes()) + ")", __FUNCTION__);
     }
     int32_t currentINodeBlockNumber = superBlock.CurrentINodeBlockNumber();
     int32_t startINodeBlockNumber = currentINodeBlockNumber;
@@ -499,7 +499,7 @@ INodePtr AllocateINode(int32_t fsNumber, cmsx::machine::Process* process)
         }
     } 
     while (currentINodeBlockNumber != startINodeBlockNumber);
-    throw SystemError(EFAIL, "filesystem " + std::to_string(fsNumber) + " is out of inodes (maximum number of files is " + std::to_string(superBlock.NumINodes()) + ")");
+    throw SystemError(EFAIL, "filesystem " + std::to_string(fsNumber) + " is out of inodes (maximum number of files is " + std::to_string(superBlock.NumINodes()) + ")", __FUNCTION__);
 }
 
 void FreeINode(INode* inode, cmsx::machine::Process* process)
@@ -729,7 +729,7 @@ INodePtr SearchDirectory(const std::string& name, INode* dirINode, const std::st
 {
     if (dirINode->GetFileType() != FileType::directory)
     {
-        throw SystemError(EFAIL, "not a directory inode");
+        throw SystemError(EFAIL, "not a directory inode", __FUNCTION__);
     }
     CheckAccess(Access::execute, process->EUID(), process->EGID(), dirINode, "could not search directory '" + dirPath + "'");
     int32_t logicalBlockNumber = 0;
@@ -764,7 +764,7 @@ DirectoryEntry GetDirectoryEntry(INode* dirINode, int32_t inodeNumber, Filesyste
 {
     if (dirINode->GetFileType() != FileType::directory)
     {
-        throw SystemError(EFAIL, "not a directory inode");
+        throw SystemError(EFAIL, "not a directory inode", __FUNCTION__);
     }
     int32_t logicalBlockNumber = 0;
     int32_t blockNumber = MapBlockNumber(logicalBlockNumber, dirINode, fs, process);
@@ -808,7 +808,7 @@ void AddDirectoryEntry(const DirectoryEntry& entry, INode* dirINode, Filesystem*
 {
     if (dirINode->GetFileType() != FileType::directory)
     {
-        throw SystemError(EFAIL, "not a directory inode");
+        throw SystemError(EFAIL, "not a directory inode", __FUNCTION__);
     }
     int32_t logicalBlockNumber = 0;
     int32_t blockNumber = MapBlockNumber(logicalBlockNumber, dirINode, fs, process);
@@ -851,7 +851,7 @@ void RemoveDirectoryEntry(const std::string& name, const std::string& filePath, 
 {
     if (dirINode->GetFileType() != FileType::directory)
     {
-        throw SystemError(EFAIL, "not a directory");
+        throw SystemError(EFAIL, "not a directory", __FUNCTION__);
     }
     int32_t logicalBlockNumber = 0;
     int32_t blockNumber = MapBlockNumber(logicalBlockNumber, dirINode, fs, process);
@@ -896,14 +896,14 @@ void RemoveDirectoryEntry(const std::string& name, const std::string& filePath, 
         ++logicalBlockNumber;
         blockNumber = MapBlockNumber(logicalBlockNumber, dirINode, fs, process);
     }
-    throw SystemError(EFAIL, "could not remove: name '" + name + "' not found");
+    throw SystemError(EFAIL, "could not remove: name '" + name + "' not found", __FUNCTION__);
 }
 
 void RenameDirectoryEntry(INode* dirINode, const std::string& oldName, const std::string& newName, Filesystem* fs, cmsx::machine::Process* process)
 {
     if (dirINode->GetFileType() != FileType::directory)
     {
-        throw SystemError(EFAIL, "not a directory");
+        throw SystemError(EFAIL, "not a directory", __FUNCTION__);
     }
     int32_t logicalBlockNumber = 0;
     int32_t blockNumber = MapBlockNumber(logicalBlockNumber, dirINode, fs, process);
@@ -935,7 +935,7 @@ void RenameDirectoryEntry(INode* dirINode, const std::string& oldName, const std
         ++logicalBlockNumber;
         blockNumber = MapBlockNumber(logicalBlockNumber, dirINode, fs, process);
     }
-    throw SystemError(EFAIL, "could not remove: name '" + oldName + "' not found");
+    throw SystemError(EFAIL, "could not remove: name '" + oldName + "' not found", __FUNCTION__);
 }
 
 INodePtr MakeDirectory(const std::string& path, Filesystem* fs, cmsx::machine::Process* process, int32_t mode)
@@ -955,7 +955,7 @@ INodePtr MakeDirectory(const std::string& path, Filesystem* fs, cmsx::machine::P
     INodePtr parentDirINode = PathToINode(parentDirectoryPath, fs, process);
     if (!parentDirINode.Get())
     {
-        throw SystemError(ENOTFOUND, "could not create directory: parent directory '" + parentDirectoryPath + "' does not exist");
+        throw SystemError(ENOTFOUND, "could not create directory: parent directory '" + parentDirectoryPath + "' does not exist", __FUNCTION__);
     }
     INodePtr dirINodePtr = AllocateINode(fs->Id(), process);
     INode* dirINode = dirINodePtr.Get();

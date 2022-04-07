@@ -27,7 +27,7 @@ ProcessManager::ProcessManager() : machine(nullptr), maxProcs(cmsx::machine::Max
     if (maxProcs <= 0 || maxProcs > 64 * 1024)
     {
         throw SystemError(EPARAM, "invalid 'maxProcs' (" + std::to_string(maxProcs) + ") in '" + cmsx::machine::ConfigFilePath() + 
-            "': value should be in range 1..." + std::to_string(64 * 1024));
+            "': value should be in range 1..." + std::to_string(64 * 1024), __FUNCTION__);
     }
     processTable.resize(numProcessTableSlots);
 }
@@ -40,7 +40,7 @@ Process* ProcessManager::GetProcess(int32_t pid) const
 {
     if (pid < 1 || pid > maxProcs + 1)
     {
-        throw SystemError(EPARAM, "invalid pid " + std::to_string(pid));
+        throw SystemError(EPARAM, "invalid pid " + std::to_string(pid), __FUNCTION__);
     }
     return processTable[pid].get();
 }
@@ -61,7 +61,7 @@ Process* ProcessManager::CreateProcess()
 {
     if (!machine)
     {
-        throw SystemError(EFAIL, "machine not set in process manager");
+        throw SystemError(EFAIL, "machine not set in process manager", __FUNCTION__);
     }
 #if (LOCK_DEBUG)
     DebugLock startDebugLock(&machine->Lock(), PROCESS_MANAGER, 0, NO_LOCK | CREATE_PROCESS); 
@@ -85,7 +85,7 @@ Process* ProcessManager::CreateProcess()
     }
     if (nextProcessId > maxProcs)
     {
-        throw SystemError(ELIMITEXCEEDED, "all process table entries in use");
+        throw SystemError(ELIMITEXCEEDED, "all process table entries in use", __FUNCTION__);
     }
     int32_t processId = nextProcessId++;
     Process* process = new Process(processId);
@@ -106,7 +106,7 @@ void ProcessManager::DeleteProcess(int32_t pid)
 {
     if (!machine)
     {
-        throw SystemError(EFAIL, "machine not set in process manager");
+        throw SystemError(EFAIL, "machine not set in process manager", __FUNCTION__);
     }
 #if (LOCK_DEBUG)
     DebugLock startDebugLock(&machine->Lock(), PROCESS_MANAGER, pid, NO_LOCK | DELETE_PROCESS);
@@ -128,7 +128,7 @@ void ProcessManager::DeleteProcess(int32_t pid)
     }
     else
     {
-        throw SystemError(ENOTFOUND, "process with id " + std::to_string(pid) + " not found");
+        throw SystemError(ENOTFOUND, "process with id " + std::to_string(pid) + " not found", __FUNCTION__);
     }
 }
 

@@ -9,9 +9,10 @@
 
 namespace cmsx::kernel {
 
-struct CMSX_KERNEL_API ProcessHostFilesystemData
+struct CMSX_KERNEL_API HostFilesystemData
 {
     std::map<int32_t, std::string> inodePathMap;
+    std::map<int32_t, std::string> inodePartialPathMap;
 };
 
 class CMSX_KERNEL_API HostFilesystem : public Filesystem
@@ -34,12 +35,12 @@ public:
     void CloseDir(int32_t dirId);
     std::string GetHostFilePath(int32_t inodeNumber, cmsx::machine::Process* process) override;
     INodePtr ReadINode(INodeKey inodeKey, cmsx::machine::Process* process) override;
-    void ClearProcessData(cmsx::machine::Process* process);
+    std::string INodeToPath(INodeKey inodeKey, cmsx::machine::Process* process) override;
 private:
     cmsx::machine::Machine* machine;
     int32_t nextINodeId;
     int32_t nextDirId;
-    std::map<int32_t, ProcessHostFilesystemData*> processDataMap;
+    HostFilesystemData data;
     std::map<int32_t, BlockFile*> fileMap;
     std::map<int32_t, DirFile*> dirFileMap;
     std::string prefix;

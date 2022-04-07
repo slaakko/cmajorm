@@ -72,18 +72,20 @@ public const byte trap_remove_dir_change_notifications = 65u;
 public const byte trap_directories_changed = 66u;
 public const byte trap_clear_directories_changed = 67u;
 public const byte trap_child_times = 68u;
-public const byte trap_sendkey = 69u;
-public const byte trap_msgq = 70u;
-public const byte trap_close_msgq = 71u;
+public const byte trap_msgq = 69u;
+public const byte trap_close_msgq = 70u;
+public const byte trap_wait_msg = 71u;
 public const byte trap_put_msg = 72u;
 public const byte trap_get_msgq_length = 73u;
 public const byte trap_get_msg_size = 74u;
 public const byte trap_get_msg = 75u;
-public const byte trap_timer_msg = 76u;
-public const byte trap_connect = 77u;
-public const byte trap_get_debug_mode = 78u;
-public const byte trap_set_debug_mode = 79u;
-public const byte trap_write_debug_message = 80u;
+public const byte trap_bind_terminal = 76u;
+public const byte trap_unbind_terminal = 77u;
+public const byte trap_timer_msg = 78u;
+public const byte trap_connect = 9u;
+public const byte trap_get_debug_mode = 80u;
+public const byte trap_set_debug_mode = 81u;
+public const byte trap_write_debug_message = 82u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -468,62 +470,72 @@ public cdecl nothrow int child_times(long* childUserTime, long* childSleepTime, 
     return cast<int>(trap(0u, trap_child_times, 0u, childUserTime, childSleepTime, childSystemTime));
 }
 
-public cdecl nothrow int sendkey(uchar key)
-{
-	return cast<int>(trap(0u, trap_sendkey, 0u, key));
-}
-
 public cdecl nothrow int msgq(const char* name)
 {
-	return cast<int>(trap(0u, trap_msgq, 0u, name));
+    return cast<int>(trap(0u, trap_msgq, 0u, name));
 }
 
 public cdecl nothrow int close_msgq(int md)
 {
-	return cast<int>(trap(0u, trap_close_msgq, 0u, md));
+    return cast<int>(trap(0u, trap_close_msgq, 0u, md));
+}
+
+public cdecl nothrow int wait_msg(int md)
+{
+    return cast<int>(trap(0u, trap_wait_msg, 0u, md));
 }
 
 public cdecl nothrow int put_msg(int md, byte* msgData, int msgSize)
 {
-	return cast<int>(trap(0u, trap_put_msg, 0u, md, msgData, msgSize));
+    return cast<int>(trap(0u, trap_put_msg, 0u, md, msgData, msgSize));
 }
 
 public cdecl nothrow int get_msgq_length(int md)
 {
-	return cast<int>(trap(0u, trap_get_msgq_length, 0u, md));
+    return cast<int>(trap(0u, trap_get_msgq_length, 0u, md));
 }
 
 public cdecl nothrow int get_msg_size(int md)
 {
-	return cast<int>(trap(0u, trap_get_msg_size, 0u, md));
+    return cast<int>(trap(0u, trap_get_msg_size, 0u, md));
 }
 
 public cdecl nothrow int get_msg(int md, byte* buffer)
 {
-	return cast<int>(trap(0u, trap_get_msg, 0u, md, buffer));
+    return cast<int>(trap(0u, trap_get_msg, 0u, md, buffer));
+}
+
+public cdecl nothrow int bind_terminal(int md)
+{
+    return cast<int>(trap(0u, trap_bind_terminal, 0u, md));
+}
+
+public cdecl nothrow int unbind_terminal()
+{
+    return cast<int>(trap(0u, trap_unbind_terminal, 0u));
 }
 
 public cdecl nothrow int timer_msg(long duration, int md, byte* msgData, int msgSize)
 {
-	return cast<int>(trap(0u, trap_timer_msg, 0u, duration, md, msgData, msgSize));
+    return cast<int>(trap(0u, trap_timer_msg, 0u, duration, md, msgData, msgSize));
 }
 
 public cdecl nothrow int connect(const char* node, const char* service)
 {
-	return cast<int>(trap(0u, trap_connect, 0u, node, service));
+    return cast<int>(trap(0u, trap_connect, 0u, node, service));
 }
 
 public cdecl nothrow int get_debug_mode()
 {
-	return cast<int>(trap(0u, trap_get_debug_mode, 0u));
+    return cast<int>(trap(0u, trap_get_debug_mode, 0u));
 }
 
 public cdecl nothrow int set_debug_mode(int mode)
 {
-	return cast<int>(trap(0u, trap_set_debug_mode, 0u, mode));
+    return cast<int>(trap(0u, trap_set_debug_mode, 0u, mode));
 }
 
 public cdecl nothrow int write_debug_message(const char* msg)
 {
-	return cast<int>(trap(0u, trap_write_debug_message, 0u, msg));
+    return cast<int>(trap(0u, trap_write_debug_message, 0u, msg));
 }

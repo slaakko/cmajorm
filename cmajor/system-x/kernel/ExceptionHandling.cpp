@@ -175,7 +175,7 @@ void DispatchException(uint64_t exceptionAddress, uint64_t exceptionClassId, Pro
             fp = processor->GetMachine()->Mem().ReadOcta(process->RV(), fp, cmsx::machine::Protection::read);
         }
     }
-    throw SystemError(EFAIL, "exception dispatch failed: exception handler not found");
+    throw SystemError(EFAIL, "exception dispatch failed: exception handler not found", __FUNCTION__);
 }
 
 void ContinueExceptionDispatch(Process* process, uint64_t& setFP, uint64_t& setSP, uint64_t& setPC)
@@ -235,7 +235,7 @@ void ContinueExceptionDispatch(Process* process, uint64_t& setFP, uint64_t& setS
             fp = processor->GetMachine()->Mem().ReadOcta(process->RV(), fp, cmsx::machine::Protection::read);
         }
     }
-    throw SystemError(EFAIL, "exception dispatch failed: exception handler not found");
+    throw SystemError(EFAIL, "exception dispatch failed: exception handler not found", __FUNCTION__);
 }
 
 } // namespace cmsx::kernel

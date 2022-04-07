@@ -61,7 +61,7 @@ int64_t GetDecompressedDataSize(Process* process, int32_t dd)
     }
     else
     {
-        throw SystemError(EBADF, std::to_string(dd) + " is not a decompression file descriptor");
+        throw SystemError(EBADF, std::to_string(dd) + " is not a decompression file descriptor", __FUNCTION__);
     }
 }
 
@@ -76,7 +76,7 @@ void GetDecompressedData(Process* process, int32_t dd, int64_t bufferAddr, int64
     }
     else
     {
-        throw SystemError(EBADF, std::to_string(dd) + " is not a decompression file descriptor");
+        throw SystemError(EBADF, std::to_string(dd) + " is not a decompression file descriptor", __FUNCTION__);
     }
 }
 
@@ -90,7 +90,7 @@ void CloseDecompression(Process* process, int32_t dd)
     }
     else
     {
-        throw SystemError(EBADF, std::to_string(dd) + " is not a decompression file descriptor");
+        throw SystemError(EBADF, std::to_string(dd) + " is not a decompression file descriptor", __FUNCTION__);
     }
 }
 

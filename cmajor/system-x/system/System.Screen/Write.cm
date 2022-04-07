@@ -18,67 +18,67 @@ namespace System.Screen
             Terminal.Out() << blankLine;
         }
     }
-	
-	public const uchar boxLeftTop = cast<uchar>(0x250c);
-	public const uchar boxRightTop = cast<uchar>(0x2510);
-	public const uchar boxHorizontal = cast<uchar>(0x2500);
-	public const uchar boxVertical = cast<uchar>(0x2502);
-	public const uchar boxLeftBottom = cast<uchar>(0x2514);
-	public const uchar boxRightBottom = cast<uchar>(0x2518);
-	
-	public void WriteBox(const Rect& rect, ConsoleColor foreColor, ConsoleColor backColor)
-	{
-		Clear(rect, foreColor, backColor);
-		SetCursorPos(rect.location.x, rect.location.y);
-		Terminal.Out() << boxLeftTop;
-		for (int i = 1; i < rect.size.w - 1; ++i)
-		{
-			Terminal.Out() << boxHorizontal;
-		}
-		Terminal.Out() << boxRightTop;
-		for (int i = 1; i < rect.size.h - 1; ++i)
-		{
-			SetCursorPos(rect.location.x, rect.location.y + i);
-			Terminal.Out() << boxVertical;
-			SetCursorPos(rect.location.x + rect.size.w - 1, rect.location.y + i);
-			Terminal.Out() << boxVertical;
-		}
-		SetCursorPos(rect.location.x, rect.location.y + rect.size.h - 1);
-		Terminal.Out() << boxLeftBottom;
-		for (int i = 1; i < rect.size.w - 1; ++i)
-		{
-			Terminal.Out() << boxHorizontal;
-		}
-		Terminal.Out() << boxRightBottom;
-	}
-	
-	public List<ustring> SplitIntoLines(const ustring& text, int width)
-	{
-		List<ustring> lines;
-		List<ustring> words = text.Split(' ');
-		ustring line;
-		bool first = true;
-		for (const ustring& word : words)
-		{
-			if (first)
-			{
-				first = false;
-			}
-			else
-			{
-				line.Append(' ');
-			}
-			if (line.Length() + word.Length() > width)
-			{
-				lines.Add(line);
-				line.Clear();
-			}
-			line.Append(word);
-		}
-		if (!line.IsEmpty())
-		{
-			lines.Add(line);
-		}
-		return lines;
-	}
+    
+    public const uchar boxLeftTop = cast<uchar>(0x250c);
+    public const uchar boxRightTop = cast<uchar>(0x2510);
+    public const uchar boxHorizontal = cast<uchar>(0x2500);
+    public const uchar boxVertical = cast<uchar>(0x2502);
+    public const uchar boxLeftBottom = cast<uchar>(0x2514);
+    public const uchar boxRightBottom = cast<uchar>(0x2518);
+    
+    public void WriteBox(const Rect& rect, ConsoleColor foreColor, ConsoleColor backColor)
+    {
+        Clear(rect, foreColor, backColor);
+        SetCursorPos(rect.location.x, rect.location.y);
+        Terminal.Out() << boxLeftTop;
+        for (int i = 1; i < rect.size.w - 1; ++i)
+        {
+            Terminal.Out() << boxHorizontal;
+        }
+        Terminal.Out() << boxRightTop;
+        for (int i = 1; i < rect.size.h - 1; ++i)
+        {
+            SetCursorPos(rect.location.x, rect.location.y + i);
+            Terminal.Out() << boxVertical;
+            SetCursorPos(rect.location.x + rect.size.w - 1, rect.location.y + i);
+            Terminal.Out() << boxVertical;
+        }
+        SetCursorPos(rect.location.x, rect.location.y + rect.size.h - 1);
+        Terminal.Out() << boxLeftBottom;
+        for (int i = 1; i < rect.size.w - 1; ++i)
+        {
+            Terminal.Out() << boxHorizontal;
+        }
+        Terminal.Out() << boxRightBottom;
+    }
+    
+    public List<ustring> SplitIntoLines(const ustring& text, int width)
+    {
+        List<ustring> lines;
+        List<ustring> words = text.Split(' ');
+        ustring line;
+        bool first = true;
+        for (const ustring& word : words)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                line.Append(' ');
+            }
+            if (line.Length() + word.Length() > width)
+            {
+                lines.Add(line);
+                line.Clear();
+            }
+            line.Append(word);
+        }
+        if (!line.IsEmpty())
+        {
+            lines.Add(line);
+        }
+        return lines;
+    }
 }

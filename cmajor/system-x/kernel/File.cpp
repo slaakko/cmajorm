@@ -23,7 +23,7 @@ std::vector<uint8_t> File::Read(int64_t count, cmsx::machine::Process* process)
 {
     if (!IsReadable())
     {
-        throw SystemError(EBADF, name + " not open for reading");
+        throw SystemError(EBADF, name + " not open for reading", __FUNCTION__);
     }
     return std::vector<uint8_t>();
 }
@@ -32,54 +32,59 @@ int64_t File::Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* 
 {
     if (!IsWritable())
     {
-        throw SystemError(EBADF, name + " not open for writing");
+        throw SystemError(EBADF, name + " not open for writing", __FUNCTION__);
     }
     return 0;
 }
 
 void File::SetCursorPos(int32_t cursorX, int32_t cursorY)
 {
-    throw SystemError(EBADF, name + ": cannot set cursor position");
+    throw SystemError(EBADF, name + ": cannot set cursor position", __FUNCTION__);
 }
 
 void File::SetCooked()
 {
-    throw SystemError(EBADF, name + " cannot be set to cooked mode");
+    throw SystemError(EBADF, name + " cannot be set to cooked mode", __FUNCTION__);
 
 }
 void File::SetRaw()
 {
-    throw SystemError(EBADF, name + " cannot be set to raw mode");
+    throw SystemError(EBADF, name + " cannot be set to raw mode", __FUNCTION__);
 }
 
 void File::SetEcho(bool echo)
 {
-    throw SystemError(EBADF, name + ": cannot set echo");
-}
-
-void File::SendKey(char32_t key)
-{
-    throw SystemError(EBADF, name + ": cannot send key");
+    throw SystemError(EBADF, name + ": cannot set echo", __FUNCTION__);
 }
 
 void File::PushLines()
 {
-    throw SystemError(EBADF, name + ": cannot push lines");
+    throw SystemError(EBADF, name + ": cannot push lines", __FUNCTION__);
 }
 
 void File::PopLines()
 {
-    throw SystemError(EBADF, name + ": cannot pop lines");
+    throw SystemError(EBADF, name + ": cannot pop lines", __FUNCTION__);
 }
 
 int64_t File::Seek(int64_t offset, Origin whence, cmsx::machine::Process* process)
 {
-    throw SystemError(EBADF, name + " not seekable");
+    throw SystemError(EBADF, name + " not seekable", __FUNCTION__);
 }
 
 int64_t File::Tell(cmsx::machine::Process* process)
 {
-    throw SystemError(EBADF, name + " not seekable");
+    throw SystemError(EBADF, name + " not seekable", __FUNCTION__);
+}
+
+void File::Bind(int32_t md)
+{
+    throw SystemError(EBADF, name + " cannot bind", __FUNCTION__);
+}
+
+void File::Unbind()
+{
+    throw SystemError(EBADF, name + " cannot unbind", __FUNCTION__);
 }
 
 ProcessFileTable::ProcessFileTable()
@@ -144,12 +149,12 @@ File* ProcessFileTable::GetFile(int32_t fd) const
 {
     if (fd < 0 || fd > files.size())
     {
-        throw SystemError(EBADF, "invalid file descriptor");
+        throw SystemError(EBADF, "invalid file descriptor", __FUNCTION__);
     }
     File* file = files[fd];
     if (!file)
     {
-        throw SystemError(EBADF, "file not open");
+        throw SystemError(EBADF, "file not open", __FUNCTION__);
     }
     return file;
 }

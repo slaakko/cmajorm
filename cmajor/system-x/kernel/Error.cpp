@@ -4,6 +4,7 @@
 // =================================
 
 #include <system-x/kernel/Error.hpp>
+#include <system-x/kernel/Debug.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <Windows.h>
 
@@ -41,14 +42,18 @@ std::string ErrorMsg(int errorCode)
     return std::string();
 }
 
-SystemError::SystemError() : std::runtime_error(""), errorCode(0), hostErrorCode(0), message()
+SystemError::SystemError() : std::runtime_error(""), errorCode(0), hostErrorCode(0), message(), function()
 {
 }
 
-SystemError::SystemError(int errorCode_, const std::string& message_) : 
+SystemError::SystemError(int errorCode_, const std::string& message_, const std::string& function_) : 
     std::runtime_error(ErrorCodeStr(errorCode_) + "(" + std::to_string(errorCode_) + "): " + ErrorMsg(errorCode_) + ": " + message_), 
-    errorCode(errorCode_), hostErrorCode(0), message(message_)
+    errorCode(errorCode_), hostErrorCode(0), message(message_), function(function_)
 {
+    if ((GetDebugMode() & debugSystemErrorMode) != 0)
+    {
+        DebugWrite(std::string(what()) + ": " + function);
+    }
 }
 
 std::string HostErrorMessage(uint64_t errorCode)
@@ -71,7 +76,7 @@ void ThrowLastHostError(const std::string& filePath)
     {
         file = " (file='" + filePath + "')";
     }
-    SystemError systemError(EHOST, HostErrorMessage(hostErrorCode) + file);
+    SystemError systemError(EHOST, HostErrorMessage(hostErrorCode) + file, __FUNCTION__);
     systemError.SetHostErrorCode(hostErrorCode);
     throw systemError;
 }

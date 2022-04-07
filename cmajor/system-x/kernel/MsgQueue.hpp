@@ -6,6 +6,7 @@
 #ifndef CMSX_KERNEL_MSG_QUEUE_INCLUDED
 #define CMSX_KERNEL_MSG_QUEUE_INCLUDED
 #include <system-x/kernel/Api.hpp>
+#include <system-x/machine/Process.hpp>
 #include <stdint.h>
 #include <vector>
 
@@ -24,6 +25,8 @@ private:
 
 CMSX_KERNEL_API int32_t MsgQ(Process* process, int64_t nameAddr);
 CMSX_KERNEL_API void CloseMsgQ(Process* process, int32_t md);
+CMSX_KERNEL_API void WaitMsg(Process* process, int32_t md);
+CMSX_KERNEL_API bool IsMsgQOpen(int32_t md);
 CMSX_KERNEL_API void PutMsg(int32_t md, const std::vector<std::uint8_t>& msgData);
 CMSX_KERNEL_API void PutMsg(Process* process, int32_t md, int64_t msgDataAddr, int32_t msgSize);
 CMSX_KERNEL_API int32_t GetMsgQueueLength(Process* process, int32_t md);

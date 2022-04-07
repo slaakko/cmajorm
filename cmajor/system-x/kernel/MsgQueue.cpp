@@ -9,6 +9,7 @@
 #include <system-x/kernel/Error.hpp>
 #include <system-x/kernel/IO.hpp>
 #include <system-x/kernel/Debug.hpp>
+#include <system-x/kernel/EventManager.hpp>
 #include <system-x/machine/Machine.hpp>
 #include <system-x/machine/Processor.hpp>
 #include <memory>
@@ -48,7 +49,7 @@ void MsgQueue::Put(const Msg& msg)
     queue.push_back(msg);
     if ((GetDebugMode() & debugMsgQueueMode) != 0)
     {
-        DebugWrite(GetMsgStr(msg) + " put to '" + Name() + "'");
+        DebugWrite("put " + GetMsgStr(msg) + " to '" + Name() + "'");
     }
 }
 
@@ -58,7 +59,7 @@ Msg MsgQueue::Get()
     queue.pop_front();
     if ((GetDebugMode() & debugMsgQueueMode) != 0)
     {
-        DebugWrite(GetMsgStr(msg) + " get from '" + Name() + "'");
+        DebugWrite("get " + GetMsgStr(msg) + " from '" + Name() + "'");
     }
     return msg;
 }
@@ -70,6 +71,7 @@ public:
     static void Done();
     static MsgQueues& Instance() { return *instance; }
     int32_t Open(const std::string& name);
+    bool IsOpen(int32_t md) const;
     MsgQueue* Get(int32_t md);
     void Delete(int32_t md);
 private:
@@ -115,6 +117,26 @@ int32_t MsgQueues::Open(const std::string& name)
     return md;
 }
 
+bool MsgQueues::IsOpen(int32_t md) const
+{
+    if (md >= 0 && md < queues.size())
+    {
+        MsgQueue* q = queues[md].get();
+        if (q)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
+}
+
 MsgQueue* MsgQueues::Get(int32_t md)
 {
     if (md >= 0 && md < queues.size())
@@ -126,12 +148,12 @@ MsgQueue* MsgQueues::Get(int32_t md)
         }
         else
         {
-            throw SystemError(EBADF, "message queue " + std::to_string(md) + " is closed");
+            throw SystemError(EBADF, "message queue " + std::to_string(md) + " is closed", __FUNCTION__);
         }
     }
     else
     {
-        throw SystemError(EBADF, "invalid message queue descriptor " + std::to_string(md));
+        throw SystemError(EBADF, "invalid message queue descriptor " + std::to_string(md), __FUNCTION__);
     }
 }
 
@@ -148,7 +170,7 @@ void MsgQueues::Delete(int32_t md)
     }
     else
     {
-        throw SystemError(EBADF, "invalid message queue descriptor " + std::to_string(md));
+        throw SystemError(EBADF, "invalid message queue descriptor " + std::to_string(md), __FUNCTION__);
     }
 }
 
@@ -156,7 +178,7 @@ int32_t MsgQ(Process* process, int64_t nameAddr)
 {
     if (nameAddr == 0)
     {
-        throw SystemError(EPARAM, "name is null");
+        throw SystemError(EPARAM, "name is null", __FUNCTION__);
     }
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::string name = ReadString(process, nameAddr, mem);
@@ -177,17 +199,75 @@ void CloseMsgQ(Process* process, int32_t md)
     }
 }
 
+void WaitMsg(Process* process, int32_t md)
+{
+    cmsx::machine::Machine* machine = process->GetProcessor()->GetMachine();
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), MSG_QUEUE, Id(), NO_LOCK | EXIT);
+#endif 
+    std::unique_lock<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), MSG_QUEUE, Id(), HAS_LOCK | EXIT);
+#endif 
+    MsgQueue* queue = MsgQueues::Instance().Get(md);
+    if ((GetDebugMode() & debugMsgQueueMode) != 0)
+    {
+        DebugWrite("> wait msg '" + queue->Name() + "': process id=" + std::to_string(process->Id()));
+    }
+    if (queue->Length() > 0)
+    {
+        if ((GetDebugMode() & debugMsgQueueMode) != 0)
+        {
+            DebugWrite("< wait msg '" + queue->Name() + "': queue not empty: process id=" + std::to_string(process->Id()));
+        }
+        return;
+    }
+    if ((GetDebugMode() & debugMsgQueueMode) != 0)
+    {
+        DebugWrite(">> wait msg '" + queue->Name() + "': sleep: process id=" + std::to_string(process->Id()));
+    }
+    cmsx::machine::Event evnt(cmsx::machine::EventKind::msgQEvent, md);
+    Sleep(evnt, process, lock);
+    if ((GetDebugMode() & debugMsgQueueMode) != 0)
+    {
+        DebugWrite("< wait msg '" + queue->Name() + "': wake up: process id=" + std::to_string(process->Id()));
+    }
+}
+
+bool IsMsgQOpen(int32_t md)
+{
+    return MsgQueues::Instance().IsOpen(md);
+}
+
 void PutMsg(int32_t md, const std::vector<std::uint8_t>& msgData)
 {
     MsgQueue* queue = MsgQueues::Instance().Get(md);
     queue->Put(Msg(msgData));
+    if ((GetDebugMode() & debugMsgQueueMode) != 0)
+    {
+        DebugWrite("> put msg '" + queue->Name() + "'");
+    }
+    cmsx::machine::Event evnt(cmsx::machine::EventKind::msgQEvent, md);
+    Wakeup(evnt);
+    if ((GetDebugMode() & debugMsgQueueMode) != 0)
+    {
+        DebugWrite("< put msg '" + queue->Name() + "': wake up");
+    }
 }
 
 void PutMsg(Process* process, int32_t md, int64_t msgDataAddr, int32_t msgSize)
 {
+    cmsx::machine::Machine* machine = process->GetProcessor()->GetMachine();
+#if (LOCK_DEBUG)
+    DebugLock startDebugLock(&machine->Lock(), MSG_QUEUE, Id(), NO_LOCK | EXIT);
+#endif 
+    std::unique_lock<std::recursive_mutex> lock(machine->Lock());
+#if (LOCK_DEBUG)
+    DebugLock hasDebugLock(&machine->Lock(), MSG_QUEUE, Id(), HAS_LOCK | EXIT);
+#endif 
     if (msgSize == 0)
     {
-        throw SystemError(EPARAM, "message is empty");
+        throw SystemError(EPARAM, "message is empty", __FUNCTION__);
     }
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();
     std::vector<uint8_t> data = ReadProcessMemory(process, msgDataAddr, msgSize);
@@ -217,12 +297,12 @@ void GetMsg(Process* process, int32_t md, int64_t bufferAddr)
 {
     if (bufferAddr == 0)
     {
-        throw SystemError(EPARAM, "buffer is null");
+        throw SystemError(EPARAM, "buffer is null", __FUNCTION__);
     }
     MsgQueue* queue = MsgQueues::Instance().Get(md);
     if (queue->IsEmpty())
     {
-        throw SystemError(EFAIL, "message queue " + std::to_string(md) + " is empty");
+        throw SystemError(EFAIL, "message queue " + std::to_string(md) + " is empty", __FUNCTION__);
     }
     Msg msg = queue->Get();
     cmsx::machine::Memory& mem = process->GetProcessor()->GetMachine()->Mem();

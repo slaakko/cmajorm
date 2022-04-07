@@ -540,89 +540,107 @@ namespace System.Os
             ThrowSystemError();
         }
     }
-	
-	public void SendKey(uchar key)
-	{
-		int result = sendkey(key);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-	}
-	
-	public int MsgQ(const char* name)
-	{
-		int result = msgq(name);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-		return result;
-	}
-	
-	public void CloseMsgQ(int md)
-	{
-		int result = close_msgq(md);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-	}
-	
-	public void PutMsg(int md, byte* msgData, int msgSize)
-	{
-		int result = put_msg(md, msgData, msgSize);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-	}
-	
-	public int GetMsgQLength(int md)
-	{
-		int result = get_msgq_length(md);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-		return result;
-	}
-	
-	public int GetMsgSize(int md)
-	{
-		int result = get_msg_size(md);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-		return result;
-	}
-	
-	public void GetMsg(int md, byte* buffer)
-	{
-		int result = get_msg(md, buffer);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-	}
-	
-	public void TimerMsg(const Duration& duration, int md, byte* msgData, int msgSize)
-	{
-		int result = timer_msg(duration.Rep(), md, msgData, msgSize);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-	}
-	
-	public int Connect(const char* node, const char* service)
-	{
-		int result = connect(node, service);
-		if (result == -1)
-		{
-			ThrowSystemError();
-		}
-		return result;
-	}
+    
+    public int MsgQ(const char* name)
+    {
+        int result = msgq(name);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public void CloseMsgQ(int md)
+    {
+        int result = close_msgq(md);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public void WaitMsg(int md)
+    {
+        int result = wait_msg(md);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public void PutMsg(int md, byte* msgData, int msgSize)
+    {
+        int result = put_msg(md, msgData, msgSize);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public int GetMsgQLength(int md)
+    {
+        int result = get_msgq_length(md);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public int GetMsgSize(int md)
+    {
+        int result = get_msg_size(md);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public void GetMsg(int md, byte* buffer)
+    {
+        int result = get_msg(md, buffer);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public void BindTerminal(int md)
+    {
+        int result = bind_terminal(md);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public void UnbindTerminal()
+    {
+        int result = unbind_terminal();
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public void TimerMsg(const Duration& duration, int md, byte* msgData, int msgSize)
+    {
+        int result = timer_msg(duration.Rep(), md, msgData, msgSize);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public int Connect(const char* node, const char* service)
+    {
+        int result = connect(node, service);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
 }
