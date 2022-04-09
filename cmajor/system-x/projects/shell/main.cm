@@ -233,6 +233,8 @@ int main(int argc, const char** argv)
         SetupShellEnvironment(environment);
         SetupCredentials(environment);
         ChDir(environment.Home().Chars());
+		MakeDefaultProfile(environment);
+		MakeUserDirs(environment);
 		StartTabCompletion(environment);
         Context context;
         Run(environment, params, context);

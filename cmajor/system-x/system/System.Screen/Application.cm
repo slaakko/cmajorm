@@ -8,6 +8,11 @@ using System.Os;
 
 namespace System.Screen
 {
+	string MakeApplicationMessageQueueName()
+	{
+		return "system.screen.msg.queue." + ToString(GetPid());
+	}
+
     public class Application
     {
         static Application() : instance(new Application())
@@ -28,7 +33,7 @@ namespace System.Screen
         {
             return *instance;
         }
-        private Application() : msgQ(MsgQ("system.screen.msg.queue")), menuBar(null), focusedControl(null), lastDefaultWriteScreenMessageWindow(-1)
+        private Application() : msgQ(MsgQ(MakeApplicationMessageQueueName().Chars())), menuBar(null), focusedControl(null), lastDefaultWriteScreenMessageWindow(-1)
         {
             RegisterMessage<KeyPressedMessage>(keyPressedMessageId);
             BindTerminal(msgQ);

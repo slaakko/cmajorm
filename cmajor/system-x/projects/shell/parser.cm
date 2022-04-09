@@ -7,6 +7,13 @@ using System;
 using System.Collections;
 using shtokens;
 
+private int debugMode = 0;
+
+void SetDebugMode()
+{
+	debugMode = GetDebugMode();
+}
+
 class ParseResult
 {
     public nothrow ParseResult() : command()
@@ -29,6 +36,12 @@ class ParseResult
 
 Command* ParseCommand(TokenLexer& lexer)
 {
+	SetDebugMode();
+	WriteDebugMessage("====================");
+	if ((debugMode & debugApp) != 0)
+	{
+		WriteDebugMessage("> sh.parse.command");
+	}
     ParseResult result;
     if (ParseCompleteCommand(lexer, result))
     {
@@ -36,6 +49,10 @@ Command* ParseCommand(TokenLexer& lexer)
         {
             throw Exception("incomplete input");
         }
+		if ((debugMode & debugApp) != 0)
+		{
+			WriteDebugMessage("< sh.parse.command.true");
+		}
         Command* command = result.ReleaseCommand();
         return command;
     }
@@ -47,42 +64,78 @@ Command* ParseCommand(TokenLexer& lexer)
 
 bool ParseCompleteCommand(TokenLexer& lexer, ParseResult& result)
 {
+	if ((debugMode & debugApp) != 0)
+	{
+		WriteDebugMessage("> sh.parse.complete.command");
+	}
     if (ParseList(lexer, result))
     {
         if (ParseSeparator(lexer, result))
         {
+			if ((debugMode & debugApp) != 0)
+			{
+				WriteDebugMessage("< sh.parse.complete.command.separator.true");
+			}
+			if ((debugMode & debugApp) != 0)
+			{
+				WriteDebugMessage("< sh.parse.complete.command.no.separator.true");
+			}
             return true;
         }
         return true;
     }
     else
     {
+		if ((debugMode & debugApp) != 0)
+		{
+			WriteDebugMessage("< sh.parse.complete.command.false");
+		}
         return false;
     }
 }
 
 bool ParseSeparator(TokenLexer& lexer, ParseResult& result)
 {
+	if ((debugMode & debugApp) != 0)
+	{
+		WriteDebugMessage("> sh.parse.separator");
+	}
     if (*lexer == AMP)
     {
         ++lexer;
         result.ResetCommand(new AsyncCommand(result.ReleaseCommand()));
+		if ((debugMode & debugApp) != 0)
+		{
+			WriteDebugMessage("< sh.parse.separator.amp");
+		}
         return true;
     }
     else if (*lexer == SEMI)
     {
         ++lexer;
         result.ResetCommand(new SyncCommand(result.ReleaseCommand()));
+		if ((debugMode & debugApp) != 0)
+		{
+			WriteDebugMessage("< sh.parse.separator.semi");
+		}
         return true;
     }
     else
     {
+		if ((debugMode & debugApp) != 0)
+		{
+			WriteDebugMessage("< sh.parse.separator.false");
+		}
         return false;
     }
 }
 
 bool ParseList(TokenLexer& lexer, ParseResult& result)
 {
+	if ((debugMode & debugApp) != 0)
+	{
+		WriteDebugMessage("> sh.parse.list");
+	}
     int save = lexer.GetPos();
     ParseResult leftResult;
     if (ParseAndOr(lexer, leftResult))
@@ -104,14 +157,26 @@ bool ParseList(TokenLexer& lexer, ParseResult& result)
         }
         lexer.SetPos(save2);
         result.ResetCommand(leftResult.ReleaseCommand());
+		if ((debugMode & debugApp) != 0)
+		{
+			WriteDebugMessage("< sh.parse.list.true");
+		}
         return true;
     }
     lexer.SetPos(save);
+	if ((debugMode & debugApp) != 0)
+	{
+		WriteDebugMessage("< sh.parse.list.false");
+	}
     return false;
 }
 
 bool ParseAndOr(TokenLexer& lexer, ParseResult& result)
 {
+	if ((debugMode & debugApp) != 0)
+	{
+		WriteDebugMessage("> sh.parse.and.or");
+	}
     ParseResult leftResult;
     int save = lexer.GetPos();
     if (ParsePipeline(lexer, leftResult))
@@ -122,6 +187,10 @@ bool ParseAndOr(TokenLexer& lexer, ParseResult& result)
             if (*lexer == AND_IF)
             {
                 ++lexer;
+				if ((debugMode & debugApp) != 0)
+				{
+					WriteDebugMessage("< sh.parse.and.or.and-if");
+				}
                 ParseResult rightResult;
                 if (ParsePipeline(lexer, rightResult))
                 {
@@ -136,6 +205,10 @@ bool ParseAndOr(TokenLexer& lexer, ParseResult& result)
             else if (*lexer == OR_IF)
             {
                 ++lexer;
+				if ((debugMode & debugApp) != 0)
+				{
+					WriteDebugMessage("< sh.parse.and.or.or-if");
+				}
                 ParseResult rightResult;
                 if (ParsePipeline(lexer, rightResult))
                 {
@@ -150,6 +223,10 @@ bool ParseAndOr(TokenLexer& lexer, ParseResult& result)
         }
         lexer.SetPos(save2);
         result.ResetCommand(leftResult.ReleaseCommand());
+		if ((debugMode & debugApp) != 0)
+		{
+			WriteDebugMessage("< sh.parse.and.or.true");
+		}
         return true;
     }
     lexer.SetPos(save);
@@ -158,11 +235,19 @@ bool ParseAndOr(TokenLexer& lexer, ParseResult& result)
 
 bool ParsePipeline(TokenLexer& lexer, ParseResult& result)
 {
+	if ((debugMode & debugApp) != 0)
+	{
+		WriteDebugMessage("> sh.parse.pipeline");
+	}
     int save = lexer.GetPos();
     bool bang = false;
     if (*lexer == BANG)
     {
         ++lexer;
+		if ((debugMode & debugApp) != 0)
+		{
+			WriteDebugMessage("> sh.parse.pipeline.bang");
+		}
         bang = true;
     }
     ParseResult leftResult;
@@ -172,6 +257,10 @@ bool ParsePipeline(TokenLexer& lexer, ParseResult& result)
         while (*lexer == PIPE)
         {
             ++lexer;
+			if ((debugMode & debugApp) != 0)
+			{
+				WriteDebugMessage("> sh.parse.pipeline.pipe");
+			}
             ParseResult rightResult;
             if (ParseCommand(lexer, rightResult))
             {
@@ -192,10 +281,18 @@ bool ParsePipeline(TokenLexer& lexer, ParseResult& result)
             result.ResetCommand(leftResult.ReleaseCommand());
         }
         lexer.SetPos(save2);
+		if ((debugMode & debugApp) != 0)
+		{
+			WriteDebugMessage("< sh.parse.pipeline.true");
+		}
         return true;
     }
     lexer.SetPos(save);
     return false;
+	if ((debugMode & debugApp) != 0)
+	{
+		WriteDebugMessage("< sh.parse.pipeline.false");
+	}
 }
 
 bool ParseCommand(TokenLexer& lexer, ParseResult& result)
@@ -216,6 +313,10 @@ bool ParseCommand(TokenLexer& lexer, ParseResult& result)
 
 bool ParseSimpleCommand(TokenLexer& lexer, ParseResult& result)
 {
+	if ((debugMode & debugApp) != 0)
+	{
+		WriteDebugMessage("> sh.parse.simple.command");
+	}
     int save = lexer.GetPos();
     ParseResult prefixResult;
     if (ParseCommandPrefix(lexer, prefixResult))
@@ -227,12 +328,20 @@ bool ParseSimpleCommand(TokenLexer& lexer, ParseResult& result)
             ParseResult suffixResult;
             if (ParseCommandSuffix(lexer, simpleCommand, suffixResult))
             {
+				if ((debugMode & debugApp) != 0)
+				{
+					WriteDebugMessage("< sh.parse.simple.command.prefix.suffix.true");
+				}
                 result.ResetCommand(new PrefixSuffixCommand(prefixResult.ReleaseCommand(), simpleCommandResult.ReleaseCommand(), suffixResult.ReleaseCommand()));
                 return true;
             }
             else
             {
                 result.ResetCommand(new PrefixSuffixCommand(prefixResult.ReleaseCommand(), simpleCommandResult.ReleaseCommand(), null));
+				if ((debugMode & debugApp) != 0)
+				{
+					WriteDebugMessage("< sh.parse.simple.command.prefix.no.suffix.true");
+				}
                 return true;
             }
         }
@@ -252,21 +361,37 @@ bool ParseSimpleCommand(TokenLexer& lexer, ParseResult& result)
             if (ParseCommandSuffix(lexer, simpleCommand, suffixResult))
             {
                 result.ResetCommand(new PrefixSuffixCommand(null, simpleCommandResult.ReleaseCommand(), suffixResult.ReleaseCommand()));
+				if ((debugMode & debugApp) != 0)
+				{
+					WriteDebugMessage("< sh.parse.simple.command.suffix.true");
+				}
                 return true;
             }
             else
             {
                 result.ResetCommand(new PrefixSuffixCommand(null, simpleCommandResult.ReleaseCommand(), null));
+				if ((debugMode & debugApp) != 0)
+				{
+					WriteDebugMessage("< sh.parse.simple.command.no.suffix.true");
+				}
                 return true;
             }
         }
     }
+	if ((debugMode & debugApp) != 0)
+	{
+		WriteDebugMessage("< sh.parse.simple.command.false");
+	}
     lexer.SetPos(save);
     return false;
 }
 
 bool ParseCommandPrefix(TokenLexer& lexer, ParseResult& result)
 {
+	if ((debugMode & debugApp) != 0)
+	{
+		WriteDebugMessage("> sh.parse.prefix");
+	}
     UniquePtr<PrefixCommand> prefixCommand(new PrefixCommand());
     bool prefixParsed = false;
     int save = lexer.GetPos();
@@ -277,7 +402,8 @@ bool ParseCommandPrefix(TokenLexer& lexer, ParseResult& result)
         bool assignmentWordParsed = false;
         int ioNumber = -1;
         ParseResult singleResult;
-        if (ParseIONumber(lexer, ioNumber))
+		string str;
+        if (ParseIONumber(lexer, ioNumber, str))
         {
             ioNumberParsed = true;
         }
@@ -312,14 +438,29 @@ bool ParseCommandPrefix(TokenLexer& lexer, ParseResult& result)
     {
         result.ResetCommand(prefixCommand.Release());
     }
+	if (prefixParsed)
+	{
+		if ((debugMode & debugApp) != 0)
+		{
+			WriteDebugMessage("< sh.parse.prefix.true");
+		}
+	}
+	else
+	{
+		if ((debugMode & debugApp) != 0)
+		{
+			WriteDebugMessage("< sh.parse.prefix.false");
+		}
+	}
     return prefixParsed;
 }
 
-bool ParseIONumber(TokenLexer& lexer, int& ioNumber)
+bool ParseIONumber(TokenLexer& lexer, int& ioNumber, string& str)
 {
     if (*lexer == WORD)
     {
-        if (ParseInt(ToUtf8(lexer.CurrentToken().match), ioNumber))
+		str = ToUtf8(lexer.CurrentToken().match);
+        if (ParseInt(str, ioNumber))
         {
             ++lexer;
             return true;
@@ -416,6 +557,10 @@ bool ParseIOFile(TokenLexer& lexer, int ioNumber, ParseResult& result)
 
 bool ParseCommandSuffix(TokenLexer& lexer, SimpleCommand* simpleCommand, ParseResult& result)
 {
+	if ((debugMode & debugApp) != 0)
+	{
+		WriteDebugMessage("> sh.parse.suffix");
+	}
     UniquePtr<SuffixCommand> suffixCommand(new SuffixCommand());
     int save = lexer.GetPos();
     bool suffixParsed = false;
@@ -426,7 +571,8 @@ bool ParseCommandSuffix(TokenLexer& lexer, SimpleCommand* simpleCommand, ParseRe
         bool ioFileParsed = false;
         bool wordParsed = false;
         int ioNumber = -1;
-        if (ParseIONumber(lexer, ioNumber))
+		string str;
+        if (ParseIONumber(lexer, ioNumber, str))
         {
             ioNumberParsed = true;
         }
@@ -445,9 +591,10 @@ bool ParseCommandSuffix(TokenLexer& lexer, SimpleCommand* simpleCommand, ParseRe
         }
         if (ioNumberParsed && !ioFileParsed)
         {
-            break;
+			simpleCommand->AddArg(str);
+			wordParsed = true;
         }
-        else if (wordParsed || ioFileParsed)
+        if (wordParsed || ioFileParsed)
         {
             suffixParsed = true;
             if (ioFileParsed)
@@ -466,19 +613,45 @@ bool ParseCommandSuffix(TokenLexer& lexer, SimpleCommand* simpleCommand, ParseRe
     {
         result.ResetCommand(suffixCommand.Release());
     }
+	if (suffixParsed)
+	{
+		if ((debugMode & debugApp) != 0)
+		{
+			WriteDebugMessage("< sh.parse.suffix.true");
+		}
+	}
+	else
+	{
+		if ((debugMode & debugApp) != 0)
+		{
+			WriteDebugMessage("< sh.parse.suffix.false");
+		}
+	}
     return suffixParsed;
 }
 
 bool ParseCommandName(TokenLexer& lexer, SimpleCommand*& simpleCommand, ParseResult& result)
 {
+	if ((debugMode & debugApp) != 0)
+	{
+		WriteDebugMessage("> sh.parse.command.name");
+	}
     simpleCommand = null;
     if (*lexer == WORD)
     {
         simpleCommand = new SimpleCommand(ToUtf8(lexer.CurrentToken().match));
         result.ResetCommand(simpleCommand);
+		if ((debugMode & debugApp) != 0)
+		{
+			WriteDebugMessage("< sh.parse.command.name.true");
+		}
         ++lexer;
         return true;
     }
+	if ((debugMode & debugApp) != 0)
+	{
+		WriteDebugMessage("< sh.parse.command.name.false");
+	}
     return false;
 }
 
@@ -500,15 +673,27 @@ bool ParseCompoundCommand(TokenLexer& lexer, ParseResult& result)
 
 bool ParseBraceGroup(TokenLexer& lexer, ParseResult& result)
 {
+	if ((debugMode & debugApp) != 0)
+	{
+		WriteDebugMessage("> sh.parse.brace.group");
+	}
     int save = lexer.GetPos();
     if (*lexer == LBRACE)
     {
         ++lexer;
+		if ((debugMode & debugApp) != 0)
+		{
+			WriteDebugMessage("> sh.parse.brace.group.lbrace");
+		}
         if (ParseCompleteCommand(lexer, result))
         {
             if (*lexer == RBRACE)
             {
                 ++lexer;
+				if ((debugMode & debugApp) != 0)
+				{
+					WriteDebugMessage("< sh.parse.brace.group.rbrace.true");
+				}
                 Command* command = result.ReleaseCommand();
                 result.ResetCommand(new BraceGroupCommand(command));
                 return true;
@@ -516,30 +701,54 @@ bool ParseBraceGroup(TokenLexer& lexer, ParseResult& result)
             else
             {
                 lexer.SetPos(save);
+				if ((debugMode & debugApp) != 0)
+				{
+					WriteDebugMessage("< sh.parse.brace.group.false");
+				}
                 return false;
             }
         }
         else
         {
             lexer.SetPos(save);
+			if ((debugMode & debugApp) != 0)
+			{
+				WriteDebugMessage("< sh.parse.brace.group.false");
+			}
             return false;
         }
     }
+	if ((debugMode & debugApp) != 0)
+	{
+		WriteDebugMessage("< sh.parse.brace.group.false");
+	}
     lexer.SetPos(save);
     return false;
 }
 
 bool ParseSubshell(TokenLexer& lexer, ParseResult& result)
 {
+	if ((debugMode & debugApp) != 0)
+	{
+		WriteDebugMessage("> sh.parse.subshell");
+	}
     int save = lexer.GetPos();
     if (*lexer == LPAREN)
     {
         ++lexer;
+		if ((debugMode & debugApp) != 0)
+		{
+			WriteDebugMessage("> sh.parse.subshell.lparen");
+		}
         if (ParseCompleteCommand(lexer, result))
         {
             if (*lexer == RPAREN)
             {
                 ++lexer;
+				if ((debugMode & debugApp) != 0)
+				{
+					WriteDebugMessage("< sh.parse.subshell.rparen.true");
+				}
                 Command* command = result.ReleaseCommand();
                 result.ResetCommand(new SubshellCommand(command));
                 return true;
@@ -547,15 +756,27 @@ bool ParseSubshell(TokenLexer& lexer, ParseResult& result)
             else
             {
                 lexer.SetPos(save);
+				if ((debugMode & debugApp) != 0)
+				{
+					WriteDebugMessage("< sh.parse.subshell.false");
+				}
                 return false;
             }
         }
         else
         {
             lexer.SetPos(save);
+			if ((debugMode & debugApp) != 0)
+			{
+				WriteDebugMessage("< sh.parse.subshell.false");
+			}
             return false;
         }
     }
+	if ((debugMode & debugApp) != 0)
+	{
+		WriteDebugMessage("< sh.parse.subshell.false");
+	}
     lexer.SetPos(save);
     return false;
 }

@@ -1,0 +1,21 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+
+void MakeDefaultProfile(ShellEnvironment& environment)
+{
+	string profileFilePath = Path.Combine(environment.Home(), ".profile");
+	if (!File.Exists(profileFilePath))
+	{
+		StreamWriter writer = File.CreateText(profileFilePath);
+		writer.WriteLine("PATH=$PATH:~/projects/bin");
+		writer.WriteLine("SX_SOURCE_ROOT=~/projects");
+		writer.WriteLine("SX_TARGET_ROOT=/mnt/sx/projects");
+		writer.WriteLine("umask 022");
+	}
+}

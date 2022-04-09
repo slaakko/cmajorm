@@ -309,7 +309,6 @@ uint64_t INodeKeyHash(INodeKey inodeKey)
 }
 
 using INodeFreeList = std::list<INode*, boost::fast_pool_allocator<INode*>>;
-//using INodeFreeList = std::list<INode*>;
 
 struct INodeHashQueueEntry
 {

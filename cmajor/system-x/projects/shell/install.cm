@@ -36,6 +36,12 @@ void InstallUser(const string& userName, int& uid, string& shell, string& home)
     WriteGroups(groups);
 }
 
+void MakeUserDirs(ShellEnvironment& environment)
+{
+	string projectsDir = Path.Combine(environment.Home(), "projects");
+	CreateDirectories(projectsDir);
+}
+
 void CopyBin()
 {
     if (!Directory.Exists("/bin"))
