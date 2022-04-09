@@ -29,7 +29,11 @@ enum class IOControlItem : int32_t
     set_raw = 9,
     set_echo = 10,
     push_lines = 11,
-    pop_lines = 12
+    pop_lines = 12,
+    tab = 13,
+    untab = 14,
+    push_pid = 15,
+    pop_pid = 16
 };
 
 CMSX_KERNEL_API std::vector<std::uint8_t> MakeStringBuffer(const std::string& str, int64_t maxLength);

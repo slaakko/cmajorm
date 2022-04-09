@@ -11,11 +11,6 @@ namespace cmsx::kernel {
 
 using namespace soulng::util;
 
-const int quitMessageId = 0;
-const int keyPressedMessageId = 1;
-const int writeScreenMessageId = 2;
-const int timerMessageId = 3;
-
 std::string MsgName(int msgId)
 {
     switch (msgId)
@@ -35,6 +30,26 @@ std::string MsgName(int msgId)
         case timerMessageId:
         {
             return "timer";
+        }
+        case completionInitMessageId:
+        {
+            return "completion.init";
+        }
+        case completionExitMessageId:
+        {
+            return "completion.exit";
+        }
+        case completionRequestMessageId:
+        {
+            return "completion.request";
+        }
+        case completionReplyMessageId:
+        {
+            return "completion.reply";
+        }
+        case completionErrorReplyMessageId:
+        {
+            return "completion.error";
         }
         default:
         {
@@ -78,7 +93,7 @@ std::string TimerMessageParams(MemoryReader& reader)
     return params;
 }
 
-std::string MsgContentStr(int msgId, MemoryReader& reader)
+std::string ScreenMsgContentStr(int msgId, MemoryReader& reader)
 {
     std::string contentStr;
     int targetWindowHandle = reader.ReadInt();
@@ -107,6 +122,64 @@ std::string MsgContentStr(int msgId, MemoryReader& reader)
             contentStr.append(TimerMessageParams(reader));
             break;
         }
+    }
+    return contentStr;
+}
+
+std::string CompletionMsgContentStr(int msgId, MemoryReader& reader)
+{
+    std::string contentStr;
+    switch (msgId)
+    {
+        case completionInitMessageId:
+        {
+            break;
+        }
+        case completionExitMessageId:
+        {
+            break;
+        }
+        case completionRequestMessageId:
+        {
+            std::string cwd = reader.ReadString();
+            std::string line = reader.ReadString();
+            int32_t pos = reader.ReadInt();
+            contentStr.append("cwd='").append(cwd).append("'").append(".line='").append(line).append("'").append(".pos=").append(std::to_string(pos));
+            break;
+        }
+        case completionReplyMessageId:
+        {
+            int32_t success = reader.ReadInt();
+            contentStr.append("success=").append(std::to_string(success));
+            if (success)
+            {
+                int32_t numCompletions = reader.ReadInt();
+                contentStr.append(".completions=").append(std::to_string(numCompletions));
+            }
+            break;
+        }
+        case completionErrorReplyMessageId:
+        {
+            int32_t success = reader.ReadInt();
+            contentStr.append("success=").append(std::to_string(success));
+            std::string errorMsg = reader.ReadString();
+            contentStr.append(".error='").append(std::to_string(success)).append("'");
+            break;
+        }
+    }
+    return contentStr;
+}
+
+std::string MsgContentStr(int msgId, MemoryReader& reader)
+{
+    std::string contentStr;
+    if (msgId >= firstScreenMessageId && msgId <= lastScreenMessageId)
+    {
+        contentStr = ScreenMsgContentStr(msgId, reader);
+    }
+    else if (msgId >= firstCompletionMessageId && msgId <= lastCompletionMessageId)
+    {
+        contentStr = CompletionMsgContentStr(msgId, reader);
     }
     return contentStr;
 }

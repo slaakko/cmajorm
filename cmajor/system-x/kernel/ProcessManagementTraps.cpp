@@ -5,6 +5,7 @@
 
 #include <system-x/kernel/ProcessManagementTraps.hpp>
 #include <system-x/kernel/Process.hpp>
+#include <system-x/kernel/ProcessManager.hpp>
 #include <system-x/kernel/Trap.hpp>
 #include <system-x/kernel/OsApi.hpp>
 #include <system-x/kernel/IO.hpp>
@@ -76,7 +77,7 @@ uint64_t TrapWaitHandler::HandleTrap(cmsx::machine::Processor& processor)
         { 
             throw SystemError(EPARAM, "child exit code pointer is null", __FUNCTION__);
         }
-        return Wait(process, childExitCodeAddress);
+        return Wait(process, -1, childExitCodeAddress);
     }
     catch (const SystemError& error)
     {
@@ -393,6 +394,57 @@ uint64_t TrapUMaskHandler::HandleTrap(cmsx::machine::Processor& processor)
     }
 }
 
+class TrapKillHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_kill"; }
+};
+
+uint64_t TrapKillHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t pid = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
+        Process* proc = ProcessManager::Instance().GetProcess(pid);
+        Kill(process, proc);
+        return 0;
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapWaitPidHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_waitpid"; }
+};
+
+uint64_t TrapWaitPidHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t pid = processor.Regs().Get(cmsx::machine::regAX);
+        int64_t childExitCodeAddress = processor.Regs().Get(cmsx::machine::regBX);
+        if (childExitCodeAddress == 0)
+        {
+            throw SystemError(EPARAM, "child exit code pointer is null", __FUNCTION__);
+        }
+        return Wait(process, pid, childExitCodeAddress);
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
 void InitProcessManagementTraps()
 {
     SetTrapHandler(trap_fork, new TrapForkHandler());
@@ -410,10 +462,14 @@ void InitProcessManagementTraps()
     SetTrapHandler(trap_geteuid, new TrapGetEUidHandler());
     SetTrapHandler(trap_getegid, new TrapGetEGidHandler());
     SetTrapHandler(trap_umask, new TrapUMaskHandler());
+    SetTrapHandler(trap_kill, new TrapKillHandler());
+    SetTrapHandler(trap_waitpid, new TrapWaitPidHandler());
 }
 
 void DoneProcessManagementTraps()
 {
+    SetTrapHandler(trap_waitpid, nullptr);
+    SetTrapHandler(trap_kill, nullptr);
     SetTrapHandler(trap_umask, nullptr);
     SetTrapHandler(trap_getgid, nullptr);
     SetTrapHandler(trap_getuid, nullptr);

@@ -335,10 +335,10 @@ namespace System.Screen
         {
             return Application.Instance().FocusedControl() == this;
         }
-		public nothrow virtual Rect FocusRect() const
-		{
-			return GetRect();
-		}
+        public nothrow virtual Rect FocusRect() const
+        {
+            return GetRect();
+        }
         public virtual void SetFocus()
         {
             Control* prevFocusedControl = Application.Instance().FocusedControl();
@@ -350,11 +350,11 @@ namespace System.Screen
                 }
                 Application.Instance().SetFocusedControl(this);
                 OnGotFocus();
-				if (prevFocusedControl != null)
-				{
-					prevFocusedControl->Invalidate(prevFocusedControl->FocusRect());
-				}
-				Invalidate(FocusRect());
+                if (prevFocusedControl != null)
+                {
+                    prevFocusedControl->Invalidate(prevFocusedControl->FocusRect());
+                }
+                Invalidate(FocusRect());
             }
         }
         public virtual bool HandleMessage(Message* message)
@@ -368,6 +368,10 @@ namespace System.Screen
             if (menuBar != null)
             {
                 menuBar->OnKeyPressed(args);
+                if (menuBar->IsOpen())
+                {
+                    return true;
+                }
             }
             if (args.Handled())
             {

@@ -39,6 +39,10 @@ public:
     int64_t Write(const std::vector<uint8_t>& buffer, cmsx::machine::Process* process) override;
     void Bind(int32_t md) override;
     void Unbind() override;
+    void SetTabMsgQueues(int32_t putTabMd, int32_t getTabMd) override;
+    void ResetTabMsgQueues() override;
+    void PushPid(int32_t pid) override;
+    void PopPid() override;
 };
 
 CMSX_KERNEL_API void SetTerminalMachine(cmsx::machine::Machine* machine);

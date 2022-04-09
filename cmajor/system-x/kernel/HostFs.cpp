@@ -312,34 +312,49 @@ void HostFilesystem::Stat(INode* inode, cmsx::machine::Process* process)
     if (it != data.inodePathMap.cend())
     {
         std::string fullPath = it->second;
-        boost::filesystem::file_status status = boost::filesystem::status(fullPath);
+        boost::system::error_code ec;
+        boost::filesystem::file_status status = boost::filesystem::status(fullPath, ec);
         cmsx::kernel::Access access = static_cast<cmsx::kernel::Access>(cmsx::kernel::Access::read | kernel::Access::write);
         std::string ext = Path::GetExtension(fullPath);
         if (ext == ".exe")
         {
             access = static_cast<cmsx::kernel::Access>(access | cmsx::kernel::Access::execute);
         }
-        if (status.type() == boost::filesystem::file_type::regular_file)
+        if (status.type() == boost::filesystem::file_type::regular_file || status.type() == boost::filesystem::file_type::status_error)
         {
             inode->SetFileType(FileType::regular);
-            inode->SetFileSize(boost::filesystem::file_size(fullPath));
+            if (status.type() != boost::filesystem::file_type::status_error)
+            {
+                uintmax_t size = boost::filesystem::file_size(fullPath, ec);
+                if (!ec)
+                {
+                    inode->SetFileSize(size);
+                }
+                else
+                {
+                    inode->SetFileSize(0);
+                }
+            }
+            else
+            {
+                inode->SetFileSize(0);
+            }
         }
         else if (status.type() == boost::filesystem::file_type::directory_file)
         {
             inode->SetFileType(FileType::directory);
             access = static_cast<cmsx::kernel::Access>(access | cmsx::kernel::Access::execute);
         }
-        else
-        {
-            throw SystemError(EFAIL, "path '" + fullPath + "' has unknown file type", __FUNCTION__);
-        }
         inode->SetOwnerAccess(access);
         inode->SetGroupAccess(access);
         inode->SetOtherAccess(access);
         inode->SetNLinks(1);
-        std::time_t lastWriteTime = boost::filesystem::last_write_time(fullPath);
-        DateTime mtime = ToDateTime(lastWriteTime);
-        inode->SetMTime(mtime);
+        std::time_t lastWriteTime = boost::filesystem::last_write_time(fullPath, ec);
+        if (!ec)
+        {
+            DateTime mtime = ToDateTime(lastWriteTime);
+            inode->SetMTime(mtime);
+        }
     }
     else
     {

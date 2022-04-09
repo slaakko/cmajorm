@@ -24,6 +24,7 @@ public:
     void Write(uint64_t x);
     void Write(int64_t x);
     void Write(const DateTime& dt);
+    void Write(const std::string& str);
 private:
     uint8_t* ptr;
     uint8_t* pos;

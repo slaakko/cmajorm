@@ -12,6 +12,8 @@ namespace System.Screen
     const int keyPressedMessageId = 1;
     const int writeScreenMessageId = 2;
     const int timerMessageId = 3;
+	
+	const int firstUserMessageId = 100;
 
     public class QuitMessage : Message
     {
@@ -91,6 +93,10 @@ namespace System.Screen
         }
         public nothrow WriteScreenMessage(const Rect& rect_) : rect(rect_)
         {
+        }
+        public nothrow override bool IsDefaultWriteScreenMessage() const
+        {
+            return rect.IsDefault();
         }
         public override void Write(MemoryWriter& writer)
         {

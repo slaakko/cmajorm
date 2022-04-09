@@ -10,9 +10,12 @@
 #include <system-x/kernel/Fs.hpp>
 #include <system-x/kernel/Mount.hpp>
 #include <system-x/kernel/MsgQueue.hpp>
+#include <system-x/kernel/DebugMsg.hpp>
 #include <system-x/kernel/Kernel.hpp>
+#include <system-x/kernel/ProcessManager.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/TextUtils.hpp>
+#include <soulng/util/MemoryReader.hpp>
 #include <soulng/util/MemoryWriter.hpp>
 #include <memory>
 #include <list>
@@ -31,6 +34,21 @@ enum class TerminalMode : int32_t
 bool IsPrintChar(char32_t ch)
 {
     return ch >= 32 && ch < static_cast<char32_t>(specialKeyStart);
+}
+
+class Completion
+{
+public:
+    Completion(const std::u32string& line_, int32_t pos_);
+    const std::u32string& Line() const { return line; }
+    int32_t Pos() const { return pos; }
+private:
+    std::u32string line;
+    int32_t pos;
+};
+
+Completion::Completion(const std::u32string& line_, int32_t pos_) : line(line_), pos(pos_)
+{
 }
 
 class Terminal
@@ -59,19 +77,23 @@ public:
     void Run();
     void Bind(int32_t md_);
     void Unbind();
+    void SetTabMsgQueues(int32_t putTabMd, int32_t getTabMd);
+    void ResetTabMsgQueues();
+    void PushPid(int32_t pid_);
+    void PopPid();
     ~Terminal();
 private:
     Terminal();
     void Write(const std::u32string& utf32Chars);
     void GetScreenBufferInfo();
-    void HandleInputChar(char32_t ch);
+    void HandleInputChar(std::unique_lock<std::recursive_mutex>& lock, char32_t ch);
     void PrintChar(char32_t ch);
     void PrintNewLine();
     void HandleChar(char32_t ch);
     void HandleEscape();
     void HandleNewLine();
     void HandleBackspace();
-    void HandleTab();
+    void HandleTab(std::unique_lock<std::recursive_mutex>& lock);
     void HandleEof();
     void HandleHome();
     void HandleEnd();
@@ -86,6 +108,7 @@ private:
     void UpdateLine();
     void UpdateCursorPos();
     void PutKeyPressedMessage(char32_t ch);
+    void GetCompletions(std::unique_lock<std::recursive_mutex>& lock);
     cmsx::machine::Machine* machine;
     static std::unique_ptr<Terminal> instance;
     static bool initialized;
@@ -124,6 +147,14 @@ private:
     bool eof;
     bool readStartChar;
     int32_t boundMd;
+    std::stack<int32_t> boundMdStack;
+    int32_t putTabMd;
+    int32_t getTabMd;
+    std::stack<std::pair<int32_t, int32_t>> tabMdStack;
+    int32_t pid;
+    std::stack<int32_t> pidStack;
+    int32_t completionIndex;
+    std::vector<Completion> completions;
 };
 
 bool Terminal::initialized = false;
@@ -139,7 +170,7 @@ void Terminal::Start()
     started = true;
     if ((GetDebugMode() & debugTerminalMode) != 0)
     {
-        DebugWrite("terminal started");
+        DebugWrite("kernel.terminal: terminal started");
     }
 }
 
@@ -160,7 +191,7 @@ void Terminal::Stop()
     terminalThread.join();
     if ((GetDebugMode() & debugTerminalMode) != 0)
     {
-        DebugWrite("terminal stopped");
+        DebugWrite("kernel.terminal: terminal stopped");
     }
 }
 
@@ -176,20 +207,78 @@ void Terminal::Run()
         terminalInputQueue.pop_front();
         if ((GetDebugMode() & debugTerminalMode) != 0)
         {
-            DebugWrite("terminal.input.key(" + OsKeyName(static_cast<int>(ch)) + ")");
+            DebugWrite("kernel.terminal: terminal.input.key(" + OsKeyName(static_cast<int>(ch)) + ")");
         }
-        HandleInputChar(ch);
+        HandleInputChar(lock, ch);
     }
 }
 
 void Terminal::Bind(int32_t md)
 {
+    boundMdStack.push(boundMd);
     boundMd = md;
 }
 
 void Terminal::Unbind()
 {
-    boundMd = -1;
+    if (boundMdStack.empty())
+    {
+        boundMd = -1;
+    }
+    else
+    {
+        boundMd = boundMdStack.top();
+        boundMdStack.pop();
+    }
+}
+
+void Terminal::SetTabMsgQueues(int32_t putTabMd, int32_t getTabMd)
+{
+    if ((GetDebugMode() & debugTerminalMode) != 0)
+    {
+        DebugWrite("kernel.terminal: set.tab.msg.queues(" + std::to_string(putTabMd) + ", " + std::to_string(getTabMd) + ")");
+    }
+    tabMdStack.push(std::make_pair(putTabMd, getTabMd));
+    this->putTabMd = putTabMd;
+    this->getTabMd = getTabMd;
+}
+
+void Terminal::ResetTabMsgQueues()
+{
+    if ((GetDebugMode() & debugTerminalMode) != 0)
+    {
+        DebugWrite("kernel.terminal: reset.tab.msg.queues");
+    }
+    if (!tabMdStack.empty())
+    {
+        std::pair<int32_t, int32_t> tabMds = std::move(tabMdStack.top());
+        tabMdStack.pop();
+        putTabMd = tabMds.first;
+        getTabMd = tabMds.second;
+    }
+}
+
+void Terminal::PushPid(int32_t pid_)
+{
+    if ((GetDebugMode() & debugTerminalMode) != 0)
+    {
+        DebugWrite("kernel.terminal: push.pid." + std::to_string(pid_));
+    }
+    pidStack.push(pid);
+    pid = pid_;
+}
+
+void Terminal::PopPid()
+{
+    if (!pidStack.empty())
+    {
+        pid = pidStack.top();
+        pidStack.pop();
+    }
+    if ((GetDebugMode() & debugTerminalMode) != 0)
+    {
+        DebugWrite("kernel.terminal: pop.pid: pid=" + std::to_string(pid));
+    }
 }
 
 void Terminal::GetTerminalInput()
@@ -205,7 +294,7 @@ void Terminal::GetTerminalInput()
         {
             if ((GetDebugMode() & debugTerminalMode) != 0)
             {
-                DebugWrite("read.key(" + OsKeyName(ch) + ")");
+                DebugWrite("kernel.terminal: read.key(" + OsKeyName(ch) + ")");
             }
             terminalInputQueue.push_back(ch);
             terminalInputReady = true;
@@ -218,12 +307,12 @@ void Terminal::PushLines()
 {
     if ((GetDebugMode() & debugTerminalMode) != 0)
     {
-        DebugWrite("> push.lines: " + std::to_string(lines.size()));
+        DebugWrite("kernel.terminal: > push.lines: " + std::to_string(lines.size()));
     }
     linesStack.push(std::move(lines));
     if ((GetDebugMode() & debugTerminalMode) != 0)
     {
-        DebugWrite("< push.lines");
+        DebugWrite("kernel.terminal: < push.lines");
     }
 }
 
@@ -235,7 +324,7 @@ void Terminal::PopLines()
         lineIndex = lines.size();
         if ((GetDebugMode() & debugTerminalMode) != 0)
         {
-            DebugWrite("> pop.lines: " + std::to_string(lines.size()) + ", line index=" + std::to_string(lineIndex));
+            DebugWrite("kernel.terminal: > pop.lines: " + std::to_string(lines.size()) + ", line index=" + std::to_string(lineIndex));
         }
         linesStack.pop();
     }
@@ -243,12 +332,12 @@ void Terminal::PopLines()
     {
         if ((GetDebugMode() & debugTerminalMode) != 0)
         {
-            DebugWrite("> pop.lines: lines stack is empty");
+            DebugWrite("kernel.terminal: < pop.lines: lines stack is empty");
         }
     }
     if ((GetDebugMode() & debugTerminalMode) != 0)
     {
-        DebugWrite("< pop.lines");
+        DebugWrite("kernel.terminal: < pop.lines");
     }
 }
 
@@ -295,7 +384,11 @@ Terminal::Terminal() :
     lineIndex(0),
     eof(false),
     readStartChar(true),
-    boundMd(-1)
+    boundMd(-1),
+    putTabMd(-1),
+    getTabMd(-1),
+    pid(-1),
+    completionIndex(-1)
 {
     GetScreenBufferInfo();
     defaultAttrs = attrs;
@@ -336,7 +429,7 @@ void Terminal::PrintNewLine()
     GetScreenBufferInfo();
 }
 
-void Terminal::HandleInputChar(char32_t ch)
+void Terminal::HandleInputChar(std::unique_lock<std::recursive_mutex>& lock, char32_t ch)
 {
     if (mode == TerminalMode::raw)
     {
@@ -363,13 +456,19 @@ void Terminal::HandleInputChar(char32_t ch)
                 terminalInputBuffer.push_back(static_cast<uint8_t>(c));
                 if ((GetDebugMode() & debugTerminalMode) != 0)
                 {
-                    DebugWrite("terminal.put.input.buffer(" + ToHexString(static_cast<uint8_t>(c)) + ")");
+                    DebugWrite("kernel.terminal: handle.input.char(" + ToHexString(static_cast<uint8_t>(c)) + ")");
                 }
             }
         }
-        DebugWrite("> terminal.input.wakeup");
+        if ((GetDebugMode() & debugTerminalMode) != 0)
+        {
+            DebugWrite("kernel.terminal: > input.wakeup");
+        }
         Wakeup(terminalInputEvent);
-        DebugWrite("< terminal.input.wakeup");
+        if ((GetDebugMode() & debugTerminalMode) != 0)
+        {
+            DebugWrite("kernel.terminal: < input.wakeup");
+        }
     }
     else if (mode == TerminalMode::cooked)
     {
@@ -389,7 +488,7 @@ void Terminal::HandleInputChar(char32_t ch)
                 }
                 case static_cast<char32_t>(keyTab):
                 {
-                    HandleTab();
+                    HandleTab(lock);
                     break;
                 }
                 case static_cast<char32_t>(keyControlD):
@@ -471,6 +570,7 @@ void Terminal::HandleChar(char32_t ch)
     {
         line.append(1, ch);
     }
+    completionIndex = -1;
     ++pos;
     UpdateLine();
     UpdateCursorPos();
@@ -537,9 +637,127 @@ void Terminal::HandleBackspace()
     }
 }
 
-void Terminal::HandleTab()
+void Terminal::GetCompletions(std::unique_lock<std::recursive_mutex>& lock)
 {
-    // todo
+    if ((GetDebugMode() & debugTerminalMode) != 0)
+    {
+        DebugWrite("kernel.terminal: > get.completions");
+    }
+    completions.clear();
+    completionIndex = -1;
+    if (pid == -1 || putTabMd == -1 || getTabMd == -1 || !IsMsgQOpen(putTabMd) || !IsMsgQOpen(getTabMd))
+    {
+        if ((GetDebugMode() & debugTerminalMode) != 0)
+        {
+            std::string reason = "unknown reason";
+            if (pid == -1)
+            {
+                reason = "pid == -1";
+            }
+            else if (putTabMd == -1)
+            {
+                reason = "putTabMd == -1";
+            }
+            else if (getTabMd == -1)
+            {
+                reason = "getTabMd == -1";
+            }
+            else if (!IsMsgQOpen(putTabMd))
+            {
+                reason = "putTabMd not open";
+            }
+            else if (!IsMsgQOpen(getTabMd))
+            {
+                reason = "getTabMd not open";
+            }
+            DebugWrite("kernel.terminal: < get.completions: no completions: reason: " + reason);
+        }
+        return;
+    }
+    try
+    {
+        cmsx::kernel::Process* process = ProcessManager::Instance().GetProcess(pid);
+        if (process)
+        {
+            INodeKey inodeKey = ToINodeKey(process->GetINodeKeyOfWorkingDir());
+            Filesystem* fs = GetFs(inodeKey.fsNumber);
+            int32_t messageId = completionRequestMessageId;
+            std::string cwd = fs->INodeToPath(inodeKey, Kernel::Instance().GetKernelProcess());
+            std::string ln = ToUtf8(line);
+            int32_t pos = this->pos;
+            int64_t count = 4 + cwd.size() + 1 + ln.size() + 1 + 4;
+            std::vector<uint8_t> putTabMsg(count, 0);
+            MemoryWriter writer(putTabMsg.data(), count);
+            writer.Write(messageId);
+            writer.Write(cwd);
+            writer.Write(ln);
+            writer.Write(pos);
+            PutMsg(putTabMd, putTabMsg);
+            WaitMsgLocked(lock, Kernel::Instance().GetKernelProcess(), getTabMd);
+            std::vector<uint8_t> getTabMsg = GetMsg(getTabMd);
+            MemoryReader reader(getTabMsg.data(), getTabMsg.size());
+            int32_t replyMessageId = reader.ReadInt();
+            int32_t success = reader.ReadInt();
+            if (success)
+            {
+                int32_t numCompletions = reader.ReadInt();
+                for (int32_t i = 0; i < numCompletions; ++i)
+                {
+                    std::string ln = reader.ReadString();
+                    int32_t pos = reader.ReadInt();
+                    completions.push_back(Completion(ToUtf32(ln), pos));
+                }
+                completionIndex = completions.size();
+                if ((GetDebugMode() & debugTerminalMode) != 0)
+                {
+                    DebugWrite("kernel.terminal: < get.completions: got " + std::to_string(numCompletions) + " completions");
+                }
+            }
+            else
+            {
+                if ((GetDebugMode() & debugTerminalMode) != 0)
+                {
+                    DebugWrite("kernel.terminal: < get.completions: success == false");
+                }
+            }
+        }
+    }
+    catch (const SystemError& error)
+    {
+        if ((GetDebugMode() & debugSystemErrorMode) != 0)
+        {
+            DebugWrite("kernel.error: " + std::string(error.what()));
+        }
+    }
+}
+
+void Terminal::HandleTab(std::unique_lock<std::recursive_mutex>& lock)
+{
+    if (completionIndex == -1)
+    {
+        GetCompletions(lock);
+    }
+    if (completionIndex == -1)
+    {
+        return;
+    }
+    if (completionIndex < completions.size())
+    {
+        ++completionIndex;
+    }
+    if (completionIndex >= completions.size())
+    {
+        completionIndex = 0;
+    }
+    if (completionIndex >= 0 && completionIndex < completions.size())
+    {
+        const Completion& completion = completions[completionIndex];
+        ClearUpdateLine();
+        line = completion.Line();
+        pos = completion.Pos();
+        UpdateLine();
+        UpdateCursorPos();
+    }
 }
 
 void Terminal::HandleEof()
@@ -549,12 +767,20 @@ void Terminal::HandleEof()
 
 void Terminal::HandleHome()
 {
+    if (pos != 0)
+    {
+        completionIndex = -1;
+    }
     pos = 0;
     UpdateCursorPos();
 }
 
 void Terminal::HandleEnd()
 {
+    if (pos != line.length())
+    {
+        completionIndex = -1;
+    }
     pos = line.length();
     UpdateCursorPos();
 }
@@ -563,6 +789,7 @@ void Terminal::HandleLeft()
 {
     if (pos > 0)
     {
+        completionIndex = -1;
         --pos;
         UpdateCursorPos();
     }
@@ -572,6 +799,7 @@ void Terminal::HandleRight()
 {
     if (pos < line.length())
     {
+        completionIndex = -1;
         ++pos;
         UpdateCursorPos();
     }
@@ -581,6 +809,7 @@ void Terminal::HandleUp()
 {
     if (lineIndex > 0)
     {
+        completionIndex = -1;
         ClearUpdateLine();
         --lineIndex;
         if (lineIndex < lines.size())
@@ -596,6 +825,7 @@ void Terminal::HandleDown()
 {
     if (lineIndex < int32_t(lines.size()) - 1)
     {
+        completionIndex = -1;
         ClearUpdateLine();
         ++lineIndex;
         line = lines[lineIndex];
@@ -608,6 +838,7 @@ void Terminal::HandleControlLeft()
 {
     if (pos > 0)
     {
+        completionIndex = -1;
         --pos;
         if (pos > 0)
         {
@@ -657,6 +888,7 @@ void Terminal::HandleControlRight()
 {
     if (pos < line.length())
     {
+        completionIndex = -1;
         ++pos;
         if (pos < line.length())
         {
@@ -702,6 +934,7 @@ void Terminal::HandleDel()
 {
     if (pos < line.length())
     {
+        completionIndex = -1;
         ++pos;
         HandleBackspace();
     }
@@ -832,7 +1065,7 @@ std::vector<uint8_t> Terminal::Read(int64_t count, cmsx::machine::Process* proce
                 bytes.push_back(x);
                 if ((GetDebugMode() & debugTerminalMode) != 0)
                 {
-                    DebugWrite("terminal.read.byte(" + ToHexString(x) + ")");
+                    DebugWrite("kernel.terminal: read.byte(" + ToHexString(x) + ")");
                 }
                 readEngine.Put(x);
                 if (readEngine.ResulReady())
@@ -840,7 +1073,7 @@ std::vector<uint8_t> Terminal::Read(int64_t count, cmsx::machine::Process* proce
                     char32_t ch = readEngine.Result();
                     if ((GetDebugMode() & debugTerminalMode) != 0)
                     {
-                        DebugWrite("terminal.read.key(" + OsKeyName(static_cast<int>(ch)) + ")");
+                        DebugWrite("kernel.terminal: read.key(" + OsKeyName(static_cast<int>(ch)) + ")");
                     }
                 }
             }
@@ -896,13 +1129,11 @@ int64_t Terminal::Write(const std::vector<uint8_t>& buffer, cmsx::machine::Proce
     return buffer.size();
 }
 
-const int keyPressedMessageId = 1;
-
 void Terminal::PutKeyPressedMessage(char32_t ch)
 {
     if ((GetDebugMode() & debugTerminalMode) != 0)
     {
-        DebugWrite("> terminal.put.key.pressed(" + OsKeyName(static_cast<int>(ch)) + ")");
+        DebugWrite("kernel.terminal: put.key.pressed(" + OsKeyName(static_cast<int>(ch)) + ")");
     }
     std::vector<std::uint8_t> keyPressedMessageData(8 + 4);
     MemoryWriter writer(keyPressedMessageData.data(), 8 + 4);
@@ -910,10 +1141,6 @@ void Terminal::PutKeyPressedMessage(char32_t ch)
     writer.Write(static_cast<int32_t>(-1)); // no window
     writer.Write(static_cast<int32_t>(ch));
     PutMsg(boundMd, keyPressedMessageData);
-    if ((GetDebugMode() & debugTerminalMode) != 0)
-    {
-        DebugWrite("< terminal.put.key.pressed(" + OsKeyName(static_cast<int>(ch)) + ")");
-    }
 }
 
 TerminalFile::TerminalFile() : File("TERMINAL")
@@ -960,7 +1187,7 @@ void TerminalFile::SetCooked()
     Terminal::Instance().SetCooked();
     if ((GetDebugMode() & debugTerminalMode) != 0)
     {
-        DebugWrite("cooked");
+        DebugWrite("kernel.terminal: cooked");
     }
 }
 
@@ -969,7 +1196,7 @@ void TerminalFile::SetRaw()
     Terminal::Instance().SetRaw();
     if ((GetDebugMode() & debugTerminalMode) != 0)
     {
-        DebugWrite("raw");
+        DebugWrite("kernel.terminal: raw");
     }
 }
 
@@ -978,7 +1205,7 @@ void TerminalFile::SetEcho(bool echo)
     Terminal::Instance().SetEcho(echo);
     if ((GetDebugMode() & debugTerminalMode) != 0)
     {
-        DebugWrite("echo=" + std::to_string(echo));
+        DebugWrite("kernel.terminal: echo=" + std::to_string(echo));
     }
 }
 
@@ -1000,6 +1227,26 @@ void TerminalFile::Bind(int32_t md)
 void TerminalFile::Unbind()
 {
     Terminal::Instance().Unbind();
+}
+
+void TerminalFile::SetTabMsgQueues(int32_t putTabMd, int32_t getTabMd)
+{
+    Terminal::Instance().SetTabMsgQueues(putTabMd, getTabMd);
+}
+
+void TerminalFile::ResetTabMsgQueues()
+{
+    Terminal::Instance().ResetTabMsgQueues();
+}
+
+void TerminalFile::PushPid(int32_t pid)
+{
+    Terminal::Instance().PushPid(pid);
+}
+
+void TerminalFile::PopPid()
+{
+    Terminal::Instance().PopPid();
 }
 
 void SetTerminalMachine(cmsx::machine::Machine* machine)

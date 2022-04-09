@@ -281,6 +281,33 @@ int32_t IOCtl(Process* process, int32_t fd, int32_t item, int64_t argAddr, int64
             file->PopLines();
             break;
         }
+        case IOControlItem::tab:
+        {
+            std::vector<uint8_t> arg = ReadProcessMemory(process, argAddr, 8);
+            MemoryReader reader(arg.data(), 8);
+            int32_t tabPutMd = reader.ReadInt();
+            int32_t tabGetMd = reader.ReadInt();
+            file->SetTabMsgQueues(tabPutMd, tabGetMd);
+            break;
+        }
+        case IOControlItem::untab:
+        {
+            file->ResetTabMsgQueues();
+            break;
+        }
+        case IOControlItem::push_pid:
+        {
+            std::vector<uint8_t> arg = ReadProcessMemory(process, argAddr, 4);
+            MemoryReader reader(arg.data(), 4);
+            int32_t pid = reader.ReadInt();
+            file->PushPid(pid);
+            break;
+        }
+        case IOControlItem::pop_pid:
+        {
+            file->PopPid();
+            break;
+        }
         default:
         {
             throw SystemError(EPARAM, "unknown ioctl item", __FUNCTION__);

@@ -107,7 +107,7 @@ void StartDebug()
 {
     if (GetDebugMode() != 0)
     {
-        DebugWrite("started kernel debugging in mode " + std::to_string(GetDebugMode()));
+        DebugWrite("kernel.debug: started kernel debugging in mode " + std::to_string(GetDebugMode()));
     }
 }
 
@@ -115,7 +115,7 @@ void StopDebug()
 {
     if (GetDebugMode() != 0)
     {
-        DebugWrite("stopped kernel debugging in mode " + std::to_string(GetDebugMode()));
+        DebugWrite("kernel.debug: stopped kernel debugging in mode " + std::to_string(GetDebugMode()));
     }
 }
 

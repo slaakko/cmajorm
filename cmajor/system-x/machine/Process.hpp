@@ -8,6 +8,7 @@
 #include <system-x/machine/Api.hpp>
 #include <string>
 #include <stdint.h>
+#include <list>
 #include <boost/pool/pool_alloc.hpp>
 
 namespace cmsx::machine {
@@ -44,6 +45,8 @@ public:
     virtual void SetGID(int32_t gid) = 0;
     virtual void SetEGID(int32_t egid) = 0;
     virtual int32_t UMask() const = 0;
+    virtual Machine* GetMachine() = 0;
+    virtual void RemoveMessageQueue(int32_t md) = 0;
 };
 
 using ProcessList = std::list<Process*, boost::fast_pool_allocator<Process*>>;

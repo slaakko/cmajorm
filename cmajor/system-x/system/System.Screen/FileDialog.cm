@@ -227,26 +227,26 @@ namespace System.Screen
         {
             base->OnWriteScreen(args);
             Rect updateRect = GetRect();
-			bool isDefault = args.GetRect().IsDefault();
+            bool isDefault = args.GetRect().IsDefault();
             if (!isDefault)
             {
                 updateRect = Rect.Intersection(updateRect, args.GetRect());
             }
             if (updateRect.IsEmpty()) return;
-			if (isDefault)
-			{
-				WriteBox(updateRect, ForeColor(), BackColor());
-				if (!caption.IsEmpty())
-				{
-					WriteCaption(u" " + ToUtf32(caption) + u" ");
-				}
-			}
+            if (isDefault)
+            {
+                WriteBox(updateRect, ForeColor(), BackColor());
+                if (!caption.IsEmpty())
+                {
+                    WriteCaption(u" " + ToUtf32(caption) + u" ");
+                }
+            }
         }
         private void ListBoxItemSelected()
         {
             if (items[listBox->SelectedIndex()].status.fileType == FileType.directory)
             {
-				InvalidateGuard guard(listBox, true);
+                InvalidateGuard guard(listBox, true);
                 directory = GetFullPath(Path.Combine(directory, items[listBox->SelectedIndex()].entry.name));
                 directoryLabel->SetText(directory);
                 MakeListBoxContent();
@@ -274,6 +274,14 @@ namespace System.Screen
                     defaultButton->SetDisabled();
                 }
             }
+            else if (items[listBox->SelectedIndex()].status.fileType == FileType.regular)
+            {
+                defaultButton->SetEnabled();
+            }
+            else if (items[listBox->SelectedIndex()].status.fileType == FileType.fifo)
+            {
+                defaultButton->SetDisabled();
+            }
         }
         private void TextBoxTextChanged()
         {
@@ -300,6 +308,18 @@ namespace System.Screen
             {
                 string filePath = FilePath();
                 if (!filePath.IsEmpty() && File.Exists(filePath))
+                {
+                    defaultButton->SetEnabled();
+                }
+                else
+                {
+                    defaultButton->SetDisabled();
+                }
+            }
+            else
+            {    
+                string filePath = FilePath();
+                if (!filePath.IsEmpty())
                 {
                     defaultButton->SetEnabled();
                 }
@@ -388,6 +408,10 @@ namespace System.Screen
                     {
                         items.Add(MakeItem(directory, entry));
                     }
+                }
+                else if (directory == "/" && entry.name == "dev")
+                {
+                    continue;
                 }
                 else
                 {

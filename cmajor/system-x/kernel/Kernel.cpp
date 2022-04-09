@@ -71,6 +71,16 @@ void KernelProcess::SetEGID(int32_t egid)
     throw SystemError(EPERMISSION, "cannot set EGID of kernel process", __FUNCTION__);
 }
 
+void KernelProcess::RemoveMessageQueue(int32_t md)
+{
+    // nothing todo
+}
+
+cmsx::machine::Machine* KernelProcess::GetMachine() 
+{
+    return Kernel::Instance().GetMachine();
+}
+
 std::unique_ptr<Kernel> Kernel::instance;
 
 void Kernel::Init()

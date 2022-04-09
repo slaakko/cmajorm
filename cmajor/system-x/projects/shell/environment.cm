@@ -7,6 +7,18 @@ using System;
 using System.Os;
 using System.Security;
 
+string MakePutTabMsgQName() 
+{
+	string name = "tab.put.message.queue." + ToString(GetPid());
+	return name;
+}
+
+string MakeGetTabMsgQName() 
+{
+	string name = "tab.get.message.queue." + ToString(GetPid());
+	return name;
+}
+
 class ShellEnvironment
 {
     public ShellEnvironment()
@@ -77,6 +89,32 @@ class ShellEnvironment
     {
         return debug;
     }
+	public nothrow void SetPutTabMsgQ(int putTabMsgQ_, const string& putTabMsgQName_)
+	{
+		putTabMsgQ = putTabMsgQ_;
+		putTabMsgQName = putTabMsgQName_;
+	}
+	public nothrow int PutTabMsgQ() const
+	{
+		return putTabMsgQ;
+	}
+	public nothrow const string& PutTabMsgQName() const
+	{
+		return putTabMsgQName;
+	}
+	public nothrow void SetGetTabMsgQ(int getTabMsgQ_, const string& getTabMsgQName_)
+	{
+		getTabMsgQ = getTabMsgQ_;
+		getTabMsgQName = getTabMsgQName_;
+	}
+	public nothrow int GetTabMsgQ() const
+	{
+		return getTabMsgQ;
+	}
+	public nothrow const string& GetTabMsgQName() const
+	{
+		return getTabMsgQName;
+	}
     private Users users;
     private string userName;
     private string hostName;
@@ -85,6 +123,10 @@ class ShellEnvironment
     private string shell;
     private string pwd;
     private bool debug;
+	private int putTabMsgQ;
+	private string putTabMsgQName;
+	private int getTabMsgQ;
+	private string getTabMsgQName;
 }
 
 void SetPWD(ShellEnvironment& shellEnvironment)
@@ -156,4 +198,10 @@ void SetupShellEnvironment(ShellEnvironment& environment)
         environment.SetShell(shell);
         SetEnv("SHELL", shell);
     }
+	string putTabMsgQName = MakePutTabMsgQName();
+	int putTabMsgQ = MsgQ(putTabMsgQName.Chars());
+	environment.SetPutTabMsgQ(putTabMsgQ, putTabMsgQName);
+	string getTabMsgQName = MakeGetTabMsgQName();
+	int getTabMsgQ = MsgQ(getTabMsgQName.Chars());
+	environment.SetGetTabMsgQ(getTabMsgQ, getTabMsgQName);
 }

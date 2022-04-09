@@ -12,6 +12,8 @@ cminst -v coreutil\head\bin\debug\head.x ..\bin\headd.x
 cminst -v coreutil\head\bin\release\head.x ..\bin\head.x
 cminst -v coreutil\hexdump\bin\debug\hexdump.x ..\bin\hexdumpd.x
 cminst -v coreutil\hexdump\bin\release\hexdump.x ..\bin\hexdump.x
+cminst -v coreutil\kill\bin\debug\kill.x ..\bin\killd.x
+cminst -v coreutil\kill\bin\release\kill.x ..\bin\kill.x
 cminst -v coreutil\less\bin\debug\less.x ..\bin\lessd.x
 cminst -v coreutil\less\bin\release\less.x ..\bin\less.x
 cminst -v coreutil\login\bin\debug\login.x ..\bin\logind.x
@@ -40,3 +42,5 @@ cminst -v editor\bin\debug\e.x ..\bin\ed.x
 cminst -v editor\bin\release\e.x ..\bin\e.x
 cminst -v shell\bin\debug\sh.x ..\bin\shd.x
 cminst -v shell\bin\release\sh.x ..\bin\sh.x
+cminst -v tab\bin\debug\tab.x ..\bin\tabd.x
+cminst -v tab\bin\release\tab.x ..\bin\tab.x

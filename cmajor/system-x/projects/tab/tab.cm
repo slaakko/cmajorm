@@ -1,0 +1,406 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+using System.Os;
+using System.RegularExpressions;
+
+const int completionInitMessageId = 10;
+const int completionExitMessageId = 11;
+const int completionRequestMessageId = 12;
+const int completionReplyMessageId = 13;
+const int completionErrorReplyMessageId = 14;
+
+Pair<ustring, FileType> MakeFileNameEntry(const string& dir, const string& fileName)
+{
+	string path = Path.Combine(dir, fileName);
+	FileStatus status;
+	Stat(path.Chars(), status);
+	return MakePair(ToUtf32(fileName), status.fileType);
+}
+
+class EntryLess : Rel<Pair<ustring, FileType>>
+{
+	public nothrow bool operator()(const Pair<ustring, FileType>& left, const Pair<ustring, FileType>& right) const
+	{
+		if (left.second == FileType.directory)
+		{
+			if (right.second == FileType.regular) 
+			{
+				return true;
+			}
+			else if (right.second == FileType.directory)
+			{
+				return left.first < right.first;
+			}
+			else if (right.second == FileType.fifo)
+			{
+				return true;
+			}
+		}
+		else if (left.second == FileType.regular)
+		{
+			if (right.second == FileType.regular)
+			{
+				return left.first < right.first;
+			}
+			else if (right.second == FileType.directory)
+			{
+				return false;
+			}
+			else if (right.second == FileType.fifo)
+			{
+				return true;
+			}
+		}
+		else if (left.second == FileType.fifo)
+		{
+			if (right.second == FileType.regular) 
+			{
+				return false;
+			}
+			else if (right.second == FileType.directory) 
+			{
+				return true;
+			}
+			else if (right.second == FileType.fifo) 
+			{
+				return left.first < right.first;
+			}
+		}
+		return false;
+	}
+}
+
+List<Pair<ustring, FileType>> GetFileNameEntries(const string& dir)
+{
+	List<Pair<ustring, FileType>> fileNameEntries;
+	if (DirectoryExists(dir))
+	{
+		DirectoryReader reader(dir);
+		DirectoryEntry entry;
+		while (reader.Read(entry))
+		{
+			if (entry.IsDot() || entry.IsDotDot())
+			{
+				continue;
+			}
+			fileNameEntries.Add(MakeFileNameEntry(dir, entry.name));
+		}
+	}
+	Sort(fileNameEntries, EntryLess());
+	return fileNameEntries;
+}
+
+List<Pair<ustring, FileType>> GetMatchingEntries(const List<Pair<ustring, FileType>>& fileNameEntries, Nfa& nfa)
+{
+	List<Pair<ustring, FileType>> matchingEntries;
+	for (const Pair<ustring, FileType>& fileNameEntry : fileNameEntries)
+	{
+		if (PatternMatch(fileNameEntry.first, nfa))
+		{
+			matchingEntries.Add(fileNameEntry);
+		}
+	}
+	return matchingEntries;
+}
+
+void GetWord(const ustring& line, int pos, int& startPos, int& slashPos, ustring& prefix, ustring& word)
+{
+	int tabPos = pos;
+	while (pos > 0 && (pos >= line.Length() || line[pos] == ' '))
+	{
+		--pos;
+	}
+	while (pos > 0 && line[pos] != ' ')
+	{
+		--pos;
+	}
+	if (pos >= 0 && line[pos] == ' ')
+	{
+		++pos;
+	}
+	startPos = pos;
+	ustring text = line.Substring(pos, tabPos - pos);
+	slashPos = cast<int>(text.RFind('/'));
+	if (slashPos != -1)
+	{
+		prefix = text.Substring(0, slashPos + 1);
+		word = text.Substring(slashPos + 1);
+	}
+	else
+	{
+		word = text;
+	}
+	if ((GetDebugMode() & debugApp) != 0)
+	{
+		WriteDebugMessage("> tab.get.word: prefix='" + ToUtf8(prefix) + "'.word=" + ToUtf8(word));
+	}
+}
+
+void MakeCompletions(const ustring& line, int startPos, int tabPos, const ustring& prefix, const List<Pair<ustring, FileType>>& matchingEntries, List<Pair<string, int>>& completions)
+{
+	for (const Pair<ustring, FileType>& matchingEntry : matchingEntries)
+	{
+		ustring completionLine = line.Substring(0, startPos);
+		if (!prefix.IsEmpty())
+		{
+			completionLine.Append(prefix);
+			if (!prefix.EndsWith(u"/"))
+			{
+				completionLine.Append('/');
+			}
+		}
+		completionLine.Append(matchingEntry.first);
+		if (matchingEntry.second != FileType.directory)
+		{
+			completionLine.Append(' ');
+		}
+		int pos = cast<int>(completionLine.Length());
+		completionLine.Append(line.Substring(tabPos));
+		completions.Add(MakePair(ToUtf8(completionLine), pos));
+	}
+}
+
+bool CompletePath(const string& cwd, const string& line, int pos, List<Pair<string, int>>& completions, Context& context)
+{
+	try
+	{
+		ustring ln = ToUtf32(line);
+		int startPos = 0;
+		int slashPos = -1;
+		ustring pattern;
+		ustring prefix;
+		GetWord(ln, pos, startPos, slashPos, prefix, pattern);
+		pattern.Append('*');
+		Nfa nfa = CompileFilePattern(context, pattern);
+		string dir = cwd;
+		if (!prefix.IsEmpty())
+		{
+			if (prefix.StartsWith(u"/"))
+			{
+				dir = ToUtf8(prefix);
+			}
+			else
+			{
+				dir = Path.Combine(dir, ToUtf8(prefix));
+			}
+		}
+		if ((GetDebugMode() & debugApp) != 0)
+		{
+			WriteDebugMessage("> tab.complete.path: dir=" + dir);
+		}
+		List<Pair<ustring, FileType>> fileNameEntries = GetFileNameEntries(dir);
+		if (fileNameEntries.IsEmpty()) 
+		{
+			return false;
+		}
+		List<Pair<ustring, FileType>> matchingEntries = GetMatchingEntries(fileNameEntries, nfa);
+		if ((GetDebugMode() & debugTerminal) != 0)
+		{
+			WriteDebugMessage("tab.complete.path: matches=" + ToString(matchingEntries.Count()));
+		}
+		MakeCompletions(ln, startPos, pos, prefix, matchingEntries, completions);
+		return !completions.IsEmpty();
+	}
+	catch (const Exception& ex)
+	{
+		if ((GetDebugMode() & debugSystemError) != 0)
+		{
+			WriteDebugMessage("tab.complete.path: " + ex.Message());
+		}
+	}
+	return false;
+}
+
+void CloseMessageQueue(int msgQ)
+{
+	if (msgQ == -1) 
+	{
+		return;
+	}
+	try
+	{
+		CloseMsgQ(msgQ);
+	}
+	catch (const Exception& ex)
+	{
+		Console.Error() << ex.ToString() << endl();
+	}
+}
+
+bool ProcessMessage(int putTabMsgQ, int getTabMsgQ, Context& context)
+{
+	try
+	{
+		if ((GetDebugMode() & debugApp) != 0)
+		{
+			WriteDebugMessage("> tab.process.message");
+		}
+		int putTabMsgSize = GetMsgSize(putTabMsgQ);
+		if (putTabMsgSize > 0)
+		{
+			UniquePtr<byte> putTabMsgData(cast<byte*>(MemAlloc(putTabMsgSize)));
+			GetMsg(putTabMsgQ, putTabMsgData.Get());
+			MemoryReader reader(putTabMsgData.Get(), putTabMsgSize);
+			int messageId = reader.ReadInt();
+			if (messageId == completionInitMessageId)
+			{
+				int success = 1;
+				List<byte> completionInitReplyMsgData;
+				int completionInitReplyMsgDataSize = 12;
+				completionInitReplyMsgData.Resize(completionInitReplyMsgDataSize);
+				MemoryWriter writer(completionInitReplyMsgData.Begin().Ptr(), completionInitReplyMsgDataSize);
+				int numCompletions = 0;
+				writer.Write(completionReplyMessageId);
+				writer.Write(success);
+				writer.Write(numCompletions);
+				PutMsg(getTabMsgQ, completionInitReplyMsgData.Begin().Ptr(), completionInitReplyMsgDataSize);
+			}
+			else if (messageId == completionExitMessageId)
+			{
+				if ((GetDebugMode() & debugApp) != 0)
+				{
+					WriteDebugMessage("tab.process.message.exit");
+				}
+				return true;
+			}
+			else if (messageId == completionRequestMessageId)
+			{
+				string cwd = reader.ReadString();
+				string line = reader.ReadString();
+				int pos = reader.ReadInt();
+				List<byte> getTabMsgData;
+				int getTabMsgSize = 4 + 4;
+				List<Pair<string, int>> completions;
+				if (CompletePath(cwd, line, pos, completions, context))
+				{
+					int replyMessageId = completionReplyMessageId;
+					int success = 1;
+					getTabMsgSize = 4 + 4;
+					getTabMsgSize = getTabMsgSize + 4;
+					for (const Pair<string, int>& completion : completions)
+					{
+						getTabMsgSize = getTabMsgSize + cast<int>(completion.first.Length()) + 1 + 4;
+					}
+					getTabMsgData.Resize(getTabMsgSize);
+					MemoryWriter writer(getTabMsgData.Begin().Ptr(), getTabMsgSize);
+					writer.Write(replyMessageId);
+					writer.Write(success);
+					writer.Write(cast<int>(completions.Count()));
+					for (const Pair<string, int>& completion : completions)
+					{
+						writer.Write(completion.first);
+						writer.Write(completion.second);
+					}
+				}
+				else
+				{
+					int replyMessageId = completionReplyMessageId;
+					int success = 0;
+					getTabMsgSize = 4 + 4;
+					getTabMsgData.Resize(getTabMsgSize);
+					MemoryWriter writer(getTabMsgData.Begin().Ptr(), getTabMsgSize);
+					writer.Write(replyMessageId);
+					writer.Write(success);
+				}
+				PutMsg(getTabMsgQ, getTabMsgData.Begin().Ptr(), getTabMsgSize);
+			}
+			else
+			{
+				throw Exception("tab: unknown message id received");
+			}
+		}
+		if ((GetDebugMode() & debugApp) != 0)
+		{
+			WriteDebugMessage("< tab.process.message");
+		}
+	}
+	catch (const Exception& ex)
+	{
+		List<byte> getTabMsgData;
+		int replyMessageId = completionErrorReplyMessageId;
+		int success = 0;
+		string error = ex.Message();
+		int getTabMsgSize = 4 + 4 + cast<int>(error.Length()) + 1;
+		getTabMsgData.Resize(getTabMsgSize);
+		MemoryWriter writer(getTabMsgData.Begin().Ptr(), getTabMsgSize);
+		writer.Write(replyMessageId);
+		writer.Write(success);
+		writer.Write(error);
+		PutMsg(getTabMsgQ, getTabMsgData.Begin().Ptr(), getTabMsgSize);
+		if ((GetDebugMode() & debugSystemError) != 0)
+		{
+			WriteDebugMessage("tab.processMessage: " + ex.Message());
+		}
+	}
+	return false;
+}
+
+int main(int argc, const char** argv)
+{
+	int putTabMsgQ = -1;
+	int getTabMsgQ = -1;
+	try
+	{
+		Context context;
+		string putTabMsgQName;
+		string getTabMsgQName;
+		for (int i = 1; i < argc; ++i)
+		{
+			string arg = argv[i];
+			if (i == 1)
+			{
+				putTabMsgQName = arg;
+			}
+			else if (i == 2)
+			{
+				getTabMsgQName = arg;
+			}
+		}
+		if (putTabMsgQName.IsEmpty() || getTabMsgQName.IsEmpty())
+		{
+			throw Exception("tab: invalid number of arguments");
+		}
+		putTabMsgQ = MsgQ(putTabMsgQName.Chars());
+		getTabMsgQ = MsgQ(getTabMsgQName.Chars());
+		if ((GetDebugMode() & debugApp) != 0)
+		{
+			WriteDebugMessage("> tab.main");
+		}
+		WaitMsg(putTabMsgQ);
+		int len = GetMsgQLength(putTabMsgQ);
+		while (len > 0)
+		{
+			bool stop = ProcessMessage(putTabMsgQ, getTabMsgQ, context);
+			if (stop)
+			{
+				break;
+			}
+			WaitMsg(putTabMsgQ);
+			len = GetMsgQLength(putTabMsgQ);
+		}
+		CloseMessageQueue(getTabMsgQ);
+		CloseMessageQueue(putTabMsgQ);
+		if ((GetDebugMode() & debugApp) != 0)
+		{
+			WriteDebugMessage("< tab.main");
+		}
+	}
+	catch (const Exception& ex)
+	{
+		Console.Error() << ex.ToString() << endl();
+		CloseMessageQueue(getTabMsgQ);
+		CloseMessageQueue(putTabMsgQ);
+		if ((GetDebugMode() & debugSystemError) != 0)
+		{
+			WriteDebugMessage("tab.main: " + ex.Message());
+		}
+		return 1;
+	}
+	return 0;
+}

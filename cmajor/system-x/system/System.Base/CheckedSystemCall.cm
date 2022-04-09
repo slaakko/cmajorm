@@ -105,6 +105,24 @@ namespace System.Os
         }
         return result;
     }
+	
+	public int WaitPid(int pid, byte* exitCode)
+	{
+		int result = waitpid(pid, exitCode);
+		if (result == -1)
+		{
+			SystemError systemError = GetSystemError();
+			if (systemError.errorCode == ENOCHILD)
+			{
+				return -1;
+			}
+	        else
+            {
+                throw systemError;
+            }
+        }
+        return result;
+	}
     
     public int GetPid()
     {
@@ -625,6 +643,33 @@ namespace System.Os
         }
     }
     
+    public void Tab(int fd, int putTabMsgQ, int getTabMsgQ)
+    {
+        byte[8] arg;
+        MemoryWriter writer(&arg[0], 8);
+        writer.Write(putTabMsgQ);
+        writer.Write(getTabMsgQ);
+        IOCtl(fd, IOControlItem.tab, &arg[0], 8);
+    }
+    
+    public void Untab(int fd)
+    {
+        IOCtl(fd, IOControlItem.untab, null, 0);
+    }
+    
+    public void PushPid(int fd, int pid)
+    {
+        byte[4] arg;
+        MemoryWriter writer(&arg[0], 4);
+        writer.Write(pid);
+        IOCtl(fd, IOControlItem.push_pid, &arg[0], 4);
+    }
+    
+    public void PopPid(int fd)
+    {
+        IOCtl(fd, IOControlItem.pop_pid, null, 0);
+    }
+    
     public void TimerMsg(const Duration& duration, int md, byte* msgData, int msgSize)
     {
         int result = timer_msg(duration.Rep(), md, msgData, msgSize);
@@ -642,5 +687,14 @@ namespace System.Os
             ThrowSystemError();
         }
         return result;
+    }
+    
+    public void Kill(int pid)
+    {
+        int result = kill(pid);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
     }
 }

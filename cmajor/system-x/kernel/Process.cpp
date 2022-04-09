@@ -228,6 +228,7 @@ void Process::Exit(uint8_t exitCode_)
     functionTable.reset();
     fileTable.CloseFiles(this);
     RemoveDirChangeNotifications(id);
+    messageQueues.CloseAll(this);
     Process* parent = Parent();
     if (parent)
     {
@@ -388,6 +389,16 @@ void Process::SetUMask(int32_t mask)
     umask = mask & 0777;
 }
 
+void Process::RemoveMessageQueue(int32_t md)
+{
+    messageQueues.Remove(md);
+}
+
+cmsx::machine::Machine* Process::GetMachine()
+{
+    return processor->GetMachine();
+}
+
 void SetupRegions(Process* parent, Process* child)
 {
     Region textRegion = parent->GetRegionTable().GetRegion(RegionId::text);
@@ -442,51 +453,66 @@ int32_t Fork(Process* parent)
     return child->Id();
 }
 
-int32_t Wait(Process* parent, int64_t childExitCodeAddress)
+int32_t Wait(Process* parent, int32_t pid, int64_t childExitCodeAddress)
 {
-    cmsx::machine::Machine* machine = ProcessManager::Instance().GetMachine();
+    while (true)
+    {
+        cmsx::machine::Machine* machine = ProcessManager::Instance().GetMachine();
 #if (LOCK_DEBUG)
-    DebugLock startDebugLock(&machine->Lock(), PROCESS_MANAGER, parent->Id(), NO_LOCK | WAIT);
+        DebugLock startDebugLock(&machine->Lock(), PROCESS_MANAGER, parent->Id(), NO_LOCK | WAIT);
 #endif 
-    std::unique_lock<std::recursive_mutex> lock(machine->Lock());
+        std::unique_lock<std::recursive_mutex> lock(machine->Lock());
 #if (LOCK_DEBUG)
-    DebugLock hasDebugLock(&machine->Lock(), PROCESS_MANAGER, parent->Id(), HAS_LOCK | WAIT);
-#endif 
-    Process* child = parent->FirstChild();
-    while (child)
-    {
-        if (child->State() == cmsx::machine::ProcessState::zombie)
+        DebugLock hasDebugLock(&machine->Lock(), PROCESS_MANAGER, parent->Id(), HAS_LOCK | WAIT);
+#endif
+        Process* child = parent->FirstChild();
+        while (child)
         {
-            child->RemoveFromParent();
-            uint8_t exitCode = child->ExitCode();
-            parent->GetProcessor()->GetMachine()->Mem().WriteByte(parent->RV(), childExitCodeAddress, exitCode, cmsx::machine::Protection::write);
-            parent->AddChildUserTime(child->UserTime());
-            parent->AddChildSleepTime(child->SleepTime());
-            parent->AddChildSystemTime(child->SystemTime());
-            return child->Id();
+            if (child->State() == cmsx::machine::ProcessState::zombie)
+            {
+                if (pid == -1 || child->Id() == pid)
+                {
+                    child->RemoveFromParent();
+                    uint8_t exitCode = child->ExitCode();
+                    parent->GetProcessor()->GetMachine()->Mem().WriteByte(parent->RV(), childExitCodeAddress, exitCode, cmsx::machine::Protection::write);
+                    parent->AddChildUserTime(child->UserTime());
+                    parent->AddChildSleepTime(child->SleepTime());
+                    parent->AddChildSystemTime(child->SystemTime());
+                    return child->Id();
+                }
+            }
+            child = child->NextSibling();
         }
-        child = child->NextSibling();
-    }
-    child = parent->FirstChild();
-    if (child)
-    {
-        Sleep(cmsx::machine::Event(cmsx::machine::EventKind::childExitEvent, parent->Id()), parent, lock);
-        lock.lock();
-    }
-    child = parent->FirstChild();
-    while (child)
-    {
-        if (child->State() == cmsx::machine::ProcessState::zombie)
+        child = parent->FirstChild();
+        if (child)
         {
-            child->RemoveFromParent();
-            uint8_t exitCode = child->ExitCode();
-            machine->Mem().WriteByte(parent->RV(), childExitCodeAddress, exitCode, cmsx::machine::Protection::write);
-            parent->AddChildUserTime(child->UserTime());
-            parent->AddChildSleepTime(child->SleepTime());
-            parent->AddChildSystemTime(child->SystemTime());
-            return child->Id();
+            Sleep(cmsx::machine::Event(cmsx::machine::EventKind::childExitEvent, parent->Id()), parent, lock);
+            lock.lock();
         }
-        child = child->NextSibling();
+        bool hasChildInZombieState = false;
+        child = parent->FirstChild();
+        while (child)
+        {
+            if (child->State() == cmsx::machine::ProcessState::zombie)
+            {
+                hasChildInZombieState = true;
+                if (pid == -1 || child->Id() == pid)
+                {
+                    child->RemoveFromParent();
+                    uint8_t exitCode = child->ExitCode();
+                    machine->Mem().WriteByte(parent->RV(), childExitCodeAddress, exitCode, cmsx::machine::Protection::write);
+                    parent->AddChildUserTime(child->UserTime());
+                    parent->AddChildSleepTime(child->SleepTime());
+                    parent->AddChildSystemTime(child->SystemTime());
+                    return child->Id();
+                }
+            }
+            child = child->NextSibling();
+        }
+        if (pid == -1 || !hasChildInZombieState)
+        {
+            break;
+        }
     }
     throw SystemError(ENOCHILD, "no child in zombie state", __FUNCTION__);
 }
@@ -527,6 +553,35 @@ void Exec(Process* process, int64_t filePathAddress, int64_t argvAddress, int64_
     soulng::util::BinaryStreamReader reader(memoryStream);
     std::unique_ptr<cmsx::object::BinaryFile> binaryFile(cmsx::object::ReadBinaryFile(reader, filePath));
     Load(process, binaryFile.get(), args, env, *machine, process->RV(), false);
+}
+
+void Kill(Process* parent, Process* process)
+{
+    bool allow = false;
+    if (parent->EUID() == 0 || parent->UID() == 0)
+    {
+        allow = true;
+    }
+    else
+    {
+        Process* par = process->Parent();
+        while (par && par != parent)
+        {
+            par = par->Parent();
+        }
+        if (par == parent)
+        {
+            allow = true;
+        }
+    }
+    if (allow)
+    {
+        process->Exit(255);
+    }
+    else
+    {
+        throw SystemError(EPERMISSION, "unauthorized", __FUNCTION__);
+    }
 }
 
 } // namespace cmsx::kernel

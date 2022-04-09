@@ -82,4 +82,16 @@ DateTime MemoryReader::ReadDateTime()
     return dt;
 }
 
+std::string MemoryReader::ReadString()
+{
+    std::string result;
+    uint8_t b = ReadByte();
+    while (b != 0u)
+    {
+        result.append(1, static_cast<char>(b));
+        b = ReadByte();
+    }
+    return result;
+}
+
 } } // namespace soulng::util

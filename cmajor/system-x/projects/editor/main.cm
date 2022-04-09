@@ -158,6 +158,16 @@ public class MainWindow : Window
         if (dialog.ShowDialog() == DialogResult.ok)
         {
             string filePath = dialog.FilePath();
+            if (File.Exists(filePath))
+            {
+                UniquePtr<MessageBox> messageBox = new MessageBox(MessageBoxCreateParams().Caption("Replace?").Text("File already exists. Do you want to replace it?").
+                Buttons(cast<MessageBoxButtons>(MessageBoxButtons.yes | MessageBoxButtons.no)));
+                DialogResult result = messageBox->ShowDialog();
+                if (result == DialogResult.no)
+                {
+                    return;
+                }
+            }
             editor->SetFilePath(filePath);
             editor->Save();
         }

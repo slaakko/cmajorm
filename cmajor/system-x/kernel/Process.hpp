@@ -10,6 +10,7 @@
 #include <system-x/kernel/File.hpp>
 #include <system-x/kernel/Region.hpp>
 #include <system-x/kernel/INodeManager.hpp>
+#include <system-x/kernel/MsgQueue.hpp>
 #include <system-x/object/Symbol.hpp>
 #include <system-x/object/FunctionTable.hpp>
 #include <system-x/machine/Debugger.hpp>
@@ -112,6 +113,9 @@ public:
     void SetDirectoriesChanged() { directoriesChanged = true; }
     bool DirectoriesChanged() const { return directoriesChanged; }
     void ClearDirectoriesChanged() { directoriesChanged = false; }
+    ProcessMessageQueues& MessageQueues() { return messageQueues; }
+    void RemoveMessageQueue(int32_t md) override;
+    cmsx::machine::Machine* GetMachine() override;
 private:
     int32_t id;
     uint64_t rv;
@@ -157,11 +161,13 @@ private:
     void* kernelFiber;
     uint64_t inodeKeyOfWorkingDirAsULong;
     bool directoriesChanged;
+    ProcessMessageQueues messageQueues;
 };
 
 CMSX_KERNEL_API int32_t Fork(Process* parent);
-CMSX_KERNEL_API int32_t Wait(Process* parent, int64_t childExitCodeAddress);
+CMSX_KERNEL_API int32_t Wait(Process* parent, int32_t pid, int64_t childExitCodeAddress);
 CMSX_KERNEL_API void Exec(Process* process, int64_t filePathAddress, int64_t argvAddress, int64_t envpAddress);
+CMSX_KERNEL_API void Kill(Process* parent, Process* process);
 
 } // namespace cmsx::kernel
 

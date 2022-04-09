@@ -21,6 +21,10 @@ namespace System.Screen
             return cast<int>(sizeof(int) + sizeof(int));
         }
         public abstract nothrow string Name() const;
+        public nothrow virtual bool IsDefaultWriteScreenMessage() const
+        {
+            return false;
+        }
         public nothrow int TargetWindowHandle() const
         {
             return targetWindowHandle;

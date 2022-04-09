@@ -103,10 +103,10 @@ namespace System.Screen
             }
             SetControlCursorPos(Location());
         }
-		public nothrow override Rect FocusRect() const
-		{
-			return LineRect(selectedIndex - topIndex);
-		}
+        public nothrow override Rect FocusRect() const
+        {
+            return LineRect(selectedIndex - topIndex);
+        }
         public override void OnWriteScreen(WriteScreenEventArgs& args)
         {
             base->OnWriteScreen(args);
@@ -119,32 +119,32 @@ namespace System.Screen
             if (updateRect.IsEmpty()) return;
             Clear(updateRect, ForeColor(), BackColor());
             Point loc = Location();
-			Rect rect = GetRect();
+            Rect rect = GetRect();
             int n = Min(rect.size.h, Max(cast<int>(0), cast<int>(items.Count() - topIndex)));
             for (int i = 0; i < n; ++i)
             {
                 int index = topIndex + i;
-				Rect lineRect = LineRect(i);
-				if (lineRect.IntersectsWith(updateRect))
-				{
-					SetCursorPos(loc.x, loc.y + i);
-					ConsoleColor foreColor = ForeColor();
-					ConsoleColor backColor = BackColor();
-					if (index == selectedIndex)
-					{
-						if (focused)
-						{
-							foreColor = selectedItemFocusedForeColor;
-							backColor = selectedItemFocusedBackColor;
-						}
-						else
-						{
-							foreColor = selectedItemForeColor;
-							backColor = selectedItemBackColor;
-						}
-					}
-					Terminal.Out() << SetColors(foreColor, backColor) << items[index];
-				}
+                Rect lineRect = LineRect(i);
+                if (lineRect.IntersectsWith(updateRect))
+                {
+                    SetCursorPos(loc.x, loc.y + i);
+                    ConsoleColor foreColor = ForeColor();
+                    ConsoleColor backColor = BackColor();
+                    if (index == selectedIndex)
+                    {
+                        if (focused)
+                        {
+                            foreColor = selectedItemFocusedForeColor;
+                            backColor = selectedItemFocusedBackColor;
+                        }
+                        else
+                        {
+                            foreColor = selectedItemForeColor;
+                            backColor = selectedItemBackColor;
+                        }
+                    }
+                    Terminal.Out() << SetColors(foreColor, backColor) << items[index];
+                }
             }
         }
         public override void OnKeyPressed(KeyEventArgs& args)
@@ -153,29 +153,29 @@ namespace System.Screen
             Size sz = GetSize();
             if (!args.Handled())
             {
-				int prevTopIndex = topIndex;
+                int prevTopIndex = topIndex;
                 switch (args.Key())
                 {
                     case keyDown:
                     {
                         if (selectedIndex < items.Count() - 1)
                         {
-							Rect updateRect = LineRect(selectedIndex - topIndex);
+                            Rect updateRect = LineRect(selectedIndex - topIndex);
                             ++selectedIndex;
                             if (selectedIndex >= topIndex + sz.h)
                             {
                                 ++topIndex;
                             }
-							updateRect = Rect.Union(updateRect, LineRect(selectedIndex - topIndex));
+                            updateRect = Rect.Union(updateRect, LineRect(selectedIndex - topIndex));
                             OnSelectedIndexChanged();
-							if (topIndex == prevTopIndex)
-							{
-								Invalidate(updateRect);
-							}
-							else
-							{
-								Invalidate();
-							}
+                            if (topIndex == prevTopIndex)
+                            {
+                                Invalidate(updateRect);
+                            }
+                            else
+                            {
+                                Invalidate();
+                            }
                             args.SetHandled();
                         }
                         break;
@@ -184,22 +184,22 @@ namespace System.Screen
                     {
                         if (selectedIndex > 0)
                         {
-							Rect updateRect = LineRect(selectedIndex - topIndex);
+                            Rect updateRect = LineRect(selectedIndex - topIndex);
                             --selectedIndex;
                             if (selectedIndex < topIndex)
                             {
                                 --topIndex;
                             }
-							updateRect = Rect.Union(updateRect, LineRect(selectedIndex - topIndex));
+                            updateRect = Rect.Union(updateRect, LineRect(selectedIndex - topIndex));
                             OnSelectedIndexChanged();
-							if (topIndex == prevTopIndex)
-							{
-								Invalidate(updateRect);
-							}
-							else
-							{
-								Invalidate();
-							}
+                            if (topIndex == prevTopIndex)
+                            {
+                                Invalidate(updateRect);
+                            }
+                            else
+                            {
+                                Invalidate();
+                            }
                             args.SetHandled();
                         }
                         break;
@@ -208,19 +208,19 @@ namespace System.Screen
                     {
                         if (selectedIndex != 0)
                         {
-							Rect updateRect = LineRect(selectedIndex - topIndex);
+                            Rect updateRect = LineRect(selectedIndex - topIndex);
                             selectedIndex = 0;
                             topIndex = 0;
-							updateRect = Rect.Union(updateRect, LineRect(selectedIndex - topIndex));
+                            updateRect = Rect.Union(updateRect, LineRect(selectedIndex - topIndex));
                             OnSelectedIndexChanged();
-							if (topIndex == prevTopIndex)
-							{
-								Invalidate(updateRect);
-							}
-							else
-							{
-								Invalidate();
-							}
+                            if (topIndex == prevTopIndex)
+                            {
+                                Invalidate(updateRect);
+                            }
+                            else
+                            {
+                                Invalidate();
+                            }
                             args.SetHandled();
                         }
                         break;
@@ -229,23 +229,23 @@ namespace System.Screen
                     {
                         if (selectedIndex != items.Count() - 1)
                         {
-							Rect updateRect = LineRect(selectedIndex - topIndex);
+                            Rect updateRect = LineRect(selectedIndex - topIndex);
                             selectedIndex = cast<int>(items.Count() - 1);
                             topIndex = cast<int>(items.Count() - sz.h);
                             if (topIndex < 0)
                             {
                                 topIndex = 0;
                             }
-							updateRect = Rect.Union(updateRect, LineRect(selectedIndex - topIndex));
+                            updateRect = Rect.Union(updateRect, LineRect(selectedIndex - topIndex));
                             OnSelectedIndexChanged();
-							if (topIndex == prevTopIndex)
-							{
-								Invalidate(updateRect);
-							}
-							else
-							{
-								Invalidate();
-							}
+                            if (topIndex == prevTopIndex)
+                            {
+                                Invalidate(updateRect);
+                            }
+                            else
+                            {
+                                Invalidate();
+                            }
                             args.SetHandled();
                         }
                         break;
@@ -254,23 +254,23 @@ namespace System.Screen
                     {
                         if (selectedIndex < items.Count() - 1)
                         {
-							Rect updateRect = LineRect(selectedIndex - topIndex);
+                            Rect updateRect = LineRect(selectedIndex - topIndex);
                             selectedIndex = Max(cast<int>(0), Min(cast<int>(items.Count() - 1), selectedIndex + sz.h));
                             topIndex = topIndex + sz.h;
                             if (topIndex + sz.h > items.Count())
                             {
                                 topIndex = Max(cast<int>(0), cast<int>(items.Count() - sz.h));
                             }
-							updateRect = Rect.Union(updateRect, LineRect(selectedIndex - topIndex));
+                            updateRect = Rect.Union(updateRect, LineRect(selectedIndex - topIndex));
                             OnSelectedIndexChanged();
-							if (topIndex == prevTopIndex)
-							{
-								Invalidate(updateRect);
-							}
-							else
-							{
-								Invalidate();
-							}
+                            if (topIndex == prevTopIndex)
+                            {
+                                Invalidate(updateRect);
+                            }
+                            else
+                            {
+                                Invalidate();
+                            }
                             args.SetHandled();
                         }
                         break;
@@ -279,19 +279,19 @@ namespace System.Screen
                     {
                         if (selectedIndex > 0)
                         {
-							Rect updateRect = LineRect(selectedIndex - topIndex);
+                            Rect updateRect = LineRect(selectedIndex - topIndex);
                             selectedIndex = Max(cast<int>(0), selectedIndex - sz.h);
                             topIndex = Max(cast<int>(0), topIndex - sz.h);
-							updateRect = Rect.Union(updateRect, LineRect(selectedIndex - topIndex));
+                            updateRect = Rect.Union(updateRect, LineRect(selectedIndex - topIndex));
                             OnSelectedIndexChanged();
-							if (topIndex == prevTopIndex)
-							{
-								Invalidate(updateRect);
-							}
-							else
-							{
-								Invalidate();
-							}
+                            if (topIndex == prevTopIndex)
+                            {
+                                Invalidate(updateRect);
+                            }
+                            else
+                            {
+                                Invalidate();
+                            }
                             args.SetHandled();
                         }
                         break;
@@ -358,14 +358,14 @@ namespace System.Screen
         {
             return itemSelectedEvent;
         }
-		private nothrow Rect LineRect(int i) const
-		{
-			Point loc = Location();
-			loc.y = loc.y + i;
-			Size sz = GetSize();
-			sz.h = 1;
-			return Rect(loc, sz);
-		}
+        private nothrow Rect LineRect(int i) const
+        {
+            Point loc = Location();
+            loc.y = loc.y + i;
+            Size sz = GetSize();
+            sz.h = 1;
+            return Rect(loc, sz);
+        }
         private ConsoleColor selectedItemForeColor;
         private ConsoleColor selectedItemBackColor;
         private ConsoleColor selectedItemFocusedForeColor;

@@ -9,6 +9,8 @@
 #include <system-x/machine/Machine.hpp>
 #include <soulng/util/MemoryWriter.hpp>
 #include <soulng/util/Time.hpp>
+#include <list>
+#include <boost/pool/pool_alloc.hpp>
 #include <stdint.h>
 #include <algorithm>
 

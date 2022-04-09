@@ -24,6 +24,7 @@ public:
     uint64_t ReadULong();
     int64_t ReadLong();
     DateTime ReadDateTime();
+    std::string ReadString();
 private:
     const uint8_t* ptr;
     const uint8_t* pos;

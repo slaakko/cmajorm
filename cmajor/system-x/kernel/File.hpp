@@ -74,6 +74,10 @@ public:
     virtual int64_t Tell(cmsx::machine::Process* process);
     virtual void Bind(int32_t md);
     virtual void Unbind();
+    virtual void SetTabMsgQueues(int32_t putMd, int32_t getMd);
+    virtual void ResetTabMsgQueues();
+    virtual void PushPid(int32_t pid);
+    virtual void PopPid();
 private:
     std::string name;
 };

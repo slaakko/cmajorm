@@ -502,28 +502,28 @@ bool ParseBraceGroup(TokenLexer& lexer, ParseResult& result)
 {
     int save = lexer.GetPos();
     if (*lexer == LBRACE)
-	{
-		++lexer;
-		if (ParseCompleteCommand(lexer, result))
-		{
-			if (*lexer == RBRACE)
-			{
-				++lexer;
-				Command* command = result.ReleaseCommand();
-				result.ResetCommand(new BraceGroupCommand(command));
-				return true;
-			}
-			else
-			{
-				lexer.SetPos(save);
-				return false;
-			}
-		}
-		else
-		{
-			lexer.SetPos(save);
-			return false;
-		}
+    {
+        ++lexer;
+        if (ParseCompleteCommand(lexer, result))
+        {
+            if (*lexer == RBRACE)
+            {
+                ++lexer;
+                Command* command = result.ReleaseCommand();
+                result.ResetCommand(new BraceGroupCommand(command));
+                return true;
+            }
+            else
+            {
+                lexer.SetPos(save);
+                return false;
+            }
+        }
+        else
+        {
+            lexer.SetPos(save);
+            return false;
+        }
     }
     lexer.SetPos(save);
     return false;
@@ -535,26 +535,26 @@ bool ParseSubshell(TokenLexer& lexer, ParseResult& result)
     if (*lexer == LPAREN)
     {
         ++lexer;
-		if (ParseCompleteCommand(lexer, result))
-		{
-			if (*lexer == RPAREN)
-			{
-				++lexer;
-				Command* command = result.ReleaseCommand();
-				result.ResetCommand(new SubshellCommand(command));
-				return true;
-			}
-			else
-			{
-				lexer.SetPos(save);
-				return false;
-			}
-		}
-		else
-		{
-			lexer.SetPos(save);
-			return false;
-		}
+        if (ParseCompleteCommand(lexer, result))
+        {
+            if (*lexer == RPAREN)
+            {
+                ++lexer;
+                Command* command = result.ReleaseCommand();
+                result.ResetCommand(new SubshellCommand(command));
+                return true;
+            }
+            else
+            {
+                lexer.SetPos(save);
+                return false;
+            }
+        }
+        else
+        {
+            lexer.SetPos(save);
+            return false;
+        }
     }
     lexer.SetPos(save);
     return false;

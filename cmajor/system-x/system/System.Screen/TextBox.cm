@@ -128,7 +128,7 @@ namespace System.Screen
             }
             else
             {
-				int startPos = StartPos();
+                int startPos = StartPos();
                 ustring txt = text.Substring(startPos, updateRect.size.w);
                 Terminal.Out() << txt;
             }
@@ -139,7 +139,7 @@ namespace System.Screen
             base->OnKeyPressed(args);
             if (IsEnabled() && !args.Handled())
             {
-				int prevStartPos = StartPos();
+                int prevStartPos = StartPos();
                 uchar key = args.Key();
                 switch (key)
                 {
@@ -217,21 +217,21 @@ namespace System.Screen
         {
             return textEnteredEvent;
         }
-		private int StartPos()
-		{
-			Rect rect = GetRect();
-			return Max(cast<int>(0), cast<int>(pos - rect.size.w));
-		}
+        private int StartPos()
+        {
+            Rect rect = GetRect();
+            return Max(cast<int>(0), cast<int>(pos - rect.size.w));
+        }
         private void CursorLeft(int prevStartPos)
         {
             if (pos > 0)
             {
                 --pos;
                 SetCursorPos();
-				if (StartPos() != prevStartPos)
-				{
-					Invalidate(GetRect());
-				}
+                if (StartPos() != prevStartPos)
+                {
+                    Invalidate(GetRect());
+                }
             }
         }
         private void CursorRight(int prevStartPos)
@@ -240,10 +240,10 @@ namespace System.Screen
             {
                 ++pos;
                 SetCursorPos();
-				if (StartPos() != prevStartPos)
-				{
-					Invalidate(GetRect());
-				}
+                if (StartPos() != prevStartPos)
+                {
+                    Invalidate(GetRect());
+                }
             }
         }
         private void CursorToStart(int prevStartPos)
@@ -252,10 +252,10 @@ namespace System.Screen
             {
                 pos = 0;
                 SetCursorPos();
-				if (StartPos() != prevStartPos)
-				{
-					Invalidate(GetRect());
-				}
+                if (StartPos() != prevStartPos)
+                {
+                    Invalidate(GetRect());
+                }
             }
         }
         private void CursorToEnd(int prevStartPos)
@@ -264,10 +264,10 @@ namespace System.Screen
             {
                 pos = cast<int>(text.Length());
                 SetCursorPos();
-				if (StartPos() != prevStartPos)
-				{
-					Invalidate(GetRect());
-				}
+                if (StartPos() != prevStartPos)
+                {
+                    Invalidate(GetRect());
+                }
             }
         }
         private void DeleteChar()
@@ -305,7 +305,7 @@ namespace System.Screen
         }
         private ustring text;
         private int pos;
-		private int startPos;
+        private int startPos;
         private Event<ChangedEventHandler> textChangedEvent;
         private Event<SelectEventHandler> textEnteredEvent;
         private ConsoleColor focusedForeColor;

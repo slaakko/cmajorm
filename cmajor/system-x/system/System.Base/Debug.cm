@@ -5,19 +5,21 @@
 
 namespace System
 {
-    public const int debugSystemError = 1 << 0;
-    public const int debugTerminal = 1 << 1;
-    public const int debugMsgQ = 1 << 2;
-    public const int debugApps = 1 << 3;
+    public const int debugSystemError = 1 << 0; // 1
+    public const int debugTerminal = 1 << 1;    // 2
+    public const int debugMsgQ = 1 << 2;        // 4    
+    public const int debugApp = 1 << 3;         // 8
     
     public nothrow int GetDebugMode()
     {
         return get_debug_mode();
     }
+	
     public nothrow void SetDebugMode(int debugMode)
     {
         set_debug_mode(debugMode);
     }
+	
     public nothrow void WriteDebugMessage(const string& message)
     {
         write_debug_message(message.Chars());

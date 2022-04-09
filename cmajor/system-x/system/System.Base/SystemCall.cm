@@ -86,6 +86,8 @@ public const byte trap_connect = 79u;
 public const byte trap_get_debug_mode = 80u;
 public const byte trap_set_debug_mode = 81u;
 public const byte trap_write_debug_message = 82u;
+public const byte trap_kill = 83u;
+public const byte trap_waitpid = 84u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -252,7 +254,11 @@ public enum IOControlItem : int
     set_raw = 9,
     set_echo = 10,
     push_lines = 11,
-    pop_lines = 12
+    pop_lines = 12,
+    tab = 13,
+    untab = 14,
+    push_pid = 15,
+    pop_pid = 16
 }
 
 public cdecl nothrow int ioctl(int fd, IOControlItem item, byte* arg, long argSize)
@@ -538,4 +544,14 @@ public cdecl nothrow int set_debug_mode(int mode)
 public cdecl nothrow int write_debug_message(const char* msg)
 {
     return cast<int>(trap(0u, trap_write_debug_message, 0u, msg));
+}
+
+public cdecl nothrow int kill(int pid)
+{
+    return cast<int>(trap(0u, trap_kill, 0u, pid));
+}
+
+public cdecl nothrow int waitpid(int pid, byte* exitCode)
+{
+    return cast<int>(trap(0u, trap_waitpid, 0u, pid, exitCode));
 }

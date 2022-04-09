@@ -87,6 +87,26 @@ void File::Unbind()
     throw SystemError(EBADF, name + " cannot unbind", __FUNCTION__);
 }
 
+void File::SetTabMsgQueues(int32_t putMd, int32_t getMd)
+{
+    throw SystemError(EBADF, name + " cannot set tab message queues", __FUNCTION__);
+}
+
+void File::ResetTabMsgQueues()
+{
+    throw SystemError(EBADF, name + " cannot reset tab message queues", __FUNCTION__);
+}
+
+void File::PushPid(int32_t pid)
+{
+    throw SystemError(EBADF, name + " cannot push pid", __FUNCTION__);
+}
+
+void File::PopPid()
+{
+    throw SystemError(EBADF, name + " cannot pop pid", __FUNCTION__);
+}
+
 ProcessFileTable::ProcessFileTable()
 {
     files.resize(cmsx::machine::MaxOpenFiles());

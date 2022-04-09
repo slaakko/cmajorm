@@ -24,15 +24,17 @@ public:
     void ReleaseProcessor(cmsx::machine::Processor* processor) override;
     uint64_t GetINodeKeyOfWorkingDir() const override;
     void SetINodeKeyOfWorkingDir(uint64_t inodeKeyAsULong) override;
-    int32_t UID() const override { return -1; }
-    int32_t GID() const override { return -1; }
+    int32_t UID() const override { return 0; }
+    int32_t GID() const override { return 0; }
     void SetUID(int32_t uid) override;
     void SetGID(int32_t gid) override;
-    int32_t EUID() const override { return -1; }
-    int32_t EGID() const override { return -1; }
+    int32_t EUID() const override { return 0; }
+    int32_t EGID() const override { return 0; }
     void SetEUID(int32_t euid) override;
     void SetEGID(int32_t egid) override;
     int32_t UMask() const override { return 0; }
+    void RemoveMessageQueue(int32_t md) override;
+    cmsx::machine::Machine* GetMachine() override;
 };
 
 class CMSX_KERNEL_API Kernel

@@ -23,6 +23,10 @@ std::string ErrorCodeStr(int errorCode)
         case ENOTFOUND: return "ENOTFOUND";
         case EALREADYEXISTS: return "EALREADYEXISTS";
         case ELIMITEXCEEDED: return "ELIMITEXCEEDED";
+        case ENOCHILD: return "ENOCHILD";
+        case EHOST: return "EHOST";
+        case EPERMISSION: return "EPERMISSION";
+        case ESOCKET: return "ESOCKET";
     }
     return std::string();
 }
@@ -38,6 +42,10 @@ std::string ErrorMsg(int errorCode)
         case ENOTFOUND: return "Not found";
         case EALREADYEXISTS: return "Already exists";
         case ELIMITEXCEEDED: return "Resource limit exceeeded";
+        case ENOCHILD: return "No child";
+        case EHOST: return "Host error";
+        case EPERMISSION: return "Permission denied";
+        case ESOCKET: return "Socket error";
     }
     return std::string();
 }
@@ -52,7 +60,7 @@ SystemError::SystemError(int errorCode_, const std::string& message_, const std:
 {
     if ((GetDebugMode() & debugSystemErrorMode) != 0)
     {
-        DebugWrite(std::string(what()) + ": " + function);
+        DebugWrite("kernel.error: " + std::string(what()) + ": " + function);
     }
 }
 

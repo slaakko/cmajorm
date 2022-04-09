@@ -90,4 +90,13 @@ void MemoryWriter::Write(const DateTime& dt)
     Write(dt.Seconds());
 }
 
+void MemoryWriter::Write(const std::string& str)
+{
+    for (char c : str)
+    {
+        Write(static_cast<uint8_t>(c));
+    }
+    Write(static_cast<uint8_t>(0u));
+}
+
 } } // namespace soulng::util

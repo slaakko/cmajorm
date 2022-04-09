@@ -5,3 +5,5 @@ sxcmc -u -v editor\editor.cms
 sxcmc -u -v -c=release editor\editor.cms
 sxcmc -u -v shell\sh.cmp
 sxcmc -u -v -c=release shell\sh.cmp
+sxcmc -u -v tab\tab.cmp
+sxcmc -u -v -c=release tab\tab.cmp

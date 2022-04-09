@@ -309,6 +309,7 @@ uint64_t INodeKeyHash(INodeKey inodeKey)
 }
 
 using INodeFreeList = std::list<INode*, boost::fast_pool_allocator<INode*>>;
+//using INodeFreeList = std::list<INode*>;
 
 struct INodeHashQueueEntry
 {
@@ -551,15 +552,15 @@ void INodeManager::InsertIntoHashQueue(INode* inode)
 {
     int hashQueueIndex = GetHashQueueNumber(inode->Key());
     auto& hashQueue = hashQueues[hashQueueIndex];
-    hashQueue.push_back(INodeHashQueueEntry(inode, INodeFreeList::iterator()));
+    hashQueue.push_back(INodeHashQueueEntry(inode, freeList.end()));
 }
 
 void INodeManager::RemoveFromFreeList(INodeHashQueueEntry* entry)
 {
-    if (entry->it != INodeFreeList::iterator())
+    if (entry->it != freeList.end())
     {
         freeList.erase(entry->it);
-        entry->it = INodeFreeList::iterator();
+        entry->it = freeList.end();
     }
 }
 

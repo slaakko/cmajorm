@@ -46,10 +46,10 @@ abstract class Command
     {
         return false;
     }
-	public nothrow virtual bool IsInternalCommand() const
-	{
-		return false;
-	}
+    public nothrow virtual bool IsInternalCommand() const
+    {
+        return false;
+    }
     private string name;
     private Command* parent;
 }
@@ -165,8 +165,8 @@ class PipeCommand : BinaryCommand
         int readFd = 0;
         int writeFd = 0;
         Pipe(&readFd, &writeFd);
-        int pid = Fork();
-        if (pid == 0)
+        int leftPID = Fork();
+        if (leftPID == 0)
         {
             Close(readFd);
             Close(1);
@@ -177,8 +177,8 @@ class PipeCommand : BinaryCommand
         }
         else
         {
-            int pid = Fork();
-            if (pid == 0)
+            int rightPID = Fork();
+            if (rightPID == 0)
             {
                 Close(writeFd);
                 Close(0);
@@ -192,10 +192,10 @@ class PipeCommand : BinaryCommand
                 Close(readFd);
                 Close(writeFd);
                 byte exitCode = 0u;
-                int pid = Wait(&exitCode);
-                while (pid != -1)
+                int pid = WaitPid(rightPID, &exitCode);
+                if (pid != -1)
                 {
-                    pid = Wait(&exitCode);
+                    pid = WaitPid(leftPID, &exitCode);
                 }
                 return exitCode;
             }
@@ -242,39 +242,39 @@ class SyncCommand : UnaryCommand
 
 class SubshellCommand : UnaryCommand
 {
-	public SubshellCommand(Command* child_) : base("SUBSHELL", child_)
-	{
-	}
-	public override byte Execute(ExecutionContext& ctx)
-	{
-		int pid = Fork();
-		if (pid == 0)
-		{
-			byte result = Child()->Execute(ctx);
-			Exit(result);
-		}
-		else
-		{
-			byte exitCode = 0u;
-			int pid = Wait(&exitCode);
-			while (pid != -1)
-			{
-				pid = Wait(&exitCode);
-			}
-			return exitCode;
-		}
-	}
+    public SubshellCommand(Command* child_) : base("SUBSHELL", child_)
+    {
+    }
+    public override byte Execute(ExecutionContext& ctx)
+    {
+        int subShellPID = Fork();
+        if (subShellPID == 0)
+        {
+            byte result = Child()->Execute(ctx);
+            Exit(result);
+        }
+        else
+        {
+            byte exitCode = 0u;
+            int pid = WaitPid(subShellPID, &exitCode);
+            while (pid != subShellPID && pid != -1)
+            {
+                pid = WaitPid(subShellPID, &exitCode);
+            }
+            return exitCode;
+        }
+    }
 }
 
 class BraceGroupCommand : UnaryCommand
 {
-	public BraceGroupCommand(Command* child_) : base("GROUP", child_)
-	{
-	}
-	public override byte Execute(ExecutionContext& ctx)
-	{
-		return Child()->Execute(ctx);
-	}
+    public BraceGroupCommand(Command* child_) : base("GROUP", child_)
+    {
+    }
+    public override byte Execute(ExecutionContext& ctx)
+    {
+        return Child()->Execute(ctx);
+    }
 }
 
 class IORedirectCommand : Command
@@ -284,64 +284,64 @@ class IORedirectCommand : Command
     }
     public override byte Execute(ExecutionContext& ctx)
     {
-		switch (ioOp)
-		{
-			case LESS:
-			{
-				RedirectInput();
-				break;
-			}
-			case GREAT:
-			{
-				RedirectOutput();
-				break;
-			}
-			case DGREAT:
-			{
-				AppendOutput();
-				break;
-			}
-		}
-		return 0u;
+        switch (ioOp)
+        {
+            case LESS:
+            {
+                RedirectInput();
+                break;
+            }
+            case GREAT:
+            {
+                RedirectOutput();
+                break;
+            }
+            case DGREAT:
+            {
+                AppendOutput();
+                break;
+            }
+        }
+        return 0u;
     }
     public override void Print()
     {
         base->Print();
         Terminal.Out() << "(" << GetTokenName(ioOp) << ", " << ioNumber << ", " << filename << ")";
     }
-	private void RedirectInput()
-	{
-		if (ioNumber == -1)
-		{
-			ioNumber = 0;
-		}
-		int fd = Open(filename.Chars(), OpenFlags.read, 0);
-		Close(ioNumber);
-		Dup(fd);
-		Close(fd);
-	}
-	private void RedirectOutput()
-	{
-		if (ioNumber == -1)
-		{
-			ioNumber = 1;
-		}
-		int fd = Open(filename.Chars(), cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), 0);
-		Close(ioNumber);
-		Dup(fd);
-		Close(fd);
-	}
-	private void AppendOutput()
-	{
-		if (ioNumber == -1)
-		{
-			ioNumber = 1;
-		}
-		int fd = Open(filename.Chars(), cast<OpenFlags>(OpenFlags.write | OpenFlags.append), 0);
-		Close(ioNumber);
-		Dup(fd);
-		Close(fd);
-	}
+    private void RedirectInput()
+    {
+        if (ioNumber == -1)
+        {
+            ioNumber = 0;
+        }
+        int fd = Open(filename.Chars(), OpenFlags.read, 0);
+        Close(ioNumber);
+        Dup(fd);
+        Close(fd);
+    }
+    private void RedirectOutput()
+    {
+        if (ioNumber == -1)
+        {
+            ioNumber = 1;
+        }
+        int fd = Open(filename.Chars(), cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), 0);
+        Close(ioNumber);
+        Dup(fd);
+        Close(fd);
+    }
+    private void AppendOutput()
+    {
+        if (ioNumber == -1)
+        {
+            ioNumber = 1;
+        }
+        int fd = Open(filename.Chars(), cast<OpenFlags>(OpenFlags.write | OpenFlags.append), 0);
+        Close(ioNumber);
+        Dup(fd);
+        Close(fd);
+    }
     private int ioOp;
     private int ioNumber;
     private string filename;
@@ -533,65 +533,65 @@ class PrefixSuffixCommand : Command
     }
     public override byte Execute(ExecutionContext& ctx)
     {
-		if (simpleCommand.IsNull() || simpleCommand->IsInternalCommand())
-		{
-			byte result = 0u;
-			if (!prefixCommand.IsNull())
-			{
-				result = prefixCommand->Execute(ctx);
-			}
-			if (result == 0u)
-			{
-				if (!suffixCommand.IsNull())
-				{
-					result = suffixCommand->Execute(ctx);
-				}
-			}
-			if (result == 0u)
-			{
-				if (!simpleCommand.IsNull())
-				{
-					result = simpleCommand->Execute(ctx);
-				}
-			}
-		}
-		else
-		{
-			int pid = Fork();
-			if (pid == 0)
-			{
-				byte result = 0u;
-				if (!prefixCommand.IsNull())
-				{
-					result = prefixCommand->Execute(ctx);
-				}
-				if (result == 0u)
-				{
-					if (!suffixCommand.IsNull())
-					{
-						result = suffixCommand->Execute(ctx);
-					}
-				}
-				if (result == 0u)
-				{
-					if (!simpleCommand.IsNull())
-					{
-						result = simpleCommand->Execute(ctx);
-					}
-				}
-				Exit(result);
-			}
-			else
-			{
-				byte exitCode = 0u;
-				int pid = Wait(&exitCode);
-				while (pid != -1)
-				{
-					pid = Wait(&exitCode);
-				}
-				return exitCode;
-			}
-		}
+        if (simpleCommand.IsNull() || simpleCommand->IsInternalCommand())
+        {
+            byte result = 0u;
+            if (!prefixCommand.IsNull())
+            {
+                result = prefixCommand->Execute(ctx);
+            }
+            if (result == 0u)
+            {
+                if (!suffixCommand.IsNull())
+                {
+                    result = suffixCommand->Execute(ctx);
+                }
+            }
+            if (result == 0u)
+            {
+                if (!simpleCommand.IsNull())
+                {
+                    result = simpleCommand->Execute(ctx);
+                }
+            }
+        }
+        else
+        {
+            int commandPID = Fork();
+            if (commandPID == 0)
+            {
+                byte result = 0u;
+                if (!prefixCommand.IsNull())
+                {
+                    result = prefixCommand->Execute(ctx);
+                }
+                if (result == 0u)
+                {
+                    if (!suffixCommand.IsNull())
+                    {
+                        result = suffixCommand->Execute(ctx);
+                    }
+                }
+                if (result == 0u)
+                {
+                    if (!simpleCommand.IsNull())
+                    {
+                        result = simpleCommand->Execute(ctx);
+                    }
+                }
+                Exit(result);
+            }
+            else
+            {
+                byte exitCode = 0u;
+                int pid = WaitPid(commandPID, &exitCode);
+                while (pid != commandPID && pid != -1)
+                {
+                    pid = WaitPid(commandPID, &exitCode);
+                }
+                return exitCode;
+            }
+        }
         return 0u;
     }
     public override void Print()
@@ -639,23 +639,23 @@ class SimpleCommand : Command
 {
     public SimpleCommand(const string& name_) : base(name_), internalCommand(null)
     {
-		internalCommand = GetInternalCommand(Name());
-	}
-	public nothrow override bool IsInternalCommand() const
-	{
-		return internalCommand != null;
-	}
+        internalCommand = GetInternalCommand(Name());
+    }
+    public nothrow override bool IsInternalCommand() const
+    {
+        return internalCommand != null;
+    }
     public void AddArg(const string& arg) 
     {
         args.Add(arg);
     }
     public override byte Execute(ExecutionContext& ctx)
     {
-		if (internalCommand != null)
-		{
+        if (internalCommand != null)
+        {
             ctx.args = args;
             return internalCommand->Execute(ctx);
-		}
+        }
         int pid = Fork();
         if (pid == 0)
         {
@@ -672,7 +672,7 @@ class SimpleCommand : Command
             if (ctx.wait)
             {
                 byte exitCode = 0u;
-                if (Wait(&exitCode) != -1)
+                if (WaitPid(pid, &exitCode) != -1)
                 {
                     return exitCode;
                 }
@@ -692,7 +692,7 @@ class SimpleCommand : Command
             Terminal.Out() << " " << arg;
         }
     }
-	private Command* internalCommand;
+    private Command* internalCommand;
     private List<string> args;
 }
 
@@ -731,40 +731,40 @@ class CdCommand : Command
 
 class PrintEnvCommand : Command
 {
-	public nothrow PrintEnvCommand() : base("printenv")
-	{
-	}
-	public override byte Execute(ExecutionContext& ctx)
-	{
-		Environment* environment = ctx.environment;
-		for (const Pair<string, string>& variable : environment->Variables())
-		{
-			Terminal.Out() << variable.first << "=" << variable.second << endl();
-		}
-		return 0u;
-	}
+    public nothrow PrintEnvCommand() : base("printenv")
+    {
+    }
+    public override byte Execute(ExecutionContext& ctx)
+    {
+        Environment* environment = ctx.environment;
+        for (const Pair<string, string>& variable : environment->Variables())
+        {
+            Terminal.Out() << variable.first << "=" << variable.second << endl();
+        }
+        return 0u;
+    }
 }
 
 class UnsetCommand : Command
 {
-	public nothrow UnsetCommand() : base("unset")
-	{
-	}
-	public override byte Execute(ExecutionContext& ctx)
-	{
-		if (!ctx.args.IsEmpty())
-		{
-			Environment* environment = ctx.environment;
-			for (const string& arg : ctx.args) 
-			{
-				environment->Remove(arg);
-			}
-		}
-		else
-		{
-			throw Exception("unset: arguments expected");
-		}
-	}
+    public nothrow UnsetCommand() : base("unset")
+    {
+    }
+    public override byte Execute(ExecutionContext& ctx)
+    {
+        if (!ctx.args.IsEmpty())
+        {
+            Environment* environment = ctx.environment;
+            for (const string& arg : ctx.args) 
+            {
+                environment->Remove(arg);
+            }
+        }
+        else
+        {
+            throw Exception("unset: arguments expected");
+        }
+    }
 }
 
 class InternalCommandMap
@@ -792,10 +792,10 @@ class InternalCommandMap
     {
         Command* cdCommand = new CdCommand();
         commands.Add(UniquePtr<Command>(cdCommand));
-		Command* printEnvCommand = new PrintEnvCommand();
-		commands.Add(UniquePtr<Command>(printEnvCommand));
-		Command* unsetCommand = new UnsetCommand();
-		commands.Add(UniquePtr<Command>(unsetCommand));
+        Command* printEnvCommand = new PrintEnvCommand();
+        commands.Add(UniquePtr<Command>(printEnvCommand));
+        Command* unsetCommand = new UnsetCommand();
+        commands.Add(UniquePtr<Command>(unsetCommand));
         for (const UniquePtr<Command>& command : commands)
         {
             commandMap[command->Name()] = command.Get();

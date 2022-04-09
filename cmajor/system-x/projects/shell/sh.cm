@@ -13,14 +13,14 @@ using shtokens;
 
 class PushPopLines
 {
-	public PushPopLines()
-	{
-		PushLines();
-	}
-	public ~PushPopLines()
-	{
-		PopLines();
-	}
+    public PushPopLines()
+    {
+        PushLines();
+    }
+    public ~PushPopLines()
+    {
+        PopLines();
+    }
 }
 
 string CWD(ShellEnvironment& environment)
@@ -46,9 +46,23 @@ void PrintPrompt(ShellEnvironment& environment)
 
 string GetLine(ShellEnvironment& environment)
 {
-    PrintPrompt(environment);
-    string line = Terminal.ReadLine();
-    return line;
+	try
+	{
+		PrintPrompt(environment);
+		PushPid(Terminal.Descriptor(), GetPid());
+		Tab(Terminal.Descriptor(), environment.PutTabMsgQ(), environment.GetTabMsgQ());
+		string line = Terminal.ReadLine();
+		Untab(Terminal.Descriptor());
+		PopPid(Terminal.Descriptor());
+		return line;
+	}
+	catch (const Exception& ex)
+	{
+		Terminal.Out() << ex.Message() << endl();
+		Untab(Terminal.Descriptor());
+		PopPid(Terminal.Descriptor());
+	}
+	return string();
 }
 
 void ProcessLine(const string& line, ShellEnvironment& environment, Params& params, Context& context, Map<string, string>& executableMap)
@@ -73,7 +87,7 @@ void ProcessLine(const string& line, ShellEnvironment& environment, Params& para
             ctx.wait = true;
             ctx.environment = &Environment.Instance();
             ctx.executableMap = &executableMap;
-			PushPopLines pushPopLines;
+            PushPopLines pushPopLines;
             command->Execute(ctx);
         }
         else
@@ -106,7 +120,7 @@ void Run(ShellEnvironment& environment, Params& params, Context& context)
     string line = GetLine(environment);
     while (line != "exit")
     {
-		ProcessLine(line, environment, params, context, executableMap);
+        ProcessLine(line, environment, params, context, executableMap);
         line = GetLine(environment);
     }
     RemoveDirChangeNotifications();

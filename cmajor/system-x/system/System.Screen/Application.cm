@@ -28,9 +28,9 @@ namespace System.Screen
         {
             return *instance;
         }
-        private Application() : msgQ(MsgQ("system.screen.msg.queue")), menuBar(null), focusedControl(null)
+        private Application() : msgQ(MsgQ("system.screen.msg.queue")), menuBar(null), focusedControl(null), lastDefaultWriteScreenMessageWindow(-1)
         {
-			RegisterMessage<KeyPressedMessage>(keyPressedMessageId);
+            RegisterMessage<KeyPressedMessage>(keyPressedMessageId);
             BindTerminal(msgQ);
         }
         public nothrow Window* MainWindow() 
@@ -44,6 +44,7 @@ namespace System.Screen
         public nothrow void SetMenuBar(MenuBar* menuBar_)
         {
             menuBar = menuBar_;
+            menuBarWindowHandle = menuBar->Handle();
         }
         public WindowManager& GetWindowManager() const
         {
@@ -74,9 +75,9 @@ namespace System.Screen
                 }
                 message = ReadMessage();
             }
-			Terminal.Out() << ResetColors();
-			ClearScreen(TerminalWindowWidth(), TerminalWindowHeight());
-			SetCursorPos(0, 0);
+            Terminal.Out() << ResetColors();
+            ClearScreen(TerminalWindowWidth(), TerminalWindowHeight());
+            SetCursorPos(0, 0);
         }
         public void RunDialog(Window* window)
         {
@@ -105,6 +106,24 @@ namespace System.Screen
         }
         public void PostMessage(Message& message)
         {
+            if (message.TargetWindowHandle() != menuBarWindowHandle)
+            {
+                if (message.IsDefaultWriteScreenMessage())
+                {
+                    if (lastDefaultWriteScreenMessageWindow == message.TargetWindowHandle())
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        lastDefaultWriteScreenMessageWindow = message.TargetWindowHandle();
+                    }
+                }
+                else
+                {
+                    lastDefaultWriteScreenMessageWindow = -1;
+                }
+            }
             int msgSize = message.Size();
             UniquePtr<byte> msg(cast<byte*>(MemAlloc(msgSize)));
             MemoryWriter writer(msg.Get(), msgSize);
@@ -163,5 +182,7 @@ namespace System.Screen
         private WindowManager windowManager;
         private MenuBar* menuBar;
         private Control* focusedControl;
+        private int lastDefaultWriteScreenMessageWindow;
+        private int menuBarWindowHandle;
     }
 }

@@ -194,7 +194,7 @@ namespace System.Screen
         public void AddLine(const string& line)
         {
             lines.Add(ToUtf32(line));
-            Invalidate();
+            Invalidate(GetRect());
         }
         public nothrow void SetFilePath(const string& filePath_)
         {
@@ -236,6 +236,7 @@ namespace System.Screen
         {
             try
             {
+                if (filePath.IsEmpty()) return;
                 StreamWriter writer = File.CreateText(filePath);
                 for (const ustring& line : lines)
                 {
@@ -255,6 +256,7 @@ namespace System.Screen
         {
             try
             {
+                if (filePath.IsEmpty()) return;
                 List<string> lines_ = File.ReadAllLines(filePath);
                 SetLines(lines_);
                 SetStatusText("text loaded");
@@ -273,7 +275,10 @@ namespace System.Screen
             List<ustring> selectionLines;
             for (int i = canonicalSelection.startLine; i <= canonicalSelection.endLine; ++i)
             {
-                selectionLines.Add(lines[i]);
+                if (i >= 0 && i < lines.Count())
+                {
+                    selectionLines.Add(lines[i]);
+                }
             }
             Clipboard.Instance().GetSelectionData().SetLines(selectionLines);
             SetStatusText("selection copied");
@@ -294,13 +299,15 @@ namespace System.Screen
                 if (caretLine < lines.Count())
                 {
                     lines.Insert(lines.Begin() + caretLine, line);
+                    ++caretLine;
                 }
                 else
                 {
                     lines.Add(line);
+                    ++caretLine;
                 }
             }
-            Invalidate();
+            Invalidate(GetRect());
             SetDirty();
         }
         public nothrow Event<ChangedEventHandler>& FilePathChangedEvent() 
@@ -594,7 +601,7 @@ namespace System.Screen
             }
             if (xOffset != prevXOffset || yOffset != prevYOffset)
             {
-                Invalidate();
+                Invalidate(GetRect());
             }
             else
             {
@@ -1335,7 +1342,7 @@ namespace System.Screen
                 SetXOffset();
                 SetYOffset();
                 SetCursorPos();
-                Invalidate();
+                Invalidate(GetRect());
                 SetDirty();
                 selection.Reset();
             }
