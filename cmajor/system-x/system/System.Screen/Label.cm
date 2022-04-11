@@ -55,7 +55,7 @@ namespace System.Screen
     {
         public nothrow Label(LabelCreateParams& createParams) : base(createParams.controlCreateParams), autoSize(createParams.autoSize), text(createParams.text)
         {
-            InvalidateGuard invalidateGuard(this, false);
+            InvalidateGuard invalidateGuard(this, InvalidateKind.dontInvalidate);
             if (autoSize)
             {
                 SetSize(Size(cast<int>(text.Length()), 1));
@@ -78,7 +78,7 @@ namespace System.Screen
             ustring t = ToUtf32(text_);
             if (text != t)
             {
-                InvalidateGuard guard(this, true);
+                InvalidateGuard guard(this, InvalidateKind.invalidateIfNotDefault);
                 text = t;
                 if (autoSize)
                 {

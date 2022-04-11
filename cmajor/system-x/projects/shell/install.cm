@@ -40,6 +40,7 @@ void MakeUserDirs(ShellEnvironment& environment)
 {
 	string projectsDir = Path.Combine(environment.Home(), "projects");
 	CreateDirectories(projectsDir);
+	ChMod(projectsDir.Chars(), cast<int>(ParseOctal("755")));
 }
 
 void CopyBin()

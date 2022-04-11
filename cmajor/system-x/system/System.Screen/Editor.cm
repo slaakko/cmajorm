@@ -127,7 +127,7 @@ namespace System.Screen
         public nothrow Editor(EditorCreateParams& createParams) : 
             base(createParams.controlCreateParams), flags(EditorFlags.none), xOffset(0), yOffset(0), caretLine(0), caretCol(0)
         {
-            InvalidateGuard invalidateGuard(this, false);
+            InvalidateGuard invalidateGuard(this, InvalidateKind.dontInvalidate);
             if (ForeColor() == ConsoleColor.defaultColor)
             {
                 SetForeColor(ConsoleColor.gray);
@@ -346,11 +346,10 @@ namespace System.Screen
         public void SetCursorPos()
         {
             Point cp = ScreenPoint(caretCol, caretLine);
-            Size sz = GetSize();
-            if (cp.x >= 0 && cp.x < sz.w && cp.y >= 0 && cp.y < sz.h)
+            if (cp.x >= 0 && cp.x < TerminalWindowWidth() && cp.y >= 0 && cp.y < TerminalWindowHeight())
             {
                 SetControlCursorPos(cp);
-                SetCursorPos(cp.x, cp.y);
+				SetCursorPos(cp.x, cp.y);
             }
         }
         public override void OnWriteScreen(WriteScreenEventArgs& args)
@@ -414,198 +413,203 @@ namespace System.Screen
             }
             else
             {
-                switch (key)
+                if (key < specialKeyStart)
                 {
-                    case keyLeft:
-                    {
-                        args.SetHandled();
-                        CursorLeft(false, true);
-                        break;
-                    }
-                    case keyRight:
-                    {
-                        args.SetHandled();
-                        CursorRight(false, true);
-                        break;
-                    }
-                    case keyUp:
-                    {
-                        args.SetHandled();
-                        CursorUp(false);
-                        break;
-                    }
-                    case keyDown:
-                    {
-                        args.SetHandled();
-                        CursorDown(false);
-                        break;
-                    }
-                    case keyControlLeft:
-                    {
-                        args.SetHandled();
-                        CursorPrevWord(false);
-                        break;
-                    }
-                    case keyControlRight:
-                    {
-                        args.SetHandled();
-                        CursorNextWord(false);
-                        break;
-                    }
-                    case keyHome:
-                    {
-                        args.SetHandled();
-                        CursorStartOfLine(false);
-                        break;
-                    }
-                    case keyEnd:
-                    {
-                        args.SetHandled();
-                        CursorEndOfLine(false);
-                        break;
-                    }
-                    case keyPgUp:
-                    {
-                        args.SetHandled();
-                        CursorPrevPage(false);
-                        break;
-                    }
-                    case keyPgDown:
-                    {
-                        args.SetHandled();
-                        CursorNextPage(false);
-                        break;
-                    }
-                    case keyControlHome:
-                    {
-                        args.SetHandled();
-                        CursorStartOfText(false);
-                        break;
-                    }
-                    case keyControlEnd:
-                    {
-                        args.SetHandled();
-                        CursorEndOfText(false);
-                        break;
-                    }
-                    case keyNewline:
+                    if (key == keyNewline)
                     {
                         args.SetHandled();
                         Newline(updateRect);
-                        break;
                     }
-                    case keyTab:
+                    else if (key == keyTab)
                     {
                         args.SetHandled();
                         Tab(updateRect);
-                        break;
                     }
-                    case keyShiftTab:
-                    {
-                        args.SetHandled();
-                        Untab(updateRect);
-                        break;
-                    }
-                    case keyDel:
-                    {
-                        args.SetHandled();
-                        if (selection.IsEmpty())
-                        {
-                            DeleteChar(updateRect);
-                        }
-                        else
-                        {    
-                            DeleteSelection();
-                        }
-                        break;
-                    }
-                    case keyBackspace:
+                    else if (key == keyBackspace)
                     {
                         args.SetHandled();
                         Backspace(updateRect);
-                        break;
                     }
-                    case keyShiftLeft:
+                }
+                else
+                {
+                    switch (key)
                     {
-                        args.SetHandled();
-                        CursorLeft(true, true);
-                        break;
-                    }
-                    case keyShiftRight:
-                    {
-                        args.SetHandled();
-                        CursorRight(true, true);
-                        break;
-                    }
-                    case keyShiftDown:
-                    {
-                        args.SetHandled();
-                        CursorDown(true);
-                        break;
-                    }
-                    case keyShiftUp:
-                    {
-                        args.SetHandled();
-                        CursorUp(true);
-                        break;
-                    }
-                    case keyShiftHome:
-                    {
-                        args.SetHandled();
-                        CursorStartOfLine(true);
-                        break;
-                    }
-                    case keyShiftEnd:
-                    {
-                        args.SetHandled();
-                        CursorEndOfLine(true);
-                        break;
-                    }
-                    case keyShiftPgUp:
-                    {
-                        args.SetHandled();
-                        CursorPrevPage(true);
-                        break;
-                    }
-                    case keyShiftPgDown:
-                    {
-                        args.SetHandled();
-                        CursorNextPage(true);
-                        break;
-                    }
-                    case keyControlShiftLeft:
-                    {
-                        args.SetHandled();
-                        CursorPrevWord(true);
-                        break;
-                    }
-                    case keyControlShiftRight:
-                    {
-                        args.SetHandled();
-                        CursorNextWord(true);
-                        break;
-                    }
-                    case keyControlShiftHome:
-                    {
-                        args.SetHandled();
-                        CursorStartOfText(true);
-                        break;
-                    }
-                    case keyControlShiftEnd:
-                    {
-                        args.SetHandled();
-                        CursorEndOfText(true);
-                        break;
+                        case keyLeft:
+                        {
+                            args.SetHandled();
+                            CursorLeft(false, true);
+                            break;
+                        }
+                        case keyRight:
+                        {
+                            args.SetHandled();
+                            CursorRight(false, true);
+                            break;
+                        }
+                        case keyUp:
+                        {
+                            args.SetHandled();
+                            CursorUp(false);
+                            break;
+                        }
+                        case keyDown:
+                        {
+                            args.SetHandled();
+                            CursorDown(false);
+                            break;
+                        }
+                        case keyControlLeft:
+                        {
+                            args.SetHandled();
+                            CursorPrevWord(false);
+                            break;
+                        }
+                        case keyControlRight:
+                        {
+                            args.SetHandled();
+                            CursorNextWord(false);
+                            break;
+                        }
+                        case keyHome:
+                        {
+                            args.SetHandled();
+                            CursorStartOfLine(false);
+                            break;
+                        }
+                        case keyEnd:
+                        {
+                            args.SetHandled();
+                            CursorEndOfLine(false);
+                            break;
+                        }
+                        case keyPgUp:
+                        {
+                            args.SetHandled();
+                            CursorPrevPage(false);
+                            break;
+                        }
+                        case keyPgDown:
+                        {
+                            args.SetHandled();
+                            CursorNextPage(false);
+                            break;
+                        }
+                        case keyControlHome:
+                        {
+                            args.SetHandled();
+                            CursorStartOfText(false);
+                            break;
+                        }
+                        case keyControlEnd:
+                        {
+                            args.SetHandled();
+                            CursorEndOfText(false);
+                            break;
+                        }
+                        case keyShiftTab:
+                        {
+                            args.SetHandled();
+                            Untab(updateRect);
+                            break;
+                        }
+                        case keyDel:
+                        {
+                            args.SetHandled();
+                            if (selection.IsEmpty())
+                            {
+                                DeleteChar(updateRect);
+                            }
+                            else
+                            {    
+                                DeleteSelection();
+                            }
+                            break;
+                        }
+                        case keyShiftLeft:
+                        {
+                            args.SetHandled();
+                            CursorLeft(true, true);
+                            break;
+                        }
+                        case keyShiftRight:
+                        {
+                            args.SetHandled();
+                            CursorRight(true, true);
+                            break;
+                        }
+                        case keyShiftDown:
+                        {
+                            args.SetHandled();
+                            CursorDown(true);
+                            break;
+                        }
+                        case keyShiftUp:
+                        {
+                            args.SetHandled();
+                            CursorUp(true);
+                            break;
+                        }
+                        case keyShiftHome:
+                        {
+                            args.SetHandled();
+                            CursorStartOfLine(true);
+                            break;
+                        }
+                        case keyShiftEnd:
+                        {
+                            args.SetHandled();
+                            CursorEndOfLine(true);
+                            break;
+                        }
+                        case keyShiftPgUp:
+                        {
+                            args.SetHandled();
+                            CursorPrevPage(true);
+                            break;
+                        }
+                        case keyShiftPgDown:
+                        {
+                            args.SetHandled();
+                            CursorNextPage(true);
+                            break;
+                        }
+                        case keyControlShiftLeft:
+                        {
+                            args.SetHandled();
+                            CursorPrevWord(true);
+                            break;
+                        }
+                        case keyControlShiftRight:
+                        {
+                            args.SetHandled();
+                            CursorNextWord(true);
+                            break;
+                        }
+                        case keyControlShiftHome:
+                        {
+                            args.SetHandled();
+                            CursorStartOfText(true);
+                            break;
+                        }
+                        case keyControlShiftEnd:
+                        {
+                            args.SetHandled();
+                            CursorEndOfText(true);
+                            break;
+                        }
                     }
                 }
             }
             if (xOffset != prevXOffset || yOffset != prevYOffset)
             {
                 Invalidate(GetRect());
+				SetCursorPos();
             }
             else
             {
                 Invalidate(updateRect);
+				SetCursorPos();
             }
         }
         private void WriteScreenNoSelection(const Rect& updateRect)

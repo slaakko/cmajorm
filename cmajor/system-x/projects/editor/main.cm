@@ -11,7 +11,7 @@ public class MainWindow : Window
 {
     public MainWindow() : base(ControlCreateParams().Defaults())
     {
-        InvalidateGuard guard(this, false);
+        InvalidateGuard guard(this, InvalidateKind.dontInvalidate);
         menuBar = new MenuBar(MenuControlCreateParams().Defaults());
         Application.Instance().SetMenuBar(menuBar);
         MenuItem* fileMenuItem = new MenuItem("&File");
@@ -54,6 +54,7 @@ public class MainWindow : Window
         AddChild(editor);
         editor->SetFocus();
         StatusBar* statusBar = new StatusBar(StatusBarCreateParams().Defaults());
+		Application.Instance().SetStatusBar(statusBar);
         dirtyStatusBarItem = new StatusBarTextItem(string());
         dirtyStatusBarItem->SetMinWidth(3);
         statusBar->AddItem(dirtyStatusBarItem);

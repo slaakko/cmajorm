@@ -128,7 +128,7 @@ namespace System.Screen
             directory(createParams.directory),
             requireFileExists(createParams.requireFileExists)
         {
-            InvalidateGuard guard(this, true);
+            InvalidateGuard guard(this, InvalidateKind.invalidateIfNotDefault);
             if (caption.IsEmpty())
             {
                 switch (kind)
@@ -246,7 +246,8 @@ namespace System.Screen
         {
             if (items[listBox->SelectedIndex()].status.fileType == FileType.directory)
             {
-                InvalidateGuard guard(listBox, true);
+                InvalidateGuard listBoxGuard(listBox, InvalidateKind.forceInvalidate);
+                InvalidateGuard directoryLabelGuard(directoryLabel, InvalidateKind.forceInvalidate);
                 directory = GetFullPath(Path.Combine(directory, items[listBox->SelectedIndex()].entry.name));
                 directoryLabel->SetText(directory);
                 MakeListBoxContent();

@@ -66,7 +66,7 @@ namespace System.Screen
             focusedForeColor(createParams.focusedForeColor), 
             focusedBackColor(createParams.focusedBackColor)
         {
-            InvalidateGuard invalidateGuard(this, false);
+            InvalidateGuard invalidateGuard(this, InvalidateKind.dontInvalidate);
             if (ForeColor() == ConsoleColor.defaultColor)
             {
                 SetForeColor(ConsoleColor.gray);
@@ -141,21 +141,14 @@ namespace System.Screen
             {
                 int prevStartPos = StartPos();
                 uchar key = args.Key();
-                switch (key)
+                if (key < specialKeyStart)
                 {
-                    case keyNewline:
+                    if (key == keyNewline)
                     {
                         args.SetHandled();
                         OnTextEntered();
-                        break;
                     }
-                    case keyDel:
-                    {
-                        args.SetHandled();
-                        DeleteChar();
-                        break;
-                    }
-                    case keyBackspace:
+                    else if (key == keyBackspace)
                     {
                         args.SetHandled();
                         if (pos > 0)
@@ -163,40 +156,50 @@ namespace System.Screen
                             CursorLeft(prevStartPos);
                             DeleteChar();
                         }
-                        break;
                     }
-                    case keyLeft:
-                    {
-                        args.SetHandled();
-                        CursorLeft(prevStartPos);
-                        break;
-                    }
-                    case keyRight:
-                    {
-                        args.SetHandled();
-                        CursorRight(prevStartPos);
-                        break;
-                    }
-                    case keyHome:
-                    {
-                        args.SetHandled();
-                        CursorToStart(prevStartPos);
-                        break;
-                    }
-                    case keyEnd:
-                    {
-                        args.SetHandled();
-                        CursorToEnd(prevStartPos);
-                        break;
-                    }
-                    default:
+                    else
                     {
                         if (key >= ' ' && key < specialKeyStart)
                         {
                             args.SetHandled();
                             InsertChar(key);
                         }
-                        break;
+                    }
+                }
+                else
+                {
+                    switch (key)
+                    {
+                        case keyDel:
+                        {
+                            args.SetHandled();
+                            DeleteChar();
+                            break;
+                        }
+                        case keyLeft:
+                        {
+                            args.SetHandled();
+                            CursorLeft(prevStartPos);
+                            break;
+                        }
+                        case keyRight:
+                        {
+                            args.SetHandled();
+                            CursorRight(prevStartPos);
+                            break;
+                        }
+                        case keyHome:
+                        {
+                            args.SetHandled();
+                            CursorToStart(prevStartPos);
+                            break;
+                        }
+                        case keyEnd:
+                        {
+                            args.SetHandled();
+                            CursorToEnd(prevStartPos);
+                            break;
+                        }
                     }
                 }
             }

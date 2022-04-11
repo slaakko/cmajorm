@@ -7,18 +7,23 @@ using System;
 
 namespace System.Screen
 {
+    public enum InvalidateKind
+    {
+        dontInvalidate = 0, invalidateIfNotDefault = 1, forceInvalidate = 2
+    }
+
     public class InvalidateGuard
     {
-        public nothrow InvalidateGuard(Control* control_, bool invalidate_) : control(control_), invalidate(invalidate_)
+        public nothrow InvalidateGuard(Control* control_, InvalidateKind invalidateKind_) : control(control_), invalidateKind(invalidateKind_)
         {
-            control->BeginInvalidate(invalidate);
+            control->BeginInvalidate();
         }
         public ~InvalidateGuard()
         {
-            control->EndInvalidate(invalidate);
+            control->EndInvalidate(invalidateKind);
         }
         private Control* control;
-        private bool invalidate;
+        private InvalidateKind invalidateKind;
     }
 
     public class ControlCreateParams
@@ -264,7 +269,7 @@ namespace System.Screen
         {
             Application.Instance().Timer(duration, this, timerId);
         }
-        public nothrow void BeginInvalidate(bool invalidate)
+        public nothrow void BeginInvalidate()
         {
             Control* parentControl = ParentControl();
             if (parentControl != null && parentControl->InvalidateCount() > 0)
@@ -277,7 +282,7 @@ namespace System.Screen
             }
             ++invalidateCount;
         }
-        public nothrow void EndInvalidate(bool invalidate)
+        public nothrow void EndInvalidate(InvalidateKind invalidateKind)
         {
             Control* parentControl = ParentControl();
             if (parentControl != null && parentControl->InvalidateCount() > 0)
@@ -285,11 +290,11 @@ namespace System.Screen
                 return;
             }
             --invalidateCount;
-            if (invalidateCount == 0 && invalidate)
+            if (invalidateCount == 0 && invalidateKind != InvalidateKind.dontInvalidate)
             {
                 if (!updateRect.IsEmpty())
                 {
-                    WriteScreenMessage message(updateRect);
+                    WriteScreenMessage message(updateRect, invalidateKind);
                     message.SetTargetWindowHandle(handle);
                     Application.Instance().PostMessage(message);
                 }
@@ -305,7 +310,7 @@ namespace System.Screen
         }
         public void Invalidate(const Rect& rect)
         {
-            InvalidateGuard guard(this, true);
+            InvalidateGuard guard(this, InvalidateKind.invalidateIfNotDefault);
             if (updateRect.IsEmpty())
             {
                 updateRect = rect;

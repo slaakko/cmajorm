@@ -304,10 +304,6 @@ void PutMsg(int32_t md, const std::vector<std::uint8_t>& msgData)
     }
     cmsx::machine::Event evnt(cmsx::machine::EventKind::msgQEvent, md);
     Wakeup(evnt);
-    if ((GetDebugMode() & debugMsgQueueMode) != 0)
-    {
-        DebugWrite("kernel.msgq: < put msg '" + queue->Name() + "': wake up");
-    }
 }
 
 void PutMsg(cmsx::kernel::Process* process, int32_t md, int64_t msgDataAddr, int32_t msgSize)

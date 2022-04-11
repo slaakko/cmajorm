@@ -5,13 +5,14 @@
 
 using System;
 using System.Os;
+using System.Message;
 
 namespace System.Screen
 {
-	string MakeApplicationMessageQueueName()
-	{
-		return "system.screen.msg.queue." + ToString(GetPid());
-	}
+    string MakeApplicationMessageQueueName()
+    {
+        return "system.screen.msg.queue." + ToString(GetPid());
+    }
 
     public class Application
     {
@@ -35,7 +36,7 @@ namespace System.Screen
         }
         private Application() : msgQ(MsgQ(MakeApplicationMessageQueueName().Chars())), menuBar(null), focusedControl(null), lastDefaultWriteScreenMessageWindow(-1)
         {
-            RegisterMessage<KeyPressedMessage>(keyPressedMessageId);
+            RegisterMessage<KeyPressedMessage>(systemScreenKeyPressedMessageId);
             BindTerminal(msgQ);
         }
         public nothrow Window* MainWindow() 
@@ -51,6 +52,11 @@ namespace System.Screen
             menuBar = menuBar_;
             menuBarWindowHandle = menuBar->Handle();
         }
+		public nothrow void SetStatusBar(StatusBar* statusBar_)
+		{
+			statusBar = statusBar_;
+			statusBarWindowHandle = statusBar->Handle();
+		}
         public WindowManager& GetWindowManager() const
         {
             return windowManager;
@@ -86,7 +92,7 @@ namespace System.Screen
         }
         public void RunDialog(Window* window)
         {
-            WriteScreenMessage writeScreenMessage(Rect.Default());
+            WriteScreenMessage writeScreenMessage(Rect.Default(), InvalidateKind.invalidateIfNotDefault);
             mainWindow->HandleWriteScreen(&writeScreenMessage);
             UniquePtr<Message> message = ReadMessage();
             while (!(message.Get() is QuitMessage*))
@@ -96,7 +102,7 @@ namespace System.Screen
                 {
                     if (window->GetDialogResult() != DialogResult.none)
                     {
-                        WriteScreenMessage writeScreenMessage(window->GetRect());
+                        WriteScreenMessage writeScreenMessage(window->GetRect(), InvalidateKind.invalidateIfNotDefault);
                         mainWindow->HandleWriteScreen(&writeScreenMessage);
                         return;
                     }
@@ -111,7 +117,7 @@ namespace System.Screen
         }
         public void PostMessage(Message& message)
         {
-            if (message.TargetWindowHandle() != menuBarWindowHandle)
+            if (message.TargetWindowHandle() != menuBarWindowHandle && message.TargetWindowHandle() != statusBarWindowHandle)
             {
                 if (message.IsDefaultWriteScreenMessage())
                 {
@@ -186,8 +192,10 @@ namespace System.Screen
         private Window* mainWindow;
         private WindowManager windowManager;
         private MenuBar* menuBar;
+		private StatusBar* statusBar;
         private Control* focusedControl;
         private int lastDefaultWriteScreenMessageWindow;
         private int menuBarWindowHandle;
+		private int statusBarWindowHandle;
     }
 }

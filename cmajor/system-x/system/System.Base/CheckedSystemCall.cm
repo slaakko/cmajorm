@@ -105,24 +105,24 @@ namespace System.Os
         }
         return result;
     }
-	
-	public int WaitPid(int pid, byte* exitCode)
-	{
-		int result = waitpid(pid, exitCode);
-		if (result == -1)
-		{
-			SystemError systemError = GetSystemError();
-			if (systemError.errorCode == ENOCHILD)
-			{
-				return -1;
-			}
-	        else
+    
+    public int WaitPid(int pid, byte* exitCode)
+    {
+        int result = waitpid(pid, exitCode);
+        if (result == -1)
+        {
+            SystemError systemError = GetSystemError();
+            if (systemError.errorCode == ENOCHILD)
+            {
+                return -1;
+            }
+            else
             {
                 throw systemError;
             }
         }
         return result;
-	}
+    }
     
     public int GetPid()
     {

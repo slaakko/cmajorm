@@ -15,41 +15,41 @@ std::string MsgName(int msgId)
 {
     switch (msgId)
     {
-        case quitMessageId:
+        case systemScreenQuitMessageId:
         {
-            return "quit";
+            return "system.screen.quit";
         }
-        case keyPressedMessageId:
+        case systemScreenKeyPressedMessageId:
         {
-            return "keyPressed";
+            return "system.screen.key.pressed";
         }
-        case writeScreenMessageId:
+        case systemScreenWriteScreenMessageId:
         {
-            return "writeScreen";
+            return "system.screen.write.screen";
         }
-        case timerMessageId:
+        case systemScreenTimerMessageId:
         {
-            return "timer";
+            return "system.screen.timer";
         }
-        case completionInitMessageId:
+        case tabCompletionInitMessageId:
         {
-            return "completion.init";
+            return "tab.completion.init";
         }
-        case completionExitMessageId:
+        case tabCompletionExitMessageId:
         {
-            return "completion.exit";
+            return "tab.completion.exit";
         }
-        case completionRequestMessageId:
+        case tabCompletionRequestMessageId:
         {
-            return "completion.request";
+            return "tab.completion.request";
         }
-        case completionReplyMessageId:
+        case tabCompletionReplyMessageId:
         {
-            return "completion.reply";
+            return "tab.completion.reply";
         }
-        case completionErrorReplyMessageId:
+        case tabCompletionErrorReplyMessageId:
         {
-            return "completion.error";
+            return "tab.completion.error";
         }
         default:
         {
@@ -72,6 +72,7 @@ std::string WriteScreenMessageParams(MemoryReader& reader)
     int32_t y = reader.ReadInt();
     int32_t w = reader.ReadInt();
     int32_t h = reader.ReadInt();
+    int32_t invalidateKind = reader.ReadInt();
     if (x == -1 && y == -1 && w == -1 && h == -1)
     {
         params.append(".default");
@@ -83,6 +84,7 @@ std::string WriteScreenMessageParams(MemoryReader& reader)
         params.append(".w=").append(std::to_string(w));
         params.append(".h=").append(std::to_string(h));
     }
+    params.append(".invalidate=" + std::to_string(invalidateKind));
     return params;
 }
 
@@ -107,17 +109,17 @@ std::string ScreenMsgContentStr(int msgId, MemoryReader& reader)
     }
     switch (msgId)
     {
-        case keyPressedMessageId:
+        case systemScreenKeyPressedMessageId:
         {
             contentStr.append(KeyPressedMessageParams(reader));
             break;
         }
-        case writeScreenMessageId:
+        case systemScreenWriteScreenMessageId:
         {
             contentStr.append(WriteScreenMessageParams(reader));
             break;
         }
-        case timerMessageId:
+        case systemScreenTimerMessageId:
         {
             contentStr.append(TimerMessageParams(reader));
             break;
@@ -131,15 +133,15 @@ std::string CompletionMsgContentStr(int msgId, MemoryReader& reader)
     std::string contentStr;
     switch (msgId)
     {
-        case completionInitMessageId:
+        case tabCompletionInitMessageId:
         {
             break;
         }
-        case completionExitMessageId:
+        case tabCompletionExitMessageId:
         {
             break;
         }
-        case completionRequestMessageId:
+        case tabCompletionRequestMessageId:
         {
             std::string cwd = reader.ReadString();
             std::string line = reader.ReadString();
@@ -147,7 +149,7 @@ std::string CompletionMsgContentStr(int msgId, MemoryReader& reader)
             contentStr.append("cwd='").append(cwd).append("'").append(".line='").append(line).append("'").append(".pos=").append(std::to_string(pos));
             break;
         }
-        case completionReplyMessageId:
+        case tabCompletionReplyMessageId:
         {
             int32_t success = reader.ReadInt();
             contentStr.append("success=").append(std::to_string(success));
@@ -158,7 +160,7 @@ std::string CompletionMsgContentStr(int msgId, MemoryReader& reader)
             }
             break;
         }
-        case completionErrorReplyMessageId:
+        case tabCompletionErrorReplyMessageId:
         {
             int32_t success = reader.ReadInt();
             contentStr.append("success=").append(std::to_string(success));

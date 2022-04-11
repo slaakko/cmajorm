@@ -48,7 +48,7 @@ namespace System.Screen
     {
         public nothrow MessageBox(MessageBoxCreateParams& createParams) : base(createParams.controlCreateParams), caption(createParams.caption), text(createParams.text), buttons(createParams.buttons)
         {
-            InvalidateGuard guard(this, true);
+            InvalidateGuard guard(this, InvalidateKind.invalidateIfNotDefault);
             bool setLoc = false;
             if (Location().IsDefault())
             {

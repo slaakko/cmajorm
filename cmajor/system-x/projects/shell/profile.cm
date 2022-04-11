@@ -6,6 +6,8 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.RegularExpressions;
+using System.Os;
 
 void MakeDefaultProfile(ShellEnvironment& environment)
 {
@@ -17,5 +19,23 @@ void MakeDefaultProfile(ShellEnvironment& environment)
 		writer.WriteLine("SX_SOURCE_ROOT=~/projects");
 		writer.WriteLine("SX_TARGET_ROOT=/mnt/sx/projects");
 		writer.WriteLine("umask 022");
+	}
+	ChMod(profileFilePath.Chars(), cast<int>(ParseOctal("644")));
+}
+
+void RunProfile(ShellEnvironment& environment, Params& params, Context& context)
+{
+	try
+	{
+		string profileFilePath = Path.Combine(environment.Home(), ".profile");
+		if (File.Exists(profileFilePath))
+		{
+			Terminal.Out() << "running " << profileFilePath << "..." << endl();
+			RunFile(environment, params, context, profileFilePath);
+		}
+	}
+	catch (const Exception& ex)
+	{
+		Terminal.Out() << ex.Message() << endl();
 	}
 }

@@ -34,7 +34,7 @@ void Expand(List<ShellToken>& tokens, ShellEnvironment& environment, Params& par
     }
     if ((globalFlags & TokenFlags.hasDollar) != TokenFlags.none)
     {
-        tokens = ParameterExpand(tokens, environment, params, context);
+        tokens = ParameterExpand(tokens, environment, params, globalFlags, context);
         if (environment.Debug())
         {
             Terminal.Out() << "tokens after parameter expansion:" << endl();

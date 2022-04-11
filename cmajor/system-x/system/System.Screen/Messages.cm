@@ -5,21 +5,15 @@
 
 using System;
 using System.IO;
+using System.Message;
 
 namespace System.Screen
 {
-    const int quitMessageId = 0;
-    const int keyPressedMessageId = 1;
-    const int writeScreenMessageId = 2;
-    const int timerMessageId = 3;
-	
-	const int firstUserMessageId = 100;
-
     public class QuitMessage : Message
     {
         public override nothrow int Id() const
         {
-            return quitMessageId;
+            return systemScreenQuitMessageId;
         }
         public override nothrow string Name() const
         {
@@ -27,7 +21,7 @@ namespace System.Screen
         }
         static nothrow QuitMessage() : Message()
         {
-            RegisterMessage<QuitMessage>(quitMessageId);
+            RegisterMessage<QuitMessage>(systemScreenQuitMessageId);
         }
     }
 
@@ -35,7 +29,7 @@ namespace System.Screen
     {
         public override nothrow int Id() const
         {
-            return keyPressedMessageId;
+            return systemScreenKeyPressedMessageId;
         }
         public override nothrow int Size() const
         {
@@ -47,7 +41,7 @@ namespace System.Screen
         }
         static nothrow KeyPressedMessage() : Message()
         {
-            RegisterMessage<KeyPressedMessage>(keyPressedMessageId);
+            RegisterMessage<KeyPressedMessage>(systemScreenKeyPressedMessageId);
         }
         public nothrow KeyPressedMessage(uchar key_) : key(key_)
         {
@@ -77,11 +71,11 @@ namespace System.Screen
     {
         public override nothrow int Id() const
         {
-            return writeScreenMessageId;
+            return systemScreenWriteScreenMessageId;
         }
         public override nothrow int Size() const
         {
-            return cast<int>(base->Size() + sizeof(Rect));
+            return cast<int>(base->Size() + sizeof(Rect) + sizeof(int));
         }
         public override nothrow string Name() const
         {
@@ -89,14 +83,14 @@ namespace System.Screen
         }
         static nothrow WriteScreenMessage() : Message()
         {
-            RegisterMessage<WriteScreenMessage>(writeScreenMessageId);
+            RegisterMessage<WriteScreenMessage>(systemScreenWriteScreenMessageId);
         }
-        public nothrow WriteScreenMessage(const Rect& rect_) : rect(rect_)
+        public nothrow WriteScreenMessage(const Rect& rect_, InvalidateKind invalidateKind_) : rect(rect_), invalidateKind(invalidateKind_)
         {
         }
         public nothrow override bool IsDefaultWriteScreenMessage() const
         {
-            return rect.IsDefault();
+            return rect.IsDefault() && invalidateKind != InvalidateKind.forceInvalidate;
         }
         public override void Write(MemoryWriter& writer)
         {
@@ -105,6 +99,7 @@ namespace System.Screen
             writer.Write(rect.location.y);
             writer.Write(rect.size.w);
             writer.Write(rect.size.h);
+            writer.Write(cast<int>(invalidateKind));
         }
         public override void Read(MemoryReader& reader)
         {
@@ -113,6 +108,7 @@ namespace System.Screen
             rect.location.y = reader.ReadInt();
             rect.size.w = reader.ReadInt();
             rect.size.h = reader.ReadInt();
+            invalidateKind = cast<InvalidateKind>(reader.ReadInt());
         }
         public override bool Dispatch(Control* control)
         {
@@ -123,13 +119,14 @@ namespace System.Screen
             return rect;
         }
         private Rect rect;
+        private InvalidateKind invalidateKind;
     }
     
     public class TimerMessage : Message
     {
         public override nothrow int Id() const
         {
-            return timerMessageId;
+            return systemScreenTimerMessageId;
         }
         public override nothrow int Size() const
         {
@@ -141,7 +138,7 @@ namespace System.Screen
         }
         static nothrow TimerMessage() : Message()
         {
-            RegisterMessage<TimerMessage>(timerMessageId);
+            RegisterMessage<TimerMessage>(systemScreenTimerMessageId);
         }
         public nothrow TimerMessage(int timerId_) : timerId(timerId_)
         {

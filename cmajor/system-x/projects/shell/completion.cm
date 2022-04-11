@@ -1,0 +1,155 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Os;
+using System.Message;
+using System.IO;
+
+void CloseMessageQueue(int msgQ)
+{
+	if (msgQ == -1) 
+	{
+		return;
+	}
+	try
+	{
+		CloseMsgQ(msgQ);
+	}
+	catch (const Exception& ex)
+	{
+		Console.Error() << ex.ToString() << endl();
+	}
+}
+
+void HandleTabCompletionInitReply(int replyMessageId, MemoryReader& reader, int putTabMsgQ, int getTabMsgQ)
+{
+	if ((GetDebugMode() & debugApp) != 0)
+	{
+		WriteDebugMessage("> sh.handle.tab.reply." + ToString(replyMessageId));
+	}
+	if (replyMessageId == tabCompletionReplyMessageId)
+	{
+		int success = reader.ReadInt();
+		CloseMessageQueue(putTabMsgQ);
+		CloseMessageQueue(getTabMsgQ);
+		if (success == 0)
+		{
+			throw SystemError(EFAIL, "sh: got tab completion init error from /bin/tab: success=false");
+		}
+	}
+	else if (replyMessageId == tabCompletionErrorReplyMessageId)
+	{
+		int success = reader.ReadInt();
+		string error = reader.ReadString();
+		CloseMessageQueue(putTabMsgQ);
+		CloseMessageQueue(getTabMsgQ);
+		throw SystemError(EFAIL, "sh: got tab completion init error from /bin/tab: success=" + ToString(success) + ", error=" + error);
+	}
+	else
+	{
+		throw SystemError(EFAIL, "sh: tab completion init failed, invalid reply message id " + ToString(replyMessageId) + " received from /bin/tab");
+	}
+	if ((GetDebugMode() & debugApp) != 0)
+	{
+		WriteDebugMessage("< sh.handle.tab.reply.");
+	}
+}
+
+void InitTabCompletion(ShellEnvironment& environment)
+{
+	if ((GetDebugMode() & debugApp) != 0)
+	{
+		WriteDebugMessage("> sh.init.tab");
+	}
+	int putTabMsgQ = environment.PutTabMsgQ();
+	int getTabMsgQ = environment.GetTabMsgQ();
+	if (putTabMsgQ == -1 || getTabMsgQ == -1)
+	{
+		return;
+	}
+	List<byte> initCompletionMsg;
+	int initCompletionMsgSize = 4;
+	initCompletionMsg.Resize(initCompletionMsgSize);
+	MemoryWriter writer(initCompletionMsg.Begin().Ptr(), initCompletionMsgSize);
+	writer.Write(tabCompletionInitMessageId);
+	PutMsg(putTabMsgQ, initCompletionMsg.Begin().Ptr(), initCompletionMsgSize);
+	WaitMsg(getTabMsgQ);
+	if (GetMsgQLength(getTabMsgQ) > 0)
+	{
+		int replyMessageSize = GetMsgSize(getTabMsgQ);
+		if ((GetDebugMode() & debugApp) != 0)
+		{
+			WriteDebugMessage("> sh.init.tab.reply.size=" + ToString(replyMessageSize));
+		}
+		if (replyMessageSize > 0)
+		{
+			UniquePtr<byte> replyMsg(cast<byte*>(MemAlloc(replyMessageSize)));
+			GetMsg(getTabMsgQ, replyMsg.Get());
+			MemoryReader reader(replyMsg.Get(), replyMessageSize);
+			int replyMessageId = reader.ReadInt();
+			HandleTabCompletionInitReply(replyMessageId, reader, putTabMsgQ, getTabMsgQ);
+		}
+	}
+	if ((GetDebugMode() & debugApp) != 0)
+	{
+		WriteDebugMessage("< sh.init.tab");
+	}
+}
+
+void StartTabCompletion(ShellEnvironment& environment)
+{
+	try
+	{
+		if ((GetDebugMode() & debugApp) != 0)
+		{
+			WriteDebugMessage("> sh.start.tab");
+		}
+		if (environment.PutTabMsgQName().IsEmpty() || environment.GetTabMsgQName().IsEmpty()) 
+		{
+			return;
+		}
+		int pid = Fork();
+		if (pid == 0)
+		{
+			List<string> args;
+			args.Add(environment.PutTabMsgQName());
+			args.Add(environment.GetTabMsgQName());
+			Exec("/bin/tab", args);
+		}
+		else
+		{
+			InitTabCompletion(environment);
+		}
+		if ((GetDebugMode() & debugApp) != 0)
+		{
+			WriteDebugMessage("< sh.start.tab");
+		}
+	}
+	catch (const Exception& ex)
+	{
+		Console.Error() << ex.ToString() << endl();
+	}
+}
+
+void StopTabCompletion(ShellEnvironment& environment)
+{
+	try
+	{
+		int putTabMsgQ = MsgQ(environment.PutTabMsgQName().Chars());
+		List<byte> completionExitMsgData;
+		int completionExitMsgSize = 4;
+		completionExitMsgData.Resize(completionExitMsgSize);
+		MemoryWriter writer(completionExitMsgData.Begin().Ptr(), completionExitMsgSize);
+		writer.Write(tabCompletionExitMessageId);
+		PutMsg(putTabMsgQ, completionExitMsgData.Begin().Ptr(), completionExitMsgSize);
+		CloseMessageQueue(putTabMsgQ);
+	}
+	catch (const Exception& ex)
+	{
+		Console.Error() << ex.ToString() << endl();
+	}
+}

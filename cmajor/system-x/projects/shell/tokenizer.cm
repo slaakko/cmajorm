@@ -8,6 +8,13 @@ using System.Collections;
 using System.Lex;
 using shtokens;
 
+private int debugMode = 0;
+
+void SetTokenizerDebugMode()
+{
+	debugMode = GetDebugMode();
+}
+
 public enum TokenFlags : int
 {
     none = 0, hasSlash = 1 << 0, hasPatternChar = 1 << 1, hasAssignment = 1 << 2, hasDollar = 1 << 3, hasTilde = 1 << 4, brace = 1 << 5
@@ -91,6 +98,16 @@ public class ShellToken
     public int line;
     public int startCol;
     public int endCol;
+}
+
+public ustring MakeValue(const List<ShellToken>& tokens)
+{
+	ustring value;
+	for (const ShellToken& token : tokens)
+	{
+		value.Append(token.match);
+	}
+	return value;
 }
 
 public void SetTokenFlags(ShellToken& token, TokenFlags& globalFlags)
@@ -217,6 +234,11 @@ void AddQuotedStr(const ShellToken& token, List<ShellToken>& words, bool& brk)
 
 List<ShellToken> MakeWords(const List<ShellToken>& tokens)
 {
+	SetTokenizerDebugMode();
+	if ((debugMode & debugShell) != 0)
+	{
+		WriteDebugMessage("> sh.tokenizer.make.words");
+	}
     bool brk = false;
     List<ShellToken> words;
     TokenLexer lexer(tokens);
@@ -226,32 +248,65 @@ List<ShellToken> MakeWords(const List<ShellToken>& tokens)
         {
             case TOKEN:
             {
+				if ((debugMode & debugShell) != 0)
+				{
+					WriteDebugMessage("> sh.tokenizer.make.words.token");
+				}
                 AddWord(lexer.CurrentToken(), words, brk);
                 break;
             }
             case QUOTED_CHAR:
             {
+				if ((debugMode & debugShell) != 0)
+				{
+					WriteDebugMessage("> sh.tokenizer.make.words.quoted.char");
+				}
                 AddQuotedChar(lexer.CurrentToken(), words, brk);
                 break;
             }
             case SINGLE_QUOTED:
             case DOUBLE_QUOTED:
             {
+				if ((debugMode & debugShell) != 0)
+				{
+					WriteDebugMessage("> sh.tokenizer.make.words.quoted");
+				}
                 AddQuotedStr(lexer.CurrentToken(), words, brk);
                 break;
             }
             case SPACE:
             {
                 brk = true;
+				if ((debugMode & debugShell) != 0)
+				{
+					WriteDebugMessage("> sh.tokenizer.make.words.space");
+				}
                 break;
             }
+			case WORD:
+			{
+				if ((debugMode & debugShell) != 0)
+				{
+					WriteDebugMessage("> sh.tokenizer.make.words.word");
+				}
+                AddWord(lexer.CurrentToken(), words, brk);
+                break;
+			}
             default:
             {
+				if ((debugMode & debugShell) != 0)
+				{
+					WriteDebugMessage("> sh.tokenizer.make.words.default token=" + ToString(lexer.CurrentToken().id));
+				}
                 words.Add(lexer.CurrentToken());
                 break;
             }
         }
         ++lexer;
     }
+	if ((debugMode & debugShell) != 0)
+	{
+		WriteDebugMessage("< sh.tokenizer.make.words.count=" + ToString(words.Count()));
+	}
     return words;
 }

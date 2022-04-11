@@ -75,7 +75,8 @@ void ProcessLine(const string& line, ShellEnvironment& environment, Params& para
     TokenLexer lexer(tokens);
     try
     {
-        UniquePtr<Command> command = ParseCommand(lexer);
+		ParserData parserData(environment, params, context);
+        UniquePtr<Command> command = ParseCommand(lexer, parserData);
         if (!command.IsNull())
         {
             if (environment.Debug())
@@ -111,13 +112,26 @@ void ProcessLine(const string& line, ShellEnvironment& environment, Params& para
     }
 }
 
+void RunFile(ShellEnvironment& environment, Params& params, Context& context, const string& filePath)
+{
+	Map<string, string> executableMap;
+	string path = GetEnv("PATH");
+	AddDirChangeNotification(path.Chars());
+	ReadPathDirectories(path, executableMap);
+	List<string> lines = File.ReadAllLines(filePath);
+	for (const string& line : lines)
+	{
+		ProcessLine(line, environment, params, context, executableMap);
+	}
+}
+
 void Run(ShellEnvironment& environment, Params& params, Context& context)
 {
-    Map<string, string> executableMap;
-    string path = GetEnv("PATH");
-    AddDirChangeNotification(path.Chars());
-    ReadPathDirectories(path, executableMap);
-    string line = GetLine(environment);
+	Map<string, string> executableMap;
+	string path = GetEnv("PATH");
+	AddDirChangeNotification(path.Chars());
+	ReadPathDirectories(path, executableMap);
+	string line = GetLine(environment);
     while (line != "exit")
     {
         ProcessLine(line, environment, params, context, executableMap);

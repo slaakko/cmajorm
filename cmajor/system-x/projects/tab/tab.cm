@@ -8,12 +8,7 @@ using System.Collections;
 using System.IO;
 using System.Os;
 using System.RegularExpressions;
-
-const int completionInitMessageId = 10;
-const int completionExitMessageId = 11;
-const int completionRequestMessageId = 12;
-const int completionReplyMessageId = 13;
-const int completionErrorReplyMessageId = 14;
+using System.Message;
 
 Pair<ustring, FileType> MakeFileNameEntry(const string& dir, const string& fileName)
 {
@@ -111,6 +106,10 @@ List<Pair<ustring, FileType>> GetMatchingEntries(const List<Pair<ustring, FileTy
 
 void GetWord(const ustring& line, int pos, int& startPos, int& slashPos, ustring& prefix, ustring& word)
 {
+	if ((GetDebugMode() & debugApp) != 0)
+	{
+		WriteDebugMessage("> tab.get.word");
+	}
 	int tabPos = pos;
 	while (pos > 0 && (pos >= line.Length() || line[pos] == ' '))
 	{
@@ -138,7 +137,7 @@ void GetWord(const ustring& line, int pos, int& startPos, int& slashPos, ustring
 	}
 	if ((GetDebugMode() & debugApp) != 0)
 	{
-		WriteDebugMessage("> tab.get.word: prefix='" + ToUtf8(prefix) + "'.word=" + ToUtf8(word));
+		WriteDebugMessage("< tab.get.word: prefix='" + ToUtf8(prefix) + "'.word=" + ToUtf8(word));
 	}
 }
 
@@ -248,20 +247,20 @@ bool ProcessMessage(int putTabMsgQ, int getTabMsgQ, Context& context)
 			GetMsg(putTabMsgQ, putTabMsgData.Get());
 			MemoryReader reader(putTabMsgData.Get(), putTabMsgSize);
 			int messageId = reader.ReadInt();
-			if (messageId == completionInitMessageId)
+			if (messageId == tabCompletionInitMessageId)
 			{
 				int success = 1;
-				List<byte> completionInitReplyMsgData;
-				int completionInitReplyMsgDataSize = 12;
-				completionInitReplyMsgData.Resize(completionInitReplyMsgDataSize);
-				MemoryWriter writer(completionInitReplyMsgData.Begin().Ptr(), completionInitReplyMsgDataSize);
+				List<byte> tabCompletionInitReplyMsgData;
+				int tabCompletionInitReplyMsgDataSize = 12;
+				tabCompletionInitReplyMsgData.Resize(tabCompletionInitReplyMsgDataSize);
+				MemoryWriter writer(tabCompletionInitReplyMsgData.Begin().Ptr(), tabCompletionInitReplyMsgDataSize);
 				int numCompletions = 0;
-				writer.Write(completionReplyMessageId);
+				writer.Write(tabCompletionReplyMessageId);
 				writer.Write(success);
 				writer.Write(numCompletions);
-				PutMsg(getTabMsgQ, completionInitReplyMsgData.Begin().Ptr(), completionInitReplyMsgDataSize);
+				PutMsg(getTabMsgQ, tabCompletionInitReplyMsgData.Begin().Ptr(), tabCompletionInitReplyMsgDataSize);
 			}
-			else if (messageId == completionExitMessageId)
+			else if (messageId == tabCompletionExitMessageId)
 			{
 				if ((GetDebugMode() & debugApp) != 0)
 				{
@@ -269,7 +268,7 @@ bool ProcessMessage(int putTabMsgQ, int getTabMsgQ, Context& context)
 				}
 				return true;
 			}
-			else if (messageId == completionRequestMessageId)
+			else if (messageId == tabCompletionRequestMessageId)
 			{
 				string cwd = reader.ReadString();
 				string line = reader.ReadString();
@@ -279,7 +278,7 @@ bool ProcessMessage(int putTabMsgQ, int getTabMsgQ, Context& context)
 				List<Pair<string, int>> completions;
 				if (CompletePath(cwd, line, pos, completions, context))
 				{
-					int replyMessageId = completionReplyMessageId;
+					int replyMessageId = tabCompletionReplyMessageId;
 					int success = 1;
 					getTabMsgSize = 4 + 4;
 					getTabMsgSize = getTabMsgSize + 4;
@@ -300,13 +299,14 @@ bool ProcessMessage(int putTabMsgQ, int getTabMsgQ, Context& context)
 				}
 				else
 				{
-					int replyMessageId = completionReplyMessageId;
+					int replyMessageId = tabCompletionReplyMessageId;
 					int success = 0;
-					getTabMsgSize = 4 + 4;
+					getTabMsgSize = 4 + 4 + 4;
 					getTabMsgData.Resize(getTabMsgSize);
 					MemoryWriter writer(getTabMsgData.Begin().Ptr(), getTabMsgSize);
 					writer.Write(replyMessageId);
 					writer.Write(success);
+					writer.Write(cast<int>(0));
 				}
 				PutMsg(getTabMsgQ, getTabMsgData.Begin().Ptr(), getTabMsgSize);
 			}
@@ -323,7 +323,7 @@ bool ProcessMessage(int putTabMsgQ, int getTabMsgQ, Context& context)
 	catch (const Exception& ex)
 	{
 		List<byte> getTabMsgData;
-		int replyMessageId = completionErrorReplyMessageId;
+		int replyMessageId = tabCompletionErrorReplyMessageId;
 		int success = 0;
 		string error = ex.Message();
 		int getTabMsgSize = 4 + 4 + cast<int>(error.Length()) + 1;

@@ -13,18 +13,18 @@
 namespace cmsx::kernel {
 
 const int firstScreenMessageId = 0;
-const int quitMessageId = 0;
-const int keyPressedMessageId = 1;
-const int writeScreenMessageId = 2;
-const int timerMessageId = 3;
+const int systemScreenQuitMessageId = 0;
+const int systemScreenKeyPressedMessageId = 1;
+const int systemScreenWriteScreenMessageId = 2;
+const int systemScreenTimerMessageId = 3;
 const int lastScreenMessageId = 3;
 
 const int firstCompletionMessageId = 10;
-const int completionInitMessageId = 10;
-const int completionExitMessageId = 11;
-const int completionRequestMessageId = 12;
-const int completionReplyMessageId = 13;
-const int completionErrorReplyMessageId = 14;
+const int tabCompletionInitMessageId = 10;
+const int tabCompletionExitMessageId = 11;
+const int tabCompletionRequestMessageId = 12;
+const int tabCompletionReplyMessageId = 13;
+const int tabCompletionErrorReplyMessageId = 14;
 const int lastCompletionMessageId = 14;
 
 const int firstUserMessageId = 100;

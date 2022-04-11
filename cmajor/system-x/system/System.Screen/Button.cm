@@ -64,7 +64,7 @@ namespace System.Screen
     {
         public nothrow Button(ButtonCreateParams& createParams) : base(createParams.controlCreateParams), flags(ButtonFlags.none), text(createParams.text)
         {
-            InvalidateGuard invalidateGuard(this, false);
+            InvalidateGuard invalidateGuard(this, InvalidateKind.dontInvalidate);
             if (createParams.controlCreateParams.foreColor == ConsoleColor.defaultColor)
             {
                 SetForeColor(ConsoleColor.black);

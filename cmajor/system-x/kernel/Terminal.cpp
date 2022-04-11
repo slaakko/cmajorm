@@ -411,6 +411,10 @@ void Terminal::GetScreenBufferInfo()
 
 void Terminal::SetCursorPos(int x, int y)
 {
+    if ((GetDebugMode() & debugTerminalMode) != 0)
+    {
+        DebugWrite("kernel.terminal: set.cursor.pos(" + std::to_string(x) + ", " + std::to_string(y) + ")");
+    }
     OsSetConsoleCursorPosition(consoleOutputHandle, x, y);
     GetScreenBufferInfo();
 }
@@ -681,7 +685,7 @@ void Terminal::GetCompletions(std::unique_lock<std::recursive_mutex>& lock)
         {
             INodeKey inodeKey = ToINodeKey(process->GetINodeKeyOfWorkingDir());
             Filesystem* fs = GetFs(inodeKey.fsNumber);
-            int32_t messageId = completionRequestMessageId;
+            int32_t messageId = tabCompletionRequestMessageId;
             std::string cwd = fs->INodeToPath(inodeKey, Kernel::Instance().GetKernelProcess());
             std::string ln = ToUtf8(line);
             int32_t pos = this->pos;
@@ -1137,8 +1141,8 @@ void Terminal::PutKeyPressedMessage(char32_t ch)
     }
     std::vector<std::uint8_t> keyPressedMessageData(8 + 4);
     MemoryWriter writer(keyPressedMessageData.data(), 8 + 4);
-    writer.Write(keyPressedMessageId);
-    writer.Write(static_cast<int32_t>(-1)); // no window
+    writer.Write(systemScreenKeyPressedMessageId);
+    writer.Write(static_cast<int32_t>(-1)); // all windows
     writer.Write(static_cast<int32_t>(ch));
     PutMsg(boundMd, keyPressedMessageData);
 }
