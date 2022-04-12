@@ -349,7 +349,7 @@ namespace System.Screen
             if (cp.x >= 0 && cp.x < TerminalWindowWidth() && cp.y >= 0 && cp.y < TerminalWindowHeight())
             {
                 SetControlCursorPos(cp);
-				SetCursorPos(cp.x, cp.y);
+                SetCursorPos(cp.x, cp.y);
             }
         }
         public override void OnWriteScreen(WriteScreenEventArgs& args)
@@ -604,12 +604,12 @@ namespace System.Screen
             if (xOffset != prevXOffset || yOffset != prevYOffset)
             {
                 Invalidate(GetRect());
-				SetCursorPos();
+                SetCursorPos();
             }
             else
             {
                 Invalidate(updateRect);
-				SetCursorPos();
+                SetCursorPos();
             }
         }
         private void WriteScreenNoSelection(const Rect& updateRect)

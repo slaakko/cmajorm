@@ -44,3 +44,5 @@ cminst -v shell\bin\debug\sh.x ..\bin\shd.x
 cminst -v shell\bin\release\sh.x ..\bin\sh.x
 cminst -v tab\bin\debug\tab.x ..\bin\tabd.x
 cminst -v tab\bin\release\tab.x ..\bin\tab.x
+cminst -v sx\bin\debug\sx.x ..\bin\sxd.x
+cminst -v sx\bin\release\sx.x ..\bin\sx.x

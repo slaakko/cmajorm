@@ -1110,7 +1110,7 @@ void Assembler::EmitSetPureRegValue(const cmsx::object::Value& registerValue, co
     {
         if (pureValue.IsPureValue())
         {
-            uint64_t value = pureValue.Val();
+            uint64_t value = pureValue.Val(); 
             if (value <= std::numeric_limits<uint16_t>().max())
             {
                 uint8_t b0 = static_cast<uint8_t>(value);

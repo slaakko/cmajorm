@@ -7,7 +7,7 @@
  <body>
   <h1>Application Class</h1>
   <h2>Definition</h2>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#11">11</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#17">17</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
   <h2>Constructors &amp; Destructor</h2>
   <table>
    <tr>
@@ -78,6 +78,10 @@
     <td xml:space="preserve"><a href="../../System.Screen/doc/class_Application_DF449292C473CDD7228F1020E204E9BA494B4D33.html#member_function_SetMenuBar_Application_C0CC42FF1DED1E48B2DBD9C6C1379F5CBBAB29A8">SetMenuBar</a>(<a href="../../System.Screen/doc/class_MenuBar_B85DA79A994DA3C9632662CAFB048A2AA1DAAA20.html">MenuBar</a>*&nbsp;menuBar_)</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../System.Screen/doc/class_Application_DF449292C473CDD7228F1020E204E9BA494B4D33.html#member_function_SetStatusBar_Application_923838C07779AEEA79E0D8129E886F0DCBCC55EB">SetStatusBar</a>(<a href="../../System.Screen/doc/class_StatusBar_0B58028090317AA728C7A064ADA36726AEAEFD0D.html">StatusBar</a>*&nbsp;statusBar_)</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span></td>
     <td xml:space="preserve"><a href="../../System.Screen/doc/class_Application_DF449292C473CDD7228F1020E204E9BA494B4D33.html#member_function_Timer_Application_7DF13D799B2E370675C21E0F583C5151DA134729">Timer</a>(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_Duration_78813FE475939D533DB7A63066BE3D8FEB436151.html">Duration</a>&amp;&nbsp;duration, <a href="../../System.Screen/doc/class_Control_7F58011C38A320C6173DCA0210818AF7E5A4A09B.html">Control</a>*&nbsp;control, <span class="kw">int</span>&nbsp;timerId)</td>
    </tr>
@@ -113,6 +117,14 @@
     <td xml:space="preserve">msgQ</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../System.Screen/doc/class_StatusBar_0B58028090317AA728C7A064ADA36726AEAEFD0D.html">StatusBar</a>*</td>
+    <td xml:space="preserve">statusBar</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">statusBarWindowHandle</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../System.Screen/doc/class_WindowManager_CBD0646CA587DF927D66295B7C2AED3D39AC8774.html">WindowManager</a></td>
     <td xml:space="preserve">windowManager</td>
    </tr>
@@ -121,21 +133,21 @@
   <h3 id="static_constructor_Application_9966F40278C67D5E0429FFECB17AE0763099A172" xml:space="preserve">Application&nbsp;Static Constructor</h3>
   <h4 xml:space="preserve"><span class="kw">static</span>&nbsp;Application()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#13">13</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#19">19</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="default_constructor_Application_5FD39BB0F729653241529051D03CCCFE605B0685" xml:space="preserve">Application&nbsp;Constructor</h3>
   <h4 xml:space="preserve"><span class="kw">private</span>&nbsp;Application()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#31">31</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#37">37</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="destructor_Application_B323AB3A01E91EC11F89FCAE41A334CB1D370A63" xml:space="preserve">~Application&nbsp;Destructor</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;~Application()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#16">16</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#22">22</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -143,98 +155,105 @@
   <h3 id="member_function_Exit_Application_6BDCD34EBD3310150BF36BA9983B3F1F60936ED7" xml:space="preserve">Exit&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;Exit()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#102">102</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#113">113</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_FocusedControl_Application_C8ABEF727EC071FD33A18E7C1AFBA949616B273A" xml:space="preserve">FocusedControl&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../System.Screen/doc/class_Control_7F58011C38A320C6173DCA0210818AF7E5A4A09B.html">Control</a>*&nbsp;FocusedControl()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#148">148</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#159">159</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_GetMenuBar_Application_772BEDF5DDA2CB7938302CEFAEC8BDA16B778A42" xml:space="preserve">GetMenuBar&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../System.Screen/doc/class_MenuBar_B85DA79A994DA3C9632662CAFB048A2AA1DAAA20.html">MenuBar</a>*&nbsp;GetMenuBar()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#40">40</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#46">46</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_GetMessage_Application_2800DC1AAE4E14FB3D4DBE17606B5862779A8EE8" xml:space="preserve">GetMessage&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a>&lt;<a href="../../System.Screen/doc/class_Message_1EF145808027CB10F4186CAB1773ED969BC576A3.html">Message</a>>&nbsp;GetMessage()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#156">156</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#167">167</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_GetWindowManager_Application_9C40DFEE777C0E5AFE9821AA9634A155071907BC" xml:space="preserve">GetWindowManager&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Screen/doc/class_WindowManager_CBD0646CA587DF927D66295B7C2AED3D39AC8774.html">WindowManager</a>&amp;&nbsp;GetWindowManager()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#49">49</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#60">60</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_Instance_Application_172FD6F4CABEEB4A5C5B816E8384B570DB57C4D0" xml:space="preserve">Instance&nbsp;Static Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">static</span>&nbsp;<a href="../../System.Screen/doc/class_Application_DF449292C473CDD7228F1020E204E9BA494B4D33.html">Application</a>&amp;&nbsp;Instance()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#27">27</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#33">33</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_MainWindow_Application_BF4BC58098746EEF24B2A05583B5FD7E4D1679F7" xml:space="preserve">MainWindow&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../System.Screen/doc/class_Window_CA67F1DD5665B0024E01F8B2B3874D6E13F93C2D.html">Window</a>*&nbsp;MainWindow()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#36">36</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#42">42</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_PostMessage_Application_4E50AEBED41A8D0A63FD9DCA8BA0C2343663FE21" xml:space="preserve">PostMessage&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;PostMessage(<a href="../../System.Screen/doc/class_Message_1EF145808027CB10F4186CAB1773ED969BC576A3.html">Message</a>&amp;&nbsp;message)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#107">107</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#118">118</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_ReadMessage_Application_B2F8B614C7697651C074351ED322E9AA68B0DDFB" xml:space="preserve">ReadMessage&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a>&lt;<a href="../../System.Screen/doc/class_Message_1EF145808027CB10F4186CAB1773ED969BC576A3.html">Message</a>>&nbsp;ReadMessage()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#133">133</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#144">144</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_Run_Application_55279E24FF373D34D3D0B1DC0925C66ACC0307C5" xml:space="preserve">Run&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;Run(<a href="../../System.Screen/doc/class_Window_CA67F1DD5665B0024E01F8B2B3874D6E13F93C2D.html">Window</a>&amp;&nbsp;mainWindow_)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#53">53</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#64">64</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_RunDialog_Application_4FFC23A1ABA4DA47C14BE1BB4D17FB709251E6DB" xml:space="preserve">RunDialog&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;RunDialog(<a href="../../System.Screen/doc/class_Window_CA67F1DD5665B0024E01F8B2B3874D6E13F93C2D.html">Window</a>*&nbsp;window)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#82">82</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#93">93</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_SetFocusedControl_Application_344D253D876A90756C2FFB156ED04A1218981487" xml:space="preserve">SetFocusedControl&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;SetFocusedControl(<a href="../../System.Screen/doc/class_Control_7F58011C38A320C6173DCA0210818AF7E5A4A09B.html">Control</a>*&nbsp;focusedControl_)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#152">152</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#163">163</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_SetMenuBar_Application_C0CC42FF1DED1E48B2DBD9C6C1379F5CBBAB29A8" xml:space="preserve">SetMenuBar&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;SetMenuBar(<a href="../../System.Screen/doc/class_MenuBar_B85DA79A994DA3C9632662CAFB048A2AA1DAAA20.html">MenuBar</a>*&nbsp;menuBar_)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#44">44</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#50">50</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_SetStatusBar_Application_923838C07779AEEA79E0D8129E886F0DCBCC55EB" xml:space="preserve">SetStatusBar&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;SetStatusBar(<a href="../../System.Screen/doc/class_StatusBar_0B58028090317AA728C7A064ADA36726AEAEFD0D.html">StatusBar</a>*&nbsp;statusBar_)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#55">55</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_Timer_Application_7DF13D799B2E370675C21E0F583C5151DA134729" xml:space="preserve">Timer&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;Timer(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_Duration_78813FE475939D533DB7A63066BE3D8FEB436151.html">Duration</a>&amp;&nbsp;duration, <a href="../../System.Screen/doc/class_Control_7F58011C38A320C6173DCA0210818AF7E5A4A09B.html">Control</a>*&nbsp;control, <span class="kw">int</span>&nbsp;timerId)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#138">138</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Screen/file/Application.cm.html#149">149</a>&nbsp;of&nbsp;<a href="../../System.Screen/file/Application.cm.html">System.Screen/Application.cm</a></span>
   <br/>
   <br/>
   <hr/>

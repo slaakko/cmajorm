@@ -1,0 +1,32 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Lex;
+
+string MakeFilePath(const Lexeme& lexeme)
+{
+    ustring s;
+    uchar* p = lexeme.begin;
+    uchar* e = lexeme.end;
+    if (p != e && *p == '<')
+    {
+        ++p;
+    }
+    while (p != e && *p != '>')
+    {
+        s.Append(*p);
+        ++p;
+    }
+    if (p != e && *p == '>')
+    {
+        ++p;
+    }
+    if (p != e)
+    {
+        throw Exception("invalid file path '" + ToUtf8(ustring(lexeme.begin, lexeme.end)) + "'");
+    }    
+    return ToUtf8(s);
+}

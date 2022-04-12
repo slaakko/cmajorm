@@ -54,13 +54,16 @@
 		<tr>
 			<td>&#8209;&#8209;debug=MODE</td>
 			<td>&#8209;d=MODE</td>
-			<td>Set kernel debug mode to MODE (1-31).</td>
-			<td> When kernel is started in debug mode != 0 kernel debug messages show up in a 'cmlog' command-line application if it is started. 
-			MODE=1 - show system errors, 
-			MODE=2 - show terminal input messages, 
-			MODE=4 - show message queue messages,
-			MODE=8 - show shell messages,
-			MODE=16 - application messages
+			<td>Set kernel debug mode to MODE (1-63).</td>
+			<td> When kernel is started in debug mode != 0 kernel debug messages show up in a 'cmlog' command-line application if it is started.<br/>
+			Mode should be the sum of the following values:<br/>
+			MODE=1: show system errors<br/>
+			MODE=2: show terminal input messages<br/>
+			MODE=4: show message queue messages<br/>
+			MODE=8: show shell messages<br/>
+			MODE=16: show lexer messages<br/>
+			MODE=32: show application messages<br/>
+		
 			</td>
 		</tr>
 	</table>

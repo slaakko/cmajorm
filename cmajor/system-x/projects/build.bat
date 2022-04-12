@@ -7,3 +7,5 @@ sxcmc -u -v shell\sh.cmp
 sxcmc -u -v -c=release shell\sh.cmp
 sxcmc -u -v tab\tab.cmp
 sxcmc -u -v -c=release tab\tab.cmp
+sxcmc -u -v sx\sx.cmp
+sxcmc -u -v -c=release sx\sx.cmp

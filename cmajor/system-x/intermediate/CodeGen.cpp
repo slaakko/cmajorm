@@ -9,6 +9,7 @@
 #include <system-x/intermediate/RegisterAllocator.hpp>
 #include <system-x/machine/OpCode.hpp>
 #include <system-x/machine/Registers.hpp>
+#include <system-x/machine/Util.hpp>
 #include <system-x/assembler/Constant.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <stdexcept>
@@ -285,7 +286,14 @@ cmsx::assembler::Node* MakeRegOperand(Value* value, const Register& r, CodeGener
             case ValueKind::sbyteValue:
             {
                 SByteValue* v = static_cast<SByteValue*>(value);
-                inst->AddOperand(cmsx::assembler::MakeConstantExpr(v->GetValue()));
+                if (v->GetValue() < 0)
+                {
+                    inst->AddOperand(cmsx::assembler::MakeConstantExpr(cmsx::machine::SignExtend(v->GetValue()))); 
+                }
+                else
+                {
+                    inst->AddOperand(cmsx::assembler::MakeConstantExpr(v->GetValue()));
+                }
                 break;
             }
             case ValueKind::byteValue:
@@ -297,7 +305,14 @@ cmsx::assembler::Node* MakeRegOperand(Value* value, const Register& r, CodeGener
             case ValueKind::shortValue:
             {
                 ShortValue* v = static_cast<ShortValue*>(value);
-                inst->AddOperand(cmsx::assembler::MakeConstantExpr(v->GetValue()));
+                if (v->GetValue() < 0)
+                {
+                    inst->AddOperand(cmsx::assembler::MakeConstantExpr(cmsx::machine::SignExtend(v->GetValue())));
+                }
+                else
+                {
+                    inst->AddOperand(cmsx::assembler::MakeConstantExpr(v->GetValue()));
+                }
                 break;
             }
             case ValueKind::ushortValue:
@@ -309,7 +324,14 @@ cmsx::assembler::Node* MakeRegOperand(Value* value, const Register& r, CodeGener
             case ValueKind::intValue:
             {
                 IntValue* v = static_cast<IntValue*>(value);
-                inst->AddOperand(cmsx::assembler::MakeConstantExpr(v->GetValue()));
+                if (v->GetValue() < 0)
+                {
+                    inst->AddOperand(cmsx::assembler::MakeConstantExpr(cmsx::machine::SignExtend(v->GetValue())));
+                }
+                else
+                {
+                    inst->AddOperand(cmsx::assembler::MakeConstantExpr(v->GetValue()));
+                }
                 break;
             }
             case ValueKind::uintValue:
@@ -321,7 +343,14 @@ cmsx::assembler::Node* MakeRegOperand(Value* value, const Register& r, CodeGener
             case ValueKind::longValue:
             {
                 LongValue* v = static_cast<LongValue*>(value);
-                inst->AddOperand(cmsx::assembler::MakeConstantExpr(v->GetValue()));
+                if (v->GetValue() < 0)
+                {
+                    inst->AddOperand(cmsx::assembler::MakeConstantExpr(cmsx::machine::SignExtend(v->GetValue())));
+                }
+                else
+                {
+                    inst->AddOperand(cmsx::assembler::MakeConstantExpr(v->GetValue()));
+                }
                 break;
             }
             case ValueKind::ulongValue:

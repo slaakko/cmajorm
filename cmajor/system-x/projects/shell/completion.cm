@@ -9,6 +9,13 @@ using System.Os;
 using System.Message;
 using System.IO;
 
+private int debugMode = 0;
+
+void SetDebugCompletionMode()
+{
+	debugMode = GetDebugMode();
+}
+
 void CloseMessageQueue(int msgQ)
 {
 	if (msgQ == -1) 
@@ -27,7 +34,7 @@ void CloseMessageQueue(int msgQ)
 
 void HandleTabCompletionInitReply(int replyMessageId, MemoryReader& reader, int putTabMsgQ, int getTabMsgQ)
 {
-	if ((GetDebugMode() & debugApp) != 0)
+	if ((debugMode & debugShell) != 0)
 	{
 		WriteDebugMessage("> sh.handle.tab.reply." + ToString(replyMessageId));
 	}
@@ -53,7 +60,7 @@ void HandleTabCompletionInitReply(int replyMessageId, MemoryReader& reader, int 
 	{
 		throw SystemError(EFAIL, "sh: tab completion init failed, invalid reply message id " + ToString(replyMessageId) + " received from /bin/tab");
 	}
-	if ((GetDebugMode() & debugApp) != 0)
+	if ((debugMode & debugShell) != 0)
 	{
 		WriteDebugMessage("< sh.handle.tab.reply.");
 	}
@@ -61,7 +68,7 @@ void HandleTabCompletionInitReply(int replyMessageId, MemoryReader& reader, int 
 
 void InitTabCompletion(ShellEnvironment& environment)
 {
-	if ((GetDebugMode() & debugApp) != 0)
+	if ((debugMode & debugShell) != 0)
 	{
 		WriteDebugMessage("> sh.init.tab");
 	}
@@ -81,7 +88,7 @@ void InitTabCompletion(ShellEnvironment& environment)
 	if (GetMsgQLength(getTabMsgQ) > 0)
 	{
 		int replyMessageSize = GetMsgSize(getTabMsgQ);
-		if ((GetDebugMode() & debugApp) != 0)
+		if ((debugMode & debugShell) != 0)
 		{
 			WriteDebugMessage("> sh.init.tab.reply.size=" + ToString(replyMessageSize));
 		}
@@ -94,7 +101,7 @@ void InitTabCompletion(ShellEnvironment& environment)
 			HandleTabCompletionInitReply(replyMessageId, reader, putTabMsgQ, getTabMsgQ);
 		}
 	}
-	if ((GetDebugMode() & debugApp) != 0)
+	if ((debugMode & debugShell) != 0)
 	{
 		WriteDebugMessage("< sh.init.tab");
 	}
@@ -102,9 +109,10 @@ void InitTabCompletion(ShellEnvironment& environment)
 
 void StartTabCompletion(ShellEnvironment& environment)
 {
+	SetDebugCompletionMode();
 	try
 	{
-		if ((GetDebugMode() & debugApp) != 0)
+		if ((debugMode & debugShell) != 0)
 		{
 			WriteDebugMessage("> sh.start.tab");
 		}
@@ -124,7 +132,7 @@ void StartTabCompletion(ShellEnvironment& environment)
 		{
 			InitTabCompletion(environment);
 		}
-		if ((GetDebugMode() & debugApp) != 0)
+		if ((debugMode & debugShell) != 0)
 		{
 			WriteDebugMessage("< sh.start.tab");
 		}

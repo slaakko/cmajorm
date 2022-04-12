@@ -106,7 +106,7 @@ List<Pair<ustring, FileType>> GetMatchingEntries(const List<Pair<ustring, FileTy
 
 void GetWord(const ustring& line, int pos, int& startPos, int& slashPos, ustring& prefix, ustring& word)
 {
-	if ((GetDebugMode() & debugApp) != 0)
+	if ((GetDebugMode() & debugShell) != 0)
 	{
 		WriteDebugMessage("> tab.get.word");
 	}
@@ -135,7 +135,7 @@ void GetWord(const ustring& line, int pos, int& startPos, int& slashPos, ustring
 	{
 		word = text;
 	}
-	if ((GetDebugMode() & debugApp) != 0)
+	if ((GetDebugMode() & debugShell) != 0)
 	{
 		WriteDebugMessage("< tab.get.word: prefix='" + ToUtf8(prefix) + "'.word=" + ToUtf8(word));
 	}
@@ -189,7 +189,7 @@ bool CompletePath(const string& cwd, const string& line, int pos, List<Pair<stri
 				dir = Path.Combine(dir, ToUtf8(prefix));
 			}
 		}
-		if ((GetDebugMode() & debugApp) != 0)
+		if ((GetDebugMode() & debugShell) != 0)
 		{
 			WriteDebugMessage("> tab.complete.path: dir=" + dir);
 		}
@@ -236,7 +236,7 @@ bool ProcessMessage(int putTabMsgQ, int getTabMsgQ, Context& context)
 {
 	try
 	{
-		if ((GetDebugMode() & debugApp) != 0)
+		if ((GetDebugMode() & debugShell) != 0)
 		{
 			WriteDebugMessage("> tab.process.message");
 		}
@@ -262,7 +262,7 @@ bool ProcessMessage(int putTabMsgQ, int getTabMsgQ, Context& context)
 			}
 			else if (messageId == tabCompletionExitMessageId)
 			{
-				if ((GetDebugMode() & debugApp) != 0)
+				if ((GetDebugMode() & debugShell) != 0)
 				{
 					WriteDebugMessage("tab.process.message.exit");
 				}
@@ -315,7 +315,7 @@ bool ProcessMessage(int putTabMsgQ, int getTabMsgQ, Context& context)
 				throw Exception("tab: unknown message id received");
 			}
 		}
-		if ((GetDebugMode() & debugApp) != 0)
+		if ((GetDebugMode() & debugShell) != 0)
 		{
 			WriteDebugMessage("< tab.process.message");
 		}
@@ -368,7 +368,7 @@ int main(int argc, const char** argv)
 		}
 		putTabMsgQ = MsgQ(putTabMsgQName.Chars());
 		getTabMsgQ = MsgQ(getTabMsgQName.Chars());
-		if ((GetDebugMode() & debugApp) != 0)
+		if ((GetDebugMode() & debugShell) != 0)
 		{
 			WriteDebugMessage("> tab.main");
 		}
@@ -386,7 +386,7 @@ int main(int argc, const char** argv)
 		}
 		CloseMessageQueue(getTabMsgQ);
 		CloseMessageQueue(putTabMsgQ);
-		if ((GetDebugMode() & debugApp) != 0)
+		if ((GetDebugMode() & debugShell) != 0)
 		{
 			WriteDebugMessage("< tab.main");
 		}
