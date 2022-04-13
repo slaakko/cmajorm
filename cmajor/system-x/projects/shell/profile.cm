@@ -15,9 +15,9 @@ void MakeDefaultProfile(ShellEnvironment& environment)
 	if (!File.Exists(profileFilePath))
 	{
 		StreamWriter writer = File.CreateText(profileFilePath);
-		writer.WriteLine("PATH=$PATH:~/projects/bin");
 		writer.WriteLine("SX_SOURCE_ROOT=~/projects");
 		writer.WriteLine("SX_TARGET_ROOT=/mnt/sx/projects");
+		writer.WriteLine("PATH=$PATH:$SX_SOURCE_ROOT/bin");
 		writer.WriteLine("umask 022");
 	}
 	ChMod(profileFilePath.Chars(), cast<int>(ParseOctal("644")));

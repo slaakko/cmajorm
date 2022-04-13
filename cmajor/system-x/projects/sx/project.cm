@@ -1,0 +1,177 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+enum Target
+{
+    none, program, winguiapp, winapp, library, winlib, unitTest
+}
+
+class Project
+{
+    public nothrow Project(const ustring& name_, const string& projectFilePath_, const string& projectDir_) : name(name_), projectFilePath(projectFilePath_), projectDir(projectDir_)
+    {
+    }
+    public nothrow const ustring& Name() const
+    {
+        return name;
+    }
+    public nothrow const string& ProjectFilePath() const
+    {
+        return projectFilePath;
+    }
+    public nothrow const string& ProjectDir() const
+    {
+        return projectDir;
+    }
+	public nothrow Target GetTarget() const 
+	{
+		return target;
+	}
+	public const List<string>& SourceFiles() const
+	{
+		return sourceFiles;
+	}
+	public const List<string>& ResourceFiles() const
+	{
+		return resourceFiles;
+	}
+	public const List<string>& TextFiles() const
+	{
+		return textFiles;
+	}
+	public const List<string>& ActionFiles() const
+	{
+		return actionFiles;
+	}
+    public void AddSourceFile(const string& filePath)
+    {
+        CheckProjectFileAbsolutePath(projectFilePath, filePath);
+		sourceFiles.Add(filePath);
+    }
+    public void AddResourceFile(const string& filePath)
+    {
+        CheckProjectFileAbsolutePath(projectFilePath, filePath);
+		resourceFiles.Add(filePath);
+    }
+    public void AddTextFile(const string& filePath)
+    {
+        CheckProjectFileAbsolutePath(projectFilePath, filePath);
+		textFiles.Add(filePath);
+    }
+    public void AddActionFile(const string& filePath)
+    {
+        CheckProjectFileAbsolutePath(projectFilePath, filePath);
+		actionFiles.Add(filePath);
+    }
+    public void SetTarget(Target target_)
+    {
+		if (target != Target.none)
+		{
+			throw Exception("target already specified in project file '" + projectFilePath + "'");
+		}
+		target = target_;
+    }
+    private ustring name;
+    private string projectFilePath;
+    private string projectDir;
+	private List<string> sourceFiles;
+	private List<string> resourceFiles;
+	private List<string> textFiles;
+	private List<string> actionFiles;
+	private Target target;
+	private int x;
+}
+
+void CheckProjectFileAbsolutePath(const string& projectFilePath, const string& path)
+{
+	if (Path.IsAbsolute(path))
+	{
+		throw Exception("error: absolute paths not supported in System X remote project files: project file '" + projectFilePath + "' has an absolute path '" + path + "'");
+	}
+}
+
+void CheckEnvVars()
+{
+	if (!HasEnv("SX_SOURCE_ROOT"))
+	{
+		throw Exception("SX_SOURCE_ROOT environment variable not found. Please set it to contain source System X project root file system path (for example '/home/user/projects').");
+	}
+	string sourceRootDir = GetEnv("SX_SOURCE_ROOT");
+	if (sourceRootDir.IsEmpty())
+	{
+		throw Exception("Value of SX_SOURCE_ROOT environment variable is empty. Please set it to contain source System X project root file system path (for example '/home/user/projects').");
+	}
+	if (!HasEnv("SX_TARGET_ROOT"))
+	{
+		throw Exception("SX_TARGET_ROOT environment variable not found. Please set it to contain target System X project host file system path (for example '/mnt/sx/projects').");
+	}
+	string targetRootDir = GetEnv("SX_TARGET_ROOT");
+	if (targetRootDir.IsEmpty())
+	{
+		throw Exception("Value of SX_TARGET_ROOT environment variable is empty. Please set it to contain target System X project host file system path (for example '/mnt/sx/projects').");
+	}
+}
+
+void CopyFile(const string& sourceFilePath, const string& targetFilePath)
+{
+	if (!File.Exists(sourceFilePath))
+	{
+		throw Exception("could not copy: source file path '" + sourceFilePath + "' does not exist");
+	}
+	string targetDir = Path.GetDirectoryName(targetFilePath);
+	if (!Directory.Exists(targetDir))
+	{
+		Console.Out() << "creating target directory '" << targetDir << "'..." << endl();
+		CreateDirectories(targetDir);
+	}
+	File.Copy(sourceFilePath, targetFilePath, cast<FileCopyOptions>(FileCopyOptions.update | FileCopyOptions.verbose));
+}
+
+void PutProject(Project* project)
+{
+	CheckEnvVars();
+	string sourceRootDir = GetEnv("SX_SOURCE_ROOT");
+	string targetRootDir = GetEnv("SX_TARGET_ROOT");
+	Console.Out() << "put project '" << project->Name() << "' from '" << sourceRootDir << "' to '" << targetRootDir << "'..." << endl();
+/*	
+	if (!project->ProjectDir().StartsWith(sourceRootDir))
+	{
+		throw Exception("project directory '" + project->ProjectDir() + "' not under source root directory SX_SOURCE_ROOT ('" + sourceRootDir + "'). " + 
+			"Please move the project under SX_SOURCE_ROOT ('" + sourceRootDir + "') or change the SX_SOURCE_ROOT environment variable in " + GetEnv("HOME") + "/.profile");
+	}
+	string projectFileName = Path.GetFileName(project->ProjectFilePath());
+	string prefix = project->ProjectDir().Substring(0, sourceRootDir.Length());
+	string targetProjectDir = Path.Combine(targetRootDir, prefix);
+	CopyFile(project->ProjectFilePath(), Path.Combine(targetProjectDir, projectFileName));
+	for (const string& sourceFile : project->SourceFiles())
+	{
+		string sourceFilePath = Path.Combine(project->ProjectDir(), sourceFile);
+		string targetFilePath = Path.Combine(targetProjectDir, sourceFile);
+		CopyFile(sourceFilePath, targetFilePath);
+	}
+	for (const string& resourceFile : project->ResourceFiles())
+	{
+		string sourceFilePath = Path.Combine(project->ProjectDir(), resourceFile);
+		string targetFilePath = Path.Combine(targetProjectDir, resourceFile);
+		CopyFile(sourceFilePath, targetFilePath);
+	}
+	for (const string& textFile : project->TextFiles())
+	{
+		string sourceFilePath = Path.Combine(project->ProjectDir(), textFile);
+		string targetFilePath = Path.Combine(targetProjectDir, textFile);
+		CopyFile(sourceFilePath, targetFilePath);
+	}
+	for (const string& actionFile : project->ActionFiles())
+	{
+		string sourceFilePath = Path.Combine(project->ProjectDir(), actionFile);
+		string targetFilePath = Path.Combine(targetProjectDir, actionFile);
+		CopyFile(sourceFilePath, targetFilePath);
+	}
+	Console.Out() << "project put succeeded" << endl();
+*/
+}

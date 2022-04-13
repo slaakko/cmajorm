@@ -1,24 +1,36 @@
 using System;
 
-const int FOO = -2;
+class Foo
+{
+	public nothrow Foo() : name("foo")
+	{
+	}
+	public const string& Name() const
+	{
+		return name;
+	}
+	private string name;
+}
+
+Foo* GetFoo()
+{
+	UniquePtr<Foo> foo;
+	foo.Reset(new Foo());
+	Foo* f = foo.Release();
+	return f;
+}
+
+Foo* GetFooBug()
+{
+	UniquePtr<Foo> foo;
+	foo.Reset(new Foo());
+	return foo.Release();
+}
 
 void main()
 {
-	int x = -2;
-	if (x == -2)
-	{
-		Console.Out() << x << " == " << -2 << endl();
-	}
-	else 
-	{
-		Console.Out() << x << " != " << FOO << endl();
-	}	
-	if (x == FOO)
-	{
-		Console.Out() << x << " == " << FOO << endl();
-	}
-	else 
-	{
-		Console.Out() << x << " != " << FOO << endl();
-	}	
+	UniquePtr<Foo> fooBug(GetFooBug());
+	Console.Out() << fooBug->Name() << endl();
+	UniquePtr<Foo> foo(GetFoo());
+	Console.Out() << foo->Name() << endl();
 }

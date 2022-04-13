@@ -1189,7 +1189,7 @@ void EmitPtrOffset(PtrOffsetInstruction& inst, CodeGenerator& codeGen)
     }
     else
     {
-        setInst->AddOperand(cmsx::assembler::MakeConstantExpr(offsetFactor));
+        setInst->AddOperand(cmsx::assembler::MakeConstantExpr(cmsx::machine::SignExtend(offsetFactor)));
     }
     codeGen.Emit(setInst);
     int machineMulInst = cmsx::machine::MUL;

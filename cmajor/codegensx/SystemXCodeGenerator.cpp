@@ -385,7 +385,6 @@ void SystemXCodeGenerator::Visit(BoundReturnStatement& boundReturnStatement)
     BoundFunctionCall* returnFunctionCall = boundReturnStatement.ReturnFunctionCall();
     if (returnFunctionCall)
     {
-        ExitBlocks(nullptr);
         boundReturnStatement.ReturnFunctionCall()->Accept(*this);
         void* returnValue = emitter->Stack().Pop();
         if (sequenceSecond)
@@ -393,6 +392,7 @@ void SystemXCodeGenerator::Visit(BoundReturnStatement& boundReturnStatement)
             sequenceSecond->SetGenerated();
             sequenceSecond->Accept(*this);
         }
+        ExitBlocks(nullptr);
         emitter->CreateRet(returnValue);
         lastInstructionWasRet = true;
     }

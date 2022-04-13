@@ -20,53 +20,6 @@ inline bool ProjectFileParserDebug()
 	return (projectFileParserDebug & debugApp) != 0;
 }
 
-enum Target
-{
-    none, program, winguiapp, winapp, library, winlib, unitTest
-}
-
-class Project
-{
-    public nothrow Project(const ustring& name_, const string& projectFilePath_, const string& projectDir_) : name(name_), projectFilePath(projectFilePath_), projectDir(projectDir_)
-    {
-    }
-    public nothrow const ustring& Name() const
-    {
-        return name;
-    }
-    public nothrow const string& ProjectFilePath() const
-    {
-        return projectFilePath;
-    }
-    public nothrow const string& ProjectDir() const
-    {
-        return projectDir;
-    }
-    public void AddSourceFile(const string& filePath)
-    {
-        // todo
-    }
-    public void AddResourceFile(const string& filePath)
-    {
-        // todo
-    }
-    public void AddTextFile(const string& filePath)
-    {
-        // todo
-    }
-    public void AddActionFile(const string& filePath)
-    {
-        // todo
-    }
-    public void SetTarget(Target target_)
-    {
-        // todo
-    }
-    private ustring name;
-    private string projectFilePath;
-    private string projectDir;
-}
-
 Project* ParseProjectFile(const string& projectFilePath)
 {
 	SetProjectFileParserDebug();
@@ -132,7 +85,10 @@ bool ParseQualifiedId(container_file_lexer& lexer, ustring& qualifiedId)
     {
 		long pos = lexer.GetPos();
 		ustring id = lexer.GetToken(pos).match.ToString();
-		WriteDebugMessage("> sx.parse.qualified.id.id=" + ToUtf8(id));
+		if (ProjectFileParserDebug())
+		{
+			WriteDebugMessage("> sx.parse.qualified.id.id=" + ToUtf8(id));
+		}
         qualifiedId.Append(id);
 		++lexer;
         if (*lexer == DOT)
