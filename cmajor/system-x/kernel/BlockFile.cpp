@@ -127,6 +127,7 @@ int64_t BlockFile::Write(const std::vector<uint8_t>& buffer, cmsx::machine::Proc
         if (filePos > inode->FileSize())
         {
             inode->SetFileSize(filePos);
+            inode->SetInternalFileSize(filePos);
             inode->SetCTime(GetCurrentDateTime());
             WriteINode(inode, process);
         }

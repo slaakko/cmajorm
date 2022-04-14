@@ -1,0 +1,158 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+using System.Os;
+using System.Security;
+
+void InstallUser(const string& userName, int& uid, string& shell, string& home)
+{
+    Users users = GetUsers();
+    uid = users.GetFreeUserId();
+    home = Path.Combine("/home", userName);
+    shell = "/bin/sh";
+    int gid = 0;
+    User newUser(userName, false, uid, gid, userName, home, shell);
+    users.AddUser(newUser);
+    WriteUsers(users);
+    Groups groups = GetGroups();
+    Group* adminGroup = groups.GetGroup(0);
+    if (adminGroup == null)
+    {
+        List<string> users;
+        users.Add("root");
+        users.Add(userName);
+        Group rootGroup("root", 0, users);
+        groups.AddGroup(rootGroup);
+    }
+    else
+    {
+        adminGroup->AddUser(userName);
+    }
+    WriteGroups(groups);
+}
+
+void MakeUserDirs(ShellEnvironment& environment)
+{
+	string projectsDir = GetFullPath(Path.Combine(environment.Home(), "projects"));
+	CreateDirectories(projectsDir);
+	ChMod(projectsDir.Chars(), cast<int>(ParseOctal("755")));
+}
+
+void CopyBin()
+{
+    if (!Directory.Exists("/bin"))
+    {
+        MkDir("/bin", MakeMode(cast<Access>(Access.read | Access.write | Access.execute), cast<Access>(Access.read | Access.execute), cast<Access>(Access.read | Access.execute)));
+    }
+    List<string> args;
+    args.Add("-vu");
+    args.Add("/mnt/sx/bin/*.x");
+    args.Add("/bin");
+    Exec("/mnt/sx/bin/cp", args);
+}
+
+void ChBinMode()
+{
+    ChMod("/bin/chmod.x",
+        MakeMode(cast<Access>(Access.read | Access.write | Access.execute), cast<Access>(Access.read | Access.execute), cast<Access>(Access.read | Access.execute)));
+    List<string> args;
+    args.Add("755");
+    args.Add("/bin/*.x");
+    Exec("/bin/chmod", args);
+}
+
+void ChTrustedMode()
+{
+    ChMod("/bin/passwd.x", cast<int>(ParseOctal("4755")));
+    ChMod("/bin/passwdd.x", cast<int>(ParseOctal("4755")));
+    ChMod("/bin/sudo.x", cast<int>(ParseOctal("4755")));
+    ChMod("/bin/sudod.x", cast<int>(ParseOctal("4755")));
+}
+
+void Install()
+{
+    Terminal.Out() << "initializing..." << endl();
+    int pid = Fork();
+    if (pid == 0)
+    {
+        CopyBin();
+    }
+    else
+    {
+        byte exitCode = 0u;
+        Wait(&exitCode);
+        if (exitCode != 0u)
+        {
+            throw Exception("shell installation failed: child returned exit code " + ToString(exitCode));
+        }
+        int pid = Fork();
+        if (pid == 0)
+        {
+            ChBinMode();
+        }
+        else
+        {
+            byte exitCode = 0u;
+            Wait(&exitCode);
+            if (exitCode != 0u)
+            {
+                throw Exception("shell installation failed: child returned exit code " + ToString(exitCode));
+            }
+            ChTrustedMode();
+            string userName = GetUserName();
+            if (!Directory.Exists("/etc")) 
+            {
+                MkDir("/etc", MakeMode(cast<Access>(Access.read | Access.write | Access.execute), cast<Access>(Access.read | Access.execute), cast<Access>(Access.read | Access.execute)));
+            }
+            if (!File.Exists("/etc/passwd"))
+            {
+                StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/passwd", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), 
+                    MakeMode(cast<Access>(Access.read | Access.write), Access.read, Access.read))));
+                // username:has_pwd:uid:gid:info:home:shell
+                writer.WriteLine("root::0:0:root:/:/bin/sh");
+                writer.WriteLine(userName + "::1:0:" + userName + ":/home/" + userName + ":/bin/sh");
+            }
+            if (!File.Exists("/etc/passwd_hash"))
+            {
+                StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/passwd_hash", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), 
+                    MakeMode(cast<Access>(Access.read | Access.write), Access.none, Access.none))));
+                // uid:hash
+            }
+            if (!File.Exists("/etc/sudoers"))
+            {
+                StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/sudoers", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), 
+                    MakeMode(cast<Access>(Access.read | Access.write), Access.none, Access.none))));
+                // username
+                writer.WriteLine(userName);
+            }
+            if (!File.Exists("/etc/group"))
+            {
+                StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/group", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate),
+                    MakeMode(cast<Access>(Access.read | Access.write), Access.read, Access.read))));
+                // groupname:gid:usercsv
+                writer.WriteLine("root:0:root," + userName);
+            }
+            if (!File.Exists("/etc/environment"))
+            {
+                StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/environment", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate),
+                    MakeMode(cast<Access>(Access.read | Access.write), Access.read, Access.read))));
+                writer.WriteLine("PATH=\"/bin\"");
+            }
+            if (!Directory.Exists("/home"))
+            {
+                MkDir("/home", MakeMode(cast<Access>(Access.read | Access.write | Access.execute), cast<Access>(Access.read | Access.execute), cast<Access>(Access.read | Access.execute)));
+            }
+            if (!Directory.Exists("/home/" + userName))
+            {
+                string homeDir = "/home/" + userName;
+                MkDir(homeDir.Chars(), MakeMode(cast<Access>(Access.read | Access.write | Access.execute), cast<Access>(Access.read | Access.execute), Access.none));
+                ChOwn(homeDir.Chars(), 1, 0);
+            }
+        }
+    }
+}

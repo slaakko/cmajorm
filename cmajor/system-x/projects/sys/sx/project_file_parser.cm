@@ -1,0 +1,440 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+using System.Lex;
+using container_file_tokens;
+
+Project* ParseProjectFile(const string& projectFilePath)
+{
+	SetParserDebug();
+	if (ParserDebug())
+	{
+		WriteDebugMessage("> sx.parse.project.file");
+	}
+    string fullProjectFilePath = GetFullPath(projectFilePath);
+    string projectDir = Path.GetDirectoryName(fullProjectFilePath);
+    ustring projectFileContent = ToUtf32(File.ReadAllText(fullProjectFilePath));
+    container_file_lexer lexer(projectFileContent.Chars(), projectFileContent.Chars() + projectFileContent.Length(), projectFilePath, 0);
+	lexer.BeginDebug();
+    lexer.SetFlag(LexerFlags.farthestError);
+    ++lexer;
+    if (*lexer == PROJECT)
+    {
+        ++lexer;
+        ustring projectName;
+        if (ParseQualifiedId(lexer, projectName))
+        {
+            if (*lexer == SEMICOLON)
+            {
+                ++lexer;
+                UniquePtr<Project> project(new Project(projectName, fullProjectFilePath, projectDir));
+                while (true)
+                {
+                    if (!ParseProjectFileDeclaration(lexer, project.Get()))
+                    {
+                        if (*lexer == END)
+                        {
+							if (ParserDebug())
+							{
+								WriteDebugMessage("< sx.parse.project.file.true");
+							}
+                            return project.Release();
+                        }
+                    }
+                }
+            }
+        }
+    }
+	if (ParserDebug())
+	{
+		WriteDebugMessage("< sx.parse.project.file.false");
+	}
+	lexer.EndDebug();
+	lexer.ThrowFarthestError();
+	return null;
+}
+
+bool ParseQualifiedId(container_file_lexer& lexer, ustring& qualifiedId)
+{
+	if (ParserDebug())
+	{
+		WriteDebugMessage("> sx.parse.qualified.id");
+	}
+    qualifiedId.Clear();
+	if (ParserDebug())
+	{
+		WriteDebugMessage("> sx.parse.qualified.id.token=" + ToString(*lexer));
+	}
+    while (*lexer == ID)
+    {
+		long pos = lexer.GetPos();
+		ustring id = lexer.GetToken(pos).match.ToString();
+		if (ParserDebug())
+		{
+			WriteDebugMessage("> sx.parse.qualified.id.id=" + ToUtf8(id));
+		}
+        qualifiedId.Append(id);
+		++lexer;
+        if (*lexer == DOT)
+        {
+            qualifiedId.Append('.');
+            ++lexer;
+        }
+    }
+	if (!qualifiedId.IsEmpty())
+	{
+		if (ParserDebug())
+		{
+			WriteDebugMessage("< sx.parse.qualified.id.true");
+		}
+		return true;
+	}
+	else
+	{
+		if (ParserDebug())
+		{
+			WriteDebugMessage("< sx.parse.qualified.id.false");
+		}
+		return false;
+	}
+}
+
+bool ParseProjectFileDeclaration(container_file_lexer& lexer, Project* project)
+{
+	if (ParserDebug())
+	{
+		WriteDebugMessage("> sx.parse.project.file.declaration");
+	}
+    if (ParseReferenceDeclaration(lexer, project))
+    {
+		if (ParserDebug())
+		{
+			WriteDebugMessage("< sx.parse.project.file.declaration.true");
+		}
+        return true;
+    }
+    if (ParseSourceFileDeclaration(lexer, project))
+    {
+		if (ParserDebug())
+		{
+			WriteDebugMessage("< sx.parse.project.file.declaration.true");
+		}
+        return true;
+    }
+    if (ParseResourceFileDeclaration(lexer, project))
+    {
+		if (ParserDebug())
+		{
+			WriteDebugMessage("< sx.parse.project.file.declaration.true");
+		}
+        return true;
+    }
+    if (ParseTextFileDeclaration(lexer, project))
+    {
+		if (ParserDebug())
+		{
+			WriteDebugMessage("< sx.parse.project.file.declaration.true");
+		}
+        return true;
+    }
+    if (ParseActionFileDeclaration(lexer, project))
+    {
+		if (ParserDebug())
+		{
+			WriteDebugMessage("< sx.parse.project.file.declaration.true");
+		}
+        return true;
+    }
+    if (ParseTargetDeclaration(lexer, project))
+    {
+		if (ParserDebug())
+		{
+			WriteDebugMessage("< sx.parse.project.file.declaration.true");
+		}
+        return true;
+    }
+	if (ParserDebug())
+	{
+		WriteDebugMessage("< sx.parse.project.file.declaration.false");
+	}
+    return false;
+}
+
+bool ParseReferenceDeclaration(container_file_lexer& lexer, Project* project)
+{
+	if (ParserDebug())
+	{
+		WriteDebugMessage("> sx.parse.reference.declaration");
+	}
+    long save = lexer.GetPos();
+    if (*lexer == REFERENCE)
+    {
+        ++lexer;
+        if (*lexer == FILEPATH)
+        {
+            ++lexer;
+            if (*lexer == SEMICOLON)
+            {
+                ++lexer;
+				if (ParserDebug())
+				{
+					WriteDebugMessage("< sx.parse.reference.declaration.true");
+				}
+                return true;
+            }
+        }
+    }
+	if (ParserDebug())
+	{
+		WriteDebugMessage("< sx.parse.reference.declaration.false");
+	}
+    lexer.SetPos(save);
+    return false;
+}
+
+bool ParseSourceFileDeclaration(container_file_lexer& lexer, Project* project)
+{
+	if (ParserDebug())
+	{
+		WriteDebugMessage("> sx.parse.source.file.declaration");
+	}
+    long save = lexer.GetPos();
+    if (*lexer == SOURCE)
+    {
+        ++lexer;
+        if (*lexer == FILEPATH)
+        {
+            string filePath = lexer.filePath;
+            ++lexer;
+            if (*lexer == SEMICOLON)
+            {
+                ++lexer;
+                project->AddSourceFile(filePath);
+				if (ParserDebug())
+				{
+					WriteDebugMessage("< sx.parse.source.file.declaration.true");
+				}
+                return true;
+            }
+        }
+    }
+	if (ParserDebug())
+	{
+		WriteDebugMessage("< sx.parse.source.file.declaration.false");
+	}
+    lexer.SetPos(save);
+    return false;
+}
+
+bool ParseResourceFileDeclaration(container_file_lexer& lexer, Project* project)
+{
+	if (ParserDebug())
+	{
+		WriteDebugMessage("> sx.parse.resource.file.declaration");
+	}
+    long save = lexer.GetPos();
+    if (*lexer == RESOURCE)
+    {
+        ++lexer;
+        if (*lexer == FILEPATH)
+        {
+            string filePath = lexer.filePath;
+            ++lexer;
+            if (*lexer == SEMICOLON)
+            {
+                ++lexer;
+                project->AddResourceFile(filePath);
+				if (ParserDebug())
+				{
+					WriteDebugMessage("< sx.parse.resource.file.declaration.true");
+				}
+                return true;
+            }
+        }
+    }
+	if (ParserDebug())
+	{
+		WriteDebugMessage("< sx.parse.resource.file.declaration.false");
+	}
+    lexer.SetPos(save);
+    return false;
+}
+
+bool ParseTextFileDeclaration(container_file_lexer& lexer, Project* project)
+{
+	if (ParserDebug())
+	{
+		WriteDebugMessage("> sx.parse.text.file.declaration");
+	}
+    long save = lexer.GetPos();
+    if (*lexer == TEXT)
+    {
+        ++lexer;
+        if (*lexer == FILEPATH)
+        {
+            string filePath = lexer.filePath;
+            ++lexer;
+            if (*lexer == SEMICOLON)
+            {
+                ++lexer;
+                project->AddTextFile(filePath);
+				if (ParserDebug())
+				{
+					WriteDebugMessage("< sx.parse.text.file.declaration.true");
+				}
+                return true;
+            }
+        }
+    }
+	if (ParserDebug())
+	{
+		WriteDebugMessage("< sx.parse.text.file.declaration.false");
+	}
+    lexer.SetPos(save);
+    return false;
+}
+
+bool ParseActionFileDeclaration(container_file_lexer& lexer, Project* project)
+{
+	if (ParserDebug())
+	{
+		WriteDebugMessage("> sx.parse.action.file.declaration");
+	}
+    long save = lexer.GetPos();
+    if (*lexer == ACTION)
+    {
+        ++lexer;
+        if (*lexer == FILEPATH)
+        {
+            string filePath = lexer.filePath;
+            ++lexer;
+            if (*lexer == SEMICOLON)
+            {
+                ++lexer;
+                project->AddActionFile(filePath);
+				if (ParserDebug())
+				{
+					WriteDebugMessage("< sx.parse.action.file.declaration.true");
+				}
+                return true;
+            }
+        }
+    }
+	if (ParserDebug())
+	{
+		WriteDebugMessage("< sx.parse.action.file.declaration.false");
+	}
+    lexer.SetPos(save);
+    return false;
+}
+
+bool ParseTargetDeclaration(container_file_lexer& lexer, Project* project)
+{
+	if (ParserDebug())
+	{
+		WriteDebugMessage("> sx.parse.target.declaration");
+	}
+	long save = lexer.GetPos();
+    if (*lexer == TARGET)
+    {
+        ++lexer;
+        if (*lexer == ASSIGN)
+        {
+            ++lexer;
+            Target target = ParseTarget(lexer);
+            if (target != Target.none)
+            {
+                if (*lexer == SEMICOLON)
+                {
+                    ++lexer;
+                    project->SetTarget(target);
+					if (ParserDebug())
+					{
+						WriteDebugMessage("< sx.parse.target.declaration.true");
+					}
+                    return true;
+                }
+            }
+        }
+    }
+	if (ParserDebug())
+	{
+		WriteDebugMessage("< sx.parse.target.declaration.false");
+	}
+    lexer.SetPos(save);
+    return false;
+}
+
+Target ParseTarget(container_file_lexer& lexer)
+{
+	if (ParserDebug())
+	{
+		WriteDebugMessage("> sx.parse.target");
+	}
+    switch (*lexer)
+    {
+        case PROGRAM:
+        {
+            ++lexer;
+			if (ParserDebug())
+			{
+				WriteDebugMessage("< sx.parse.target.program.true");
+			}
+            return Target.program;
+        }
+        case WINGUIAPP:
+        {
+            ++lexer;
+			if (ParserDebug())
+			{
+				WriteDebugMessage("< sx.parse.target.winguiapp.true");
+			}
+            return Target.winguiapp;
+        }
+        case WINAPP:
+        {
+            ++lexer;
+			if (ParserDebug())
+			{
+				WriteDebugMessage("< sx.parse.target.winapp.true");
+			}
+            return Target.winapp;
+        }
+        case LIBRARY:
+        {
+            ++lexer;
+			if (ParserDebug())
+			{
+				WriteDebugMessage("< sx.parse.target.library.true");
+			}
+            return Target.library;
+        }
+        case WINLIB:
+        {
+            ++lexer;
+			if (ParserDebug())
+			{
+				WriteDebugMessage("< sx.parse.target.winlib.true");
+			}
+            return Target.winlib;
+        }
+        case UNITTEST:
+        {
+            ++lexer;
+			if (ParserDebug())
+			{
+				WriteDebugMessage("< sx.parse.target.unitTest.true");
+			}
+            return Target.unitTest;
+        }        
+    }
+	if (ParserDebug())
+	{
+		WriteDebugMessage("< sx.parse.target.false");
+	}
+    return Target.none;
+}

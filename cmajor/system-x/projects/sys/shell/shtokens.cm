@@ -1,0 +1,268 @@
+using System;
+
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/system-x/projects/sys/shell/shlexer.lexer' using soulcm lexer generator scmlg version 4.0.0
+
+namespace shtokens
+{
+    public const int END = 0;
+
+    public const int QUOTED_CHAR = 1;
+
+    public const int SINGLE_QUOTED = 2;
+
+    public const int DOUBLE_QUOTED = 3;
+
+    public const int CASE = 4;
+
+    public const int DO = 5;
+
+    public const int DONE = 6;
+
+    public const int ELIF = 7;
+
+    public const int ELSE = 8;
+
+    public const int ESAC = 9;
+
+    public const int FI = 10;
+
+    public const int FOR = 11;
+
+    public const int IF = 12;
+
+    public const int IN = 13;
+
+    public const int THEN = 14;
+
+    public const int UNTIL = 15;
+
+    public const int WHILE = 16;
+
+    public const int TIME = 17;
+
+    public const int AND_IF = 18;
+
+    public const int OR_IF = 19;
+
+    public const int DSEMI = 20;
+
+    public const int DLESSDASH = 21;
+
+    public const int DLESS = 22;
+
+    public const int DGREAT = 23;
+
+    public const int LBRACE = 24;
+
+    public const int RBRACE = 25;
+
+    public const int BANG = 26;
+
+    public const int PIPE = 27;
+
+    public const int LPAREN = 28;
+
+    public const int RPAREN = 29;
+
+    public const int LESSAND = 30;
+
+    public const int GREATAND = 31;
+
+    public const int LESSGREAT = 32;
+
+    public const int CLOBBER = 33;
+
+    public const int LESS = 34;
+
+    public const int GREAT = 35;
+
+    public const int AMP = 36;
+
+    public const int SEMI = 37;
+
+    public const int BACKQUOTE = 38;
+
+    public const int TOKEN = 39;
+
+    public const int WORD = 40;
+
+    public const int SPACE = 41;
+
+    internal class TokenMap
+    {
+        static TokenMap() :
+            instance(new TokenMap())
+        {
+        }
+        public static TokenMap& Instance()
+        {
+            return *instance;
+        }
+        public int GetTokenId(const ustring& tokenName)
+        {
+            System.Collections.Map<ustring, int>.ConstIterator it = tokenIdMap.CFind(tokenName);
+            if (it != tokenIdMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        public ustring GetTokenName(int tokenId)
+        {
+            return tokenNameList[tokenId];
+        }
+        public ustring GetTokenInfo(int tokenId)
+        {
+            return tokenInfoList[tokenId];
+        }
+        private TokenMap()
+        {
+            tokenIdMap[u"AMP"] = 36;
+            tokenIdMap[u"AND_IF"] = 18;
+            tokenIdMap[u"BACKQUOTE"] = 38;
+            tokenIdMap[u"BANG"] = 26;
+            tokenIdMap[u"CASE"] = 4;
+            tokenIdMap[u"CLOBBER"] = 33;
+            tokenIdMap[u"DGREAT"] = 23;
+            tokenIdMap[u"DLESS"] = 22;
+            tokenIdMap[u"DLESSDASH"] = 21;
+            tokenIdMap[u"DO"] = 5;
+            tokenIdMap[u"DONE"] = 6;
+            tokenIdMap[u"DOUBLE_QUOTED"] = 3;
+            tokenIdMap[u"DSEMI"] = 20;
+            tokenIdMap[u"ELIF"] = 7;
+            tokenIdMap[u"ELSE"] = 8;
+            tokenIdMap[u"ESAC"] = 9;
+            tokenIdMap[u"FI"] = 10;
+            tokenIdMap[u"FOR"] = 11;
+            tokenIdMap[u"GREAT"] = 35;
+            tokenIdMap[u"GREATAND"] = 31;
+            tokenIdMap[u"IF"] = 12;
+            tokenIdMap[u"IN"] = 13;
+            tokenIdMap[u"LBRACE"] = 24;
+            tokenIdMap[u"LESS"] = 34;
+            tokenIdMap[u"LESSAND"] = 30;
+            tokenIdMap[u"LESSGREAT"] = 32;
+            tokenIdMap[u"LPAREN"] = 28;
+            tokenIdMap[u"OR_IF"] = 19;
+            tokenIdMap[u"PIPE"] = 27;
+            tokenIdMap[u"QUOTED_CHAR"] = 1;
+            tokenIdMap[u"RBRACE"] = 25;
+            tokenIdMap[u"RPAREN"] = 29;
+            tokenIdMap[u"SEMI"] = 37;
+            tokenIdMap[u"SINGLE_QUOTED"] = 2;
+            tokenIdMap[u"SPACE"] = 41;
+            tokenIdMap[u"THEN"] = 14;
+            tokenIdMap[u"TIME"] = 17;
+            tokenIdMap[u"TOKEN"] = 39;
+            tokenIdMap[u"UNTIL"] = 15;
+            tokenIdMap[u"WHILE"] = 16;
+            tokenIdMap[u"WORD"] = 40;
+            tokenNameList.Add(u"END");
+            tokenInfoList.Add(u"end of file");
+            tokenNameList.Add(u"QUOTED_CHAR");
+            tokenInfoList.Add(u"'quoted_char'");
+            tokenNameList.Add(u"SINGLE_QUOTED");
+            tokenInfoList.Add(u"'single_quoted'");
+            tokenNameList.Add(u"DOUBLE_QUOTED");
+            tokenInfoList.Add(u"'double_quoted'");
+            tokenNameList.Add(u"CASE");
+            tokenInfoList.Add(u"'case'");
+            tokenNameList.Add(u"DO");
+            tokenInfoList.Add(u"'do'");
+            tokenNameList.Add(u"DONE");
+            tokenInfoList.Add(u"'done'");
+            tokenNameList.Add(u"ELIF");
+            tokenInfoList.Add(u"'elif'");
+            tokenNameList.Add(u"ELSE");
+            tokenInfoList.Add(u"'else'");
+            tokenNameList.Add(u"ESAC");
+            tokenInfoList.Add(u"'esac'");
+            tokenNameList.Add(u"FI");
+            tokenInfoList.Add(u"'fi'");
+            tokenNameList.Add(u"FOR");
+            tokenInfoList.Add(u"'for'");
+            tokenNameList.Add(u"IF");
+            tokenInfoList.Add(u"'if'");
+            tokenNameList.Add(u"IN");
+            tokenInfoList.Add(u"'in'");
+            tokenNameList.Add(u"THEN");
+            tokenInfoList.Add(u"'then'");
+            tokenNameList.Add(u"UNTIL");
+            tokenInfoList.Add(u"'until'");
+            tokenNameList.Add(u"WHILE");
+            tokenInfoList.Add(u"'while'");
+            tokenNameList.Add(u"TIME");
+            tokenInfoList.Add(u"'time'");
+            tokenNameList.Add(u"AND_IF");
+            tokenInfoList.Add(u"'&&'");
+            tokenNameList.Add(u"OR_IF");
+            tokenInfoList.Add(u"'||'");
+            tokenNameList.Add(u"DSEMI");
+            tokenInfoList.Add(u"';;'");
+            tokenNameList.Add(u"DLESSDASH");
+            tokenInfoList.Add(u"'<<-'");
+            tokenNameList.Add(u"DLESS");
+            tokenInfoList.Add(u"'<<'");
+            tokenNameList.Add(u"DGREAT");
+            tokenInfoList.Add(u"'>>'");
+            tokenNameList.Add(u"LBRACE");
+            tokenInfoList.Add(u"'{'");
+            tokenNameList.Add(u"RBRACE");
+            tokenInfoList.Add(u"'}'");
+            tokenNameList.Add(u"BANG");
+            tokenInfoList.Add(u"'!'");
+            tokenNameList.Add(u"PIPE");
+            tokenInfoList.Add(u"'|'");
+            tokenNameList.Add(u"LPAREN");
+            tokenInfoList.Add(u"'('");
+            tokenNameList.Add(u"RPAREN");
+            tokenInfoList.Add(u"')'");
+            tokenNameList.Add(u"LESSAND");
+            tokenInfoList.Add(u"'<&'");
+            tokenNameList.Add(u"GREATAND");
+            tokenInfoList.Add(u"'>&'");
+            tokenNameList.Add(u"LESSGREAT");
+            tokenInfoList.Add(u"'<>'");
+            tokenNameList.Add(u"CLOBBER");
+            tokenInfoList.Add(u"'>|'");
+            tokenNameList.Add(u"LESS");
+            tokenInfoList.Add(u"'<'");
+            tokenNameList.Add(u"GREAT");
+            tokenInfoList.Add(u"'>'");
+            tokenNameList.Add(u"AMP");
+            tokenInfoList.Add(u"'&'");
+            tokenNameList.Add(u"SEMI");
+            tokenInfoList.Add(u"';'");
+            tokenNameList.Add(u"BACKQUOTE");
+            tokenInfoList.Add(u"'`'");
+            tokenNameList.Add(u"TOKEN");
+            tokenInfoList.Add(u"'token'");
+            tokenNameList.Add(u"WORD");
+            tokenInfoList.Add(u"'word'");
+            tokenNameList.Add(u"SPACE");
+            tokenInfoList.Add(u"' '");
+        }
+        private static System.UniquePtr<TokenMap> instance;
+        private System.Collections.Map<ustring, int> tokenIdMap;
+        private System.Collections.List<ustring> tokenNameList;
+        private System.Collections.List<ustring> tokenInfoList;
+    }
+    public int GetTokenId(const ustring& tokenName)
+    {
+        return TokenMap.Instance().GetTokenId(tokenName);
+    }
+
+    public ustring GetTokenName(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenName(tokenId);
+    }
+
+    public ustring GetTokenInfo(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenInfo(tokenId);
+    }
+} // namespace shtokens

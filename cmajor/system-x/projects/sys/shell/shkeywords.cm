@@ -1,0 +1,60 @@
+using System;
+
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/system-x/projects/sys/shell/shlexer.lexer' using soulcm lexer generator scmlg version 4.0.0
+
+namespace shkeywords
+{
+    internal class Keywords
+    {
+        static Keywords() :
+            instance(new Keywords())
+        {
+        }
+        public static Keywords& Instance()
+        {
+            return *instance;
+        }
+        public System.Lex.KeywordMap* GetKeywordMap()
+        {
+            return keywordMap.Get();
+        }
+        private Keywords()
+        {
+            System.Lex.Keyword keyword0(u"case", shtokens.CASE);
+            keywordList.Add(keyword0);
+            System.Lex.Keyword keyword1(u"do", shtokens.DO);
+            keywordList.Add(keyword1);
+            System.Lex.Keyword keyword2(u"done", shtokens.DONE);
+            keywordList.Add(keyword2);
+            System.Lex.Keyword keyword3(u"elif", shtokens.ELIF);
+            keywordList.Add(keyword3);
+            System.Lex.Keyword keyword4(u"else", shtokens.ELSE);
+            keywordList.Add(keyword4);
+            System.Lex.Keyword keyword5(u"esac", shtokens.ESAC);
+            keywordList.Add(keyword5);
+            System.Lex.Keyword keyword6(u"fi", shtokens.FI);
+            keywordList.Add(keyword6);
+            System.Lex.Keyword keyword7(u"if", shtokens.IF);
+            keywordList.Add(keyword7);
+            System.Lex.Keyword keyword8(u"then", shtokens.THEN);
+            keywordList.Add(keyword8);
+            System.Lex.Keyword keyword9(u"until", shtokens.UNTIL);
+            keywordList.Add(keyword9);
+            System.Lex.Keyword keyword10(u"while", shtokens.WHILE);
+            keywordList.Add(keyword10);
+            System.Lex.Keyword keyword11(u"time", shtokens.TIME);
+            keywordList.Add(keyword11);
+            System.Lex.Keyword nullKeyword(null, -1);
+            keywordList.Add(nullKeyword);
+            keywordMap.Reset(new System.Lex.KeywordMap(keywordList.CBegin().Ptr()));
+        }
+        private static System.UniquePtr<Keywords> instance;
+        private System.Collections.List<System.Lex.Keyword> keywordList;
+        private System.UniquePtr<System.Lex.KeywordMap> keywordMap;
+    }
+
+    public System.Lex.KeywordMap* GetKeywordMap()
+    {
+        return Keywords.Instance().GetKeywordMap();
+    }
+} // namespace shkeywords

@@ -1,0 +1,75 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+abstract class Command
+{
+    public abstract void Execute();
+}
+
+class PutCommand : Command
+{
+    public nothrow PutCommand(const string& path_, bool force_) : path(path_), force(force_)
+    {
+    }
+    public override void Execute()
+    {
+        if (path.EndsWith(".cmp"))
+		{
+			project.Reset(ParseProjectFile(path));
+			PutProject(project.Get(), force);
+		}
+		else if (path.EndsWith(".cms"))
+		{
+			solution.Reset(ParseSolutionFile(path));
+			PutSolution(solution.Get(), force);
+		}
+		else
+		{
+			throw Exception("solution (.cms) or project (.cmp) file expected ('" + path + "')");
+		}
+    }
+	public nothrow Project* GetProject() const
+	{
+		return project.Get();
+	}
+    private string path;
+	private bool force;
+	private UniquePtr<Project> project;
+	private UniquePtr<Solution> solution;
+}
+
+class GetCommand : Command
+{
+    public nothrow GetCommand(const string& path_, bool force_) : path(path_), force(force_)
+    {
+    }
+    public override void Execute()
+    {
+        if (path.EndsWith(".cmp"))
+		{
+			project.Reset(ParseProjectFile(path));
+			GetProject(project.Get(), force);
+		}
+		else if (path.EndsWith(".cms"))
+		{
+			solution.Reset(ParseSolutionFile(path));
+			GetSolution(solution.Get(), force);
+		}
+		else
+		{
+			throw Exception("solution (.cms) or project (.cmp) file expected ('" + path + "')");
+		}
+    }
+	public nothrow Project* GetProject() const
+	{
+		return project.Get();
+	}
+    private string path;
+	private bool force;
+	private UniquePtr<Project> project;
+	private UniquePtr<Solution> solution;
+}

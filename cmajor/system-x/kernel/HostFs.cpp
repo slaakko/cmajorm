@@ -58,8 +58,25 @@ HostFilesystemFile::HostFilesystemFile(HostFilesystem* fs_, int32_t fileId_, con
 void HostFilesystemFile::Close(cmsx::kernel::Process* process)
 {
     INodePtr inode = GetINode(process);
+    int64_t fileSize = inode.Get()->FileSize();
+    int64_t internalFileSize = inode.Get()->InternalFileSize();
+    HostFile* hostFile = GetHostFile(hostFileId);
+    std::string filePath = hostFile->FilePath();
     CloseHostFile(hostFileId);
     fs->Close(fileId, inode.Get(), process);
+    boost::system::error_code ec;
+    if (fileSize != 0 && internalFileSize != 0 && internalFileSize != fileSize)
+    {
+        boost::filesystem::resize_file(filePath, inode.Get()->InternalFileSize(), ec);
+        if (ec)
+        {
+            throw SystemError(EHOST, "could not resize host file system file '" + Name() + "': " + PlatformStringToUtf8(ec.message()), __FUNCTION__);
+        }
+    }
+    if (ec)
+    {
+        throw SystemError(EHOST, "could not get size of host file system file '" + Name() + "': " + PlatformStringToUtf8(ec.message()), __FUNCTION__);
+    }
 }
 
 int32_t HostFilesystemFile::GetBlockNumber(INode* inode, cmsx::machine::Process* process, bool allocate) const

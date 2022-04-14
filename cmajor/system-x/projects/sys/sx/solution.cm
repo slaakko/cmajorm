@@ -1,0 +1,97 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+class Solution
+{
+    public nothrow Solution(const ustring& name_, const string& solutionFilePath_, const string& solutionDir_) : name(name_), solutionFilePath(solutionFilePath_), solutionDir(solutionDir_)
+    {
+    }
+    public nothrow const ustring& Name() const
+    {
+        return name;
+    }
+    public nothrow const string& SolutionFilePath() const
+    {
+        return solutionFilePath;
+    }
+    public nothrow const string& SolutionDir() const
+    {
+        return solutionDir;
+    }
+	public void AddProjectFile(const string& projectFilePath)
+	{
+		CheckSolutionProjectFileAbsolutePath(solutionFilePath, projectFilePath);
+		projectFiles.Add(projectFilePath);
+	}
+	public nothrow const List<string>& ProjectFiles() const
+	{
+		return projectFiles;
+	}
+    private ustring name;
+    private string solutionFilePath;
+    private string solutionDir;
+	private List<string> projectFiles;
+}
+
+void CheckSolutionProjectFileAbsolutePath(const string& solutionFilePath, const string& path)
+{
+	if (Path.IsAbsolute(path))
+	{
+		throw Exception("error: absolute paths not supported in System X remote solution files: solution file '" + solutionFilePath + "' has an absolute path '" + path + "'");
+	}
+}
+
+void PutSolution(Solution* solution, bool force)
+{
+	CheckEnvVars();
+	string sourceRootDir = GetEnv("SX_SOURCE_ROOT");
+	string targetRootDir = GetEnv("SX_TARGET_ROOT");
+	string prefix = solution->SolutionDir().Substring(sourceRootDir.Length() + 1);
+	Console.Out() << "put solution '" << solution->Name() << "' from '" << sourceRootDir << "' to '" << targetRootDir << "'..." << endl();
+	if (!solution->SolutionDir().StartsWith(sourceRootDir))
+	{
+		throw Exception("solution directory '" + solution->SolutionDir() + "' not under source root directory SX_SOURCE_ROOT ('" + sourceRootDir + "'). " + 
+			"Please move the solution under SX_SOURCE_ROOT ('" + sourceRootDir + "') or change the SX_SOURCE_ROOT environment variable in " + GetEnv("HOME") + "/.profile");
+	}
+	string solutionDir = Path.GetDirectoryName(solution->SolutionFilePath());
+	string solutionFileName = Path.GetFileName(solution->SolutionFilePath());
+	string targetSolutionDir = Path.Combine(targetRootDir, prefix);
+	CopyFile(solution->SolutionFilePath(), Path.Combine(targetSolutionDir, solutionFileName), force);
+	for (const string& projectFile : solution->ProjectFiles())
+	{
+		string projectFilePath = GetFullPath(Path.Combine(solutionDir, projectFile));
+		UniquePtr<Project> project(ParseProjectFile(projectFilePath));
+		PutProject(project.Get(), force);
+	}
+	Console.Out() << "put solution succeeded" << endl();
+}
+
+void GetSolution(Solution* solution, bool force)
+{
+	CheckEnvVars();
+	string sourceRootDir = GetEnv("SX_SOURCE_ROOT");
+	string targetRootDir = GetEnv("SX_TARGET_ROOT");
+	string prefix = solution->SolutionDir().Substring(targetRootDir.Length() + 1);
+	Console.Out() << "get solution '" << solution->Name() << "' from '" << Path.Combine(targetRootDir, prefix) << "' to '" << Path.Combine(sourceRootDir, prefix) << "'..." << endl();
+	if (!solution->SolutionDir().StartsWith(targetRootDir))
+	{
+		throw Exception("solution directory '" + solution->SolutionDir() + "' not under target root directory SX_TARGET_ROOT ('" + targetRootDir + "'). " + 
+			"Please move the solution under SX_TARGET_ROOT ('" + targetRootDir + "') or change the SX_TARGET_ROOT environment variable in " + GetEnv("HOME") + "/.profile");
+	}
+	string solutionDir = Path.GetDirectoryName(solution->SolutionFilePath());
+	string solutionFileName = Path.GetFileName(solution->SolutionFilePath());
+	string sourceSolutionDir = Path.Combine(sourceRootDir, prefix);
+	CopyFile(solution->SolutionFilePath(), Path.Combine(sourceSolutionDir, solutionFileName), force);
+	for (const string& projectFile : solution->ProjectFiles())
+	{
+		string projectFilePath = GetFullPath(Path.Combine(solutionDir, projectFile));
+		UniquePtr<Project> project(ParseProjectFile(projectFilePath));
+		GetProject(project.Get(), force);
+	}
+	Console.Out() << "get solution succeeded" << endl();
+}

@@ -1,0 +1,163 @@
+using System;
+
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/system-x/projects/sys/sx/container_file_lexer.lexer' using soulcm lexer generator scmlg version 4.0.0
+
+namespace container_file_tokens
+{
+    public const int END = 0;
+
+    public const int PROJECT = 1;
+
+    public const int SOLUTION = 2;
+
+    public const int REFERENCE = 3;
+
+    public const int SOURCE = 4;
+
+    public const int RESOURCE = 5;
+
+    public const int TEXT = 6;
+
+    public const int ACTION = 7;
+
+    public const int TARGET = 8;
+
+    public const int PROGRAM = 9;
+
+    public const int WINGUIAPP = 10;
+
+    public const int WINAPP = 11;
+
+    public const int LIBRARY = 12;
+
+    public const int WINLIB = 13;
+
+    public const int UNITTEST = 14;
+
+    public const int ACTIVEPROJECT = 15;
+
+    public const int ID = 16;
+
+    public const int FILEPATH = 17;
+
+    public const int ASSIGN = 18;
+
+    public const int SEMICOLON = 19;
+
+    public const int DOT = 20;
+
+    internal class TokenMap
+    {
+        static TokenMap() :
+            instance(new TokenMap())
+        {
+        }
+        public static TokenMap& Instance()
+        {
+            return *instance;
+        }
+        public int GetTokenId(const ustring& tokenName)
+        {
+            System.Collections.Map<ustring, int>.ConstIterator it = tokenIdMap.CFind(tokenName);
+            if (it != tokenIdMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        public ustring GetTokenName(int tokenId)
+        {
+            return tokenNameList[tokenId];
+        }
+        public ustring GetTokenInfo(int tokenId)
+        {
+            return tokenInfoList[tokenId];
+        }
+        private TokenMap()
+        {
+            tokenIdMap[u"ACTION"] = 7;
+            tokenIdMap[u"ACTIVEPROJECT"] = 15;
+            tokenIdMap[u"ASSIGN"] = 18;
+            tokenIdMap[u"DOT"] = 20;
+            tokenIdMap[u"FILEPATH"] = 17;
+            tokenIdMap[u"ID"] = 16;
+            tokenIdMap[u"LIBRARY"] = 12;
+            tokenIdMap[u"PROGRAM"] = 9;
+            tokenIdMap[u"PROJECT"] = 1;
+            tokenIdMap[u"REFERENCE"] = 3;
+            tokenIdMap[u"RESOURCE"] = 5;
+            tokenIdMap[u"SEMICOLON"] = 19;
+            tokenIdMap[u"SOLUTION"] = 2;
+            tokenIdMap[u"SOURCE"] = 4;
+            tokenIdMap[u"TARGET"] = 8;
+            tokenIdMap[u"TEXT"] = 6;
+            tokenIdMap[u"UNITTEST"] = 14;
+            tokenIdMap[u"WINAPP"] = 11;
+            tokenIdMap[u"WINGUIAPP"] = 10;
+            tokenIdMap[u"WINLIB"] = 13;
+            tokenNameList.Add(u"END");
+            tokenInfoList.Add(u"end of file");
+            tokenNameList.Add(u"PROJECT");
+            tokenInfoList.Add(u"'project'");
+            tokenNameList.Add(u"SOLUTION");
+            tokenInfoList.Add(u"'solution'");
+            tokenNameList.Add(u"REFERENCE");
+            tokenInfoList.Add(u"'reference'");
+            tokenNameList.Add(u"SOURCE");
+            tokenInfoList.Add(u"'source'");
+            tokenNameList.Add(u"RESOURCE");
+            tokenInfoList.Add(u"'resource'");
+            tokenNameList.Add(u"TEXT");
+            tokenInfoList.Add(u"'text'");
+            tokenNameList.Add(u"ACTION");
+            tokenInfoList.Add(u"'action'");
+            tokenNameList.Add(u"TARGET");
+            tokenInfoList.Add(u"'target'");
+            tokenNameList.Add(u"PROGRAM");
+            tokenInfoList.Add(u"'program'");
+            tokenNameList.Add(u"WINGUIAPP");
+            tokenInfoList.Add(u"'winguiapp'");
+            tokenNameList.Add(u"WINAPP");
+            tokenInfoList.Add(u"'winapp'");
+            tokenNameList.Add(u"LIBRARY");
+            tokenInfoList.Add(u"'library'");
+            tokenNameList.Add(u"WINLIB");
+            tokenInfoList.Add(u"'winlib'");
+            tokenNameList.Add(u"UNITTEST");
+            tokenInfoList.Add(u"'unitTest'");
+            tokenNameList.Add(u"ACTIVEPROJECT");
+            tokenInfoList.Add(u"'activeProject'");
+            tokenNameList.Add(u"ID");
+            tokenInfoList.Add(u"identifier");
+            tokenNameList.Add(u"FILEPATH");
+            tokenInfoList.Add(u"file path");
+            tokenNameList.Add(u"ASSIGN");
+            tokenInfoList.Add(u"'='");
+            tokenNameList.Add(u"SEMICOLON");
+            tokenInfoList.Add(u"';'");
+            tokenNameList.Add(u"DOT");
+            tokenInfoList.Add(u"'.'");
+        }
+        private static System.UniquePtr<TokenMap> instance;
+        private System.Collections.Map<ustring, int> tokenIdMap;
+        private System.Collections.List<ustring> tokenNameList;
+        private System.Collections.List<ustring> tokenInfoList;
+    }
+    public int GetTokenId(const ustring& tokenName)
+    {
+        return TokenMap.Instance().GetTokenId(tokenName);
+    }
+
+    public ustring GetTokenName(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenName(tokenId);
+    }
+
+    public ustring GetTokenInfo(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenInfo(tokenId);
+    }
+} // namespace container_file_tokens

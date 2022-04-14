@@ -368,9 +368,12 @@ namespace System.IO
             }
             if ((options & FileCopyOptions.dontPreserveMode) == FileCopyOptions.none)
             {
-                FileStatus status;
-                Stat(sourceFilePath.Chars(), status);
-                ChMod(destFilePath.Chars(), MakeMode(status.ownerAccess, status.groupAccess, status.otherAccess));
+				if (!destFilePath.StartsWith("/mnt"))
+				{
+					FileStatus status;
+					Stat(sourceFilePath.Chars(), status);
+					ChMod(destFilePath.Chars(), MakeMode(status.ownerAccess, status.groupAccess, status.otherAccess));
+				}
             }
             if ((options & FileCopyOptions.verbose) != FileCopyOptions.none)
             {

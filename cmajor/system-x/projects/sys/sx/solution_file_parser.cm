@@ -1,0 +1,142 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+using System.Lex;
+using container_file_tokens;
+
+Solution* ParseSolutionFile(const string& solutionFilePath)
+{
+	SetParserDebug();
+	if (ParserDebug())
+	{
+		WriteDebugMessage("> sx.parse.solution.file");
+	}
+    string fullSolutionFilePath = GetFullPath(solutionFilePath);
+    string solutionDir = Path.GetDirectoryName(fullSolutionFilePath);
+    ustring solutionFileContent = ToUtf32(File.ReadAllText(fullSolutionFilePath));
+    container_file_lexer lexer(solutionFileContent.Chars(), solutionFileContent.Chars() + solutionFileContent.Length(), solutionFilePath, 0);
+	lexer.BeginDebug();
+    lexer.SetFlag(LexerFlags.farthestError);
+    ++lexer;
+    if (*lexer == SOLUTION)
+    {
+        ++lexer;
+        ustring solutionName;
+        if (ParseQualifiedId(lexer, solutionName))
+        {
+            if (*lexer == SEMICOLON)
+            {
+                ++lexer;
+                UniquePtr<Solution> solution(new Solution(solutionName, fullSolutionFilePath, solutionDir));
+                while (true)
+                {
+                    if (!ParseSolutionFileDeclaration(lexer, solution.Get()))
+                    {
+                        if (*lexer == END)
+                        {
+							if (ParserDebug())
+							{
+								WriteDebugMessage("< sx.parse.solution.file.true");
+							}
+                            return solution.Release();
+                        }
+                    }
+                }
+            }
+        }
+    }
+	if (ParserDebug())
+	{
+		WriteDebugMessage("< sx.parse.solution.file.false");
+	}
+	lexer.EndDebug();
+	lexer.ThrowFarthestError();
+	return null;
+}
+
+bool ParseSolutionFileDeclaration(container_file_lexer& lexer, Solution* solution)
+{
+	if (ParserDebug())
+	{
+		WriteDebugMessage("> sx.parse.solution.file.declaration");
+	}
+	if (ParseSolutionProjectDeclaration(lexer, solution))
+	{
+		return true;
+	}
+	if (ParseActiveProjectDeclaration(lexer, solution))
+	{
+		return true;
+	}
+    return false;
+}
+
+bool ParseSolutionProjectDeclaration(container_file_lexer& lexer, Solution* solution)
+{
+	if (ParserDebug())
+	{
+		WriteDebugMessage("> sx.parse.solution.project.declaration");
+	}
+    long save = lexer.GetPos();
+    if (*lexer == PROJECT)
+    {
+        ++lexer;
+        if (*lexer == FILEPATH)
+        {
+			string filePath = lexer.filePath;
+            ++lexer;
+            if (*lexer == SEMICOLON)
+            {
+                ++lexer;
+				solution->AddProjectFile(filePath);
+				if (ParserDebug())
+				{
+					WriteDebugMessage("< sx.parse.solution.project.declaration.true");
+				}
+                return true;
+            }
+        }
+    }
+	if (ParserDebug())
+	{
+		WriteDebugMessage("< sx.parse.reference.declaration.false");
+	}
+    lexer.SetPos(save);
+    return false;
+}
+
+bool ParseActiveProjectDeclaration(container_file_lexer& lexer, Solution* solution)
+{
+	if (ParserDebug())
+	{
+		WriteDebugMessage("> sx.parse.active.project.declaration");
+	}
+	long save = lexer.GetPos();
+	if (*lexer == ACTIVEPROJECT)
+	{
+		++lexer;
+		ustring projectName;
+		if (ParseQualifiedId(lexer, projectName))
+		{
+			if (*lexer == SEMICOLON)
+			{
+				++lexer;
+				if (ParserDebug())
+				{
+					WriteDebugMessage("< sx.parse.active.project.declaration");
+				}
+				return true;
+			}
+		}
+	}
+	if (ParserDebug())
+	{
+		WriteDebugMessage("< sx.parse.active.project.declaration.false");
+	}
+	lexer.SetPos(save);
+    return false;
+}

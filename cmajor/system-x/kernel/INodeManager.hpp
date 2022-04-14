@@ -162,6 +162,8 @@ public:
     void SetGID(int32_t gid_) { gid = gid_; }
     int64_t FileSize() const { return fileSize; }
     void SetFileSize(int64_t fileSize_) { fileSize = fileSize_; }
+    int64_t InternalFileSize() const { return internalFileSize; }
+    void SetInternalFileSize(int64_t internalFileSize_) { internalFileSize = internalFileSize_; }
     const DateTime& CTime() const { return ctime; }
     void SetCTime(const DateTime& ctime_) { ctime = ctime_; }
     const DateTime& MTime() const { return mtime; }
@@ -196,6 +198,7 @@ private:
     int32_t uid;
     int32_t gid;
     int64_t fileSize;
+    int64_t internalFileSize;
     DateTime ctime;
     DateTime mtime;
     DateTime atime;

@@ -118,6 +118,7 @@ INode::INode() :
     uid(0),
     gid(0),
     fileSize(0),
+    internalFileSize(0),
     ctime(),
     mtime(),
     atime(),
