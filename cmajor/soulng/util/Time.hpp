@@ -199,6 +199,8 @@ UTIL_API std::string DurationStr(const std::chrono::nanoseconds& duration);
 
 UTIL_API std::time_t Time();
 
+UTIL_API std::time_t MkTime(const DateTime& dt);
+
 UTIL_API DateTime ToDateTime(time_t time);
 
 UTIL_API std::string TimeToString(std::time_t time);

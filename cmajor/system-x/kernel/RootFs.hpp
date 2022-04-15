@@ -26,6 +26,7 @@ public:
     void CloseFile(int32_t id, cmsx::kernel::Process* process);
     std::string GetHostFilePath(int32_t inodeNumber, cmsx::machine::Process* process) override { return std::string(); }
     INodePtr ReadINode(INodeKey inodeKey, cmsx::machine::Process* process) override;
+    void WriteINode(INode* inode, cmsx::machine::Process* process) override;
     std::string INodeToPath(INodeKey inodeKey, cmsx::machine::Process* process) override;
 private:
     cmsx::machine::Machine* machine;

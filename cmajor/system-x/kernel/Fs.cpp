@@ -538,6 +538,8 @@ INodePtr ReadINode(const INodeKey& inodeKey, cmsx::machine::Process* process)
 void WriteINode(INode* inode, cmsx::machine::Process* process)
 {
     Filesystem* fs = GetFs(inode->Key().fsNumber);
+    fs->WriteINode(inode, process);
+/*
     if (fs->Id() != rootFSNumber) return;
     SuperBlock superBlock;
     ReadSuperBlock(superBlock, fs, process);
@@ -548,6 +550,7 @@ void WriteINode(INode* inode, cmsx::machine::Process* process)
     inode->SetValid();
     inodeBlock.SetINode(*inode, inodeIndex);
     WriteINodeBlock(inodeBlock, inb, fs, process);
+*/
 }
 
 BlockPtr AllocateBlock(int32_t fsNumber, cmsx::machine::Process* process)

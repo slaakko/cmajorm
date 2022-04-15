@@ -376,6 +376,19 @@ INodePtr RootFilesystem::ReadINode(INodeKey inodeKey, cmsx::machine::Process* pr
     return cmsx::kernel::ReadINode(inodeKey, process);
 }
 
+void RootFilesystem::WriteINode(INode* inode, cmsx::machine::Process* process)
+{
+    SuperBlock superBlock;
+    ReadSuperBlock(superBlock, this, process);
+    int32_t inodeBlockNumber = superBlock.GetINodeBlockNumber(inode->Key().inodeNumber);
+    INodeBlock inodeBlock;
+    BlockPtr inb = ReadINodeBlock(inodeBlock, inodeBlockNumber, this, process);
+    int32_t inodeIndex = superBlock.GetINodeIndexInBlock(inode->Key().inodeNumber);
+    inode->SetValid();
+    inodeBlock.SetINode(*inode, inodeIndex);
+    WriteINodeBlock(inodeBlock, inb, this, process);
+}
+
 std::string RootFilesystem::INodeToPath(INodeKey inodeKey, cmsx::machine::Process* process)
 {
     INodePtr dirINodePtr = ReadINode(inodeKey, process);

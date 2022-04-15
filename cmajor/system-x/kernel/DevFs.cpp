@@ -130,6 +130,11 @@ INodePtr DevFilesystem::ReadINode(INodeKey inodeKey, cmsx::machine::Process* pro
     }
 }
 
+void DevFilesystem::WriteINode(INode* inode, cmsx::machine::Process* process)
+{
+    // nothing to do
+}
+
 std::string DevFilesystem::INodeToPath(INodeKey inodeKey, cmsx::machine::Process* process)
 {
     if (inodeKey == devINodeKey)

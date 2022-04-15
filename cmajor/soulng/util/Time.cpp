@@ -526,6 +526,21 @@ std::time_t Time()
     return time;
 }
 
+std::time_t MkTime(const DateTime& dt)
+{
+    std::time_t time = std::time(nullptr);
+    std::tm* ltm = std::localtime(&time);
+    std::tm tm{};
+    tm.tm_year = dt.GetDate().Year() - 1900;
+    tm.tm_mon = static_cast<int>(dt.GetDate().GetMonth()) - static_cast<int>(Month::january);
+    tm.tm_mday = dt.GetDate().Day();
+    tm.tm_hour = dt.Hours() % 24;
+    tm.tm_min = dt.Minutes() % 60;
+    tm.tm_sec = dt.Seconds() % 60;
+    tm.tm_isdst = ltm->tm_isdst;
+    return std::mktime(&tm);
+}
+
 std::string TimeToString(std::time_t time)
 {
     std::tm* ptm = std::localtime(&time);

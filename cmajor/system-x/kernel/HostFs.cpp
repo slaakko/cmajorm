@@ -516,6 +516,29 @@ INodePtr HostFilesystem::ReadINode(INodeKey inodeKey, cmsx::machine::Process* pr
     }
 }
 
+void HostFilesystem::WriteINode(INode* inode, cmsx::machine::Process* process)
+{
+    auto it = data.inodePathMap.find(inode->Key().inodeNumber);
+    if (it != data.inodePathMap.cend())
+    {
+        std::string fullPath = it->second;
+        DateTime dt = inode->MTime();
+        if (dt != DateTime())
+        {
+            time_t time = MkTime(dt);
+            if (time != -1)
+            {
+                boost::system::error_code ec;
+                boost::filesystem::last_write_time(fullPath, time, ec);
+                if (ec)
+                {
+                    throw SystemError(EHOST, "host file system could not set last write time", __FUNCTION__);
+                }
+            }
+        }
+    }
+}
+
 std::string HostFilesystem::INodeToPath(INodeKey inodeKey, cmsx::machine::Process* process)
 {
     auto it = data.inodePartialPathMap.find(inodeKey.inodeNumber);
