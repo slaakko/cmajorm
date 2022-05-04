@@ -60,6 +60,10 @@ bool ParseCommand(CommandLexer& lexer, ParseResult& result)
 	{
 		return true;
 	}
+	else if (ParseBuildCommand(lexer, result))
+	{
+		return true;
+	}
     else
     {
         return false;
@@ -146,4 +150,46 @@ bool ParseGetCommand(CommandLexer& lexer, ParseResult& result)
         lexer.SetPos(save);
         return false;
     }
+}
+
+bool ParseBuildCommand(CommandLexer& lexer, ParseResult& result)
+{
+	int save = lexer.GetPos();
+	if (*lexer == BUILD)
+	{
+		++lexer;
+		Config config = Config.none;
+		if (*lexer == DEBUG)
+		{
+			++lexer;
+			config = cast<Config>(config | Config.debug);
+		}
+		if (*lexer == RELEASE)
+		{
+			++lexer;
+			config = cast<Config>(config | Config.release);
+		}
+		string project;
+		bool first = true;
+		while (*lexer != END)
+		{
+			if (first)
+			{
+				first = false;
+			}
+			else
+			{
+				project.Append(' ');
+			}
+			project.Append(ToUtf8(lexer.GetWord()));
+			++lexer;
+		}
+		if (!project.IsEmpty())
+		{
+			result.ResetCommand(new BuildCommand(project, config));
+			return true;
+		}
+	}
+	lexer.SetPos(save);
+	return false;
 }

@@ -88,6 +88,8 @@ public const byte trap_set_debug_mode = 81u;
 public const byte trap_write_debug_message = 82u;
 public const byte trap_kill = 83u;
 public const byte trap_waitpid = 84u;
+public const byte trap_start = 85u;
+public const byte trap_stop = 86u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -554,4 +556,14 @@ public cdecl nothrow int kill(int pid)
 public cdecl nothrow int waitpid(int pid, byte* exitCode)
 {
     return cast<int>(trap(0u, trap_waitpid, 0u, pid, exitCode));
+}
+
+public cdecl nothrow int start(const char* prog)
+{
+	return cast<int>(trap(0u, trap_start, 0u, prog));
+}
+
+public cdecl nothrow int stop(int prog)
+{
+	return cast<int>(trap(0u, trap_stop, 0u, prog));
 }

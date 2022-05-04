@@ -697,4 +697,23 @@ namespace System.Os
             ThrowSystemError();
         }
     }
+	
+	public int Start(const char* prog)
+	{
+		int result = start(prog);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+		return result;
+	}
+	
+	public void Stop(int prog)
+	{
+		int result = stop(prog);
+		if (result == -1)
+		{
+			ThrowSystemError();
+		}
+	}
 }

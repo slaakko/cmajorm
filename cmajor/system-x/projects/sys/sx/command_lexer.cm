@@ -11,9 +11,11 @@ const int PUT = 1;
 const int GET = 2;
 const int BUILD = 3;
 const int INSTALL = 4;
-const int FORCE = 5;
-const int ANY = 6;
-const int ALL = 7;
+const int DEBUG = 5;
+const int RELEASE = 6;
+const int FORCE = 7;
+const int ANY = 8;
+const int ALL = 9;
 
 class CommandTokens
 {
@@ -41,6 +43,8 @@ class CommandTokens
         tokenMap[u"put"] = PUT;
 		tokenMap[u"get"] = GET;
         tokenMap[u"build"] = BUILD;
+		tokenMap[u"debug"] = DEBUG;
+		tokenMap[u"release"] = RELEASE;
 		tokenMap[u"install"] = INSTALL;
 		tokenMap[u"--force"] = FORCE;
 		tokenMap[u"-f"] = FORCE;

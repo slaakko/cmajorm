@@ -366,11 +366,14 @@ void HostFilesystem::Stat(INode* inode, cmsx::machine::Process* process)
         inode->SetGroupAccess(access);
         inode->SetOtherAccess(access);
         inode->SetNLinks(1);
-        std::time_t lastWriteTime = boost::filesystem::last_write_time(fullPath, ec);
-        if (!ec)
+        if (inode->GetFileType() != FileType::directory)
         {
-            DateTime mtime = ToDateTime(lastWriteTime);
-            inode->SetMTime(mtime);
+            std::time_t lastWriteTime = boost::filesystem::last_write_time(fullPath, ec);
+            if (!ec)
+            {
+                DateTime mtime = ToDateTime(lastWriteTime);
+                inode->SetMTime(mtime);
+            }
         }
     }
     else

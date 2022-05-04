@@ -1,0 +1,47 @@
+// =================================
+// Copyright (c) 2022 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+abstract class Message
+{
+	public virtual ~Message()
+}
+
+abstract class Request : Message
+{
+	public abstract string ToString() const 
+}
+
+class BuildRequest : Request
+{
+	public nothrow BuildRequest(const string& project_, Config config_) : project(project_), config(config_)
+	{
+	}
+	public override string ToString() const
+	{
+		string str = "build";
+		if ((config & Config.debug) != Config.none)
+		{
+			str.Append(" debug");
+		}
+		if ((config & Config.release) != Config.none)
+		{
+			str.Append(" release");
+		}
+		str.Append(" request");
+		str.Append(" ").Append(project);
+		return str;
+	}
+	private string project;
+}
+
+class ExitRequest : Request
+{
+	public override string ToString() const
+	{
+		return "exit request";
+	}
+}

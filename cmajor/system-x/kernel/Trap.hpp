@@ -96,6 +96,8 @@ const uint8_t trap_set_debug_mode = 81;
 const uint8_t trap_write_debug_message = 82;
 const uint8_t trap_kill = 83;
 const uint8_t trap_waitpid = 84;
+const uint8_t trap_start = 85;
+const uint8_t trap_stop = 86;
 
 class CMSX_KERNEL_API TrapHandler
 {

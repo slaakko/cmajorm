@@ -5,6 +5,9 @@
 
 using System;
 using System.Collections;
+using System.Os;
+
+public const int sxbsPortNumber = 55001;
 
 enum Target
 {
@@ -218,4 +221,32 @@ void GetProject(Project* project, bool force)
 		CopyFile(sourceFilePath, targetFilePath, force);
 	}
 	Console.Out() << "get project succeeded" << endl();
+}
+
+void BuildProject(Project* project, Config config)
+{
+	int sxbs = Start("sx.bs");
+	try
+	{
+		Sleep(Duration.FromSeconds(1));
+		string sourceRootDir = GetEnv("SX_SOURCE_ROOT");
+		Socket socket("127.0.0.1", ToString(sxbsPortNumber));
+		string project = project->ProjectFilePath().Substring(sourceRootDir.Length() + 1);
+		BuildRequest buildRequest(project, config);
+		string requestStr = buildRequest.ToString();
+		socket.Write(requestStr);
+		string replyStr = socket.ReadStr();
+		UniquePtr<Message> message = ParseMessage(replyStr);
+		// todo
+		ExitRequest exitRequest;
+		requestStr = exitRequest.ToString();
+		socket.Write(requestStr);
+		replyStr = socket.ReadStr();
+		message = ParseMessage(replyStr);
+		Stop(sxbs);
+	}
+	catch (const Exception& ex)
+	{
+		Stop(sxbs);
+	}
 }

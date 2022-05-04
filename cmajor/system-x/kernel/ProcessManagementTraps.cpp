@@ -6,6 +6,7 @@
 #include <system-x/kernel/ProcessManagementTraps.hpp>
 #include <system-x/kernel/Process.hpp>
 #include <system-x/kernel/ProcessManager.hpp>
+#include <system-x/kernel/Prog.hpp>
 #include <system-x/kernel/Trap.hpp>
 #include <system-x/kernel/OsApi.hpp>
 #include <system-x/kernel/IO.hpp>
@@ -430,13 +431,58 @@ uint64_t TrapWaitPidHandler::HandleTrap(cmsx::machine::Processor& processor)
     Process* process = static_cast<Process*>(processor.CurrentProcess());
     try
     {
-        int32_t pid = processor.Regs().Get(cmsx::machine::regAX);
+        int32_t pid = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
         int64_t childExitCodeAddress = processor.Regs().Get(cmsx::machine::regBX);
         if (childExitCodeAddress == 0)
         {
             throw SystemError(EPARAM, "child exit code pointer is null", __FUNCTION__);
         }
         return Wait(process, pid, childExitCodeAddress);
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapStartHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_start"; }
+};
+
+uint64_t TrapStartHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int64_t progAddr = processor.Regs().Get(cmsx::machine::regAX);
+        return Start(process, progAddr);
+    }
+    catch (const SystemError& error)
+    {
+        process->SetError(error);
+        return static_cast<uint64_t>(-1);
+    }
+}
+
+class TrapStopHandler : public TrapHandler
+{
+public:
+    uint64_t HandleTrap(cmsx::machine::Processor& processor) override;
+    std::string TrapName() const { return "trap_stop"; }
+};
+
+uint64_t TrapStopHandler::HandleTrap(cmsx::machine::Processor& processor)
+{
+    Process* process = static_cast<Process*>(processor.CurrentProcess());
+    try
+    {
+        int32_t prog = static_cast<int32_t>(processor.Regs().Get(cmsx::machine::regAX));
+        Stop(prog);
+        return 0;
     }
     catch (const SystemError& error)
     {
@@ -464,10 +510,14 @@ void InitProcessManagementTraps()
     SetTrapHandler(trap_umask, new TrapUMaskHandler());
     SetTrapHandler(trap_kill, new TrapKillHandler());
     SetTrapHandler(trap_waitpid, new TrapWaitPidHandler());
+    SetTrapHandler(trap_start, new TrapStartHandler());
+    SetTrapHandler(trap_stop, new TrapStopHandler());
 }
 
 void DoneProcessManagementTraps()
 {
+    SetTrapHandler(trap_stop, nullptr);
+    SetTrapHandler(trap_start, nullptr);
     SetTrapHandler(trap_waitpid, nullptr);
     SetTrapHandler(trap_kill, nullptr);
     SetTrapHandler(trap_umask, nullptr);
