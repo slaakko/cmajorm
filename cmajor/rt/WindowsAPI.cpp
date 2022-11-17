@@ -29,6 +29,9 @@ using namespace soulng::unicode;
 using namespace soulng::util;
 using namespace Gdiplus;
 
+#undef min
+#undef max
+
 struct CodeMapping
 {
     CodeMapping(long extCode_, long winCode_) : extCode(extCode_), winCode(winCode_)

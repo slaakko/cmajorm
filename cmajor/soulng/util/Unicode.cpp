@@ -2231,7 +2231,9 @@ void CharacterTable::ReadExtendedHeader(BinaryStreamReader& reader)
     extendedHeader.Read(reader);
 }
 
+#ifndef __MINGW32__
 std::mutex mtx;
+#endif
 
 const CharacterInfo& CharacterTable::GetCharacterInfo(char32_t codePoint)
 {
@@ -2242,7 +2244,9 @@ const CharacterInfo& CharacterTable::GetCharacterInfo(char32_t codePoint)
     int pageIndex = codePoint / numInfosInPage;
     if (pages.size() <= pageIndex)
     {
+#ifndef __MINGW32__
         std::lock_guard<std::mutex> lock(mtx);
+#endif
         while (pages.size() <= pageIndex)
         {
             pages.push_back(std::unique_ptr<CharacterInfoPage>());
@@ -2251,7 +2255,9 @@ const CharacterInfo& CharacterTable::GetCharacterInfo(char32_t codePoint)
     CharacterInfoPage* page = pages[pageIndex].get();
     if (!page)
     {
+#ifndef __MINGW32__
         std::lock_guard<std::mutex> lock(mtx);
+#endif
         if (!page)
         {
             Streams streams = GetReadStreams();
@@ -2296,7 +2302,9 @@ const ExtendedCharacterInfo& CharacterTable::GetExtendedCharacterInfo(char32_t c
     int pageIndex = codePoint / numInfosInPage;
     if (extendedPages.size() <= pageIndex)
     {
+#ifndef __MINGW32__
         std::lock_guard<std::mutex> lock(mtx);
+#endif
         while (extendedPages.size() <= pageIndex)
         {
             extendedPages.push_back(std::unique_ptr<ExtendedCharacterInfoPage>());
@@ -2305,7 +2313,9 @@ const ExtendedCharacterInfo& CharacterTable::GetExtendedCharacterInfo(char32_t c
     ExtendedCharacterInfoPage* extendedPage = extendedPages[pageIndex].get();
     if (!extendedPage)
     {
+#ifndef __MINGW32__
         std::lock_guard<std::mutex> lock(mtx);
+#endif
         if (!extendedPage)
         {
             Streams streams = GetReadStreams();

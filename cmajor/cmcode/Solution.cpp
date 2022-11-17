@@ -18,6 +18,7 @@
 #include <soulng/util/Sha1.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <algorithm>
+#include <fstream>
 
 namespace cmcode {
 

@@ -244,7 +244,6 @@ private:
     int index;
     std::string hash;
     std::vector<std::string> dependsOnIds;
-    std::mutex mtx;
 };
 
 

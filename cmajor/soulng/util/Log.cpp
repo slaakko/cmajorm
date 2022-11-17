@@ -18,11 +18,13 @@ namespace soulng { namespace util {
 
 using namespace soulng::unicode;
 
+#ifndef __MINGW32__
 std::mutex logMutex;
+std::condition_variable messageEnqueuedOrEndLog;
+#endif
 LogMode logMode = LogMode::console;
 bool endLog = false;
 std::list<std::string> log;
-std::condition_variable messageEnqueuedOrEndLog;
 
 void SetLogMode(LogMode mode)
 {
@@ -36,6 +38,7 @@ void StartLog()
 
 void EndLog()
 {
+#ifndef __MINGW32__
     for (int i = 0; i < 10; ++i)
     {
         if (!log.empty())
@@ -50,11 +53,14 @@ void EndLog()
     }
     endLog = true;
     messageEnqueuedOrEndLog.notify_one();
+#endif 
 }
 
 void LogMessage(int logStreamId, const std::string& message)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(logMutex);
+#endif
     if (logMode == LogMode::console)
     {
         if (logStreamId == -1)
@@ -76,7 +82,9 @@ void LogMessage(int logStreamId, const std::string& message)
         {
             log.push_back(Format(std::to_string(logStreamId), 2, FormatWidth::min, FormatJustify::right, '0') + ">" + message);
         }
+#ifndef __MINGW32__
         messageEnqueuedOrEndLog.notify_one();
+#endif
     }
 }
 
@@ -89,6 +97,7 @@ std::string logMessage;
 
 int WaitForLogMessage()
 {
+#ifndef __MINGW32__
     std::unique_lock<std::mutex> lock(logMutex);
     messageEnqueuedOrEndLog.wait(lock, []{ return !log.empty() || endLog; });
     if (!log.empty())
@@ -101,6 +110,9 @@ int WaitForLogMessage()
     {
         return -1;
     }
+#else
+    return -1;
+#endif
 }
 
 int FetchLogMessage(char16_t* buf, int size)
@@ -125,6 +137,7 @@ int FetchLogMessage(char16_t* buf, int size)
 
 std::string FetchLogMessage(bool& endOfLog, int timeoutMs, bool& timeout)
 {
+#ifndef __MINGW32__
     endOfLog = false;
     std::unique_lock<std::mutex> lock(logMutex);
     if (timeoutMs)
@@ -145,6 +158,7 @@ std::string FetchLogMessage(bool& endOfLog, int timeoutMs, bool& timeout)
         log.pop_front();
         return logMessage;
     }
+#endif
     endOfLog = true;
     return std::string();
 }

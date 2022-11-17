@@ -17,6 +17,8 @@
 
 namespace cmajor {namespace rt {
 
+#ifndef __MINGW32__
+
 using namespace soulng::util;
 using namespace soulng::unicode;
 
@@ -115,15 +117,21 @@ void Profiler::EndFunction(const boost::uuids::uuid& functionId)
     functionProfileData->push_back(FunctionProfileData(TimePointKind::end, functionId));
 }
 
+#endif
+
 void InitProfiler()
 {
+#ifndef __MINGW32__
     Profiler::Init();
+#endif
 }
 
 void DoneProfiler()
 {
+#ifndef __MINGW32__
     Profiler::Instance().WriteData();
     Profiler::Done();
+#endif
 }
 
 } }  // namespace cmajor::rt
@@ -131,24 +139,32 @@ void DoneProfiler()
 extern "C" RT_API void RtStartProfiling(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassIdArray, 
     int64_t numberOfStaticClassIds, const uint64_t* staticClassIdArray)
 {
+#ifndef __MINGW32__
     cmajor::rt::InitProfiler();
     RtInit(numberOfPolymorphicClassIds, polymorphicClassIdArray, numberOfStaticClassIds, staticClassIdArray, nullptr);
+#endif
 }
 
 extern "C" RT_API void RtEndProfiling()
 {
+#ifndef __MINGW32__
     RtDone();
     cmajor::rt::DoneProfiler();
+#endif
 }
 
 extern "C" RT_API void RtProfileStartFunction(void* functionId)
 {
+#ifndef __MINGW32__
     boost::uuids::uuid* funId = reinterpret_cast<boost::uuids::uuid*>(functionId);
     cmajor::rt::Profiler::Instance().StartFunction(*funId);
+#endif
 }
 
 extern "C" RT_API void RtProfileEndFunction(void* functionId)
 {
+#ifndef __MINGW32__
     boost::uuids::uuid* funId = reinterpret_cast<boost::uuids::uuid*>(functionId);
     cmajor::rt::Profiler::Instance().EndFunction(*funId);
+#endif
 }

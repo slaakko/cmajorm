@@ -5,6 +5,8 @@
 
 #include <wing/ManualResetEvent.hpp>
 #include <Windows.h>
+#undef min
+#undef max
 
 namespace cmajor { namespace wing {
 

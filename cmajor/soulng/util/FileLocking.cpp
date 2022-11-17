@@ -14,6 +14,8 @@
 
 namespace soulng { namespace util {
 
+#ifndef __MINGW32__
+
 bool debugFileLocking = false;
 
 class FileLockTable
@@ -32,8 +34,10 @@ private:
     std::mutex mtx;
     std::map<std::string, int> readMap;
     std::set<std::string> writeLocks;
+#ifndef __MINGW32__
     std::condition_variable releaseRead;
     std::condition_variable releaseWrite;
+#endif
     bool waitingReadLock;
     bool waitingWriteLock;
 };
@@ -160,24 +164,34 @@ void FileLockTable::UnlockFile(const std::string& filePath, LockKind lockKind)
     }
 }
 
+#endif
+
 void LockFile(const std::string& filePath, LockKind lockKind)
 {
+#ifndef __MINGW32__
     FileLockTable::Instance().LockFile(GetFullPath(filePath), lockKind);
+#endif 
 }
 
 void UnlockFile(const std::string& filePath, LockKind lockKind)
 {
+#ifndef __MINGW32__
     FileLockTable::Instance().UnlockFile(GetFullPath(filePath), lockKind);
+#endif
 }
 
 void InitFileLocking()
 {
+#ifndef __MINGW32__
     FileLockTable::Init();
+#endif
 }
 
 void DoneFileLocking()
 {
+#ifndef __MINGW32__
     FileLockTable::Done();
+#endif
 }
 
 } } // namespace soulng::util

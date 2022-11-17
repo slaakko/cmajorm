@@ -35,6 +35,9 @@
 #define INVALID_SOCKET -1
 #endif
 
+#undef min
+#undef max
+
 namespace cmajor { namespace rt {
 
 using namespace soulng::util;

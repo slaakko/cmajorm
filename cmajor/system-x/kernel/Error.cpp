@@ -7,6 +7,8 @@
 #include <system-x/kernel/Debug.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <Windows.h>
+#undef min
+#undef max
 
 namespace cmsx::kernel {
 

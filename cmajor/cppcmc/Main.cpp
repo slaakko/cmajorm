@@ -11,6 +11,8 @@
 #ifdef _WIN32
 #include <cmajor/cmres/InitDone.hpp>
 #include <Windows.h>
+#undef min
+#undef max
 #endif
 #include <cmajor/binder/TypeBinder.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>

@@ -16,6 +16,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <iostream>
+#include <fstream>
 
 namespace cmajor { namespace build {
 

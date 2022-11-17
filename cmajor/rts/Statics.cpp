@@ -27,7 +27,9 @@ public:
     void EndCriticalSection(const boost::uuids::uuid& classId);
 private:
     static std::unique_ptr<StaticInitTable> instance;
+#ifndef __MINGW32__
     std::vector<std::unique_ptr<std::recursive_mutex>> mutexes;
+#endif
     std::unordered_map<boost::uuids::uuid, int, boost::hash<boost::uuids::uuid>> mutexMap;
 };
 
@@ -45,6 +47,7 @@ void StaticInitTable::Done()
 
 void StaticInitTable::AllocateMutexes(const std::vector<boost::uuids::uuid>& staticClassIds)
 {
+#ifndef __MINGW32__
     int n = staticClassIds.size();
     for (int i = 0; i < n; ++i)
     {
@@ -52,10 +55,12 @@ void StaticInitTable::AllocateMutexes(const std::vector<boost::uuids::uuid>& sta
         mutexMap[classId] = mutexes.size();
         mutexes.push_back(std::unique_ptr<std::recursive_mutex>(new std::recursive_mutex()));
     }
+#endif
 }
 
 void StaticInitTable::BeginCriticalSection(const boost::uuids::uuid& classId)
 {
+#ifndef __MINGW32__
     auto it = mutexMap.find(classId);
     if (it != mutexMap.cend())
     {
@@ -68,10 +73,12 @@ void StaticInitTable::BeginCriticalSection(const boost::uuids::uuid& classId)
     {
         Assert(false, "invalid class id");
     }
+#endif
 }
 
 void StaticInitTable::EndCriticalSection(const boost::uuids::uuid& classId)
 {
+#ifndef __MINGW32__
     auto it = mutexMap.find(classId);
     if (it != mutexMap.cend())
     {
@@ -84,6 +91,7 @@ void StaticInitTable::EndCriticalSection(const boost::uuids::uuid& classId)
     {
         Assert(false, "invalid class id");
     }
+#endif
 }
 
 void AllocateMutexes(const std::vector<boost::uuids::uuid>& staticClassIds)
@@ -168,11 +176,15 @@ extern "C" RT_API void RtEndStaticInitCriticalSection(void* staticClassId)
     }
 }
 
+#ifndef __MINGW32__
 std::mutex destructionListMutex;
- 
+#endif 
+
 extern "C" RT_API void RtEnqueueDestruction(void* destructor, void* arg)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(destructionListMutex);
+#endif
     cmajor::rt::destructionList = new cmajor::rt::Destruction(reinterpret_cast<cmajor::rt::destructor_ptr>(destructor), arg, cmajor::rt::destructionList);
 }
 

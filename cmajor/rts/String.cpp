@@ -24,11 +24,15 @@ StringTable::StringTable() : nextStringHandle(1)
 {
 }
 
+#ifndef __MINGW32__
 std::mutex mtx;
+#endif
 
 int32_t StringTable::InstallString(const std::string& str)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(mtx);
+#endif
     int32_t stringHandle = nextStringHandle++;
     stringMap[stringHandle] = str;
     return stringHandle;
@@ -36,7 +40,9 @@ int32_t StringTable::InstallString(const std::string& str)
 
 const char* StringTable::GetString(int32_t stringHandle)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(mtx);
+#endif
     auto it = stringMap.find(stringHandle);
     if (it != stringMap.cend())
     {
@@ -47,7 +53,9 @@ const char* StringTable::GetString(int32_t stringHandle)
 
 void StringTable::DisposeString(int32_t stringHandle)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(mtx);
+#endif
     stringMap.erase(stringHandle);
 }
 

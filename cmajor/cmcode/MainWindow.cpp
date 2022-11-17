@@ -47,6 +47,7 @@
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Process.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <fstream>
 
 #undef min
 #undef max

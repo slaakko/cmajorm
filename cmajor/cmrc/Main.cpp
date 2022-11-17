@@ -13,6 +13,7 @@
 #include <soulng/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include <stdexcept>
 #include <string>

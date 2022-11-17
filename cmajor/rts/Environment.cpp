@@ -71,7 +71,9 @@ public:
 private:
     static std::unique_ptr<Executor> instance;
     Executor();
+#ifndef __MINGW32__
     std::mutex mtx;
+#endif
     int32_t nextExecHandle;
     std::unordered_map<int32_t, std::unique_ptr<Exec>> execMap;
     int32_t Execute(Exec* exec);
@@ -95,7 +97,9 @@ Executor::Executor() : nextExecHandle(1)
 
 int32_t Executor::BeginExecute(const char* command)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(mtx);
+#endif
     int32_t execHandle = nextExecHandle++;
     std::unique_ptr<Exec> exec(new Exec());
     exec->command = command;
@@ -105,7 +109,9 @@ int32_t Executor::BeginExecute(const char* command)
 
 void Executor::AddRedirection(int32_t execHandle, int handle, const char* file)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(mtx);
+#endif
     auto it = execMap.find(execHandle);
     if (it != execMap.cend())
     {
@@ -118,7 +124,9 @@ int32_t Executor::EndExecute(int32_t execHandle)
 {
     Exec* exec = nullptr;
     {
+#ifndef __MINGW32__
         std::lock_guard<std::mutex> lock(mtx);
+#endif
         auto it = execMap.find(execHandle);
         if (it != execMap.cend())
         {
@@ -128,7 +136,9 @@ int32_t Executor::EndExecute(int32_t execHandle)
     if (exec)
     {
         int32_t exitCode = Execute(exec);
+#ifndef __MINGW32__
         std::lock_guard<std::mutex> lock(mtx);
+#endif
         execMap.erase(execHandle);
         return exitCode;
     }
@@ -228,11 +238,15 @@ extern "C" RT_API const char* RtGetEnvironmentVariable(const char* environmentVa
     return "";
 }
 
+#ifndef __MINGW32__
 std::mutex mtx;
+#endif
 
 extern "C" RT_API int32_t RtGetCurrentWorkingDirectoryHandle()
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(mtx);
+#endif
     std::unique_ptr<char[]> buffer(new char[8192]);
     if (getcwd(buffer.get(), 8192))
     {

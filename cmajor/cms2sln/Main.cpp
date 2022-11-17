@@ -16,6 +16,7 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <stdexcept>
 #include <iostream>
+#include <fstream>
 
 void InitApplication()
 {

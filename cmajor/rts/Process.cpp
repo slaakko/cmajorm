@@ -9,6 +9,7 @@
 
 void* RtCreateProcess(const char* command, int32_t redirections, int32_t& errorStringHandle)
 {
+#ifndef __MINGW32__
     std::string cmd(command);
     errorStringHandle = -1;
     try
@@ -20,26 +21,35 @@ void* RtCreateProcess(const char* command, int32_t redirections, int32_t& errorS
     {
         errorStringHandle = cmajor::rt::InstallString("error creating process '" + cmd + "': " + ex.what());
     }
+#endif
     return nullptr;
 }
 
 void RtDeleteProcess(void* process)
 {
+#ifndef __MINGW32__
     delete static_cast<soulng::util::Process*>(process);
+#endif
 }
 
 const char* RtGetString(int32_t stringHandle)
 {
+#ifndef __MINGW32__
     return cmajor::rt::GetString(stringHandle);
+#endif
+    return nullptr;
 }
 
 void RtDisposeString(int32_t stringHandle)
 {
+#ifndef __MINGW32__
     cmajor::rt::DisposeString(stringHandle);
+#endif
 }
 
 bool RtProcessRunning(void* process, int32_t& errorStringHandle)
 {
+#ifndef __MINGW32__
     try
     {
         errorStringHandle = -1;
@@ -50,10 +60,13 @@ bool RtProcessRunning(void* process, int32_t& errorStringHandle)
         errorStringHandle = cmajor::rt::InstallString(ex.what());
         return false;
     }
+#endif
+    return false;
 }
 
 bool RtProcessWaitForExit(void* process, int32_t& errorStringHandle)
 {
+#ifndef __MINGW32__
     try
     {
         errorStringHandle = -1;
@@ -65,10 +78,13 @@ bool RtProcessWaitForExit(void* process, int32_t& errorStringHandle)
         errorStringHandle = cmajor::rt::InstallString(ex.what());
         return false;
     }
+#endif
+    return false;
 }
 
 int RtProcessExitCode(void* process, int32_t& errorStringHandle)
 {
+#ifndef __MINGW32__
     try
     {
         errorStringHandle = -1;
@@ -79,10 +95,13 @@ int RtProcessExitCode(void* process, int32_t& errorStringHandle)
         errorStringHandle = cmajor::rt::InstallString(ex.what());
         return 1;
     }
+#endif
+    return 0;
 }
 
 bool RtProcessTerminate(void* process, int32_t& errorStringHandle)
 {
+#ifndef __MINGW32__
     try
     {
         errorStringHandle = -1;
@@ -94,10 +113,13 @@ bool RtProcessTerminate(void* process, int32_t& errorStringHandle)
         return false;
     }
     return true;
+#endif
+    return false;
 }
 
 bool RtProcessEof(void* process, int handle, int32_t& errorStringHandle)
 {
+#ifndef __MINGW32__
     try
     {
         errorStringHandle = -1;
@@ -108,10 +130,13 @@ bool RtProcessEof(void* process, int handle, int32_t& errorStringHandle)
         errorStringHandle = cmajor::rt::InstallString(ex.what());
         return true;
     }
+#endif
+    return false;
 }
 
 int32_t RtProcessReadLine(void* process, int handle, int32_t& errorStringHandle)
 {
+#ifndef __MINGW32__
     try
     {
         errorStringHandle = -1;
@@ -123,10 +148,13 @@ int32_t RtProcessReadLine(void* process, int handle, int32_t& errorStringHandle)
         errorStringHandle = cmajor::rt::InstallString(ex.what());
         return -1;
     }
+#endif
+    return -1;
 }
 
 int32_t RtProcessReadToEnd(void* process, int handle, int32_t& errorStringHandle)
 {
+#ifndef __MINGW32__
     try
     {
         errorStringHandle = -1;
@@ -138,10 +166,13 @@ int32_t RtProcessReadToEnd(void* process, int handle, int32_t& errorStringHandle
         errorStringHandle = cmajor::rt::InstallString(ex.what());
         return -1;
     }
+#endif
+    return -1;
 }
 
 bool RtProcessWriteLine(void* process, const char* line, int32_t& errorStrHandle)
 {
+#ifndef __MINGW32__
     try
     {
         errorStrHandle = -1;
@@ -154,4 +185,6 @@ bool RtProcessWriteLine(void* process, const char* line, int32_t& errorStrHandle
         return false;
     }
     return true;
+#endif
+    return false;
 }

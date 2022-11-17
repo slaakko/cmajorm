@@ -19,6 +19,8 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>    
 #include <Windows.h>
+#undef min
+#undef max
 #else
 #include <unistd.h>
 #include <sys/types.h>

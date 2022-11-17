@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <ctime>
 #include <chrono>
+#include <memory>
 
 namespace soulng { namespace util {
 

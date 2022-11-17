@@ -8,6 +8,8 @@
 #include <wing/Wing.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <Windows.h>
+#undef min
+#undef max
 
 namespace cmajor { namespace wing {
 

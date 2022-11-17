@@ -14,6 +14,9 @@
 #include <soulng/util/Time.hpp>
 #include <soulng/util/MemoryWriter.hpp>
 
+#undef min
+#undef max
+
 using namespace soulng::unicode;
 
 #ifdef _WIN32

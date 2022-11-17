@@ -13,6 +13,8 @@
 #include <system-x/machine/Config.hpp>
 #include <system-x/machine/Event.hpp>
 #include <condition_variable>
+#undef min
+#undef max
 #include <boost/pool/pool_alloc.hpp>
 #include <list>
 

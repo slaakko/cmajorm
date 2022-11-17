@@ -8,6 +8,8 @@
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Path.hpp>
 #include <Windows.h>
+#undef min
+#undef max
 #include <lmcons.h>
 #include <cstring>
 

@@ -10,7 +10,7 @@
 
 namespace cmsx::db {
 
-    class Debugger;
+class Debugger;
 
 class DebugView
 {

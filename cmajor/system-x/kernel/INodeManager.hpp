@@ -10,6 +10,8 @@
 #include <soulng/util/MemoryWriter.hpp>
 #include <soulng/util/Time.hpp>
 #include <list>
+#undef min
+#undef max
 #include <boost/pool/pool_alloc.hpp>
 #include <stdint.h>
 #include <algorithm>

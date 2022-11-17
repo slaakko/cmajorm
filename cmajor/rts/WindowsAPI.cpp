@@ -17,6 +17,8 @@
 #include <string>
 #include <gdiplus.h>
 #pragma comment (lib,"Gdiplus.lib")
+#undef min
+#undef max
 
 #ifndef __MINGW32__
 #include <shobjidl_core.h>
@@ -2013,7 +2015,11 @@ bool WinGetCursorPos(int& x, int& y)
 
 int WinGetCurrentProcessId()
 {
+#ifdef __MINGW32__
+    return 0;
+#else
     return soulng::util::GetPid();
+#endif
 }
 
 int WinGetLogicalDrives()

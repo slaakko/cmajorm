@@ -464,12 +464,25 @@ void Emitter::EmitObjectCodeFile(const std::string& objectFilePath)
     }
 }
 
+#if (LLVM_VERSION_MAJOR < 12)
+
 llvm::DebugLoc Emitter::GetDebugLocation(const Span& span)
 {
     if (!diCompileUnit || !span.Valid() || !currentDIBuilder) return llvm::DebugLoc();
     int column = GetColumn(span);
     return llvm::DebugLoc::get(span.line, column, static_cast<llvm::DIScope*>(CurrentScope()));
 }
+
+#else
+
+llvm::DebugLoc Emitter::GetDebugLocation(const Span& span)
+{
+    if (!diCompileUnit || !span.Valid() || !currentDIBuilder) return llvm::DebugLoc();
+    int column = GetColumn(span);
+    return llvm::DILocation::get(context, span.line, column, static_cast<llvm::DIScope*>(CurrentScope()));
+}
+
+#endif
 
 void Emitter::ResetCurrentDebugLocation()
 {

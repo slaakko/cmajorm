@@ -14,19 +14,26 @@
 
 void* RtAllocateConditionVariable()
 {
+#ifndef __MINGW32__
     return new std::condition_variable_any();
+#else
+	return nullptr;
+#endif
 }
 
 void RtFreeConditionVariable(void* nativeHandle)
 {
+#ifndef __MINGW32__
     if (nativeHandle)
     {
         delete static_cast<std::condition_variable_any*>(nativeHandle);
     }
+#endif	
 }
 
 int32_t RtNotifyOne(void* nativeHandle)
 {
+#ifndef __MINGW32__
     try
     {
         std::condition_variable_any* conditionVariable = static_cast<std::condition_variable_any*>(nativeHandle);
@@ -37,10 +44,13 @@ int32_t RtNotifyOne(void* nativeHandle)
     {
         return cmajor::rt::InstallError(ex.what());
     }
+#endif
+	return 0;
 }
 
 int32_t RtNotifyAll(void* nativeHandle)
 {
+#ifndef __MINGW32__	
     try
     {
         std::condition_variable_any* conditionVariable = static_cast<std::condition_variable_any*>(nativeHandle);
@@ -51,10 +61,13 @@ int32_t RtNotifyAll(void* nativeHandle)
     {
         return cmajor::rt::InstallError(ex.what());
     }
+#endif
+	return 0;
 }
 
 int32_t RtWaitConditionVariable(void* nativeHandle, void* recursiveMutexHandle)
 {
+#ifndef __MINGW32__
     try
     {
         std::recursive_mutex* recursiveMutex = static_cast<std::recursive_mutex*>(recursiveMutexHandle);
@@ -67,6 +80,8 @@ int32_t RtWaitConditionVariable(void* nativeHandle, void* recursiveMutexHandle)
     {
         return cmajor::rt::InstallError(ex.what());
     }
+#endif
+	return 0;
 }
 
 enum class CondVarStatus : int32_t
@@ -76,6 +91,7 @@ enum class CondVarStatus : int32_t
 
 int32_t RtWaitConditionVariableDuration(void* nativeHandle, void* recursiveMutexHandle, int64_t nanoseconds)
 {
+#ifndef __MINGW32__
     try
     {
         CondVarStatus status = CondVarStatus::timeout;
@@ -93,4 +109,6 @@ int32_t RtWaitConditionVariableDuration(void* nativeHandle, void* recursiveMutex
     {
         return cmajor::rt::InstallError(ex.what());
     }
+#endif
+	return 0;
 }

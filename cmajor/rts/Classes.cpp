@@ -100,7 +100,9 @@ void InitClasses(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphi
             IntsToUuid(typeId1, typeId2, staticTypeId);
             staticClassIds.push_back(staticTypeId);
         }
+#ifndef __MINGW32__
         AllocateMutexes(staticClassIds);
+#endif
     }
     catch (const std::exception& ex)
     {
@@ -114,11 +116,15 @@ void InitClasses(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphi
     }
 }
 
+#ifndef __MINGW32__
 std::mutex dynamicInitVmtMutex;
+#endif
 
 bool DynamicInitVmtsAndCompare(void* vmt1, void* vmt2)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(dynamicInitVmtMutex);
+#endif
     uint64_t* vmt1Header = reinterpret_cast<uint64_t*>(vmt1);
     boost::multiprecision::uint128_t classId1(boost::multiprecision::uint128_t(vmt1Header[0]) << 64 | vmt1Header[1]);
     if (classId1 == 0) // class id is zero at the start of the VMT if not yet initialized

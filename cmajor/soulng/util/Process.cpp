@@ -7,6 +7,8 @@
 #include <soulng/util/ProcessImpl.hpp>
 #ifdef _WIN32
 #include <Windows.h>
+#undef min
+#undef max
 #else
 #include <sys/types.h>
 #include <unistd.h>

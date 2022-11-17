@@ -23,6 +23,8 @@ typedef void(*ThreadFunctionWithParam)(void*);
 typedef void(*ThreadMethod)(void*);
 typedef void(*ThreadMethodWithParam)(void*, void*);
 
+#ifndef __MINGW32__
+
 void ExecuteThreadFunction(ThreadFunction threadFunction, int32_t threadId)
 {
     try
@@ -251,33 +253,48 @@ bool ThreadPool::JoinThread(int32_t threadId)
     return false;
 }
 
+#endif
+
 void InitThread()
 {
+#ifndef __MINGW32__
     ThreadPool::Init();
+#endif
 }
 
 void DoneThread() 
 {
+#ifndef __MINGW32__
     ThreadPool::Done();
+#endif
 }
 
 } } // namespace cmajor::rt
 
 extern "C" RT_API int32_t RtGetHardwareConcurrency()
 {
+#ifndef __MINGW32__
     return std::thread::hardware_concurrency();
+#endif
+    return 0;
 }
 
 extern "C" RT_API int32_t RtStartThreadFunction(void* function)
 {
+#ifndef __MINGW32__
     cmajor::rt::ThreadFunction threadFun = reinterpret_cast<cmajor::rt::ThreadFunction>(function);
     return cmajor::rt::ThreadPool::Instance().StartThreadFunction(threadFun);
+#endif
+    return 0;
 }
 
 extern "C" RT_API int32_t RtStartThreadFunctionWithParam(void* function, void* param)
 {
+#ifndef __MINGW32__
     cmajor::rt::ThreadFunctionWithParam threadFunWithParam = reinterpret_cast<cmajor::rt::ThreadFunctionWithParam>(function);
     return cmajor::rt::ThreadPool::Instance().StartThreadFunction(threadFunWithParam, param);
+#endif
+    return 0;
 }
 
 struct ClassDelegate
@@ -288,30 +305,42 @@ struct ClassDelegate
 
 extern "C" RT_API int32_t RtStartThreadMethod(void* classDelegate)
 {
+#ifndef __MINGW32__
     ClassDelegate* clsDlg = reinterpret_cast<ClassDelegate*>(classDelegate);
     cmajor::rt::ThreadMethod threadMethod = reinterpret_cast<cmajor::rt::ThreadMethod>(clsDlg->method);
     return cmajor::rt::ThreadPool::Instance().StartThreadMethod(threadMethod, clsDlg->object);
+#endif
+    return 0;
 }
 
 extern "C" RT_API int32_t RtStartThreadMethodWithParam(void* classDelegate, void* param)
 {
+#ifndef __MINGW32__
     ClassDelegate* clsDlg = reinterpret_cast<ClassDelegate*>(classDelegate);
     cmajor::rt::ThreadMethodWithParam threadMethodWithParam = reinterpret_cast<cmajor::rt::ThreadMethodWithParam>(clsDlg->method);
     return cmajor::rt::ThreadPool::Instance().StartThreadMethod(threadMethodWithParam, clsDlg->object, param);
+#endif
+    return 0;
 }
 
 extern "C" RT_API bool RtJoinThread(int32_t threadId)
 {
+#ifndef __MINGW32__
     return cmajor::rt::ThreadPool::Instance().JoinThread(threadId);
+#endif
+    return false;
 }
 
 std::unordered_map<std::thread::id, int> threadIdMap;
 
 int nextThreadId = 0;
+#ifndef __MINGW32__
 std::mutex threadIdMapMutex;
+#endif
 
 extern "C" RT_API int32_t RtThisThreadId()
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(threadIdMapMutex);
     std::thread::id id = std::this_thread::get_id();
     auto it = threadIdMap.find(id);
@@ -322,4 +351,6 @@ extern "C" RT_API int32_t RtThisThreadId()
     int threadId = nextThreadId++;
     threadIdMap[id] = threadId;
     return threadId;
+#endif
+    return 0;
 }

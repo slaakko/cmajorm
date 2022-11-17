@@ -6,6 +6,8 @@
 #include <soulng/util/Fiber.hpp>
 #ifdef _WIN32
 #include <Windows.h>
+#undef min
+#undef max
 #else
 #include <signal.h>
 #include <stdio.h>

@@ -8,6 +8,7 @@
 #include <soulng/util/Path.hpp>
 #include <algorithm>
 #include <unordered_set>
+#include <fstream>
 
 namespace sngcm { namespace ast {
 

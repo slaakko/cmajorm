@@ -6,6 +6,8 @@
 #ifndef CMSX_MACHINE_CLOCK_INCLUDED
 #define CMSX_MACHINE_CLOCK_INCLUDED
 #include <system-x/machine/Api.hpp>
+#undef min
+#undef max
 #include <boost/pool/pool_alloc.hpp>
 #include <chrono>
 #include <condition_variable>

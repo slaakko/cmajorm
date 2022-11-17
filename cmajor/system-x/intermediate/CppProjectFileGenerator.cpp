@@ -15,6 +15,7 @@
 #include <boost/uuid/random_generator.hpp>
 #include <boost/lexical_cast.hpp>
 #include <iostream>
+#include <fstream>
 
 namespace cmsx::intermediate {
 

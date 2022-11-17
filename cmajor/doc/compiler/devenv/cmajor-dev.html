@@ -18,8 +18,8 @@
 	</h2>
 	
 	<ul>
-		<li>Microsoft Visual Studio Community Edition 2019 with 'Desktop development with C++' workload installed.
-			The C++ compiler version (cl /?) should be 19.29.30136 or later.</li> 
+		<li>Microsoft Visual Studio Community Edition 2022 with 'Desktop development with C++' workload installed.
+			The C++ compiler version (cl /?) should be 19.34.31933 or later.</li> 
 	</ul>
 
     <h2>
@@ -31,7 +31,7 @@
     </h3>
     
     <p>
-        <strong>1.77</strong>
+        <strong>1.80</strong>
     </p>
     
     <h3>
@@ -51,8 +51,8 @@
     </p>
     
     <p>
-        Extract sources to <strong>C:\work\boost_1_77_0</strong> directory.
-		(For example place boost_1_77_0.7z package in C:\work directory and choose 7-Zip | Extract here)
+        Extract sources to <strong>C:\work\boost_1_80_0</strong> directory.
+		(For example place boost_1_80_0.7z package in C:\work directory and choose 7-Zip | Extract here)
     </p>
     
     <h3>
@@ -61,26 +61,26 @@
     
     <ol>
     
-    <li>Open x64 Native Tools Command Prompt for VS 2019 (can be found from the start menu in Visual Studio 2019 folder)</li>
+    <li>Open x64 Native Tools Command Prompt for VS 2022 (can be found from the start menu in Visual Studio 2022 folder)</li>
     
-    <li>Change to C:\work\boost_1_77_0 directory.</li>
+    <li>Change to C:\work\boost_1_80_0 directory.</li>
     
     <li>
         Bootstrap:
     <pre>
-        C:\work\boost_1_77_0> bootstrap
+        C:\work\boost_1_80_0> bootstrap
     </pre>
     </li>
     
     <li>
         Compilation:
     <pre>
-        C:\work\boost_1_77_0> b2 toolset=msvc address-model=64 --build-dir=C:\boost-build-dir --prefix=C:\boost install
+        C:\work\boost_1_80_0> b2 toolset=msvc address-model=64 --build-dir=C:\boost-build-dir --prefix=C:\boost install
     </pre>
     </li>
 	
     <li>
-        After compiling <strong>C:\boost-build-dir</strong> ja <strong>C:\work\boost_1_77_0</strong> can be removed.
+        After compiling <strong>C:\boost-build-dir</strong> ja <strong>C:\work\boost_1_80_0</strong> can be removed.
     </li>
     
 	</ol>
@@ -94,7 +94,7 @@
     </h3>
 
     <p>
-        From the <a href="http://mingw-w64.org/doku.php/download">Download</a> page select MingW-W64-builds.
+        From the <a href="https://www.mingw-w64.org/downloads/">Download</a> page select MingW-W64-builds.
     </p>
 
     <h3>
@@ -102,7 +102,7 @@
     <h3>
     
     <p>
-        <strong>8.1.0</strong>
+        <strong>12.2.0</strong>
     </p>
     
     <h3>
@@ -111,15 +111,12 @@
     
     <ol>
     
-    <li>
-    <p>
-        Installation using these settings:<br/>
-        <img src="mingw.png"/>
-    </p>
-    </li>
+    <li>Follow instructions in the <a href="https://www.mingw-w64.org/downloads/#mingw-builds">https://www.mingw-w64.org/downloads/#mingw-builds</a> page.</li>
+	<li>Package to download is <strong>x86_64-12.2.0-release-win32-seh-rt_v10-rev1.7z</strong></li>
+	<li>Extract to <strong>C:\mingw64</strong>
 
     <li>
-        Add <strong>C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin</strong> directory to PATH.
+        Add <strong>C:\mingw64\bin</strong> to PATH.
     </li>
 
     </ol>
@@ -133,7 +130,7 @@
     </h3>
     
     <p>
-        <strong>1.77</strong>
+        <strong>1.80</strong>
     </p>
     
     <h3>
@@ -153,7 +150,7 @@
     </p>
     
     <p>
-         Extract sources to <strong>C:\work\boost_1_77_0</strong> directory.
+         Extract sources to <strong>C:\work\boost_1_80_0</strong> directory.
     </p>
     
     <h3>
@@ -162,17 +159,17 @@
 
     <ol>
     
-    <li>Open Windows Terminal (wt.exe) to <strong>C:\work\boost_1_77_0</strong> directory:
+    <li>Open Windows Terminal (wt.exe) to <strong>C:\work\boost_1_80_0</strong> directory:
     
     <li>
-        It's assumed that mingw-w64's gcc can be found from PATH: gcc --version
+        It's assumed that mingw-w64's gcc can be found from PATH: gcc --version command should print <strong>gcc (x86_64-win32-seh-rev1, Built by MinGW-W64 project) 12.2.0</strong>
     </li>
     
     <li>
         Bootstrap:
         
     <pre>
-        C:\work\boost_1_77_0> bootstrap gcc
+        C:\work\boost_1_80_0> bootstrap gcc
     </pre>
         
     </li>
@@ -180,12 +177,12 @@
     <li>
         Compilation:
     <pre>
-        C:\work\boost_1_77_0> b2 toolset=gcc address-model=64 --build-dir=C:\mingw-boost-build-dir --prefix=C:\mingw-boost install
+        C:\work\boost_1_80_0> b2 toolset=gcc address-model=64 --build-dir=C:\mingw-boost-build-dir --prefix=C:\mingw-boost install
     </pre>
     </li>
     
     <li>
-        After compiling <strong>C:\mingw-boost-build-dir</strong> ja <strong>C:\work\boost_1_77_0</strong> can be removed.
+        After compiling <strong>C:\mingw-boost-build-dir</strong> ja <strong>C:\work\boost_1_80_0</strong> can be removed.
     </li>
     
     </ol>
@@ -199,7 +196,7 @@
     </h3>
     
     <p>
-        <strong>11.0.0</strong>
+        <strong>12.0.0</strong>
     </p>
     
     <h3>
@@ -215,11 +212,12 @@
     </h3>
     
     <p>
-        From the <a href="https://releases.llvm.org/download.html#11.0.0">Download</a> page select Windows (64-bit) link.
+        <li>From the <a href="https://releases.llvm.org/">Download</a> page select the <strong>12.0.0/download</strong> link.</li>
+		<li>Select the <strong>LLVM-12.0.0-win64.exe</strong> link.
     </p>
     
     <p>
-        This is a direct link: <a href="https://github.com/llvm/llvm-project/releases/download/llvmorg-11.0.0/LLVM-11.0.0-win64.exe">LLVM-11.0.0-win64.exe</a>
+        This is a direct link: <a href="https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.0/LLVM-12.0.0-win64.exe">LLVM-12.0.0-win64.exe</a>
     </p>
     
     <h3>
@@ -239,7 +237,7 @@
     </h3>
     
     <p>
-        <strong>3.18.4</strong>
+        <strong>3.24.3</strong>
     </p>
     
     <h3>
@@ -255,11 +253,11 @@
     </h3>
     
     <p>
-        From the <a href="https://cmake.org/download/">Download</a> page select cmake-3.18.4-win64-x64.msi link.
+        From the <a href="https://cmake.org/download/">Download</a> page select cmake-3.24.3-windows-x86_64.msi link.
     </p>
     
     <p>
-        This is a direct link: <a href="https://github.com/Kitware/CMake/releases/download/v3.18.4/cmake-3.18.4-win64-x64.msi">cmake-3.18.4-win64-x64.msi</a>
+        This is a direct link: <a href="https://github.com/Kitware/CMake/releases/download/v3.24.3/cmake-3.24.3-windows-x86_64.msi">cmake-3.24.3-windows-x86_64.msi</a>
     </p>
     
     <h3>
@@ -286,7 +284,7 @@
 	</h3>
 	
 	<p>
-		3.9.0
+		3.11.0
 	</p>
 	
 	<h3>
@@ -294,7 +292,7 @@
 	</h3>
 	
 	<p>
-		C:\Program Files\Python39
+		C:\Program Files\Python311
 	</p>
 	
 	<h3>
@@ -302,7 +300,7 @@
 	</h3>
 	
 	<p>
-		From the <a href="https://www.python.org/downloads/">Download</a> page select Download Python 3.9.0.
+		From the <a href="https://www.python.org/downloads/windows">Python Releases for Windows</a> page select Download Windows installer (64-bit).
 	</p>
 	
 	<h3>
@@ -324,7 +322,7 @@
     </h3>
     
     <p>
-        <strong>11.0.0</strong>
+        <strong>12.0.0</strong>
     </p>
     
     <h3>
@@ -332,23 +330,24 @@
     </h3>
     
     <p>
-        <strong>C:\llvm-11.0.0.src</strong>
+        <strong>C:\llvm-12.0.0.src</strong>
     </p>
     
     <h3>
         Download
     </h3>
     
+    <ul>
+		<li>From the <a href="https://releases.llvm.org/">Download</a> page select the <strong>12.0.0/download</strong> link.</li>
+        <li>LLVM 12.0.0 page select <strong>llvm-12.0.0.src.tar.xz</strong> link.</li>
+    </ul>
+    
     <p>
-        From the <a href="https://releases.llvm.org/download.html#11.0.0">Download</a> page select LLVM source code.
+        This is a direct link: <a href="https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.0/llvm-12.0.0.src.tar.xz">llvm-12.0.0.src.tar.xz</a>
     </p>
     
     <p>
-        This is a direct link: <a href="https://github.com/llvm/llvm-project/releases/download/llvmorg-11.0.0/llvm-11.0.0.src.tar.xz">llvm-11.0.0.src.tar.xz</a>
-    </p>
-    
-    <p>
-        Extract package to <strong>C:\llvm-11.0.0.src</strong> folder.
+        Extract package to <strong>C:\llvm-12.0.0.src.tar.xz</strong> folder.
     </p>
     
     <h3>
@@ -357,18 +356,18 @@
     
     <ol>
         <li>
-            Open x64 Native Tools Command Prompt for VS 2019.
+            Open x64 Native Tools Command Prompt for VS 2022.
         </li>
         
         <li>
-            Change to C:\llvm-11.0.0.src directory.
+            Change to C:\llvm-12.0.0.src directory.
         </li>
         
         <li>
             Make directory <strong>build</strong>:
             
         <pre>
-            C:\llvm-11.0.0.src>mkdir build
+            C:\llvm-12.0.0.src>mkdir build
         </pre>
         </li>
         
@@ -376,7 +375,7 @@
             Change to <strong>build</strong> directory:
             
         <pre>
-            C:\llvm-11.0.0.src>cd build
+            C:\llvm-12.0.0.src>cd build
         </pre>
         </li>
         
@@ -384,12 +383,12 @@
             Run CMake:
             
         <pre>
-            C:\llvm-11.0.0.src\build> cmake -G "Visual Studio 16 2019" -Thost=x64 -DLLVM_TARGETS_TO_BUILD="X86" -DLLVM_ENABLE_EH=On -DLLVM_ENABLE_RTTI=On ..
+            C:\llvm-12.0.0.src\build> cmake -G "Visual Studio 17 2022" -Thost=x64 -DLLVM_TARGETS_TO_BUILD="X86" -DLLVM_ENABLE_EH=On -DLLVM_ENABLE_RTTI=On ..
         </pre>
         </li>
         
         <li>
-            Open <strong>C:\llvm-11.0.0.src\build\LLVM.sln</strong> solution in Visual Studio 2019.
+            Open <strong>C:\llvm-12.0.0.src\build\LLVM.sln</strong> solution in Visual Studio 2022.
         </li>
         
         <li>
@@ -406,7 +405,7 @@
 	</h2>
 	
 	<h3>
-		Versio
+		Version
 	</h3>
 	
 	<p><strong>2.28.0</strong></p>
@@ -466,12 +465,12 @@
 	</p>
 
 	<ol>
-		<li><strong>BOOST_INCLUDE_DIR</strong>. The default value is <strong>C:\boost\include\boost-1_77</strong>.</li>
+		<li><strong>BOOST_INCLUDE_DIR</strong>. The default value is <strong>C:\boost\include\boost-1_80</strong>.</li>
 		<li><strong>BOOST_LIB_DIR</strong>. The default value is <strong>C:\boost\lib</strong>.</li>
-		<li><strong>LLVM_SRC_INCLUDE_DIR</strong>. The default value is <strong>C:\llvm-11.0.0.src\include</strong>.</li>
-		<li><strong>LLVM_BUILD_INCLUDE_DIR</strong>. The default value is <strong>C:\llvm-11.0.0.src\build\include</strong>.</li>
-		<li><strong>LLVM_RELEASE_LIB_DIR</strong>. The default value is <strong>C:\llvm-11.0.0.src\build\Release\lib</strong>.</li>
-		<li><strong>LLVM_DEBUG_LIB_DIR</strong>. The default value is <strong>C:\llvm-11.0.0.src\build\Debug\lib</strong>.</li>
+		<li><strong>LLVM_SRC_INCLUDE_DIR</strong>. The default value is <strong>C:\llvm-12.0.0.src\include</strong>.</li>
+		<li><strong>LLVM_BUILD_INCLUDE_DIR</strong>. The default value is <strong>C:\llvm-12.0.0.src\build\include</strong>.</li>
+		<li><strong>LLVM_RELEASE_LIB_DIR</strong>. The default value is <strong>C:\llvm-12.0.0.src\build\Release\lib</strong>.</li>
+		<li><strong>LLVM_DEBUG_LIB_DIR</strong>. The default value is <strong>C:\llvm-12.0.0.src\build\Debug\lib</strong>.</li>
 	</ol>
 
 	<h4>
@@ -483,14 +482,14 @@
 	</p>
 	
 	<ol>
-		<li><strong>BOOST_INCLUDE_DIR</strong>.	The default value is <strong>C:/mingw-boost/include/boost-1_77</strong>.</li>
+		<li><strong>BOOST_INCLUDE_DIR</strong>.	The default value is <strong>C:/mingw-boost/include/boost-1_80</strong>.</li>
 		<li><strong>BOOST_LIB_DIR</strong>.	The default value is <strong>C:/mingw-boost/lib</strong>.</li>
-		<li><strong>BOOST_DEBUG_FILESYSTEM_LIB</strong>. The default value is <strong>boost_filesystem-mgw8-mt-d-x64-1_77</strong>.</li>
-		<li><strong>BOOST_DEBUG_IOSTREAMS_LIB</strong>. The default value is <strong>boost_iostreams-mgw8-mt-d-x64-1_77</strong>.</li>
-		<li><strong>BOOST_DEBUG_SYSTEM_LIB</strong>. The default value is <strong>boost_system-mgw8-mt-d-x64-1_77</strong>.</li>
-		<li><strong>BOOST_RELEASE_FILESYSTEM_LIB</strong>. The default value is <strong>boost_filesystem-mgw8-mt-x64-1_77</strong>.</li>
-		<li><strong>BOOST_RELEASE_IOSTREAMS_LIB</strong>. The default value is <strong>boost_iostreams-mgw8-mt-x64-1_77</strong>.</li>
-		<li><strong>BOOST_RELEASE_SYSTEM_LIB</strong>. The default value is <strong>boost_system-mgw8-mt-x64-1_77</strong>.</li>
+		<li><strong>BOOST_DEBUG_FILESYSTEM_LIB</strong>. The default value is <strong>boost_filesystem-mgw12-mt-d-x64-1_80</strong>.</li>
+		<li><strong>BOOST_DEBUG_IOSTREAMS_LIB</strong>. The default value is <strong>boost_iostreams-mgw12-mt-d-x64-1_80</strong>.</li>
+		<li><strong>BOOST_DEBUG_SYSTEM_LIB</strong>. The default value is <strong>boost_system-mgw12-mt-d-x64-1_80</strong>.</li>
+		<li><strong>BOOST_RELEASE_FILESYSTEM_LIB</strong>. The default value is <strong>boost_filesystem-mgw12-mt-x64-1_80</strong>.</li>
+		<li><strong>BOOST_RELEASE_IOSTREAMS_LIB</strong>. The default value is <strong>boost_iostreams-mgw12-mt-x64-1_80</strong>.</li>
+		<li><strong>BOOST_RELEASE_SYSTEM_LIB</strong>. The default value is <strong>boost_system-mgw12-mt-x64-1_80</strong>.</li>
 	</ol>
 
 	<h4>
@@ -507,10 +506,10 @@
 	</p>
 	
 	<ol>
-		<li><strong>line 302</strong>. The default libraries are <strong>boost_filesystem-mgw8-mt-d-x64-1_77</strong>,
-		<strong>boost_iostreams-mgw8-mt-d-x64-1_77</strong> and <strong>boost_system-mgw8-mt-d-x64-1_77</strong>.</li>
-		<li><strong>line 323</strong>. The default libraries are <strong>boost_filesystem-mgw8-mt-x64-1_77</strong>,
-		<strong>boost_iostreams-mgw8-mt-x64-1_77</strong> and <strong>boost_system-mgw8-mt-x64-1_77</strong>.
+		<li><strong>line 302</strong>. The default libraries are <strong>boost_filesystem-mgw12-mt-d-x64-1_80</strong>,
+		<strong>boost_iostreams-mgw12-mt-d-x64-1_80</strong> and <strong>boost_system-mgw12-mt-d-x64-1_80</strong>.</li>
+		<li><strong>line 323</strong>. The default libraries are <strong>boost_filesystem-mgw12-mt-x64-1_80</strong>,
+		<strong>boost_iostreams-mgw12-mt-x64-1_80</strong> and <strong>boost_system-mgw12-mt-x64-1_80</strong>.
 	</ol>
 
     <h3>
@@ -530,7 +529,7 @@
         <li>Add environment variable CMAJOR_ROOT with value <strong>C:\work\cmajorm\cmajor</strong>.</li>
 		<li>Create directory <strong>C:\work\cmajorm\cmajor\bin</strong>.</li>
 		<li>Add <strong>C:\work\cmajorm\cmajor\bin</strong> directory to PATH.
-		<li>Open x64 Native Tools Command Prompt for VS 2019</li>
+		<li>Open x64 Native Tools Command Prompt for VS 2022</li>
 		<li>Change to <strong>C:\work\cmajorm\cmajor\bat</strong> directory</li>
 		<li>Run <strong>nmake</strong>
 	</ol>

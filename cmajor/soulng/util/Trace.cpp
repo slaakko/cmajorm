@@ -16,7 +16,9 @@
 #include <vector>
 #include <stdexcept>
 #include <mutex>
+#include <fstream>
 #include <map>
+#include <memory>
 
 namespace soulng { namespace util {
 
@@ -70,7 +72,9 @@ public:
     void Read();
     void Write();
 private:
+#ifndef __MINGW32__
     std::mutex mtx;
+#endif
     static std::unique_ptr<TraceTable> instance;
     std::vector<std::string> traceFunctions;
     std::map<std::string, int32_t> traceFunctionMap;
@@ -102,7 +106,9 @@ TraceTable::TraceTable() : unknownMessage("<UNKNOWN_WINDOWS_MESSSAGE>")
 
 int32_t TraceTable::GetTraceFunctionId(const std::string& functionFullName)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(mtx);
+#endif 
     auto it = traceFunctionMap.find(functionFullName);
     if (it != traceFunctionMap.cend())
     {
@@ -225,7 +231,9 @@ public:
 private:
     static std::unique_ptr<Trace> instance;
     std::vector<TraceEntry> entries;
+#ifndef __MINGW32__
     std::mutex mtx;
+#endif
 };
 
 std::unique_ptr<Trace> Trace::instance;
@@ -242,7 +250,9 @@ void Trace::Done()
 
 void Trace::AddEntry(const TraceEntry& entry)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(mtx);
+#endif
     entries.push_back(entry);
 }
 

@@ -21,6 +21,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <algorithm>
 #include <cmath>
 

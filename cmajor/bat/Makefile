@@ -1,5 +1,5 @@
 #	Makefile for Cmajor compiler & tools, system library, tool programs and examples.
-#	Run with nmake from Visual Studio 2019 x64 Native Tools Command Prompt
+#	Run with nmake from Visual Studio 2022 x64 Native Tools Command Prompt
 
 all: makedirs pdcurses zlibasm compiler cppbert systemx vstask unicode sys cmlean tools examples xmlSerializationTests olddevenv
 	inst.bat
@@ -26,8 +26,6 @@ cppbert:
 systemx:
 	sxcmc -u -v ../system-x/system/System.cms
 	sxcmc -u -v -c=release ../system-x/system/System.cms
-	cd ..\system-x\projects && build.bat
-	cd ..\system-x\projects && install.bat
 
 vstask:	
 	MSBuild -m -verbosity:minimal ..\task\task.sln -p:Configuration="Debug" -p:Platform="Any CPU"

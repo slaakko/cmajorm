@@ -9,6 +9,7 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
+#include <string>
 
 namespace cmajor { namespace wing {
 

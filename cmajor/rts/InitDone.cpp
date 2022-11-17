@@ -21,6 +21,8 @@
 #if defined(_WIN32) 
 #include <cmajor/rts/CommandLine.hpp>
 #include <Windows.h>
+#undef min
+#undef max
 #endif
 #include <cmajor/rts/Socket.hpp>
 #include <cmajor/rts/Environment.hpp>
@@ -52,11 +54,15 @@ extern "C" RT_API void RtExit(int32_t exitCode)
     exit(exitCode);
 }
 
+#ifndef __MINGW32__
 std::recursive_mutex initMutex;
+#endif
 
 void RtInitCompileUnits()
 {
+#ifndef __MINGW32__
     std::lock_guard<std::recursive_mutex> initLock(initMutex);
+#endif
     if (initCompileUnitsFunction)
     {
         GlobalInitFunctionType init = initCompileUnitsFunction;
@@ -67,13 +73,17 @@ void RtInitCompileUnits()
 
 extern "C" RT_API void RtBeginUnwindInfoInit()
 {
+#ifndef __MINGW32__
     initMutex.lock();
+#endif
     RtInitCompileUnits();
 }
 
 extern "C" RT_API void RtEndUnwindInfoInit()
 {
+#ifndef __MINGW32__
     initMutex.unlock();
+#endif
 }
 
 namespace cmajor { namespace rt {
@@ -88,10 +98,14 @@ void Init(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassI
     InitError();
     InitString();
     InitMemory();
+#ifndef __MINGW32__
     InitThread();
+#endif
     InitSocket();
     InitEnvironment();
+#ifndef __MINGW32__
     InitStatics();
+#endif
     InitClasses(numberOfPolymorphicClassIds, polymorphicClassIdArray, numberOfStaticClassIds, staticClassIdArray);
 #if defined(_WIN32) 
     InitCommandLine();
@@ -109,10 +123,14 @@ void Done()
     DoneCommandLine();
 #endif
     DoneClasses();
+#ifndef __MINGW32__
     DoneStatics();
+#endif
     DoneEnvironment();
     DoneSocket();
+#ifndef __MINGW32__
     DoneThread();
+#endif
     DoneMemory();
     DoneString();
     DoneError();

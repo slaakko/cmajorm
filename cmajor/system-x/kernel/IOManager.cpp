@@ -14,6 +14,8 @@
 #include <memory>
 #include <list>
 #include <boost/filesystem.hpp>
+#undef min
+#undef max
 #include <boost/pool/pool_alloc.hpp>
 #include <thread>
 #include <condition_variable>

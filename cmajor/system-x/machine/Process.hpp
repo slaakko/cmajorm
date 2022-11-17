@@ -9,6 +9,8 @@
 #include <string>
 #include <stdint.h>
 #include <list>
+#undef min
+#undef max
 #include <boost/pool/pool_alloc.hpp>
 
 namespace cmsx::machine {

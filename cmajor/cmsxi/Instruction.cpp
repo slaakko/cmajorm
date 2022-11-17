@@ -412,7 +412,7 @@ void StoreInstruction::Write(CodeFormatter& formatter, Function& function, Conte
     formatter.Write(" ");
     formatter.Write(value->Name(context));
     formatter.Write(", ");
-    formatter.Write(ptr->GetType(context)->Name());
+    formatter.Write(ptr->GetType( context)->Name());
     formatter.Write(" ");
     formatter.Write(ptr->Name(context));
     WriteMetadataRef(formatter);

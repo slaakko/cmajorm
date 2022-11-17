@@ -8,6 +8,9 @@
 #include <wing/Label.hpp>
 #include <wing/Metrics.hpp>
 
+#undef min
+#undef max
+
 namespace cmsx::db {
 
 using namespace cmajor::wing;

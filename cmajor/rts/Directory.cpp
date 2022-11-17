@@ -37,7 +37,9 @@ private:
     DirectoryIterationTable();
     int32_t nextIterationHandle;
     std::unordered_map<int32_t, Iteration> iterationMap;
+#ifndef __MINGW32__
     std::mutex mtx;
+#endif
 };
 
 std::unique_ptr<DirectoryIterationTable> DirectoryIterationTable::instance;
@@ -58,7 +60,9 @@ DirectoryIterationTable::DirectoryIterationTable() : nextIterationHandle(0)
 
 int32_t DirectoryIterationTable::BeginIterate(const char* directoryPath)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(mtx);
+#endif
     int32_t handle = nextIterationHandle++;
     Iteration iteration;
     iteration.directoryName = GetFullPath(Path::MakeCanonical(directoryPath));
@@ -69,13 +73,17 @@ int32_t DirectoryIterationTable::BeginIterate(const char* directoryPath)
 
 void DirectoryIterationTable::EndIterate(int32_t handle)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(mtx);
+#endif
     iterationMap.erase(handle);
 }
 
 const char* DirectoryIterationTable::IterateFiles(int32_t handle)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(mtx);
+#endif
     auto it = iterationMap.find(handle);
     if (it != iterationMap.cend())
     {
@@ -102,7 +110,9 @@ const char* DirectoryIterationTable::IterateFiles(int32_t handle)
 
 const char* DirectoryIterationTable::IterateDirectories(int32_t handle)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(mtx);
+#endif
     auto it = iterationMap.find(handle);
     if (it != iterationMap.cend())
     {

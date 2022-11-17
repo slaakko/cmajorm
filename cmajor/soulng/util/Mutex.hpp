@@ -10,6 +10,8 @@
 
 namespace soulng {namespace util {
 
+#ifndef __MINGW32__
+
 class UTIL_API MutexOwner
 {
 public:
@@ -58,6 +60,8 @@ private:
     char id;
     std::mutex mtx;
 };
+
+#endif
 
 } } // namespace soulng::util
 

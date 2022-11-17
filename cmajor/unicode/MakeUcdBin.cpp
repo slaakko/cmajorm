@@ -7,6 +7,7 @@
 #include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <stdexcept>
 #include <stdlib.h>
 #include <stdint.h>

@@ -14,6 +14,7 @@
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <algorithm>
+#include <fstream>
 
 namespace cmajor { namespace cmdoclib {
 

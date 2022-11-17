@@ -11,6 +11,7 @@
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
+#include <fstream>
 #include <mutex>
 
 namespace cmajor { namespace cmdoclib {

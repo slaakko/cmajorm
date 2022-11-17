@@ -27,7 +27,9 @@ public:
     void DisposeError(int32_t errorId);
 private:
     static std::unique_ptr<ErrorTable> instance;
+#ifndef __MINGW32__
     std::mutex mtx;
+#endif
     std::unordered_map<int32_t, std::string> errorMap;
     int32_t nextErrorId;
     ErrorTable();
@@ -51,7 +53,9 @@ ErrorTable::ErrorTable() : nextErrorId(1)
 
 int32_t ErrorTable::InstallError(const std::string& errorMessage)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(mtx);
+#endif
     int32_t errorId = nextErrorId++;
     errorMap[errorId] = errorMessage;
     return errorId;
@@ -59,7 +63,9 @@ int32_t ErrorTable::InstallError(const std::string& errorMessage)
 
 const char* ErrorTable::GetError(int32_t errorId)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(mtx);
+#endif
     auto it = errorMap.find(errorId);
     if (it != errorMap.cend())
     {
@@ -73,7 +79,9 @@ const char* ErrorTable::GetError(int32_t errorId)
 
 void ErrorTable::DisposeError(int32_t errorId)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(mtx);
+#endif
     errorMap.erase(errorId);
 }
 

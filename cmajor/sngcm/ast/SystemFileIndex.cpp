@@ -25,11 +25,15 @@ SystemFileIndex::SystemFileIndex() : nextSystemFileIndex(firstSystemFileIndex), 
 {
 }
 
+#ifndef __MINGW32__
 std::mutex mtx;
+#endif
 
 uint32_t SystemFileIndex::RegisterSystemSourceFile(const std::string& systemSourceFilePath)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(mtx);
+#endif
     uint32_t fileIndex = nextSystemFileIndex++;
     std::string sfp = GetFullPath(systemSourceFilePath);
     if (sfp.find(cmajorRootDir, 0) == 0)
@@ -46,7 +50,9 @@ uint32_t SystemFileIndex::RegisterSystemSourceFile(const std::string& systemSour
 
 std::string SystemFileIndex::GetSystemSourceFilePath(uint32_t systemFileIndex) const
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(mtx);
+#endif
     auto it = systemFileMap.find(systemFileIndex);
     if (it != systemFileMap.cend())
     {
@@ -64,7 +70,9 @@ std::string SystemFileIndex::GetSystemSourceFilePath(uint32_t systemFileIndex) c
 
 void SystemFileIndex::Write(const std::string& systemFileIndexFilePath)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(mtx);
+#endif
     BinaryWriter writer(systemFileIndexFilePath);
     writer.Write(nextSystemFileIndex);
     uint32_t n = systemFileMap.size();
@@ -80,7 +88,9 @@ void SystemFileIndex::Write(const std::string& systemFileIndexFilePath)
 
 void SystemFileIndex::Read(const std::string& systemFileIndexFilePath)
 {
+#ifndef __MINGW32__
     std::lock_guard<std::mutex> lock(mtx);
+#endif
     nextSystemFileIndex = firstSystemFileIndex;
     systemFileMap.clear();
     BinaryReader reader(systemFileIndexFilePath);

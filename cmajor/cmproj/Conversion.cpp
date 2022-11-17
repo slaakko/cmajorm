@@ -13,6 +13,7 @@
 #include <soulng/util/Path.hpp>
 #include <soulng/util/CodeFormatter.hpp>
 #include <iostream>
+#include <fstream>
 
 namespace cmajor { namespace cmproj {
 

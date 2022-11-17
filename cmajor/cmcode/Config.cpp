@@ -9,6 +9,7 @@
 #include <boost/filesystem.hpp>
 #include <soulng/util/Path.hpp>
 #include <sstream>
+#include <fstream>
 
 namespace cmcode {
 

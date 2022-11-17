@@ -7,6 +7,8 @@
 
 namespace soulng { namespace util {
 
+#ifndef __MINGW32__
+
 MutexOwner::MutexOwner(char id_): id(id_)
 {
 }
@@ -61,5 +63,7 @@ void LockGuard::Unlock()
 Mutex::Mutex(char id_) : id(id_)
 {
 }
+
+#endif
 
 } } // namespace soulng::util
