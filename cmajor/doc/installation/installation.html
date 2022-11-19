@@ -51,7 +51,7 @@
 	</p>
 
     <p>
-        <a href="https://sourceforge.net/projects/cmajor/files/4.2.0/cmajor-4.2.0-win-x64-setup.exe">Download</a> the setup program and run it.
+        <a href="https://sourceforge.net/projects/cmajor/files/4.3.0/cmajor-4.3.0-win-x64-setup.exe">Download</a> the setup program and run it.
         You can specify installation directory that is by default <b>C:\cmajor</b>.
         Note: the compiler needs write access to installation directory and its subdirectories,
         so C:\Program Files\ is not a good place to install.
@@ -85,14 +85,15 @@
     <p>
         <ul>
             <li>
-                Option 1: Download and install <a href="https://github.com/llvm/llvm-project/releases/download/llvmorg-11.0.0/LLVM-11.0.0-win64.exe">LLVM 11.0.0 pre-built binaries for Windows (64-bit)</a>.<br/>
+				
+                Option 1: Download and install <a href="https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.0/LLVM-12.0.0-win64.exe">LLVM 12.0.0 pre-built binaries for Windows (64-bit)</a>.<br/>
                 Add LLVM tools to System PATH so that Cmajor compiler can find them:
             </li>
 
 			<img src="image/LLVM.png" />
 
             <li>
-                Option 2: Download <a href="https://releases.llvm.org/download.html#11.0.0">LLVM source code</a> and build from sources using CMake and Visual Studio.
+                Option 2: Download <a href="https://releases.llvm.org/download.html#12.0.0">LLVM source code</a> and build from sources using CMake and Visual Studio.
             </li>
         </ul>
     </p>
@@ -104,22 +105,17 @@
     <p>
         <ul>
             <li>
-                Download <a href="http://mingw-w64.org/doku.php">mingw-w64<a/>, more precisely the 
-                <a href="http://mingw-w64.org/doku.php/download">MinGW-W64-builds</a> toolchain.
+                Goto <a href="https://www.mingw-w64.org/downloads/#mingw-builds">mingw-builds<a/> page and 
+				select the <a href="https://github.com/niXman/mingw-builds-binaries/releases">GitHub</a> link.
+				From that <a href="https://github.com/niXman/mingw-builds-binaries/releases">page</a> download the 
+				<strong>x86_64-12.2.0-release-win32-seh-rt_v10-rev1.7z</strong> package.
             </li>
             <li>
-                Install it with the following options:
-                <br/>
-                <img src="image/mingw.png"/>
-                <br/>
+                Extract it for example to the <strong>C:\mingw64</strong> folder.
             </li>
             <li>
-                Insert the <strong>bin</strong> directory of the mingw-w64 
-                to the PATH environment variable, 
-                so that cppcmc and cmbs can find <strong>g++</strong> and cmdb can find <strong>gdb</strong> from there:
-                <br/>
-                <img src="image/mingw-path.png"/>
-                <br/>
+                Insert the <strong>C:\mingw64\bin</strong> directory
+                to the PATH environment variable, so that cppcmc and cmbs can find <strong>g++</strong> and cmdb can find <strong>gdb</strong> from there.
             </li>
         </ul>
     </p>
