@@ -2387,7 +2387,7 @@ void ExpressionBinder::Visit(PostfixDecrementNode& postfixDecrementNode)
             {
                 CloneContext cloneContext;
                 AssignmentStatementNode assignmentStatement(postfixDecrementNode.GetSpan(), postfixDecrementNode.ModuleId(), postfixDecrementNode.Subject()->Clone(cloneContext),
-                    new AddNode(postfixDecrementNode.GetSpan(), postfixDecrementNode.ModuleId(), postfixDecrementNode.Subject()->Clone(cloneContext), 
+                    new SubNode(postfixDecrementNode.GetSpan(), postfixDecrementNode.ModuleId(), postfixDecrementNode.Subject()->Clone(cloneContext), 
                         new ByteLiteralNode(postfixDecrementNode.GetSpan(), postfixDecrementNode.ModuleId(), 1u)));
                 statementBinder->CompileStatement(&assignmentStatement, true);
             }
@@ -2395,7 +2395,7 @@ void ExpressionBinder::Visit(PostfixDecrementNode& postfixDecrementNode)
             {
                 CloneContext cloneContext;
                 AssignmentStatementNode assignmentStatement(postfixDecrementNode.GetSpan(), postfixDecrementNode.ModuleId(), postfixDecrementNode.Subject()->Clone(cloneContext),
-                    new AddNode(postfixDecrementNode.GetSpan(), postfixDecrementNode.ModuleId(), postfixDecrementNode.Subject()->Clone(cloneContext), 
+                    new SubNode(postfixDecrementNode.GetSpan(), postfixDecrementNode.ModuleId(), postfixDecrementNode.Subject()->Clone(cloneContext),
                         new SByteLiteralNode(postfixDecrementNode.GetSpan(), postfixDecrementNode.ModuleId(), 1)));
                 statementBinder->CompileStatement(&assignmentStatement, true);
             }

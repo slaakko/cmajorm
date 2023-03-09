@@ -704,23 +704,29 @@ namespace System.Collections
             {
                 return End();
             }
+            RedBlackTreeNode<ValueType>* y = header.Get();
             RedBlackTreeNode<ValueType>* x = Root();
             while (x != null)
             {
-                if (Comp(key, KeyOf(x->Value())))
+                if (!Comp(KeyOf(x->Value()), key))
                 {
+                    y = x;
                     x = cast<RedBlackTreeNode<ValueType>*>(x->Left());
                 }
                 else if (Comp(KeyOf(x->Value()), key))
                 {
                     x = cast<RedBlackTreeNode<ValueType>*>(x->Right());
                 }
-                else
-                {
-                    return Iterator(x);
-                }
             }
-            return End();
+            Iterator j = Iterator(y);
+            if (j == End() || Comp(key, KeyOf(j.Node()->Value())))
+            {
+                return End();
+            }
+            else
+            {
+                return j;
+            }
         }
         public nothrow ConstIterator Find(const KeyType& key) const
         {
@@ -728,23 +734,29 @@ namespace System.Collections
             {
                 return CEnd();
             }
+            RedBlackTreeNode<ValueType>* y = header.Get();
             RedBlackTreeNode<ValueType>* x = Root();
             while (x != null)
             {
-                if (Comp(key, KeyOf(x->Value())))
+                if (!Comp(KeyOf(x->Value()), key))
                 {
+                    y = x;
                     x = cast<RedBlackTreeNode<ValueType>*>(x->Left());
                 }
                 else if (Comp(KeyOf(x->Value()), key))
                 {
                     x = cast<RedBlackTreeNode<ValueType>*>(x->Right());
                 }
-                else
-                {
-                    return ConstIterator(x);
-                }
             }
-            return CEnd();
+            ConstIterator j = ConstIterator(y);
+            if (j == CEnd() || Comp(key, KeyOf(j.Node()->Value())))
+            {
+                return CEnd();
+            }
+            else
+            {
+                return j;
+            }
         }
         public nothrow ConstIterator CFind(const KeyType& key) const
         {
@@ -752,23 +764,29 @@ namespace System.Collections
             {
                 return CEnd();
             }
+            RedBlackTreeNode<ValueType>* y = header.Get();
             RedBlackTreeNode<ValueType>* x = Root();
             while (x != null)
             {
-                if (Comp(key, KeyOf(x->Value())))
+                if (!Comp(KeyOf(x->Value()), key))
                 {
+                    y = x;
                     x = cast<RedBlackTreeNode<ValueType>*>(x->Left());
                 }
                 else if (Comp(KeyOf(x->Value()), key))
                 {
                     x = cast<RedBlackTreeNode<ValueType>*>(x->Right());
                 }
-                else
-                {
-                    return ConstIterator(x);
-                }
             }
-            return CEnd();
+            ConstIterator j = ConstIterator(y);
+            if (j == CEnd() || Comp(key, KeyOf(j.Node()->Value())))
+            {
+                return CEnd();
+            }
+            else
+            {
+                return j;
+            }
         }
         public nothrow Iterator LowerBound(const KeyType& key)
         {
