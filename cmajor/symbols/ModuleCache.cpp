@@ -169,7 +169,7 @@ void ModuleCache::PutModule(std::unique_ptr<Module>&& module)
             {
                 throw std::runtime_error("module cache: invalid module index");
             }
-            module->SetFlag(ModuleFlags::readFromModuleFile); 
+            module->SetFlag(ModuleFlags::readFromModuleFile); // reread
             modules[moduleIndex] = std::move(module);
         }
         else
