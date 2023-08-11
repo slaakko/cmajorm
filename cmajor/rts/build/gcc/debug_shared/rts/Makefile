@@ -34,10 +34,10 @@ $(BINARY_PREFIX)/$(LIBRARY_NAME): $(OBJECTS)
 		-lcmsngcmparserd -lcmsngcmlexerd \
 		-lcmsngparserd -lcmsngcmastd -lcmsngxmldomd -lcmsngxmlxmld \
 		-lcmsngxmlxpathd -lcmsnglexerd -lcmehd -lcmcommond -lcmsngutild -lpdcursesd \
-		-lbz2d -lzd -lwsock32 -lws2_32 \
 		-l$(BOOST_DEBUG_FILESYSTEM_LIB) \
 		-l$(BOOST_DEBUG_IOSTREAMS_LIB) \
 		-l$(BOOST_DEBUG_SYSTEM_LIB) \
+		-lbz2d -lzd -lwsock32 -lws2_32 \
 		-lgdiplus 
 
 clean:

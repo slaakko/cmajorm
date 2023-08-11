@@ -698,9 +698,9 @@ namespace System.Os
         }
     }
 	
-	public int Start(const char* prog)
+	public int Start(const char* prog, int port)
 	{
-		int result = start(prog);
+		int result = start(prog, port);
 		if (result == -1)
 		{
 			ThrowSystemError();
@@ -716,4 +716,14 @@ namespace System.Os
 			ThrowSystemError();
 		}
 	}
+
+    public int GetPort(int prog)
+    {
+        int result = get_port(prog);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
 }

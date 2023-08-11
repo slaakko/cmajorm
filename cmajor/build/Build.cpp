@@ -1595,8 +1595,8 @@ void CreateMainUnitLlvm(std::vector<std::string>& objectFilePaths, Module& modul
     mainCompileUnit.SetSynthesizedUnit();
     mainCompileUnit.SetProgramMainUnit();
     mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"System")));
-    mainCompileUnit.GlobalNs()->AddMember(MakePolymorphicClassArray(module.GetSymbolTable().PolymorphicClasses(), U"@polymorphicClassArray"));
-    mainCompileUnit.GlobalNs()->AddMember(MakeStaticClassArray(module.GetSymbolTable().ClassesHavingStaticConstructor(), U"@staticClassArray"));
+    mainCompileUnit.GlobalNs()->AddMember(cmajor::symbols::MakePolymorphicClassArray(module.GetSymbolTable().PolymorphicClasses(), U"@polymorphicClassArray"));
+    mainCompileUnit.GlobalNs()->AddMember(cmajor::symbols::MakeStaticClassArray(module.GetSymbolTable().ClassesHavingStaticConstructor(), U"@staticClassArray"));
     FunctionNode* mainFunction(new FunctionNode(Span(), boost::uuids::nil_uuid(), Specifiers::public_, new IntNode(Span(), boost::uuids::nil_uuid()), U"main", nullptr));
 #ifndef _WIN32
     mainFunction->AddParameter(new ParameterNode(Span(), boost::uuids::nil_uuid(), new IntNode(Span(), boost::uuids::nil_uuid()), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argc")));
