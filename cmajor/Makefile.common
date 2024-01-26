@@ -2,9 +2,9 @@ CXX=clang++
 CC=clang
 AR=llvm-ar
 ifeq ($(config),debug)
-CXXFLAGS += -pthread -fPIC -std=c++20 -I../.. -I.. -g -O0
+CXXFLAGS += -pthread -fPIC -std=c++17 -I../.. -I.. -g -O0
 CFLAGS += -pthread -fPIC -I../.. -g -O0
 else
-CXXFLAGS += -pthread -fPIC -std=c++20 -I../.. -I.. -DNDEBUG -O2
+CXXFLAGS += -pthread -fPIC -std=c++17 -I../.. -I.. -DNDEBUG -O2
 CFLAGS += -pthread -fPIC -I../.. -DNDEBUG -O2
 endif
