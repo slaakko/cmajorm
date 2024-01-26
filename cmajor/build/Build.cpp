@@ -908,10 +908,14 @@ std::string GetCppSolutionDirectoryPath(Project* project)
     return GetFullPath(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::GetDirectoryName(currentSolution->FilePath()), "cpp"), GetToolChain()), GetConfig()), configuration.outputDirectory));
 }
 
+#ifdef _WIN32
+
 void CreateCppProjectFileSystemX(Project* project, Module& module, const std::string& mainObjectFilePath)
 {
     cmsx::intermediate::GenerateProjectFile(project, &module, mainObjectFilePath, true);
 }
+
+#endif
 
 void CreateCppProjectFile(Project* project, Module& module, const std::string& mainSourceFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths)
 {
@@ -2847,6 +2851,8 @@ ProjectInfo ReadPojectInfo(Project* project, const std::string& projectInfoFileP
     return projectInfo;
 }
 
+#ifdef _WIN32
+
 void AddResourcesSystemX(Project* project, std::vector<std::string>& objectFilePaths)
 {
     for (const auto& resourceFilePath : project->ResourceFilePaths())
@@ -2855,6 +2861,8 @@ void AddResourcesSystemX(Project* project, std::vector<std::string>& objectFileP
         objectFilePaths.push_back(objectFilePath);
     }
 }
+
+#endif
 
 void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& stop, bool resetRootModule, std::set<std::string>& builtProjects)
 {
@@ -3073,10 +3081,12 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                         CreateMainUnitSystemX(objectFilePaths, *rootModule, emittingContext, &attributeBinder, mainObjectFilePath);
                     }
                 }
+#ifdef _WIN32
                 if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
                 {
                     AddResourcesSystemX(project, objectFilePaths);
                 }
+#endif
                 if (!objectFilePaths.empty())
                 {
                     GenerateLibrary(rootModule.get(), objectFilePaths, project->LibraryFilePath());
@@ -3088,6 +3098,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                 {
                     CreateCppProjectFile(project, *rootModule, mainSourceFilePath, project->LibraryFilePath(), rootModule->LibraryFilePaths());
                 }
+#ifdef _WIN32
                 else if (GetBackEnd() == BackEnd::cmsx)
                 {
                     if (GetGlobalFlag(GlobalFlags::cpp))
@@ -3095,6 +3106,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                         CreateCppProjectFileSystemX(project, *rootModule, mainObjectFilePath);
                     }
                 }
+#endif
                 if (project->GetTarget() == Target::program || project->GetTarget() == Target::winguiapp || project->GetTarget() == Target::winapp)
                 {
                     Link(project->GetTarget(), project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(),
