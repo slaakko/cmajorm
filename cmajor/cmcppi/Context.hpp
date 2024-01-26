@@ -10,6 +10,7 @@
 #include <cmajor/cmdebug/DebugInfo.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <stack>
+#include <stdint.h>
 
 namespace cmcppi {
 

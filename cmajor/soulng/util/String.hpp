@@ -7,6 +7,7 @@
 #define SOULNG_UTIL_STRING_INCLUDED
 #include <soulng/util/Defines.hpp>
 #include <soulng/util/Error.hpp>
+#include <stdint.h>
 
 namespace soulng { namespace util {
 

@@ -8,6 +8,7 @@
 #include <soulng/util/UtilApi.hpp>
 #include <string>
 #include <fstream>
+#include <stdint.h>
 
 namespace soulng { namespace util {
 

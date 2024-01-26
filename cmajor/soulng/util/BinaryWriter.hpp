@@ -8,6 +8,7 @@
 #include <soulng/util/FilePtr.hpp>
 #include <string>
 #include <boost/uuid/uuid.hpp>
+#include <stdint.h>
 
 namespace soulng { namespace util {
 

@@ -8,6 +8,7 @@
 #include <soulng/util/UtilApi.hpp>
 #include <soulng/util/MappedInputFile.hpp>
 #include <boost/uuid/uuid.hpp>
+#include <stdint.h>
 
 namespace soulng { namespace util {
 
