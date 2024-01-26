@@ -60,9 +60,9 @@ install:
 	mkdir -p $(prefix)/bin
 	cp bin/* $(prefix)/bin
 	mkdir -p $(prefix)/lib
-	cp lib/$(cmrtsoname).so.4.2.0 $(prefix)/lib
-	ln -f $(prefix)/lib/$(cmrtsoname).so.4.2.0 $(prefix)/lib/$(cmrtsoname).so.4
-	ln -f $(prefix)/lib/$(cmrtsoname).so.4.2.0 $(prefix)/lib/$(cmrtsoname).so
+	cp lib/$(cmrtsoname).so.4.2.1 $(prefix)/lib
+	ln -f $(prefix)/lib/$(cmrtsoname).so.4.2.1 $(prefix)/lib/$(cmrtsoname).so.4
+	ln -f $(prefix)/lib/$(cmrtsoname).so.4.2.1 $(prefix)/lib/$(cmrtsoname).so
 
 sys:
 	cmc --verbose system/platform/linux/System.cms
