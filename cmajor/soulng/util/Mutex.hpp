@@ -7,6 +7,7 @@
 #define SOULNG_UTIL_MUTEX_INCLUDED
 #include <soulng/util/UtilApi.hpp>
 #include <mutex>
+#include <string>
 
 namespace soulng {namespace util {
 
