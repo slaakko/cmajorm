@@ -5,6 +5,11 @@ include Makefile.common
 all: build
 
 build:
+	mkdir -p bin
+	mkdir -p lib
+	mkdir -p lib/gcc
+	mkdir -p rts/build/gcc/bin
+	mkdir -p rts/build/gcc/lib
 	$(MAKE) -C soulng
 	$(MAKE) -C sngxml
 	$(MAKE) -C sngcm
