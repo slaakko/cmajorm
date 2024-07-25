@@ -3182,13 +3182,19 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                 }
                 if (rootModule->Name() == U"System.Install")
                 {
-                    InstallSystemLibraries(rootModule.get());
-                    systemLibraryInstalled = true;
+                    if (!cmajor::symbols::GetGlobalFlag(cmajor::symbols::GlobalFlags::cmdoc))
+                    {
+                        InstallSystemLibraries(rootModule.get());
+                        systemLibraryInstalled = true;
+                    }
                 }
                 else if (rootModule->Name() == U"System.Windows.Install")
                 {
-                    InstallSystemWindowsLibraries(rootModule.get());
-                    systemLibraryInstalled = true;
+                    if (!cmajor::symbols::GetGlobalFlag(cmajor::symbols::GlobalFlags::cmdoc))
+                    {
+                        InstallSystemWindowsLibraries(rootModule.get());
+                        systemLibraryInstalled = true;
+                    }
                 }
             }
         }
